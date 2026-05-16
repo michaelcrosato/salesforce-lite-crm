@@ -75,6 +75,17 @@ Playwright covers one smoke test:
 - The top search routes to contacts only.
 - SQLite is used for local proof-of-concept data, not production operations.
 
+## Switching to Postgres
+
+SQLite remains the default local workflow. To prepare a Postgres database, set:
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+npm run prisma:postgres
+```
+
+The `prisma:postgres` script temporarily copies `prisma/schema.postgres.prisma` over `prisma/schema.prisma`, runs `prisma generate` and `prisma db push`, then restores the SQLite schema file. At actual switch time, `lib/prisma.ts` also needs to swap from the SQLite adapter to a Postgres-compatible Prisma Client configuration.
+
 ## Next Recommended Build Step
 
 Add deal creation/editing and a deal detail page, then reuse the existing activity timeline and deterministic summarizer for deal-specific notes.

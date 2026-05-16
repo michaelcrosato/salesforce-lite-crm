@@ -1,27 +1,14 @@
-import Link from "next/link";
-import { Eye } from "lucide-react";
-import { AccountStatusBadge, HealthBadge } from "@/components/account-badges";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { AccountsTable } from "@/components/accounts-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
 import {
   ACCOUNT_STATUSES,
   ACCOUNT_STATUS_LABELS,
   type AccountStatus
 } from "@/lib/crm-constants";
-import { formatCurrency } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
 
@@ -115,59 +102,28 @@ export default async function AccountsPage({
         </CardHeader>
         <CardContent>
           {accounts.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Industry</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Health</TableHead>
-                  <TableHead>Owner</TableHead>
-                  <TableHead>Contacts</TableHead>
-                  <TableHead>Open Pipeline</TableHead>
-                  <TableHead className="w-16">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {accounts.map((account) => {
-                  const openPipeline = account.deals
-                    .filter((deal) => isOpenDealStage(deal.stage))
-                    .reduce((total, deal) => total + deal.value, 0);
-
-                  return (
-                    <TableRow key={account.id}>
-                      <TableCell className="font-medium">{account.name}</TableCell>
-                      <TableCell>{account.industry ?? "No industry"}</TableCell>
-                      <TableCell>
-                        {[account.city, account.region].filter(Boolean).join(", ") ||
-                          "No location"}
-                      </TableCell>
-                      <TableCell>
-                        <AccountStatusBadge status={account.status} />
-                      </TableCell>
-                      <TableCell>
-                        <HealthBadge value={account.healthScore} />
-                      </TableCell>
-                      <TableCell>{account.owner?.name ?? "Unassigned"}</TableCell>
-                      <TableCell>{account.contacts.length}</TableCell>
-                      <TableCell>{formatCurrency(openPipeline)}</TableCell>
-                      <TableCell>
-                        <Button asChild variant="ghost" size="icon">
-                          <Link href={`/accounts/${account.id}`} aria-label="Open account">
-                            <Eye className="h-4 w-4" aria-hidden="true" />
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <AccountsTable
+              accounts={accounts.map((account) => ({
+                id: account.id,
+                name: account.name,
+                industry: account.industry,
+                city: account.city,
+                region: account.region,
+                status: account.status,
+                healthScore: account.healthScore,
+                ownerName: account.owner?.name ?? null,
+                contactsCount: account.contacts.length,
+                openPipeline: account.deals
+                  .filter((deal) => isOpenDealStage(deal.stage))
+                  .reduce((total, deal) => total + deal.value, 0)
+              }))}
+            />
           ) : (
             <EmptyState
               title="No accounts found"
               description="Adjust search or filter values to find accounts."
+              actionHref="/accounts/new"
+              actionLabel="Create account"
             />
           )}
         </CardContent>

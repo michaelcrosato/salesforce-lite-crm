@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { useToast } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
 import { CONTACT_STATUSES, CONTACT_STATUS_LABELS } from "@/lib/crm-constants";
 
@@ -39,6 +40,7 @@ export function ContactForm({
   submitLabel: string;
 }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<ActionResult | null>(null);
@@ -53,6 +55,11 @@ export function ContactForm({
           ? await updateContactAction(initialValues.id, formData)
           : await createContactAction(formData);
         setResult(actionResult);
+        showToast({
+          title: actionResult.ok ? "Contact saved" : "Contact not saved",
+          description: actionResult.message,
+          variant: actionResult.ok ? "success" : "error"
+        });
 
         if (actionResult.ok) {
           if (!initialValues?.id) {
@@ -148,16 +155,7 @@ export function ContactForm({
             </Select>
             <FieldError errors={errors?.status} />
           </div>
-          <div className="flex items-end justify-between gap-3 md:col-span-2">
-            <p
-              className={
-                result?.ok
-                  ? "text-sm text-emerald-700"
-                  : "text-sm text-destructive"
-              }
-            >
-              {result?.message}
-            </p>
+          <div className="flex items-end justify-end gap-3 md:col-span-2">
             <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : submitLabel}
             </Button>

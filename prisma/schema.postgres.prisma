@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String     @id @default(cuid()) @db.Text
+  name       String     @db.VarChar(255)
+  email      String     @unique @db.VarChar(255)
+  role       String     @default("sales") @db.VarChar(50)
+  createdAt  DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt  DateTime   @updatedAt @db.Timestamp(3)
+  accounts   Account[]
+  deals      Deal[]
+  activities Activity[]
+}
+
+model Account {
+  id          String     @id @default(cuid()) @db.Text
+  name        String     @db.VarChar(255)
+  domain      String?    @db.VarChar(255)
+  industry    String?    @db.VarChar(120)
+  city        String?    @db.VarChar(120)
+  region      String?    @db.VarChar(120)
+  status      String     @db.VarChar(50)
+  ownerId     String?    @db.Text
+  owner       User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  healthScore Int        @default(80) @db.Integer
+  createdAt   DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime   @updatedAt @db.Timestamp(3)
+  contacts    Contact[]
+  deals       Deal[]
+  activities  Activity[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model Contact {
+  id         String     @id @default(cuid()) @db.Text
+  accountId  String?    @db.Text
+  account    Account?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  firstName  String     @db.VarChar(120)
+  lastName   String     @db.VarChar(120)
+  email      String?    @unique @db.VarChar(255)
+  phone      String?    @db.VarChar(80)
+  title      String?    @db.VarChar(255)
+  status     String     @db.VarChar(50)
+  createdAt  DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt  DateTime   @updatedAt @db.Timestamp(3)
+  deals      Deal[]
+  activities Activity[]
+
+  @@index([accountId])
+  @@index([status])
+}
+
+model Deal {
+  id                String     @id @default(cuid()) @db.Text
+  accountId         String?    @db.Text
+  account           Account?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId         String?    @db.Text
+  contact           Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  ownerId           String?    @db.Text
+  owner             User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  name              String     @db.VarChar(255)
+  stage             String     @db.VarChar(50)
+  value             Int        @db.Integer
+  probability       Int        @db.Integer
+  expectedCloseDate DateTime?  @db.Timestamp(3)
+  lastActivityAt    DateTime?  @db.Timestamp(3)
+  createdAt         DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime   @updatedAt @db.Timestamp(3)
+  activities        Activity[]
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([ownerId])
+  @@index([stage])
+  @@index([lastActivityAt])
+}
+
+model Activity {
+  id        String   @id @default(cuid()) @db.Text
+  accountId String?  @db.Text
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId String?  @db.Text
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  dealId    String?  @db.Text
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  userId    String?  @db.Text
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      String   @db.VarChar(50)
+  title     String   @db.VarChar(255)
+  rawText   String?  @db.Text
+  summary   String?  @db.Text
+  nextStep  String?  @db.Text
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}

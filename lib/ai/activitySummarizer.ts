@@ -59,7 +59,7 @@ const nextStepRules: Array<{
   },
   {
     tag: "friday",
-    pattern: /\bfriday\b/i,
+    pattern: /\b(by|next|this)\s+friday\b/i,
     nextStep: "Follow up by Friday."
   },
   {

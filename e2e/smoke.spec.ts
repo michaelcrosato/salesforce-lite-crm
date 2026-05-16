@@ -11,10 +11,11 @@ test("daily CRM loop smoke test", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Maya Singh" })).toBeVisible();
 
   const noteText =
-    "Follow up next week with pricing and decision maker details for smoke test.";
+    "Smoke summary first sentence. Smoke summary second sentence. Hidden raw third sentence asks to follow up next week with pricing.";
+  const expectedSummary = "Smoke summary first sentence. Smoke summary second sentence.";
   await page.getByLabel("Raw note").fill(noteText);
   await page.getByRole("button", { name: "Save note" }).click();
-  await expect(page.getByText(noteText)).toBeVisible();
+  await expect(page.getByText(expectedSummary)).toBeVisible();
 
   await page.getByRole("link", { name: "Deals" }).first().click();
   await expect(page.getByRole("heading", { name: "Deals" })).toBeVisible();

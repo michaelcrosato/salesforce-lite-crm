@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { moveDealAction } from "@/app/deals/actions";
 import { deterministicActivitySummarizer } from "@/lib/ai/activitySummarizer";
 import {
   calculateWeightedForecast,
@@ -6,6 +7,7 @@ import {
   probabilityForStage
 } from "@/lib/business/deals";
 import { rankTodaysFocus } from "@/lib/business/dashboard";
+import { prisma } from "@/lib/prisma";
 
 describe("deal business logic", () => {
   it("calculates weighted forecast for open deals only", () => {
@@ -52,6 +54,61 @@ describe("deal business logic", () => {
     expect(probabilityForStage("won")).toBe(100);
     expect(probabilityForStage("lost")).toBe(0);
   });
+
+  it("does not write an activity when moving a deal to its current stage", async () => {
+    const dealId = "test-same-stage-deal";
+    await prisma.activity.deleteMany({
+      where: {
+        dealId
+      }
+    });
+    await prisma.deal.deleteMany({
+      where: {
+        id: dealId
+      }
+    });
+    await prisma.deal.create({
+      data: {
+        id: dealId,
+        name: "Same stage test deal",
+        stage: "qualified",
+        value: 10000,
+        probability: 25
+      }
+    });
+
+    const before = await prisma.activity.count({
+      where: {
+        dealId
+      }
+    });
+    const result = await moveDealAction({
+      dealId,
+      stage: "qualified"
+    });
+    const after = await prisma.activity.count({
+      where: {
+        dealId
+      }
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      message: "Deal is already in that stage."
+    });
+    expect(after).toBe(before);
+
+    await prisma.activity.deleteMany({
+      where: {
+        dealId
+      }
+    });
+    await prisma.deal.deleteMany({
+      where: {
+        id: dealId
+      }
+    });
+  });
 });
 
 describe("today focus ranking", () => {
@@ -60,24 +117,34 @@ describe("today focus ranking", () => {
       now: new Date("2026-05-16T12:00:00Z"),
       deals: [
         {
-          id: "low",
-          name: "Low value new deal",
-          stage: "new",
-          value: 10000,
-          probability: 10,
-          createdAt: "2026-05-10T12:00:00Z",
-          lastActivityAt: "2026-05-12T12:00:00Z",
-          accountName: "LowCo"
-        },
-        {
-          id: "high",
-          name: "High value stale proposal",
+          id: "lower",
+          name: "Lower value stale proposal",
           stage: "proposal",
-          value: 200000,
+          value: 50000,
           probability: 50,
           createdAt: "2026-04-01T12:00:00Z",
           lastActivityAt: "2026-04-20T12:00:00Z",
+          accountName: "LowerCo"
+        },
+        {
+          id: "high",
+          name: "High value stale negotiation",
+          stage: "negotiation",
+          value: 200000,
+          probability: 75,
+          createdAt: "2026-04-01T12:00:00Z",
+          lastActivityAt: "2026-04-20T12:00:00Z",
           accountName: "HighCo"
+        },
+        {
+          id: "fresh",
+          name: "Fresh new deal",
+          stage: "new",
+          value: 15000,
+          probability: 10,
+          createdAt: "2026-05-10T12:00:00Z",
+          lastActivityAt: "2026-05-12T12:00:00Z",
+          accountName: "FreshCo"
         }
       ],
       accounts: [
@@ -95,13 +162,18 @@ describe("today focus ranking", () => {
           type: "note",
           nextStep: "Follow up Friday.",
           createdAt: "2026-05-15T12:00:00Z",
-          contactName: "Buyer"
+          contactName: "Buyer",
+          contactId: "buyer-1"
         }
       ]
     });
 
-    expect(items[0]?.title).toBe("High value stale proposal");
-    expect(items).toHaveLength(3);
+    expect(items[0]?.title).toBe("High value stale negotiation");
+    expect(items[1]?.title).toBe("Lower value stale proposal");
+    expect(items.find((item) => item.title === "Follow up Friday.")?.href).toBe(
+      "/contacts/buyer-1"
+    );
+    expect(items).toHaveLength(4);
   });
 });
 
@@ -123,5 +195,14 @@ describe("activity summarizer", () => {
     });
 
     expect(result.nextStep).toBe("Review and schedule follow-up.");
+  });
+
+  it("handles empty and whitespace-only notes without throwing", () => {
+    expect(deterministicActivitySummarizer.summarize({ rawText: "" }).nextStep).toBe(
+      "Review and schedule follow-up."
+    );
+    expect(
+      deterministicActivitySummarizer.summarize({ rawText: "   \n\t  " }).nextStep
+    ).toBe("Review and schedule follow-up.");
   });
 });

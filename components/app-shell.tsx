@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 />
                 <Input
                   name="q"
-                  placeholder="Search contacts, accounts, or deals"
+                  placeholder="Search contacts"
                   className="pl-9"
                 />
               </form>

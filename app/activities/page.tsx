@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_LABELS, type ActivityType } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
@@ -92,7 +93,16 @@ export default async function ActivitiesPage({
           </form>
         </CardHeader>
         <CardContent>
-          <ActivityTimeline activities={activities} />
+          {activities.length > 0 ? (
+            <ActivityTimeline activities={activities} />
+          ) : (
+            <EmptyState
+              title="No activities found"
+              description="Open a contact and add a note to create an activity."
+              actionHref="/contacts"
+              actionLabel="Open contacts"
+            />
+          )}
         </CardContent>
       </Card>
     </div>

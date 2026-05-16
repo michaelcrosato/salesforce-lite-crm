@@ -69,6 +69,9 @@ export default async function DashboardPage() {
   }));
   const dashboardActivities = activities.map((activity) => ({
     id: activity.id,
+    accountId: activity.accountId,
+    contactId: activity.contactId,
+    dealId: activity.dealId,
     title: activity.title,
     type: activity.type,
     nextStep: activity.nextStep,

@@ -25,6 +25,9 @@ export type DashboardAccount = {
 
 export type DashboardActivity = {
   id: string;
+  accountId?: string | null;
+  contactId?: string | null;
+  dealId?: string | null;
   title: string;
   type: ActivityType | string;
   nextStep: string | null;
@@ -139,12 +142,14 @@ export function rankTodaysFocus(input: {
           activity.contactName ??
           activity.accountName ??
           activity.title,
-        score: 25 + Math.max(0, 14 - ageInDays),
-        href: activity.dealName
-          ? `/deals`
-          : activity.contactName
-            ? `/contacts`
-            : `/activities?type=${activity.type}`
+        score: 25 + Math.min(14, ageInDays),
+        href: activity.dealId
+          ? `/deals?deal=${activity.dealId}`
+          : activity.contactId
+            ? `/contacts/${activity.contactId}`
+            : activity.accountId
+              ? `/accounts/${activity.accountId}`
+              : `/activities?type=${activity.type}`
       });
     }
   }

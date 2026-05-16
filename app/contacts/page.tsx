@@ -1,22 +1,9 @@
-import Link from "next/link";
-import { Eye } from "lucide-react";
+import { ContactsTable } from "@/components/contacts-table";
 import { ContactForm } from "@/components/contact-form";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
-import { CONTACT_STATUS_LABELS } from "@/lib/crm-constants";
-import { formatRelativeDays } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
 
@@ -108,11 +95,13 @@ export default async function ContactsPage({
         description="Search contacts, create new stakeholders, and open detail timelines."
       />
 
-      <ContactForm
-        title="Create Contact"
-        submitLabel="Create contact"
-        accounts={accounts}
-      />
+      <div id="create-contact">
+        <ContactForm
+          title="Create Contact"
+          submitLabel="Create contact"
+          accounts={accounts}
+        />
+      </div>
 
       <Card>
         <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -123,79 +112,27 @@ export default async function ContactsPage({
         </CardHeader>
         <CardContent>
           {contacts.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Account</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Activity</TableHead>
-                  <TableHead>Open Deals</TableHead>
-                  <TableHead className="w-16">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contacts.map((contact) => {
-                  const openDeals = contact.deals.filter((deal) =>
-                    isOpenDealStage(deal.stage)
-                  ).length;
-                  const lastActivity = contact.activities[0]?.createdAt ?? null;
-
-                  return (
-                    <TableRow key={contact.id}>
-                      <TableCell className="font-medium">
-                        <Link
-                          href={`/contacts/${contact.id}`}
-                          className="text-primary hover:underline"
-                        >
-                          {contact.firstName} {contact.lastName}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {contact.account ? (
-                          <Link
-                            href={`/accounts/${contact.account.id}`}
-                            className="text-primary hover:underline"
-                          >
-                            {contact.account.name}
-                          </Link>
-                        ) : (
-                          <span className="text-muted-foreground">No account</span>
-                        )}
-                      </TableCell>
-                      <TableCell>{contact.title ?? "No title"}</TableCell>
-                      <TableCell>{contact.email ?? "No email"}</TableCell>
-                      <TableCell>{contact.phone ?? "No phone"}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={contact.status === "active" ? "success" : "outline"}
-                        >
-                          {contact.status === "active"
-                            ? CONTACT_STATUS_LABELS.active
-                            : CONTACT_STATUS_LABELS.inactive}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatRelativeDays(lastActivity)}</TableCell>
-                      <TableCell>{openDeals}</TableCell>
-                      <TableCell>
-                        <Button asChild variant="ghost" size="icon">
-                          <Link href={`/contacts/${contact.id}`} aria-label="Open contact">
-                            <Eye className="h-4 w-4" aria-hidden="true" />
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <ContactsTable
+              contacts={contacts.map((contact) => ({
+                id: contact.id,
+                firstName: contact.firstName,
+                lastName: contact.lastName,
+                account: contact.account,
+                title: contact.title,
+                email: contact.email,
+                phone: contact.phone,
+                status: contact.status,
+                lastActivityAt: contact.activities[0]?.createdAt.toISOString() ?? null,
+                openDeals: contact.deals.filter((deal) => isOpenDealStage(deal.stage))
+                  .length
+              }))}
+            />
           ) : (
             <EmptyState
               title="No contacts found"
               description="Adjust the search or create a new contact above."
+              actionHref="#create-contact"
+              actionLabel="Create contact"
             />
           )}
         </CardContent>

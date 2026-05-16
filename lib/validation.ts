@@ -20,6 +20,26 @@ export const contactStatusSchema = z.enum(CONTACT_STATUSES);
 export const dealStageSchema = z.enum(DEAL_STAGES);
 export const activityTypeSchema = z.enum(ACTIVITY_TYPES);
 
+const requiredInteger = (message: string) =>
+  z.coerce
+    .number({
+      invalid_type_error: message
+    })
+    .int(message);
+
+export const accountFormSchema = z.object({
+  name: z.string().trim().min(1, "Account name is required."),
+  domain: optionalText,
+  industry: optionalText,
+  city: optionalText,
+  region: optionalText,
+  status: accountStatusSchema,
+  ownerId: optionalText,
+  healthScore: requiredInteger("Health score must be a whole number.")
+    .min(0, "Health score must be at least 0.")
+    .max(100, "Health score cannot exceed 100.")
+});
+
 export const contactFormSchema = z.object({
   accountId: optionalText,
   firstName: z.string().trim().min(1, "First name is required."),
@@ -28,6 +48,22 @@ export const contactFormSchema = z.object({
   phone: optionalText,
   title: optionalText,
   status: contactStatusSchema
+});
+
+export const dealFormSchema = z.object({
+  accountId: optionalText,
+  contactId: optionalText,
+  ownerId: optionalText,
+  name: z.string().trim().min(1, "Deal name is required."),
+  stage: dealStageSchema,
+  value: requiredInteger("Value must be a whole number.").min(
+    0,
+    "Value must be 0 or greater."
+  ),
+  probability: requiredInteger("Probability must be a whole number.")
+    .min(0, "Probability must be at least 0.")
+    .max(100, "Probability cannot exceed 100."),
+  expectedCloseDate: optionalText
 });
 
 export const noteFormSchema = z.object({

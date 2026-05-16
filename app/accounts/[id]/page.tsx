@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AccountForm } from "@/components/account-form";
 import { ActivityTimeline } from "@/components/activity-timeline";
 import { PageHeader } from "@/components/page-header";
 import { AccountStatusBadge, HealthBadge } from "@/components/account-badges";
@@ -25,70 +26,81 @@ export default async function AccountDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = await params;
-  const account = await prisma.account.findUnique({
-    where: {
-      id: resolvedParams.id
-    },
-    include: {
-      owner: {
-        select: {
-          name: true,
-          email: true
-        }
+  const [account, owners] = await Promise.all([
+    prisma.account.findUnique({
+      where: {
+        id: resolvedParams.id
       },
-      contacts: {
-        orderBy: [
-          {
-            lastName: "asc"
-          },
-          {
-            firstName: "asc"
+      include: {
+        owner: {
+          select: {
+            name: true,
+            email: true
           }
-        ]
-      },
-      deals: {
-        orderBy: {
-          updatedAt: "desc"
         },
-        include: {
-          contact: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true
+        contacts: {
+          orderBy: [
+            {
+              lastName: "asc"
+            },
+            {
+              firstName: "asc"
+            }
+          ]
+        },
+        deals: {
+          orderBy: {
+            updatedAt: "desc"
+          },
+          include: {
+            contact: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true
+              }
             }
           }
-        }
-      },
-      activities: {
-        orderBy: {
-          createdAt: "desc"
         },
-        take: 10,
-        include: {
-          account: {
-            select: {
-              id: true,
-              name: true
-            }
+        activities: {
+          orderBy: {
+            createdAt: "desc"
           },
-          contact: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true
-            }
-          },
-          deal: {
-            select: {
-              id: true,
-              name: true
+          take: 10,
+          include: {
+            account: {
+              select: {
+                id: true,
+                name: true
+              }
+            },
+            contact: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true
+              }
+            },
+            deal: {
+              select: {
+                id: true,
+                name: true
+              }
             }
           }
         }
       }
-    }
-  });
+    }),
+    prisma.user.findMany({
+      orderBy: {
+        name: "asc"
+      },
+      select: {
+        id: true,
+        name: true
+      }
+    })
+  ]);
 
   if (!account) {
     notFound();
@@ -124,6 +136,30 @@ export default async function AccountDetailPage({
           <SummaryItem label="Deals" value={account.deals.length.toString()} />
         </CardContent>
       </Card>
+
+      <details className="rounded-lg border bg-card p-5 shadow-soft">
+        <summary className="cursor-pointer text-sm font-semibold text-primary">
+          Edit account
+        </summary>
+        <div className="mt-5">
+          <AccountForm
+            title="Edit Account"
+            submitLabel="Save account"
+            owners={owners}
+            initialValues={{
+              id: account.id,
+              name: account.name,
+              domain: account.domain,
+              industry: account.industry,
+              city: account.city,
+              region: account.region,
+              status: account.status,
+              ownerId: account.ownerId,
+              healthScore: account.healthScore
+            }}
+          />
+        </div>
+      </details>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card>

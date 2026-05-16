@@ -16,6 +16,10 @@
 - Used a persistent CRM shell with sidebar navigation, top search, and a main content region.
 - Routed the top search to contacts because global search across all objects was beyond the stated first-build feature list.
 - Used links to `/deals?deal=:id` instead of adding a deal detail page because a deal detail page was not in the requested scope.
+- Account creation uses `/accounts/new`; account editing is exposed inline on the account detail page to avoid adding extra navigation.
+- Toasts are hand-rolled with React context so mutation feedback stays dependency-free.
+- Contact and account sorting is client-side because the lists are unpaged in this proof of concept.
+- Loading states are route-level skeletons to keep async page rendering simple.
 
 ## AI-Style Summarization
 
@@ -27,8 +31,24 @@
 - Implemented drag-and-drop using native browser drag events to avoid adding another UI dependency.
 - Added a compact stage selector on deal cards as an accessibility and live-demo fallback that uses the same move action.
 - On stage movement, the app updates the stage, resets probability using stage defaults, updates last activity, and creates a `status_change` activity.
+- Deal create/edit uses the same stage/probability rules as board movement and logs a `status_change` when a deal is created or changes stage.
+- Deal detail is a local drawer on `/deals` instead of a separate route to preserve the first-build navigation surface.
 
 ## Testing
 
 - Kept Vitest tests focused on pure business logic.
 - Added one Playwright smoke test for the critical daily loop rather than broader browser coverage.
+
+## Stabilization
+
+- Today's Focus now scores older actionable notes above fresh ones so stale follow-up rises.
+- Today's Focus activity items link to the most specific available deal, contact, or account record.
+- The global search placeholder says "Search contacts" because the current global form only routes to contacts.
+- The Friday summarizer rule now requires "by Friday", "next Friday", or "this Friday" to avoid casual mentions.
+
+## Postgres Migration
+
+- Added a separate Postgres Prisma schema and kept SQLite as the default schema for local development.
+- The Postgres prep script temporarily swaps schemas and restores SQLite afterward so normal local commands do not change.
+- Switching for real requires a Postgres `DATABASE_URL` and replacing the SQLite adapter in `lib/prisma.ts`.
+- No SQLite-specific query workarounds were found in the app queries; status and stage remain strings enforced by Zod.
