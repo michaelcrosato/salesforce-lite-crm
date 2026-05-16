@@ -14,6 +14,15 @@ import type { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import type { Note, Opportunity } from "@/lib/crm/registry";
 import {
+  completeTask as completeTaskService,
+  createTask as createTaskService,
+  deleteTask as deleteTaskService,
+  getTask as getTaskService,
+  listTasks as listTasksService,
+  updateTask as updateTaskService
+} from "@/lib/services/tasks";
+import type { TaskListInput as TaskServiceListInput } from "@/lib/services/tasks";
+import {
   accountCreateSchema,
   accountUpdateSchema,
   activityCreateSchema,
@@ -46,7 +55,7 @@ export type LeadListOptions = Pick<Prisma.LeadFindManyArgs, "where" | "orderBy" 
 export type ActivityListOptions = Pick<Prisma.ActivityFindManyArgs, "where" | "orderBy" | "skip" | "take">;
 export type DealerOrderListOptions = Pick<Prisma.DealerOrderFindManyArgs, "where" | "orderBy" | "skip" | "take">;
 export type AreaListOptions = Pick<Prisma.AreaFindManyArgs, "where" | "orderBy" | "skip" | "take">;
-export type TaskListOptions = Pick<Prisma.TaskFindManyArgs, "where" | "orderBy" | "skip" | "take">;
+export type TaskListOptions = TaskServiceListInput;
 export type CaseListOptions = Pick<Prisma.CaseFindManyArgs, "where" | "orderBy" | "skip" | "take">;
 export type CampaignListOptions = Pick<Prisma.CampaignFindManyArgs, "where" | "orderBy" | "skip" | "take">;
 
@@ -282,25 +291,27 @@ export async function deleteArea(id: string): Promise<Area> {
 }
 
 export async function listTasks(opts: TaskListOptions = {}): Promise<Task[]> {
-  return prisma.task.findMany(opts);
+  return listTasksService(opts);
 }
 
 export async function getTask(id: string): Promise<Task | null> {
-  return prisma.task.findUnique({ where: { id: parseId(id) } });
+  return getTaskService(id);
 }
 
 export async function createTask(input: TaskCreateInput): Promise<Task> {
-  const data: Prisma.TaskUncheckedCreateInput = taskCreateSchema.parse(input);
-  return prisma.task.create({ data });
+  return createTaskService(input);
 }
 
 export async function updateTask(id: string, input: TaskUpdateInput): Promise<Task> {
-  const data: Prisma.TaskUncheckedUpdateInput = taskUpdateSchema.parse(input);
-  return prisma.task.update({ where: { id: parseId(id) }, data });
+  return updateTaskService(id, input);
+}
+
+export async function completeTask(id: string): Promise<Task> {
+  return completeTaskService(id);
 }
 
 export async function deleteTask(id: string): Promise<Task> {
-  return prisma.task.delete({ where: { id: parseId(id) } });
+  return deleteTaskService(id);
 }
 
 export async function listCases(opts: CaseListOptions = {}): Promise<Case[]> {

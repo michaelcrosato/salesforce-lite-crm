@@ -139,6 +139,7 @@ All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod s
 - `getTask(id: string): Promise<Task | null>`
 - `createTask(input: TaskCreateInput): Promise<Task>`
 - `updateTask(id: string, input: TaskUpdateInput): Promise<Task>`
+- `completeTask(id: string): Promise<Task>`
 - `deleteTask(id: string): Promise<Task>`
 
 ### Case
