@@ -52,3 +52,11 @@
 - The Postgres prep script temporarily swaps schemas and restores SQLite afterward so normal local commands do not change.
 - Switching for real requires a Postgres `DATABASE_URL` and replacing the SQLite adapter in `lib/prisma.ts`.
 - No SQLite-specific query workarounds were found in the app queries; status and stage remain strings enforced by Zod.
+
+## Sprint 3B Dealer Revenue Command Center
+
+- Added Dealer Revenue Command Center after Sprint 3A was stable because the core CRM loop can now support vertical dealer workflows.
+- Stored `Area.postalPrefixes` as a comma-separated string to stay SQLite-friendly and avoid premature geospatial modeling.
+- Kept lead routing synchronous and deterministic in a server action; no external APIs or LLM calls participate in assignment.
+- Treated active dealer order eligibility as status-based plus area-linked quota capacity; start and end dates display for operators but do not gate routing yet.
+- Used `routing_event` as another string activity type so existing timeline rendering can show routing decisions without a separate event model.

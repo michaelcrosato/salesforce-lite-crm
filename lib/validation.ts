@@ -3,7 +3,9 @@ import {
   ACCOUNT_STATUSES,
   ACTIVITY_TYPES,
   CONTACT_STATUSES,
-  DEAL_STAGES
+  DEALER_ORDER_STATUSES,
+  DEAL_STAGES,
+  LEAD_STATUSES
 } from "@/lib/crm-constants";
 
 const optionalText = z.preprocess((value) => {
@@ -19,6 +21,8 @@ export const accountStatusSchema = z.enum(ACCOUNT_STATUSES);
 export const contactStatusSchema = z.enum(CONTACT_STATUSES);
 export const dealStageSchema = z.enum(DEAL_STAGES);
 export const activityTypeSchema = z.enum(ACTIVITY_TYPES);
+export const leadStatusSchema = z.enum(LEAD_STATUSES);
+export const dealerOrderStatusSchema = z.enum(DEALER_ORDER_STATUSES);
 
 const requiredInteger = (message: string) =>
   z.coerce
@@ -77,6 +81,21 @@ export const dealMoveSchema = z.object({
   stage: dealStageSchema
 });
 
+export const leadFormSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required."),
+  lastName: z.string().trim().min(1, "Last name is required."),
+  phone: optionalText,
+  email: optionalText.pipe(z.string().email("Enter a valid email.").optional()),
+  postalCode: optionalText,
+  province: optionalText,
+  source: optionalText
+});
+
+export const leadStatusUpdateSchema = z.object({
+  leadId: z.string().trim().min(1, "Lead is required."),
+  status: leadStatusSchema
+});
+
 export const activityFilterSchema = z
   .union([activityTypeSchema, z.literal("all")])
   .default("all");
@@ -87,4 +106,8 @@ export function isDealStage(value: string): value is z.infer<typeof dealStageSch
 
 export function isActivityType(value: string): value is z.infer<typeof activityTypeSchema> {
   return activityTypeSchema.safeParse(value).success;
+}
+
+export function isLeadStatus(value: string): value is z.infer<typeof leadStatusSchema> {
+  return leadStatusSchema.safeParse(value).success;
 }

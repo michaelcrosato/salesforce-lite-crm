@@ -50,6 +50,13 @@ export default async function ActivitiesPage({
           id: true,
           name: true
         }
+      },
+      lead: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true
+        }
       }
     }
   });

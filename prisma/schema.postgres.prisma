@@ -34,9 +34,80 @@ model Account {
   contacts    Contact[]
   deals       Deal[]
   activities  Activity[]
+  dealerOrders DealerOrder[]
 
   @@index([ownerId])
   @@index([status])
+}
+
+model Area {
+  id             String            @id @default(cuid()) @db.Text
+  name           String            @db.VarChar(255)
+  province       String?           @db.VarChar(80)
+  region         String?           @db.VarChar(120)
+  postalPrefixes String            @db.Text
+  createdAt      DateTime          @default(now()) @db.Timestamp(3)
+  updatedAt      DateTime          @updatedAt @db.Timestamp(3)
+  dealerOrders   DealerOrderArea[]
+  leads          Lead[]
+
+  @@index([name])
+  @@index([province])
+}
+
+model DealerOrder {
+  id           String            @id @default(cuid()) @db.Text
+  accountId    String            @db.Text
+  account      Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name         String            @db.VarChar(255)
+  monthlyQuota Int               @db.Integer
+  status       String            @db.VarChar(50)
+  startDate    DateTime          @db.Timestamp(3)
+  endDate      DateTime?         @db.Timestamp(3)
+  createdAt    DateTime          @default(now()) @db.Timestamp(3)
+  updatedAt    DateTime          @updatedAt @db.Timestamp(3)
+  areas        DealerOrderArea[]
+  leads        Lead[]
+
+  @@index([accountId])
+  @@index([status])
+  @@index([startDate])
+}
+
+model DealerOrderArea {
+  id            String      @id @default(cuid()) @db.Text
+  dealerOrderId String      @db.Text
+  dealerOrder   DealerOrder @relation(fields: [dealerOrderId], references: [id], onDelete: Cascade)
+  areaId        String      @db.Text
+  area          Area        @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  @@unique([dealerOrderId, areaId])
+  @@index([areaId])
+}
+
+model Lead {
+  id               String       @id @default(cuid()) @db.Text
+  firstName        String       @db.VarChar(120)
+  lastName         String       @db.VarChar(120)
+  phone            String?      @db.VarChar(80)
+  email            String?      @db.VarChar(255)
+  postalCode       String?      @db.VarChar(20)
+  province         String?      @db.VarChar(80)
+  source           String?      @db.VarChar(120)
+  status           String       @db.VarChar(50)
+  areaId           String?      @db.Text
+  area             Area?        @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  assignedOrderId  String?      @db.Text
+  assignedOrder    DealerOrder? @relation(fields: [assignedOrderId], references: [id], onDelete: SetNull)
+  assignmentReason String?      @db.VarChar(120)
+  createdAt        DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt        DateTime     @updatedAt @db.Timestamp(3)
+  activities       Activity[]
+
+  @@index([areaId])
+  @@index([assignedOrderId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Contact {
@@ -91,6 +162,8 @@ model Activity {
   contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
   dealId    String?  @db.Text
   deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  leadId    String?  @db.Text
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
   userId    String?  @db.Text
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   type      String   @db.VarChar(50)
@@ -103,6 +176,7 @@ model Activity {
   @@index([accountId])
   @@index([contactId])
   @@index([dealId])
+  @@index([leadId])
   @@index([userId])
   @@index([type])
   @@index([createdAt])

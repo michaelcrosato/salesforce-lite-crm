@@ -25,6 +25,11 @@ export type TimelineActivity = {
     id: string;
     name: string;
   } | null;
+  lead?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
 };
 
 export function ActivityTimeline({ activities }: { activities: TimelineActivity[] }) {
@@ -78,6 +83,11 @@ export function ActivityTimeline({ activities }: { activities: TimelineActivity[
               {activity.deal ? (
                 <Link href={`/deals?deal=${activity.deal.id}`} className="hover:text-primary">
                   {activity.deal.name}
+                </Link>
+              ) : null}
+              {activity.lead ? (
+                <Link href={`/leads/${activity.lead.id}`} className="hover:text-primary">
+                  {activity.lead.firstName} {activity.lead.lastName}
                 </Link>
               ) : null}
             </div>

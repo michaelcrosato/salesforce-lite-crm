@@ -5,7 +5,10 @@ import {
   BarChart3,
   Building2,
   ContactRound,
-  Handshake
+  Handshake,
+  MapPinned,
+  Route,
+  ScrollText
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,6 +19,9 @@ const navItems = [
   { href: "/contacts", label: "Contacts", icon: ContactRound },
   { href: "/accounts", label: "Accounts", icon: Building2 },
   { href: "/deals", label: "Deals", icon: Handshake },
+  { href: "/leads", label: "Leads", icon: Route },
+  { href: "/orders", label: "Orders", icon: ScrollText },
+  { href: "/areas", label: "Areas", icon: MapPinned },
   { href: "/activities", label: "Activities", icon: Activity }
 ];
 
