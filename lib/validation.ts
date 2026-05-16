@@ -100,6 +100,12 @@ export const activityFilterSchema = z
   .union([activityTypeSchema, z.literal("all")])
   .default("all");
 
+export const forecastQuerySchema = z.object({
+  multiplier: z.coerce.number().min(0.5).max(3).optional(),
+  assignmentRate: z.coerce.number().min(10).max(100).optional(),
+  area: optionalText
+});
+
 export function isDealStage(value: string): value is z.infer<typeof dealStageSchema> {
   return dealStageSchema.safeParse(value).success;
 }

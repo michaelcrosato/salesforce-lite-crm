@@ -139,7 +139,9 @@ export default async function OrdersPage() {
           ) : (
             <EmptyState
               title="No dealer orders"
-              description="Seed dealer orders to start pacing analysis."
+              description="Dealer orders are seeded and demo-managed for now."
+              actionHref="/dashboard"
+              actionLabel="Return to dashboard"
             />
           )}
         </CardContent>

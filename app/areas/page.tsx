@@ -95,7 +95,9 @@ export default async function AreasPage() {
           ) : (
             <EmptyState
               title="No areas"
-              description="Seed routing areas before creating dealer leads."
+              description="Routing areas are seeded and demo-managed for now."
+              actionHref="/dashboard"
+              actionLabel="Return to dashboard"
             />
           )}
         </CardContent>

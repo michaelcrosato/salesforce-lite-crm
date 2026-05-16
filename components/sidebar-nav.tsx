@@ -8,7 +8,8 @@ import {
   Handshake,
   MapPinned,
   Route,
-  ScrollText
+  ScrollText,
+  TrendingUp
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/leads", label: "Leads", icon: Route },
   { href: "/orders", label: "Orders", icon: ScrollText },
   { href: "/areas", label: "Areas", icon: MapPinned },
+  { href: "/forecast", label: "Forecast", icon: TrendingUp },
   { href: "/activities", label: "Activities", icon: Activity }
 ];
 

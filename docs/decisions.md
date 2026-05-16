@@ -60,3 +60,11 @@
 - Kept lead routing synchronous and deterministic in a server action; no external APIs or LLM calls participate in assignment.
 - Treated active dealer order eligibility as status-based plus area-linked quota capacity; start and end dates display for operators but do not gate routing yet.
 - Used `routing_event` as another string activity type so existing timeline rendering can show routing decisions without a separate event model.
+
+## Sprint 3C Demo Hardening
+
+- Added a deterministic analyst panel instead of a real LLM so the Tuesday demo is repeatable and key signals remain explainable.
+- Kept forecast math transparent: projected delivered leads use current run rate, lead volume multiplier, assignment rate, and days in month.
+- Retained drawer-based deal detail at `/deals?deal=:id`; no `/deals/[id]` route was added.
+- Left dealer order and area CRUD out of scope; orders and areas remain seeded and demo-managed.
+- Deferred auth, deployment, Postgres migration, and external AI until after the Tuesday demo hardening pass.

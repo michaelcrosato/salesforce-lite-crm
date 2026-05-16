@@ -5,6 +5,7 @@ test("daily CRM loop smoke test", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await expect(page.getByText("Dealer Ops", { exact: true })).toBeVisible();
   await expect(page.getByText("Leads This Month")).toBeVisible();
+  await expect(page.getByText("Analyst Panel")).toBeVisible();
 
   await page.getByRole("link", { name: "Contacts" }).first().click();
   await expect(page.getByRole("heading", { name: "Contacts" })).toBeVisible();
@@ -33,6 +34,7 @@ test("daily CRM loop smoke test", async ({ page }) => {
   await targetColumn.dispatchEvent("drop", { dataTransfer });
   await sourceCard.dispatchEvent("dragend", { dataTransfer });
   await expect(targetColumn.locator(`[data-deal-id="${dealId}"]`)).toBeVisible();
+  await expect(page.getByText("Deal moved").first()).toBeVisible();
 
   await page.getByRole("link", { name: "Leads" }).first().click();
   await expect(page.getByRole("heading", { name: "Lead Inbox" })).toBeVisible();
@@ -62,4 +64,13 @@ test("daily CRM loop smoke test", async ({ page }) => {
     page.getByRole("heading", { name: "Vancouver fleet lead package", exact: true })
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "E2E Route", exact: true })).toBeVisible();
+
+  await page.goto("/forecast");
+  await expect(page.getByRole("heading", { name: "Forecast Simulator" })).toBeVisible();
+  const firstProjection = page.locator("[data-forecast-projected]").first();
+  const beforeProjection = await firstProjection.textContent();
+  await page.getByLabel("Lead volume multiplier").fill("2");
+  await page.getByRole("button", { name: "Apply" }).click();
+  await expect(page).toHaveURL(/multiplier=2/);
+  await expect(firstProjection).not.toHaveText(beforeProjection ?? "");
 });

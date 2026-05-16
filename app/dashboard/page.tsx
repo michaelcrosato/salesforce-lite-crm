@@ -1,10 +1,12 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCharts, type StageChartDatum } from "@/components/dashboard-charts";
 import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
 import { DEAL_STAGES, STAGE_LABELS } from "@/lib/crm-constants";
+import { buildAnalystPanel } from "@/lib/business/analyst";
 import { calculateDashboardKpis, rankTodaysFocus } from "@/lib/business/dashboard";
 import { calculateDealerOpsKpis, rankDealerOpsFocus } from "@/lib/business/dealerOps";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
@@ -38,6 +40,7 @@ export default async function DashboardPage() {
       include: {
         account: {
           select: {
+            id: true,
             name: true
           }
         }
@@ -79,7 +82,7 @@ export default async function DashboardPage() {
       orderBy: {
         createdAt: "desc"
       },
-      take: 30,
+      take: 50,
       select: {
         id: true,
         firstName: true,
@@ -174,6 +177,21 @@ export default async function DashboardPage() {
     now,
     limit: 5
   });
+  const analystPanel = buildAnalystPanel({
+    orders: dealerOpsOrders,
+    leads: dealerLeads,
+    deals: deals.map((deal) => ({
+      id: deal.id,
+      name: deal.name,
+      stage: deal.stage,
+      value: deal.value,
+      createdAt: deal.createdAt,
+      lastActivityAt: deal.lastActivityAt,
+      accountId: deal.accountId,
+      accountName: deal.account?.name
+    })),
+    now
+  });
 
   const chartData: StageChartDatum[] = DEAL_STAGES.map((stage) => {
     const stageDeals = deals.filter((deal) => deal.stage === stage);
@@ -210,6 +228,117 @@ export default async function DashboardPage() {
       </div>
 
       <DashboardCharts data={chartData} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Analyst Panel</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 xl:grid-cols-4">
+            <AnalystList title="Behind-Pace Orders">
+              {analystPanel.behindOrders.length > 0 ? (
+                analystPanel.behindOrders.slice(0, 3).map((order) => (
+                  <Link
+                    key={order.id}
+                    href={order.href}
+                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">{order.name}</p>
+                      <Badge variant="danger">{order.paceStatus}</Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {order.explanation}
+                    </p>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No behind-pace orders.</p>
+              )}
+            </AnalystList>
+
+            <AnalystList title="Unrouted Leads">
+              {analystPanel.unroutedLeads.length > 0 ? (
+                analystPanel.unroutedLeads.slice(0, 3).map((lead) => (
+                  <Link
+                    key={lead.id}
+                    href={lead.href}
+                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                  >
+                    <p className="text-sm font-semibold">{lead.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {lead.assignmentReason}
+                    </p>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">All recent leads routed.</p>
+              )}
+            </AnalystList>
+
+            <AnalystList title="Stale High-Value Deals">
+              {analystPanel.staleHighValueDeals.length > 0 ? (
+                analystPanel.staleHighValueDeals.slice(0, 3).map((deal) => (
+                  <Link
+                    key={deal.id}
+                    href={deal.href}
+                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                  >
+                    <p className="text-sm font-semibold">{deal.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {deal.accountName} · {formatCurrency(deal.value)}
+                    </p>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No stale high-value deals.</p>
+              )}
+            </AnalystList>
+
+            <AnalystList title="Low-Health Dealer Accounts">
+              {analystPanel.lowHealthAccounts.length > 0 ? (
+                analystPanel.lowHealthAccounts.slice(0, 3).map((account) => (
+                  <Link
+                    key={`${account.id}-${account.orderName}`}
+                    href={account.href}
+                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                  >
+                    <p className="text-sm font-semibold">{account.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Health {account.healthScore} · {account.orderName}
+                    </p>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No low-health behind-pace dealer accounts.
+                </p>
+              )}
+            </AnalystList>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold">Do Today</h3>
+            <div className="mt-3 grid gap-3 lg:grid-cols-5">
+              {analystPanel.actions.map((action) => (
+                <Link
+                  key={action.id}
+                  href={action.href}
+                  className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
+                >
+                  <p className="line-clamp-2 text-sm font-semibold">{action.title}</p>
+                  <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                    {action.reason}
+                  </p>
+                  <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground">
+                    {action.suggestedNextAction}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <section className="space-y-4">
         <div>
@@ -297,6 +426,21 @@ export default async function DashboardPage() {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function AnalystList({
+  title,
+  children
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      {children}
     </div>
   );
 }
