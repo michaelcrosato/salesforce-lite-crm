@@ -5,6 +5,7 @@ import type { ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
+import { recordOpportunityStageChangeOperation } from "@/lib/services/opportunityStageHistory";
 import { dealFormSchema, dealMoveSchema } from "@/lib/validation";
 
 function formValue(formData: FormData, key: string) {
@@ -229,6 +230,13 @@ export async function moveDealAction(input: {
             : "Confirm next action for the new stage.",
         createdAt: now
       }
+    }),
+    recordOpportunityStageChangeOperation({
+      dealId: deal.id,
+      fromStage: deal.stage,
+      toStage: parsed.data.stage,
+      changedAt: now,
+      changedByUserId: deal.ownerId ?? undefined
     })
   ]);
 

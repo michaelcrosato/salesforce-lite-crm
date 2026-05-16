@@ -19,6 +19,7 @@ model User {
   tasks      Task[]
   cases      Case[]
   campaigns  Campaign[]
+  opportunityStageChanges OpportunityStageHistory[]
 }
 
 model Account {
@@ -157,6 +158,7 @@ model Deal {
   updatedAt         DateTime   @updatedAt @db.Timestamp(3)
   activities        Activity[]
   tasks             Task[]
+  stageHistory      OpportunityStageHistory[]
 
   @@index([accountId])
   @@index([contactId])
@@ -253,4 +255,19 @@ model Campaign {
   updatedAt   DateTime  @updatedAt @db.Timestamp(3)
 
   @@index([status])
+}
+
+model OpportunityStageHistory {
+  id              String   @id @default(cuid()) @db.Text
+  dealId          String   @db.Text
+  deal            Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fromStage       String?  @db.VarChar(50)
+  toStage         String   @db.VarChar(50)
+  changedAt       DateTime @default(now()) @db.Timestamp(3)
+  changedByUserId String?  @db.Text
+  changedByUser   User?    @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([dealId])
+  @@index([changedAt])
+  @@index([changedByUserId])
 }

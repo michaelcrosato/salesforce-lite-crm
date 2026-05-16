@@ -20,6 +20,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - TypeScript alias: `Opportunity = Deal`.
 - Route: `/deals`; detail route uses the existing `/deals?deal=<id>` drawer flow, NOT `/deals/[id]`.
 - Stage values: `new`, `qualified`, `proposal`, `negotiation`, `won`, `lost`.
+- Stage changes are recorded in `OpportunityStageHistory` with `dealId`, `fromStage`, `toStage`, `changedAt`, and optional `changedByUserId`.
 
 ### Lead
 - Existing Prisma model: `Lead`.

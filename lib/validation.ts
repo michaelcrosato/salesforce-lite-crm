@@ -164,6 +164,14 @@ export const opportunityCreateSchema = dealFormSchema.extend({
 });
 export const opportunityUpdateSchema = opportunityCreateSchema.partial();
 
+export const opportunityStageHistoryCreateSchema = z.object({
+  dealId: idSchema,
+  fromStage: dealStageSchema.optional(),
+  toStage: dealStageSchema,
+  changedAt: optionalDate,
+  changedByUserId: optionalText
+});
+
 export const leadCreateSchema = leadFormSchema.extend({
   status: leadStatusSchema.default("new"),
   areaId: optionalText,
