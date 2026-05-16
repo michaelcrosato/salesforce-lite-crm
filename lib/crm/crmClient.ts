@@ -14,6 +14,15 @@ import type { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import type { Note, Opportunity } from "@/lib/crm/registry";
 import {
+  completeCampaign as completeCampaignService,
+  createCampaign as createCampaignService,
+  deleteCampaign as deleteCampaignService,
+  getCampaign as getCampaignService,
+  listCampaigns as listCampaignsService,
+  updateCampaign as updateCampaignService
+} from "@/lib/services/campaigns";
+import type { CampaignListInput as CampaignServiceListInput } from "@/lib/services/campaigns";
+import {
   createCase as createCaseService,
   deleteCase as deleteCaseService,
   getCase as getCaseService,
@@ -66,7 +75,7 @@ export type DealerOrderListOptions = Pick<Prisma.DealerOrderFindManyArgs, "where
 export type AreaListOptions = Pick<Prisma.AreaFindManyArgs, "where" | "orderBy" | "skip" | "take">;
 export type TaskListOptions = TaskServiceListInput;
 export type CaseListOptions = CaseServiceListInput;
-export type CampaignListOptions = Pick<Prisma.CampaignFindManyArgs, "where" | "orderBy" | "skip" | "take">;
+export type CampaignListOptions = CampaignServiceListInput;
 
 export type AccountCreateInput = z.input<typeof accountCreateSchema>;
 export type AccountUpdateInput = z.input<typeof accountUpdateSchema>;
@@ -348,37 +357,25 @@ export async function deleteCase(id: string): Promise<Case> {
 }
 
 export async function listCampaigns(opts: CampaignListOptions = {}): Promise<Campaign[]> {
-  return prisma.campaign.findMany(opts);
+  return listCampaignsService(opts);
 }
 
 export async function getCampaign(id: string): Promise<Campaign | null> {
-  return prisma.campaign.findUnique({ where: { id: parseId(id) } });
+  return getCampaignService(id);
 }
 
 export async function createCampaign(input: CampaignCreateInput): Promise<Campaign> {
-  const { contactIds, leadIds, ownerId, ...parsed } = campaignCreateSchema.parse(input);
-  const data: Prisma.CampaignCreateInput = {
-    ...parsed,
-    owner: ownerId ? { connect: { id: ownerId } } : undefined,
-    leads: leadIds ? { connect: leadIds.map((id) => ({ id })) } : undefined,
-    contacts: contactIds ? { connect: contactIds.map((id) => ({ id })) } : undefined
-  };
-
-  return prisma.campaign.create({ data });
+  return createCampaignService(input);
 }
 
 export async function updateCampaign(id: string, input: CampaignUpdateInput): Promise<Campaign> {
-  const { contactIds, leadIds, ownerId, ...parsed } = campaignUpdateSchema.parse(input);
-  const data: Prisma.CampaignUpdateInput = {
-    ...parsed,
-    owner: ownerId ? { connect: { id: ownerId } } : undefined,
-    leads: leadIds ? { set: leadIds.map((leadId) => ({ id: leadId })) } : undefined,
-    contacts: contactIds ? { set: contactIds.map((contactId) => ({ id: contactId })) } : undefined
-  };
+  return updateCampaignService(id, input);
+}
 
-  return prisma.campaign.update({ where: { id: parseId(id) }, data });
+export async function completeCampaign(id: string): Promise<Campaign> {
+  return completeCampaignService(id);
 }
 
 export async function deleteCampaign(id: string): Promise<Campaign> {
-  return prisma.campaign.delete({ where: { id: parseId(id) } });
+  return deleteCampaignService(id);
 }

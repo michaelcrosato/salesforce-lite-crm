@@ -155,4 +155,5 @@ All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod s
 - `getCampaign(id: string): Promise<Campaign | null>`
 - `createCampaign(input: CampaignCreateInput): Promise<Campaign>`
 - `updateCampaign(id: string, input: CampaignUpdateInput): Promise<Campaign>`
+- `completeCampaign(id: string): Promise<Campaign>`
 - `deleteCampaign(id: string): Promise<Campaign>`
