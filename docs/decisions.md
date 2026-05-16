@@ -25,6 +25,7 @@
 ## Deal Movement
 
 - Implemented drag-and-drop using native browser drag events to avoid adding another UI dependency.
+- Added a compact stage selector on deal cards as an accessibility and live-demo fallback that uses the same move action.
 - On stage movement, the app updates the stage, resets probability using stage defaults, updates last activity, and creates a `status_change` activity.
 
 ## Testing

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { moveDealAction } from "@/app/deals/actions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select } from "@/components/ui/select";
 import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/crm-constants";
 import { formatCurrency, formatDate, formatPercent, formatRelativeDays } from "@/lib/formatters";
 
@@ -153,6 +154,21 @@ export function DealBoard({
                             {formatRelativeDays(deal.lastActivityAt ?? deal.createdAt)}
                           </Badge>
                         </div>
+                        <Select
+                          aria-label={`Move ${deal.name} stage`}
+                          className="h-8 text-xs"
+                          defaultValue={deal.stage}
+                          disabled={isPending}
+                          onChange={(event) =>
+                            moveDeal(event.currentTarget.value as DealStage, deal.id)
+                          }
+                        >
+                          {DEAL_STAGES.map((dealStage) => (
+                            <option key={dealStage} value={dealStage}>
+                              {STAGE_LABELS[dealStage]}
+                            </option>
+                          ))}
+                        </Select>
                       </CardContent>
                     </Card>
                   ))

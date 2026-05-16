@@ -45,7 +45,7 @@ npm run build
 2. Go to `/contacts`, search for a contact, then open Maya Singh.
 3. Add a rough note such as `Follow up next week with pricing and decision maker details.`
 4. Confirm the activity timeline shows the raw note summary and deterministic next step.
-5. Go to `/deals`, drag a deal from New to Qualified, and confirm the card moves with an updated probability and status-change activity.
+5. Go to `/deals`, drag a deal from New to Qualified or use the card stage selector, then confirm the card moves with an updated probability and status-change activity.
 6. Open `/activities` and filter by Note or Status Change to see the cross-object timeline.
 7. Open `/accounts` and review account health, related contacts, related deals, and recent activities.
 
