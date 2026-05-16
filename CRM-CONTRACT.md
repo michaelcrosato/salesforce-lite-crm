@@ -147,6 +147,7 @@ All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod s
 - `getCase(id: string): Promise<Case | null>`
 - `createCase(input: CaseCreateInput): Promise<Case>`
 - `updateCase(id: string, input: CaseUpdateInput): Promise<Case>`
+- `resolveCase(id: string): Promise<Case>`
 - `deleteCase(id: string): Promise<Case>`
 
 ### Campaign
