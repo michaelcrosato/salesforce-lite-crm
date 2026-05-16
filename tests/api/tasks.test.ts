@@ -143,6 +143,22 @@ async function createOwner(id: string, name: string) {
 }
 
 async function cleanupTasks() {
+  await prisma.activity.deleteMany({
+    where: {
+      OR: [
+        {
+          taskId: {
+            not: null
+          }
+        },
+        {
+          title: {
+            startsWith: "Task completed: Task service"
+          }
+        }
+      ]
+    }
+  });
   await prisma.task.deleteMany({
     where: {
       OR: [

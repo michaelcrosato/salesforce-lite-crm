@@ -117,6 +117,8 @@ type ActivityFilters = {
   contactId: string;
   dealId: string;
   leadId: string;
+  taskId: string;
+  caseId: string;
 };
 export type ActivityListOptions = ListQueryInput<ActivitySortBy, ActivityFilters>;
 
@@ -307,7 +309,9 @@ function activityListQuery(opts: ActivityListOptions) {
         accountId: (accountId) => ({ accountId }),
         contactId: (contactId) => ({ contactId }),
         dealId: (dealId) => ({ dealId }),
-        leadId: (leadId) => ({ leadId })
+        leadId: (leadId) => ({ leadId }),
+        taskId: (taskId) => ({ taskId }),
+        caseId: (caseId) => ({ caseId })
       }
     }
   );
@@ -479,6 +483,20 @@ export async function updateActivity(id: string, input: ActivityUpdateInput): Pr
 
 export async function deleteActivity(id: string): Promise<Activity> {
   return prisma.activity.delete({ where: { id: parseId(id) } });
+}
+
+export async function addActivityToTask(
+  taskId: string,
+  input: ActivityCreateInput
+): Promise<Activity> {
+  return createActivity({ ...input, taskId: parseId(taskId) });
+}
+
+export async function addActivityToCase(
+  caseId: string,
+  input: ActivityCreateInput
+): Promise<Activity> {
+  return createActivity({ ...input, caseId: parseId(caseId) });
 }
 
 export async function listNotes(opts: ActivityListOptions = {}): Promise<Note[]> {

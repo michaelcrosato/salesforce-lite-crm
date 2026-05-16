@@ -77,11 +77,33 @@ export async function updateTask(id: string, input: unknown): Promise<Task> {
 }
 
 export async function completeTask(id: string): Promise<Task> {
-  return prisma.task.update({
-    where: { id: idSchema.parse(id) },
-    data: {
-      status: "done"
-    }
+  const taskId = idSchema.parse(id);
+  const now = new Date();
+
+  return prisma.$transaction(async (tx) => {
+    const task = await tx.task.update({
+      where: { id: taskId },
+      data: {
+        status: "done"
+      }
+    });
+
+    await tx.activity.create({
+      data: {
+        accountId: task.accountId,
+        contactId: task.contactId,
+        dealId: task.dealId,
+        leadId: task.leadId,
+        taskId: task.id,
+        userId: task.ownerId,
+        type: "status_change",
+        title: `Task completed: ${task.title}`,
+        summary: "Task status changed to done.",
+        createdAt: now
+      }
+    });
+
+    return task;
   });
 }
 

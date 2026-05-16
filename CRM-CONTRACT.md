@@ -32,6 +32,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - Existing Prisma model: `Activity`.
 - Route: `/activities`.
 - Type values: `note`, `call`, `email`, `meeting`, `status_change`, `routing_event`.
+- Optional relations: `Account`, `Contact`, `Opportunity`, `Lead`, `Task`, `Case`, owner `User`.
 
 ### Note
 - Derived entity: `Activity` rows with `type = "note"`.
@@ -114,6 +115,8 @@ List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and ar
 - `createActivity(input: ActivityCreateInput): Promise<Activity>`
 - `updateActivity(id: string, input: ActivityUpdateInput): Promise<Activity>`
 - `deleteActivity(id: string): Promise<Activity>`
+- `addActivityToTask(taskId: string, input: ActivityCreateInput): Promise<Activity>`
+- `addActivityToCase(caseId: string, input: ActivityCreateInput): Promise<Activity>`
 
 ### Note
 - `listNotes(opts?: ActivityListOptions): Promise<Note[]>`

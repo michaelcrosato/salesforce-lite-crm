@@ -185,6 +185,8 @@ export const activityCreateSchema = z.object({
   contactId: optionalText,
   dealId: optionalText,
   leadId: optionalText,
+  taskId: optionalText,
+  caseId: optionalText,
   userId: optionalText,
   type: activityTypeSchema,
   title: z.string().trim().min(1, "Activity title is required."),

@@ -177,6 +177,10 @@ model Activity {
   deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
   leadId    String?
   lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  caseId    String?
+  case      Case?    @relation(fields: [caseId], references: [id], onDelete: SetNull)
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   type      String
@@ -190,6 +194,8 @@ model Activity {
   @@index([contactId])
   @@index([dealId])
   @@index([leadId])
+  @@index([taskId])
+  @@index([caseId])
   @@index([userId])
   @@index([type])
   @@index([createdAt])
@@ -212,6 +218,7 @@ model Task {
   deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
   leadId      String?
   lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  activities  Activity[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -232,6 +239,7 @@ model Case {
   contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
   ownerId     String?
   owner       User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  activities  Activity[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
