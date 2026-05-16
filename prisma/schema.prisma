@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id         String     @id @default(cuid())
+  name       String
+  email      String     @unique
+  role       String     @default("sales")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  accounts   Account[]
+  deals      Deal[]
+  activities Activity[]
+}
+
+model Account {
+  id          String     @id @default(cuid())
+  name        String
+  domain      String?
+  industry    String?
+  city        String?
+  region      String?
+  status      String
+  ownerId     String?
+  owner       User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  healthScore Int        @default(80)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  contacts    Contact[]
+  deals       Deal[]
+  activities  Activity[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model Contact {
+  id         String     @id @default(cuid())
+  accountId  String?
+  account    Account?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  firstName  String
+  lastName   String
+  email      String?    @unique
+  phone      String?
+  title      String?
+  status     String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deals      Deal[]
+  activities Activity[]
+
+  @@index([accountId])
+  @@index([status])
+}
+
+model Deal {
+  id                String     @id @default(cuid())
+  accountId         String?
+  account           Account?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId         String?
+  contact           Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  ownerId           String?
+  owner             User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  name              String
+  stage             String
+  value             Int
+  probability       Int
+  expectedCloseDate DateTime?
+  lastActivityAt    DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  activities        Activity[]
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([ownerId])
+  @@index([stage])
+  @@index([lastActivityAt])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      String
+  title     String
+  rawText   String?
+  summary   String?
+  nextStep  String?
+  createdAt DateTime @default(now())
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
