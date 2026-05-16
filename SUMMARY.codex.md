@@ -7,3 +7,4 @@
 - Feature 2.3 shipped: campaigns service, relation-aware crmClient adapter, and campaign API tests; full gate green.
 - Feature 2.4 shipped: opportunity stage history schema, service, moveDealAction recording, and tests; full gate green.
 - Feature 2.5 shipped: global CRM search service with route-safe results and search tests; full gate green.
+- Feature 2.6 shipped: typed list query helper wired into crmClient list adapters; full gate green.

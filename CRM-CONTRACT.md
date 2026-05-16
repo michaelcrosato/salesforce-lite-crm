@@ -78,6 +78,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 ## crmClient Adapter Signatures
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.
+List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and are translated to Prisma `where`, `orderBy`, `skip`, and `take` clauses by `lib/services/listQuery.ts`.
 
 ### Account
 - `listAccounts(opts?: AccountListOptions): Promise<Account[]>`
