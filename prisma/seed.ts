@@ -393,6 +393,7 @@ function buildDealerLeads() {
 }
 
 async function main() {
+  await prisma.task.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.lead.deleteMany();
   await prisma.dealerOrderArea.deleteMany();
@@ -566,6 +567,88 @@ async function main() {
 
   await prisma.activity.createMany({
     data: [...activityData, ...routingEvents]
+  });
+
+  // === NEW SECTION: Task seed data (Grok G1) — ~40 tasks preserving dealer-routing story ===
+  // Mix: overdue (past dueDate, open/in_progress), due-today, upcoming (1-30d), completed (done).
+  // Links to existing Accounts, Contacts, Deals, Leads, Users. No changes to prior seed sections.
+  const taskTemplates = [
+    "Follow up on proposal pricing",
+    "Schedule demo with decision maker",
+    "Review contract redlines",
+    "Confirm budget approval",
+    "Send security questionnaire",
+    "Update CRM notes from call",
+    "Chase invoice payment",
+    "Prep for renewal discussion",
+    "Coordinate onboarding kickoff",
+    "Validate lead routing assignment",
+    "Review dealer order pacing",
+    "Confirm area coverage for new lead"
+  ];
+  const taskAccountIds = accounts.map((a) => a[0]);
+  const taskContactIds = contacts.map((c) => c[0]);
+  const taskDealIds = deals.map((d) => d[0]);
+  const taskLeadIds = Array.from({ length: 12 }, (_, i) => `lead-${i + 1}`);
+  const taskOwnerIds = users.map((u) => u.id);
+
+  const taskData = Array.from({ length: 42 }, (_, i) => {
+    const accountId = taskAccountIds[i % taskAccountIds.length];
+    const contactId = taskContactIds[i % taskContactIds.length];
+    const dealId = i % 4 === 0 ? taskDealIds[i % taskDealIds.length] : null;
+    const leadId = i % 5 === 0 ? taskLeadIds[i % taskLeadIds.length] : null;
+    const ownerId = taskOwnerIds[i % taskOwnerIds.length];
+
+    const mod = i % 12;
+    let dueDate: Date;
+    let status: string;
+    let priority: string;
+
+    if (mod < 4) {
+      // overdue (past due, open or in_progress)
+      dueDate = new Date(Date.now() - (3 + (i % 5)) * 86400000);
+      status = i % 2 === 0 ? "open" : "in_progress";
+      priority = ["high", "urgent", "normal"][i % 3] as string;
+    } else if (mod < 6) {
+      // due today
+      const today = new Date();
+      today.setHours(17, 30, 0, 0);
+      dueDate = today;
+      status = "open";
+      priority = "normal";
+    } else if (mod < 9) {
+      // upcoming +1 to +30 days
+      dueDate = new Date(Date.now() + (mod - 5) * 3 * 86400000);
+      status = "open";
+      priority = ["low", "normal", "high"][i % 3] as string;
+    } else {
+      // completed
+      dueDate = new Date(Date.now() - (mod - 8) * 2 * 86400000);
+      status = "done";
+      priority = "normal";
+    }
+    if (i % 11 === 0) {
+      status = "cancelled";
+      priority = "low";
+    }
+
+    return {
+      id: `task-${String(i + 1).padStart(3, "0")}`,
+      title: `${taskTemplates[i % taskTemplates.length]} #${i + 1}`,
+      description: "Seeded task for Task list, overdue filters, and dealer follow-up demo.",
+      dueDate,
+      status,
+      priority,
+      ownerId,
+      accountId,
+      contactId,
+      dealId,
+      leadId
+    };
+  });
+
+  await prisma.task.createMany({
+    data: taskData
   });
 }
 
