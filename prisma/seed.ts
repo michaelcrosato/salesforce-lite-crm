@@ -394,6 +394,7 @@ function buildDealerLeads() {
 
 async function main() {
   await prisma.task.deleteMany();
+  await prisma.case.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.lead.deleteMany();
   await prisma.dealerOrderArea.deleteMany();
@@ -649,6 +650,50 @@ async function main() {
 
   await prisma.task.createMany({
     data: taskData
+  });
+
+  // === NEW SECTION: Case seed data (Grok G2) — ~20 cases linked to accounts/contacts ===
+  // Mix of statuses (new/in_progress/waiting/resolved/closed) and priorities.
+  const caseTemplates = [
+    "Billing discrepancy on last invoice",
+    "Onboarding delayed for new portal",
+    "Feature request: bulk import",
+    "Integration outage with dealer CRM",
+    "Password reset loop for fleet users",
+    "Data migration validation needed",
+    "Compliance audit documentation",
+    "Training session scheduling",
+    "Renewal negotiation support",
+    "Lead routing feedback ticket"
+  ];
+  const caseAccountIds = accounts.map((a) => a[0]);
+  const caseContactIds = contacts.map((c) => c[0]);
+  const caseOwnerIds = users.map((u) => u.id);
+  const caseStatuses = ["new", "in_progress", "waiting", "resolved", "closed"] as const;
+  const casePriorities = ["low", "normal", "high", "urgent"] as const;
+
+  const caseData = Array.from({ length: 20 }, (_, i) => {
+    const accountId = caseAccountIds[i % caseAccountIds.length];
+    const contactId = i % 3 === 0 ? caseContactIds[i % caseContactIds.length] : null;
+    const ownerId = caseOwnerIds[i % caseOwnerIds.length];
+    const mod = i % 7;
+    const status = caseStatuses[mod % caseStatuses.length];
+    const priority = casePriorities[i % casePriorities.length];
+
+    return {
+      id: `case-${String(i + 1).padStart(3, "0")}`,
+      subject: `${caseTemplates[i % caseTemplates.length]} #${i + 1}`,
+      description: "Seeded support case for case management and priority queue demo.",
+      status,
+      priority,
+      accountId,
+      contactId,
+      ownerId
+    };
+  });
+
+  await prisma.case.createMany({
+    data: caseData
   });
 }
 
