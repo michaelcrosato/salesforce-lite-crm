@@ -754,6 +754,69 @@ async function main() {
       leads: { connect: campaignLeadIds.slice(4, 7).map((id) => ({ id })) }
     }
   });
+
+  // === YOLO EASTER EGG: Dealer Glory Trophies & Mascots (Grok special) ===
+  // A few ceremonial "Trophy Award" tasks so the most improved dealers get recognized.
+  // These are 100% non-functional but bring immense joy to the Dealer Revenue Command Center.
+  const trophyTasks = [
+    {
+      id: "task-trophy-001",
+      title: "🏆 Present Golden Shovel to most improved dealer",
+      description: "Ceremony for the dealer who dug themselves out of the biggest pacing hole this month. Mandatory fun.",
+      dueDate: new Date(Date.now() + 3 * 86400000),
+      status: "open",
+      priority: "high",
+      ownerId: "user-elena",
+      accountId: "acct-luma",
+      contactId: "contact-3",
+      dealId: null,
+      leadId: null,
+    },
+    {
+      id: "task-trophy-002",
+      title: "🦙 Crown Turbo Llama of the Month",
+      description: "Fastest quota acceleration award. The llama costume is in the mail.",
+      dueDate: new Date(Date.now() + 5 * 86400000),
+      status: "in_progress",
+      priority: "urgent",
+      ownerId: "user-ava",
+      accountId: "acct-northstar",
+      contactId: "contact-1",
+      dealId: "deal-1",
+      leadId: null,
+    },
+    {
+      id: "task-trophy-003",
+      title: "🐆 Pacing Panther Appreciation Call",
+      description: "Quietly terrifying efficiency deserves recognition. Send the good panther vibes.",
+      dueDate: new Date(Date.now() + 7 * 86400000),
+      status: "open",
+      priority: "normal",
+      ownerId: "user-marcus",
+      accountId: "acct-cascade",
+      contactId: "contact-5",
+      dealId: null,
+      leadId: null,
+    },
+  ];
+
+  await prisma.task.createMany({
+    data: trophyTasks,
+  });
+
+  // One extra ridiculous trophy-themed campaign
+  await prisma.campaign.create({
+    data: {
+      id: "campaign-trophy-001",
+      name: "Dealer Glory Awards 2026 — The Reckoning",
+      description: "Annual (monthly) celebration of the most majestic, chaotic, and majestic-chaotic dealers in the network. Prizes include bragging rights and a novelty giant check.",
+      status: "active",
+      startDate: new Date(Date.now() - 5 * 86400000),
+      endDate: new Date(Date.now() + 20 * 86400000),
+      budget: 4200,
+      ownerId: "user-elena",
+    }
+  });
 }
 
 function routingFailureSummary(reason: string) {
