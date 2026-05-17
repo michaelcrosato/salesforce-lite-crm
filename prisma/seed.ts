@@ -395,6 +395,7 @@ function buildDealerLeads() {
 async function main() {
   await prisma.task.deleteMany();
   await prisma.case.deleteMany();
+  await prisma.campaign.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.lead.deleteMany();
   await prisma.dealerOrderArea.deleteMany();
@@ -694,6 +695,64 @@ async function main() {
 
   await prisma.case.createMany({
     data: caseData
+  });
+
+  // === NEW SECTION: Campaign seed data (Grok G3) — ~8 campaigns with varied statuses/dates ===
+  // Links some to leads/contacts via join tables (many-to-many).
+  const campaignTemplates = [
+    "Spring Fleet Lead Push",
+    "Dealer Onboarding Wave Q2",
+    "Summer Conquest - Toronto",
+    "Healthcare Vertical Refresh",
+    "Retention Calling Campaign",
+    "New Area Coverage Launch",
+    "Winback for Churned Accounts",
+    "Partner Co-Sell Enablement"
+  ];
+  const campaignOwners = users.map((u) => u.id);
+  const campaignStatuses = ["planned", "active", "completed", "cancelled"] as const;
+  const campaignLeadIds = Array.from({ length: 8 }, (_, i) => `lead-${i + 10}`);
+  const campaignContactIds = contacts.slice(0, 6).map((c) => c[0]);
+
+  const campaignData = Array.from({ length: 8 }, (_, i) => {
+    const ownerId = campaignOwners[i % campaignOwners.length];
+    const mod = i % 5;
+    const status = campaignStatuses[mod % campaignStatuses.length];
+    const start = new Date(Date.now() - (30 + i * 5) * 86400000);
+    const end = new Date(start.getTime() + (mod + 10) * 86400000);
+    const budget = 5000 + (i % 4) * 2500;
+
+    return {
+      id: `campaign-${String(i + 1).padStart(3, "0")}`,
+      name: campaignTemplates[i % campaignTemplates.length],
+      description: "Seeded marketing campaign for campaign list and lead association demo.",
+      status,
+      startDate: start,
+      endDate: end,
+      budget,
+      ownerId
+    };
+  });
+
+  await prisma.campaign.createMany({
+    data: campaignData
+  });
+
+  // Link some campaigns to leads/contacts (many-to-many, after create)
+  const firstCampaignId = "campaign-001";
+  const secondCampaignId = "campaign-002";
+  await prisma.campaign.update({
+    where: { id: firstCampaignId },
+    data: {
+      leads: { connect: campaignLeadIds.slice(0, 4).map((id) => ({ id })) },
+      contacts: { connect: campaignContactIds.slice(0, 3).map((id) => ({ id })) }
+    }
+  });
+  await prisma.campaign.update({
+    where: { id: secondCampaignId },
+    data: {
+      leads: { connect: campaignLeadIds.slice(4, 7).map((id) => ({ id })) }
+    }
   });
 }
 
