@@ -1,33 +1,32 @@
 Agent: codex
-Sprint: repo-readiness; Sprint 4 queued
-Feature: Repo readiness and coordination scaffold
-Branch: feat/codex-crm-contract-api
+Sprint: repo-readiness; main promotion
+Feature: Promote feat/codex-crm-contract-api into main
+Branch: main
 Status: done
-Commits this prompt: 73bdceb - docs: align repo control center for max-yolo agents; e1c27af - chore: add local gate and worktree helper scripts
+Commits this prompt: 0f5d301 - merge: promote codex CRM readiness branch
 Gate status: PASS
 DoD self-check: PASS
-Timestamp: 2026-05-17T15:55:00-07:00
+Timestamp: 2026-05-17T16:09:23-07:00
 
 ### Completed this prompt
-- Updated `PLAN.md`, `README.md`, and `AGENTS.md` for max-YOLO repo-local execution.
-- Added coordination docs under `docs/` and prompt-folder README scaffolding under `prompts/`.
-- Added PowerShell helpers for the local gate, worktree checks/creation, agent status, artifact cleanup, and HEAD archive creation.
-- Removed safe local artifacts: `_screenshots/`, `.next/`, `dev-server.log`, and `test-results/`.
-- Ran drift scans for `/deals/[id]`, B2B lead conversion wording, lint/typecheck claims, and hard operator/human approval language.
-- Ran the full local gate via `scripts/local-gate.ps1`: PASS (`npm install`, Prisma generate/db push, seed, 88 Vitest tests, build, Chromium install, 1 Playwright test).
+- Confirmed `feat/codex-crm-contract-api` was clean at `5992eef`.
+- Removed safe generated artifacts before merge: `.next/` and `test-results/`.
+- Fast-forwarded `main` to `origin/main` at `5644596`.
+- Merged `origin/feat/codex-crm-contract-api` into `main` with merge commit `0f5d301`.
+- Resolved the `PLAN.md` add/add conflict by taking the feature branch readiness plan over the short `main` placeholder, matching the prompt's readiness-doc preference.
+- Ran post-merge cleanup and drift scans for deferred `/deals/[id]` wording, B2B lead conversion wording, hard human/operator approval language, and lint/typecheck/format claims.
+- Ran the full local gate via `scripts/local-gate.ps1`: PASS (`npm install`, Prisma generate/db push, seed, 13 Vitest files / 88 tests, build, Chromium install, 1 Playwright smoke test).
 
 ### Dirty inventory classification
-- Intentional planning/docs changes: committed in `73bdceb`.
-- Intentional scripts/cleanup changes: committed in `e1c27af`.
-- Local artifacts removed: `_screenshots/`, `.next/`, `dev-server.log`, `test-results/`.
-- Generated/local artifacts not for commit: `.env`, `node_modules/`, regenerated `.next/`, regenerated `test-results/`, `prisma/dev.db*`.
-- Source changes needing review: `app/accounts/actions.ts`, `app/contacts/actions.ts`, `app/deals/actions.ts`, `components/dashboard-charts.tsx`, `lib/crm/crmClient.ts`, `lib/validation.ts`, `tests/api/opportunityStageHistory.test.ts`, `tests/api/validation.test.ts`, `tests/api/formActions.test.ts`.
-- Unknown/unresolved local file: `REVIEW.CODEX.md`.
-- Other worktree state: Claude worktree clean; Grok worktree dirty; Gemini worktree missing.
+- No uncommitted source, docs, or test changes were present before switching to `main`.
+- Cleanup removed only generated local artifacts and did not change tracked files.
+- `.env`, `node_modules/`, and `prisma/dev.db*` were preserved.
+- `git status --short` was clean after the merge and after the gate.
 
 ### Next action
-Resolve or explicitly adopt the remaining pre-existing dirty source/test files, then create the pending Gemini worktree only when its branch is defined.
+Commit this report update, push `main`, create the requested HEAD archive, and report final verification.
 
 ### Scope confirmation
-No cross-ownership edits: YES
-CRM-CONTRACT.md honored:  YES
+No product scope added: YES
+No force push or history rewrite: YES
+CRM-CONTRACT.md honored: YES
