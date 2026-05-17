@@ -1,21 +1,33 @@
-# Codex Summary
+Agent: codex
+Sprint: repo-readiness; Sprint 4 queued
+Feature: Repo readiness and coordination scaffold
+Branch: feat/codex-crm-contract-api
+Status: done
+Commits this prompt: 73bdceb - docs: align repo control center for max-yolo agents; e1c27af - chore: add local gate and worktree helper scripts
+Gate status: PASS
+DoD self-check: PASS
+Timestamp: 2026-05-17T15:55:00-07:00
 
-- Slice 0 shipped: repo patterns confirmed; baseline gate green.
-- Slice 1 shipped: CRM contract, registry, additive schema, validation, and crmClient adapter; full gate green.
-- Feature 2.1 shipped: tasks service, crmClient complete adapter, and task API tests; full gate green.
-- Feature 2.2 shipped: cases service, crmClient resolve adapter, and case API tests; full gate green.
-- Feature 2.3 shipped: campaigns service, relation-aware crmClient adapter, and campaign API tests; full gate green.
-- Feature 2.4 shipped: opportunity stage history schema, service, moveDealAction recording, and tests; full gate green.
-- Feature 2.5 shipped: global CRM search service with route-safe results and search tests; full gate green.
-- Feature 2.6 shipped: typed list query helper wired into crmClient list adapters; full gate green.
-- Feature 2.7 shipped: validation rejection coverage and crmClient CRUD smoke tests; full gate green with 73 Vitest tests.
-- Feature 2.8 shipped: Activity links to Task and Case plus automatic task completion activity logging; full gate green.
-- Feature 2.9 shipped: report query service data shapes and report tests; full gate green with 82 Vitest tests.
+### Completed this prompt
+- Updated `PLAN.md`, `README.md`, and `AGENTS.md` for max-YOLO repo-local execution.
+- Added coordination docs under `docs/` and prompt-folder README scaffolding under `prompts/`.
+- Added PowerShell helpers for the local gate, worktree checks/creation, agent status, artifact cleanup, and HEAD archive creation.
+- Removed safe local artifacts: `_screenshots/`, `.next/`, `dev-server.log`, and `test-results/`.
+- Ran drift scans for `/deals/[id]`, B2B lead conversion wording, lint/typecheck claims, and hard operator/human approval language.
+- Ran the full local gate via `scripts/local-gate.ps1`: PASS (`npm install`, Prisma generate/db push, seed, 88 Vitest tests, build, Chromium install, 1 Playwright test).
 
-## Final Audit
-- Shipped features: Slice 0 through Feature 2.10.
-- Deferred items: UI pages for `/tasks`, `/cases`, and `/campaigns` remain for Claude Code per the agent handoff.
-- Current Vitest count: 82.
-- Final Feature 2.10 gate status: green (`npm run test`, `npm run build`, `npm run test:e2e`).
-- Type-safety scan: clean for `lib/crm`, `lib/services`, and `tests/api`.
-- Deal route scan: clean for implemented code and contract references.
+### Dirty inventory classification
+- Intentional planning/docs changes: committed in `73bdceb`.
+- Intentional scripts/cleanup changes: committed in `e1c27af`.
+- Local artifacts removed: `_screenshots/`, `.next/`, `dev-server.log`, `test-results/`.
+- Generated/local artifacts not for commit: `.env`, `node_modules/`, regenerated `.next/`, regenerated `test-results/`, `prisma/dev.db*`.
+- Source changes needing review: `app/accounts/actions.ts`, `app/contacts/actions.ts`, `app/deals/actions.ts`, `components/dashboard-charts.tsx`, `lib/crm/crmClient.ts`, `lib/validation.ts`, `tests/api/opportunityStageHistory.test.ts`, `tests/api/validation.test.ts`, `tests/api/formActions.test.ts`.
+- Unknown/unresolved local file: `REVIEW.CODEX.md`.
+- Other worktree state: Claude worktree clean; Grok worktree dirty; Gemini worktree missing.
+
+### Next action
+Resolve or explicitly adopt the remaining pre-existing dirty source/test files, then create the pending Gemini worktree only when its branch is defined.
+
+### Scope confirmation
+No cross-ownership edits: YES
+CRM-CONTRACT.md honored:  YES
