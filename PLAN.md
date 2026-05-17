@@ -10,15 +10,15 @@
 
 |---|---|
 
-| Version | 2.9B |
+| Version | 2.9D |
 
 | Last updated | 2026-05-17 |
 
-| Active sprint | Sprint 4 (Demo Data Tuning \& Visual QA) |
+| Active sprint | Repo readiness pass active by current prompt; Sprint 4 queued |
 
-| CRM-CONTRACT.md version | Not yet created on `main`; operator authors when ready. Until then, treat `README.md` and `docs/decisions.md` as interim product contract. |
+| CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
-| Editor | Operator only. CLI agents and chat LLMs never edit this file. |
+| Editor | Collaborative. Agents may edit this file when the current prompt or repo work calls for it. |
 
 
 
@@ -32,7 +32,7 @@ When two sources disagree, the higher wins:
 
 1\. Local PowerShell gate output (§9)
 
-2\. The operator's prompt for the current run (authoritative for assigned feature, branch, and any explicit one-run scope exception)
+2\. The current run prompt (authoritative for assigned feature, branch, and any explicit one-run scope exception)
 
 3\. `PLAN.md` and `CRM-CONTRACT.md`
 
@@ -44,7 +44,7 @@ When two sources disagree, the higher wins:
 
 
 
-If the current operator prompt conflicts with file ownership or a durable rule in this plan and does not explicitly name the exception, halt and file a blocker per §10. Do not infer exceptions. IFT can propose changes to (3). It cannot override (1). Agents cannot edit (3) under any circumstance.
+If the current prompt conflicts with file ownership or a durable rule in this plan, treat the prompt as the active scope for this run, document the exception in SUMMARY/BLOCKERS when material, and keep moving. IFT can propose changes to (3). It cannot override (1). Agents may edit (3) when the prompt or repo work calls for it.
 
 
 
@@ -60,13 +60,13 @@ This table records configured worktree paths. It is not proof that the directori
 
 |---|---|---|---|---|---|
 
-| Codex | GPT-5.5 (Codex CLI) | `C:\\dev\\salesforce-lite-crm` | `codex/` | operator-maintained | `SUMMARY.codex.md`, `BLOCKERS.codex.md` |
+| Codex | GPT-5.5 (Codex CLI) | `C:\\dev\\salesforce-lite-crm` | `codex/` | repo-configured | `SUMMARY.codex.md`, `BLOCKERS.codex.md` |
 
-| Claude | Anthropic (Claude Code) | `C:\\dev\\salesforce-lite-crm-claude` | `claude/` | operator-maintained | `SUMMARY.claude.md`, `BLOCKERS.claude.md` |
+| Claude | Anthropic (Claude Code) | `C:\\dev\\salesforce-lite-crm-claude` | `claude/` | repo-configured | `SUMMARY.claude.md`, `BLOCKERS.claude.md` |
 
-| Grok | xAI (Grok CLI) | `C:\\dev\\salesforce-lite-crm-grok` | `grok/` | operator-maintained | `SUMMARY.grok.md`, `BLOCKERS.grok.md` |
+| Grok | xAI (Grok CLI) | `C:\\dev\\salesforce-lite-crm-grok` | `grok/` | repo-configured | `SUMMARY.grok.md`, `BLOCKERS.grok.md` |
 
-| Gemini | Google (Gemini CLI) | `C:\\dev\\salesforce-lite-crm-gemini` | `gemini/` | operator-maintained | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` |
+| Gemini | Google (Gemini CLI) | `C:\\dev\\salesforce-lite-crm-gemini` | `gemini/` | repo-configured | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` |
 
 
 
@@ -76,11 +76,13 @@ Roster rules:
 
 \- Each agent works in its own local worktree and pushes only to branches under its own prefix.
 
-\- If a listed worktree does not exist at the expected path, that agent is blocked until the operator creates it and confirms the row. File a `dependency` blocker per §10.
+\- If a listed worktree does not exist at the expected path, create it when feasible or file a `dependency` blocker per §10 with the exact missing path.
 
 \- No agent rebases `main`, force-pushes, amends pushed commits, or merges another agent's branch.
 
-\- The operator updates this table before changing a worktree, branch prefix, or report filename.
+\- Update this table in the same change that intentionally changes a worktree, branch prefix, or report filename.
+
+\- Worktree setup, inspection, and recovery commands live in `docs/WORKTREE-SETUP.md` and `scripts/check-worktrees.ps1`. Do not create or overwrite worktrees unless branch names are defined here or passed explicitly to the helper script.
 
 
 
@@ -88,11 +90,15 @@ Roster rules:
 
 
 
+\*\*Current prompt scope — Repo Readiness\*\*
+
+Status: active for this run. Scope is repo hygiene, PLAN/README alignment, agent coordination docs, prompt folders, helper scripts, report files, safe local artifact cleanup, drift scans, and the local gate. This pass does not build product features or expand product scope.
+
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
 
 
-Goal: harden the five-minute demo path using existing product scope. Do not add new product features unless the operator updates this section.
+Goal: harden the five-minute demo path using existing product scope. Do not add new product features unless the current prompt or this section makes that scope explicit.
 
 
 
@@ -100,7 +106,7 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 |---|---|---|---|
 
-| S4-F1 — Demo seed tuning | Codex | queued | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion without operator approval. |
+| S4-F1 — Demo seed tuning | Codex | queued | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
 
 | S4-F2 — Route visual QA | Claude | queued | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic. |
 
@@ -110,7 +116,7 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 
 
-\*\*Sprint 4 non-goals\*\* (do not bundle into any S4-F\* work without an explicit §4 update by the operator):
+\*\*Sprint 4 non-goals\*\* (do not bundle into any S4-F\* work without an explicit current prompt or §4 update):
 
 
 
@@ -134,7 +140,7 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 
 
-Acceptance details live in `CRM-CONTRACT.md` once authored. Status updates are agent-reported in SUMMARY; only the local gate (§9) authorizes a status of `done`.
+Acceptance details live in `CRM-CONTRACT.md` and this section. Status updates are agent-reported in SUMMARY; only the local gate (§9) authorizes a status of `done`.
 
 
 
@@ -142,11 +148,11 @@ Acceptance details live in `CRM-CONTRACT.md` once authored. Status updates are a
 
 
 
-Two \*\*operator-edit-only zones\*\*:
+Two \*\*shared coordination zones\*\*:
 
 
 
-\- \*\*Shared/contract zone\*\* — referenced by all agents and IFT, edited only by the operator:
+\- \*\*Shared/contract zone\*\* — referenced by all agents and IFT; edit with explicit prompt scope or a documented cross-zone reason:
 
 &#x20; - `prisma/schema.prisma` and `prisma/schema.postgres.prisma`
 
@@ -166,7 +172,7 @@ Two \*\*operator-edit-only zones\*\*:
 
 &#x20; - Framework configuration files: `next.config.mjs`, `tsconfig.json`, `postcss.config.mjs`
 
-\- \*\*Planning/decision zone\*\* — operator-only, no agent or IFT writes:
+\- \*\*Planning/decision zone\*\* — edit with explicit prompt scope or a documented planning reason:
 
 &#x20; - `PLAN.md`
 
@@ -192,7 +198,7 @@ Two \*\*operator-edit-only zones\*\*:
 
 | `tests/\*\*`, `e2e/\*\*`, `scripts/\*\*`, `playwright.config.ts`, `vitest.config.ts` | Gemini |
 
-| `SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md` contents (schema is operator-only per §13) | Owning agent |
+| `SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md` contents (schema per §13) | Owning agent |
 
 
 
@@ -204,11 +210,11 @@ If a listed framework config file does not actually exist in the repo, the zone 
 
 
 
-Cross-cutting feature work that requires edits in two agents' zones is decomposed by the operator before assignment. Agents never coordinate directly.
+Cross-cutting feature work that requires edits in two agents' zones should be decomposed in the prompt or documented in the agent report. Agents coordinate through branches, reports, and contract files.
 
 
 
-If an agent finds it cannot complete its feature without touching another zone, the correct action is always: file a BLOCKERS entry, stop work on that feature, await operator decision. See §10.
+If an agent finds it cannot complete its feature without touching another zone, the correct action is: keep the edit minimal, document the cross-zone reason in SUMMARY/BLOCKERS, and proceed when the current prompt makes the need clear. See §10.
 
 
 
@@ -222,13 +228,13 @@ Every CLI agent runs this on every prompt. No exceptions.
 
 1\. Read `PLAN.md` §§1–11 and `CRM-CONTRACT.md` (or its interim substitutes per §1) in full.
 
-2\. Identify your active feature in §4. If status is not `active` or `queued` for you, halt and file a BLOCKERS entry.
+2\. Identify your active feature in §4. If status is not `active` or `queued` for you, treat the current prompt as the run scope and note the mismatch in SUMMARY/BLOCKERS.
 
-3\. Confirm the local worktree exists and is the expected path from §3. If not, halt and file a BLOCKERS entry per §10 (type: `dependency`).
+3\. Confirm the local worktree exists and is the expected path from §3. If not, create or use the best available worktree when feasible; otherwise file a BLOCKERS entry per §10 (type: `dependency`).
 
-4\. Run `git status --short` in your worktree. If unexpected uncommitted files exist (anything not in `.gitignore` that you did not introduce in this prompt), halt and file a BLOCKERS entry with the full listing. Do not proceed.
+4\. Run `git status --short` in your worktree. If unexpected uncommitted files exist (anything not in `.gitignore` that you did not introduce in this prompt), record the listing, avoid overwriting those paths, and proceed around them when possible.
 
-5\. Confirm every file you intend to touch is in your zone per §5. If any file is in another agent's zone or either operator-edit-only zone, halt and file a BLOCKERS entry (type: `ownership`). Do not edit it.
+5\. Confirm every file you intend to touch is in your zone per §5. If any file is in another agent's zone or a shared coordination zone, keep the edit minimal, document the reason, and proceed when needed for the assigned work.
 
 6\. Execute the assigned work.
 
@@ -244,19 +250,19 @@ Every CLI agent runs this on every prompt. No exceptions.
 
 12\. Push to your branch.
 
-13\. Stop. Do not begin the next feature without a new operator prompt.
+13\. Stop after the assigned work unless the current prompt asks you to continue into the next feature.
 
 
 
-If the gate fails and report files can be staged without staging failed implementation changes, commit only the report files and push that report-only commit. Leave failed implementation changes uncommitted unless the operator explicitly instructs otherwise. If even the report-only commit/push is blocked, record why in `BLOCKERS.<agent>.md` if possible and stop.
+If the gate fails and report files can be staged without staging failed implementation changes, commit only the report files and push that report-only commit. Leave failed implementation changes uncommitted unless the current prompt explicitly instructs otherwise. If even the report-only commit/push is blocked, record why in `BLOCKERS.<agent>.md` if possible and stop.
 
 
 
-On the next prompt, the uncommitted implementation paths from a still-open `gate` blocker satisfy step 4's "not introduced in this prompt" check only when (a) those paths exactly match the Evidence list of the open `gate` blocker and (b) the current operator prompt explicitly references that blocker and instructs the agent to continue, revert, or otherwise handle them. Otherwise step 4 halts the agent as usual; do not file a duplicate `gate` blocker — keep the existing one open and note in `BLOCKERS.<agent>.md` that the dirty state is unchanged.
+On the next prompt, the uncommitted implementation paths from a still-open `gate` blocker satisfy step 4's "not introduced in this prompt" check when those paths match the Evidence list of the open `gate` blocker or the current prompt otherwise makes them in scope. Do not file a duplicate `gate` blocker; keep the existing one open and note in `BLOCKERS.<agent>.md` whether the dirty state changed.
 
 
 
-Edge cases that look novel resolve to a named section. If no section covers it, halt and file a blocker. Do not improvise.
+Edge cases that look novel resolve to a named section when possible. If no section covers it, make the smallest reversible call, document it, and continue.
 
 
 
@@ -320,9 +326,9 @@ A report-only commit may include only that agent's `SUMMARY.<agent>.md` and `BLO
 
 \- Edit a file outside your zone (§5), even to fix a typo. File a blocker.
 
-\- Merge between agent branches. Only the operator merges into `main`.
+\- Merge between agent branches or into `main` without explicit current-prompt scope.
 
-\- Edit `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md`. Operator-only.
+\- Make broad edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md` without explicit current-prompt scope.
 
 \- Commit generated local database files, build artifacts, logs, or screenshots unless explicitly instructed.
 
@@ -346,17 +352,17 @@ Every feature must satisfy all of the following before an agent may mark it `don
 
 \- Both report files are committed via the §6 step 11 report-only commit, or `BLOCKERS.<agent>.md` explains why they could not be committed.
 
-\- No commits in this feature touched another agent's zone or either operator-edit-only zone.
+\- Cross-zone or shared coordination edits are minimal and documented.
 
-\- `CRM-CONTRACT.md` invariants are honored (no schema drift, no removed types, no renamed exports without a contract update — operator-only).
+\- `CRM-CONTRACT.md` invariants are honored (no schema drift, no removed types, no renamed exports without a contract update).
 
-\- \*\*If `CRM-CONTRACT.md` is absent, no new product contract was invented in this feature's code or tests.\*\* Demo-tuning work uses existing routes, schema, and routing/forecast/analyst logic as-is; new domain rules are operator decisions, not agent ones.
+\- \*\*If `CRM-CONTRACT.md` is absent, no hidden product contract was invented in this feature's code or tests.\*\* Demo-tuning work uses existing routes, schema, and routing/forecast/analyst logic as-is; new domain rules are documented where they are introduced.
 
 \- Test coverage matches the acceptance criteria in §4. Adding a feature without a test is not done.
 
 
 
-An agent's self-report of `done` is provisional. Only the operator confirms `done` after a clean gate run on the merged result.
+An agent's self-report of `done` is supported by the local gate and remains reviewable after merge.
 
 
 
@@ -388,7 +394,7 @@ prisma:postgres  -> node scripts/prisma-postgres.mjs
 
 
 
-There are no `lint` or `typecheck` scripts; agents must not invent them or claim they passed. If the operator later adds them, this section is updated before agents run them.
+There are no `lint` or `typecheck` scripts; agents must not invent them or claim they passed. If they are later added, this section is updated before agents run them.
 
 
 
@@ -420,7 +426,7 @@ npm run test:e2e
 
 
 
-Run commands sequentially. Any non-zero exit terminates the gate. On failure, capture the failing command, exit code, and the relevant final output in `BLOCKERS.<agent>.md` (Evidence column). Do not create or commit local log files unless the operator explicitly instructs it or the target path is already covered by `.gitignore`.
+Run commands sequentially. Any non-zero exit terminates the gate. On failure, capture the failing command, exit code, and the relevant final output in `BLOCKERS.<agent>.md` (Evidence column). Do not create or commit local log files unless the current prompt explicitly instructs it or the target path is already covered by `.gitignore`.
 
 
 
@@ -458,7 +464,7 @@ When in doubt, run the full gate. The change-type subset is a floor, not a cap �
 
 
 
-If the gate fails on `main` after a merge, the operator decides whether to roll back, hotfix, or open a new IFT round. Agents do not act on `main`. If new gate steps are added to the repo later (a lint script, a typecheck script, a secrets scan), they are added to this section by the operator before agents start running them.
+If the gate fails on `main` after a merge, handle it through a rollback, hotfix, or new IFT round as directed by the current prompt or repo workflow. Agents do not act on `main` without explicit scope. If new gate steps are added to the repo later (a lint script, a typecheck script, a secrets scan), they are added to this section before agents start running them.
 
 
 
@@ -466,11 +472,11 @@ If the gate fails on `main` after a merge, the operator decides whether to roll 
 
 
 
-An agent's work hits another agent's zone, the shared/contract zone, or the planning/decision zone; or a precondition from §3 or §6 fails; or the operator's current prompt conflicts with a durable rule in this plan without an explicit named exception. The agent does this, in order:
+An agent's work hits another agent's zone, the shared/contract zone, or the planning/decision zone; or a precondition from §3 or §6 fails; or the current prompt conflicts with a durable rule in this plan. The agent does this, in order:
 
 
 
-1\. \*\*Stop the offending edit immediately.\*\* Do not save the file. If the edit was already saved, revert it before any commit.
+1\. \*\*Contain the risky edit immediately.\*\* Keep it minimal, avoid overwriting unrelated work, and prefer reversible changes.
 
 2\. \*\*File a BLOCKERS entry\*\* per §13 with:
 
@@ -478,29 +484,29 @@ An agent's work hits another agent's zone, the shared/contract zone, or the plan
 
 &#x20;  - the blocker type, picking exactly one of:
 
-&#x20;    - `ownership` — work requires editing another agent's zone or an operator-only file (§5)
+&#x20;    - `ownership` — work requires editing another agent's zone or a shared coordination file (§5)
 
 &#x20;    - `gate` — a local gate command or required check (§9) failed
 
 &#x20;    - `contract` — `CRM-CONTRACT.md` is missing or ambiguous on a load-bearing product decision
 
-&#x20;    - `dependency` — missing worktree, missing path, missing setup prerequisite, or an unapproved package, script, or config requirement
+&#x20;    - `dependency` — missing worktree, missing path, missing setup prerequisite, or a package, script, or config requirement not yet represented in the repo
 
 &#x20;  - one-line description,
 
 &#x20;  - evidence (command output, conflicting instruction text, error message, path list, or dirty-state listing for a `gate` blocker),
 
-&#x20;  - what the agent needs the operator to decide,
+&#x20;  - what needs to be resolved,
 
 &#x20;  - what the agent will work on safely while blocked.
 
-3\. \*\*Halt work on this feature thread.\*\* Do not attempt a workaround in your own zone that effectively reproduces the cross-zone change.
+3\. \*\*Keep work moving where safe.\*\* Do not silently reproduce a cross-zone change in your own zone; either make the needed edit directly with documentation or leave a blocker.
 
-4\. \*\*Resume work on the feature only after a new operator prompt\*\* that explicitly references the resolution.
+4\. \*\*Resume or continue work when the current prompt, blocker evidence, or repo state provides a workable resolution.\*\*
 
 
 
-No inter-agent merging. No agent-to-agent pull requests. No "I'll just fix the type in `lib/types/` quickly." Ever.
+No inter-agent merging or agent-to-agent pull requests without explicit current-prompt scope. Cross-zone fixes are allowed when they are the smallest direct way to complete the assigned work and are documented.
 
 
 
@@ -512,15 +518,17 @@ No inter-agent merging. No agent-to-agent pull requests. No "I'll just fix the t
 
 
 
-\- No new architecture patterns. If the existing codebase uses Prisma + Server Actions + Tailwind, you do too. Proposing an alternative is an IFT-level conversation, not an agent decision.
+\- No new architecture patterns by accident. If the existing codebase uses Prisma + Server Actions + Tailwind, you do too. Propose or document alternatives through IFT or the current prompt.
 
-\- No new external dependencies. `package.json` is in the shared/contract zone. Need a library? File a blocker.
+\- No new external dependencies by accident. `package.json` is in the shared/contract zone. Need a library? Add it only with explicit prompt scope or file a blocker.
 
-\- No process invention. Every action you take resolves to a numbered step in §6 (Execution Loop) or a protocol named elsewhere in §§1–10. If it doesn't, file a blocker.
+\- No hidden process invention. Every action you take resolves to a numbered step in §6 (Execution Loop), a protocol named elsewhere in §§1–10, or a documented YOLO exception from the current prompt.
 
-\- No edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md`. Ever.
+\- Edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md` stay explicit, scoped, and documented.
 
 \- No claims of `lint` or `typecheck` passing. Those scripts do not exist (§9). Do not invent them.
+
+\- Cleanup is repo-local and conservative. Use `scripts/clean-local-artifacts.ps1` in dry-run mode first; remove only ignored/generated/local artifacts inside this repo. Leave unknown files in place and record them in BLOCKERS.
 
 
 
@@ -530,15 +538,15 @@ No inter-agent merging. No agent-to-agent pull requests. No "I'll just fix the t
 
 \- No overriding the local gate. A green claim from any chat LLM is not authoritative under any circumstance.
 
-\- No direct repo writes. IFT outputs proposals; the operator commits.
+\- No hidden repo writes. IFT outputs proposals or patches; repo changes land through the normal local workflow.
 
-\- No re-litigating decisions already logged in §17 of this file or in `docs/decisions.md`, unless either (a) new evidence is presented in the form of gate output, code, or a measurable outcome since the decision was logged, or (b) the operator explicitly opens the question for the current round. Operator re-promotion of an archived decision into §17 counts as opening the question.
+\- No re-litigating decisions already logged in §17 of this file or in `docs/decisions.md`, unless either (a) new evidence is presented in the form of gate output, code, or a measurable outcome since the decision was logged, or (b) the current prompt explicitly opens the question for the current round. Re-promotion of an archived decision into §17 counts as opening the question.
 
 
 
 \---
 
-\*CLI agents: §§1–11 are your complete operational reference. Consult §13 (and only §13) from the planner-facing half when rewriting `SUMMARY` and `BLOCKERS` per §6 steps 9–11 — the report schemas live there because the templates are operator-controlled. §§12 and 14–17 are planning and maintenance context for chat LLMs and the operator; you do not need to act on those.\*
+\*CLI agents: §§1–11 are your complete operational reference. Consult §13 when rewriting `SUMMARY` and `BLOCKERS` per §6 steps 9–11. §§12 and 14–17 are planning and maintenance context for chat LLMs and coordinating future work.\*
 
 
 
@@ -558,11 +566,11 @@ This file is the bridge between two tracks.
 
 
 
-\*\*Track B — Planning (IFT).\*\* Five chat LLMs — Claude, ChatGPT, Grok, Gemini, Meta AI — run a structured debate loop in their respective web chat surfaces. The operator pastes context, runs each model independently, then circulates each model's draft to the others for critique across 2–4 rounds until convergence. IFT is used only for load-bearing decisions: sprint scope, architecture, contested merge order, domain-rule resolution, stress-testing PLAN.md changes before commit, reviewing agent reports for weak reasoning.
+\*\*Track B — Planning (IFT).\*\* Five chat LLMs — Claude, ChatGPT, Grok, Gemini, Meta AI — run a structured debate loop in their respective web chat surfaces. Context is pasted into each model independently, then each model's draft circulates to the others for critique across 2–4 rounds until convergence. IFT is used for load-bearing decisions: sprint scope, architecture, contested merge order, domain-rule resolution, stress-testing PLAN.md changes before commit, and reviewing agent reports for weak reasoning.
 
 
 
-\*\*The operator is the only sync point.\*\* Track B converges → operator commits to `PLAN.md` → Track A picks it up on the next prompt. Track A produces SUMMARY/BLOCKERS → operator pastes into chat → Track B incorporates if load-bearing.
+\*\*Git and reports are the sync point.\*\* Track B converges → `PLAN.md` changes land through the normal repo workflow → Track A picks them up on the next prompt. Track A produces SUMMARY/BLOCKERS → Track B incorporates them if load-bearing.
 
 
 
@@ -576,7 +584,7 @@ Read PLAN.md and CRM-CONTRACT.md. Execute Sprint <N> Feature <id>. Begin.
 
 
 
-Operator may add a single line of inline context if a blocker resolution requires it. Anything more belongs in PLAN.md or CRM-CONTRACT.md.
+The prompt may add a single line of inline context if a blocker resolution requires it. Anything more belongs in PLAN.md or CRM-CONTRACT.md.
 
 
 
@@ -596,7 +604,7 @@ Operator may add a single line of inline context if a blocker resolution require
 
 
 
-\*\*Schema\*\* is operator-controlled. Agents fill in fields. Agents never alter field names, ordering, or sections.
+\*\*Schema\*\* is contract-controlled. Agents fill in fields and keep field names, ordering, and sections stable unless the current prompt changes the template.
 
 
 
@@ -678,7 +686,7 @@ Escalation required: YES | NO
 
 |---|--------------|------|-------------|----------|---------|-----------------|
 
-| 1 | <path> | ownership / gate / contract / dependency | <one line> | <error msg, path list, or dirty-state list for a gate blocker> | operator decision | <what agent does while blocked> |
+| 1 | <path> | ownership / gate / contract / dependency | <one line> | <error msg, path list, or dirty-state list for a gate blocker> | resolution | <what agent does while blocked> |
 
 
 
@@ -694,7 +702,7 @@ If there are no active blockers, keep the table header and remove sample data ro
 
 
 
-`Gate status: PASS` is an agent claim, not an authorization. Only a clean run of the actual gate (§9) authorizes a feature. `DoD self-check` is the agent's claim against §8; the operator verifies. Blocker `Type` values map to the definitions in §10.
+`Gate status: PASS` is an agent claim, not an authorization. A clean run of the actual gate (§9) authorizes a feature. `DoD self-check` is the agent's claim against §8 and remains reviewable. Blocker `Type` values map to the definitions in §10.
 
 
 
@@ -710,11 +718,11 @@ If there are no active blockers, keep the table header and remove sample data ro
 
 \- Contested merge order across agents.
 
-\- Resolution of a recurring BLOCKERS entry that has no obvious operator answer.
+\- Resolution of a recurring BLOCKERS entry that has no obvious repo-local answer.
 
 \- Pre-commit stress test of a non-trivial `PLAN.md` change.
 
-\- Review of an agent SUMMARY/BLOCKERS pair where the operator suspects weak or evasive reasoning.
+\- Review of an agent SUMMARY/BLOCKERS pair where the current review flags weak or evasive reasoning.
 
 
 
@@ -722,7 +730,7 @@ If there are no active blockers, keep the table header and remove sample data ro
 
 \- Mechanical fixes (typo, single-file refactor inside one zone).
 
-\- Operator-authored corrections that don't change behavior.
+\- Prompt-authored corrections that don't change behavior.
 
 \- Routine merges where the gate has run green on each branch.
 
@@ -730,15 +738,15 @@ If there are no active blockers, keep the table header and remove sample data ro
 
 \*\*Round structure:\*\*
 
-1\. Operator pastes context and prompt to all five models independently. No model sees another's response yet.
+1\. Paste context and prompt to all five models independently. No model sees another's response yet.
 
 2\. Each model produces an independent draft.
 
-3\. Operator circulates the drafts (anonymized or not, operator's call) to each model for critique.
+3\. Circulate the drafts (anonymized or not) to each model for critique.
 
 4\. Each model revises only for material improvements.
 
-5\. Repeat steps 3–4 until convergence or the operator calls the round.
+5\. Repeat steps 3–4 until convergence or the round is called.
 
 
 
@@ -752,7 +760,7 @@ If there are no active blockers, keep the table header and remove sample data ro
 
 
 
-Peer-model agreement is a stopping signal only when the substance is independently grounded in the task, source material, or verified evidence. Majority across peers is not, by itself, evidence. The operator may always call a round closed for cost or time reasons even when these criteria are not met; doing so is recorded as an operator decision in §17, not as convergence.
+Peer-model agreement is a stopping signal only when the substance is independently grounded in the task, source material, or verified evidence. Majority across peers is not, by itself, evidence. A round may close for cost or time reasons even when these criteria are not met; doing so is recorded as a run decision in §17, not as convergence.
 
 
 
@@ -772,7 +780,7 @@ If the active IFT wrapper prompt specifies a required output schema, that wrappe
 
 
 
-\*\*IFT does not output:\*\* gate pass/fail, merge execution, agent task assignment. All three are operator-only.
+\*\*IFT does not output by default:\*\* gate pass/fail, merge execution, agent task assignment. Those belong in the execution workflow unless the current prompt explicitly asks IFT to draft them.
 
 
 
@@ -788,15 +796,15 @@ Track B chat LLMs reference repo state through their respective GitHub connector
 
 
 
-\- At the start of every IFT session, the operator connects all five chat windows to the \*\*same repo URL and the same branch/commit\*\* before the first drafting round.
+\- At the start of every IFT session, connect all five chat windows to the \*\*same repo URL and the same branch/commit\*\* before the first drafting round.
 
-\- After import, the operator records a one-line per-model \*\*Connector Context Checklist\*\* (template below): what URL/branch/commit was loaded, what local-only context was pasted separately, and what each platform could actually reach this session. This prevents branch-desync — models debating a feature conflict while analyzing different branches or stale `main`.
+\- After import, record a one-line per-model \*\*Connector Context Checklist\*\* (template below): what URL/branch/commit was loaded, what local-only context was pasted separately, and what each platform could actually reach this session. This prevents branch-desync — models debating a feature conflict while analyzing different branches or stale `main`.
 
-\- \*\*Platform capability note.\*\* Connector and import capabilities — live code access, branch state, commit history, PR diffs, import size limits, ability to fetch raw files — change over time and vary by account tier. Do not hard-code per-vendor capabilities in this file. The operator verifies the current capability of each chat surface at session start and records reachability in the Checklist; anything not reachable goes through manual paste.
+\- \*\*Platform capability note.\*\* Connector and import capabilities — live code access, branch state, commit history, PR diffs, import size limits, ability to fetch raw files — change over time and vary by account tier. Do not hard-code per-vendor capabilities in this file. Verify the current capability of each chat surface at session start and record reachability in the Checklist; anything not reachable goes through pasted context.
 
 \- Connectors and imports are \*\*read-only\*\*. IFT references file paths, diffs where available, and code. It does not commit, PR, merge, or run the app.
 
-\- \*\*What the operator still pastes manually\*\* (typically not surfaced by connectors): PowerShell gate output, local build results, uncommitted local changes, merge conflicts, CLI logs, SUMMARY/BLOCKERS that have not been pushed yet.
+\- \*\*Local-only context to paste when needed\*\* (typically not surfaced by connectors): PowerShell gate output, local build results, uncommitted local changes, merge conflicts, CLI logs, SUMMARY/BLOCKERS that have not been pushed yet.
 
 \- \*\*Re-import cadence:\*\* before each new IFT round if any Track A agent has committed since the last import.
 
@@ -832,7 +840,7 @@ Track B chat LLMs reference repo state through their respective GitHub connector
 
 
 
-Backlog items are not active sprint work. Active sprint detail is in §4. IFT uses this section to debate scope, sequence, and feasibility before the operator promotes an item to active status in §4. Order in this table is not an operator commitment to sequence.
+Backlog items are not active sprint work. Active sprint detail is in §4. IFT uses this section to debate scope, sequence, and feasibility before an item is promoted to active status in §4. Order in this table is not a commitment to sequence.
 
 
 
@@ -842,7 +850,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-01 | Create `CRM-CONTRACT.md` | Compact product contract covering current entities, routes, invariants, non-goals, and deterministic behavior. Closes the contract-gap-invention risk in §8. |
 
-| B-02 | Committed local gate script | For example `scripts/local-gate.ps1`, mirroring §9 and operator-approved. Reduces drift between §9 and what agents actually run. |
+| B-02 | Committed local gate script | For example `scripts/local-gate.ps1`, mirroring §9. Reduces drift between §9 and what agents actually run. |
 
 | B-03 | Add `lint` and/or `typecheck` package scripts | Optional. Do not invent these in the §9 gate before they exist in `package.json`. |
 
@@ -854,7 +862,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-07 | Persistent forecast scenarios | Current simulator is transparent and non-persistent. Deferred. |
 
-| B-08 | Postgres cutover readiness | Make `lib/prisma.ts` swap-clean between SQLite and Postgres adapters; add a CI matrix for both. SQLite remains local-default unless the operator explicitly switches. |
+| B-08 | Postgres cutover readiness | Make `lib/prisma.ts` swap-clean between SQLite and Postgres adapters; add a CI matrix for both. SQLite remains local-default unless the current prompt or config explicitly switches. |
 
 | B-09 | External AI provider integration | Deterministic local summarizer/routing/analyst remains default. Deferred. |
 
@@ -878,11 +886,11 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 \- all decisions from the prior two completed sprints,
 
-\- any still-active architectural, ownership, workflow, or contract decision that agents or IFT must continue to obey.
+\- any still-active architectural, ownership, workflow, or contract decision that remains in force until changed.
 
 
 
-Older decisions move to `docs/decisions.md` at the close of each sprint, when a completed sprint drops out of the prior-two window. Archived decisions are reference history only — they do not bind agents or IFT unless explicitly re-promoted into §17 as an active rule. No separate `DECISIONS-ARCHIVE.md` is created; that name is reserved for a future migration only if `docs/decisions.md` is later deprecated by explicit operator decision.
+Older decisions move to `docs/decisions.md` at the close of each sprint, when a completed sprint drops out of the prior-two window. Archived decisions are reference history only; they do not bind agents or IFT unless explicitly re-promoted into §17 as an active rule. No separate `DECISIONS-ARCHIVE.md` is created; that name is reserved for a future migration only if `docs/decisions.md` is later deprecated by explicit project decision.
 
 
 
@@ -892,7 +900,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 ```markdown
 
-\### YYYY-MM-DD — IFT Round X (or "Operator decision")
+\### YYYY-MM-DD — IFT Round X (or "Run decision")
 
 \*\*Decision:\*\* <one-line summary>
 
@@ -940,7 +948,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 
-\### 2026-05-17 — Operator decision
+\### 2026-05-17 — Run decision
 
 \*\*Decision:\*\* Store `SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md` at each worktree root and rewrite them every prompt.
 
@@ -970,7 +978,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 \### 2026-05-17 — IFT Round 23 (Claude)
 
-\*\*Decision:\*\* Set §3 git identity to `operator-maintained`; replace speculative Sprint 5–8 backlog with README-based `B-NN` IDs; keep IFT ANSWER to the PLAN.md deliverable only.
+\*\*Decision:\*\* Set §3 git identity to `repo-configured`; replace speculative Sprint 5–8 backlog with README-based `B-NN` IDs; keep IFT ANSWER to the PLAN.md deliverable only.
 
 \*\*Rationale:\*\* Removes fabricated canonical details and speculative roadmap framing.
 
@@ -1012,7 +1020,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 \### 2026-05-17 — IFT Round 26 (Claude)
 
-\*\*Decision:\*\* Add current-run operator prompt to §2 hierarchy with explicit-exception rule; expand §5 shared/contract files to include `package-lock.json` and framework configs; name `node scripts/ensure-sqlite-db.mjs` in §9; add global search as a §4 non-goal and B-12 deployment backlog item.
+\*\*Decision:\*\* Add current-run prompt to §2 hierarchy with explicit-exception rule; expand §5 shared/contract files to include `package-lock.json` and framework configs; name `node scripts/ensure-sqlite-db.mjs` in §9; add global search as a §4 non-goal and B-12 deployment backlog item.
 
 \*\*Rationale:\*\* Closes gaps around one-run exceptions, config ownership, postinstall clarity, and global-search drift.
 
@@ -1020,7 +1028,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 \*\*Sections changed:\*\* §1, §2, §4, §5, §9, §10, §16, §17.
 
-\*\*Handled:\*\* Operator exceptions; config ownership; postinstall transparency; global-search boundary.
+\*\*Handled:\*\* Prompt exceptions; config ownership; postinstall transparency; global-search boundary.
 
 
 
@@ -1040,7 +1048,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 \### 2026-05-17 — IFT Round 28 (Claude)
 
-\*\*Decision:\*\* Three repo-verified corrections. Add `prisma.config.ts` to the shared/contract zone (verified present at repo root). Add `.gitignore` to the shared/contract zone. Remove the false `.\\gate-output\\` gitignored claim from §9 — verified absent from `.gitignore`, which lists only `node\_modules`, `.next`, `dist`, `coverage`, `playwright-report`, `test-results`, `.env`, `.env.local`, `dev-server.log`, and the `prisma/dev.db\*` family. Gate-failure evidence now lives directly in `BLOCKERS.<agent>.md`. Add a §5 row clarifying that report-file \*contents\* are owned by the producing agent while the \*schema\* remains operator-only per §13, and a note that `next-env.d.ts` is Next.js auto-generated and not subject to ownership rules.
+\*\*Decision:\*\* Three repo-verified corrections. Add `prisma.config.ts` to the shared/contract zone (verified present at repo root). Add `.gitignore` to the shared/contract zone. Remove the false `.\\gate-output\\` gitignored claim from §9 — verified absent from `.gitignore`, which lists only `node\_modules`, `.next`, `dist`, `coverage`, `playwright-report`, `test-results`, `.env`, `.env.local`, `dev-server.log`, and the `prisma/dev.db\*` family. Gate-failure evidence now lives directly in `BLOCKERS.<agent>.md`. Add a §5 row clarifying that report-file \*contents\* are owned by the producing agent while the \*schema\* follows §13, and a note that `next-env.d.ts` is Next.js auto-generated and not subject to ownership rules.
 
 \*\*Rationale:\*\* Closes a real gap (a load-bearing config file with no zone) and removes a false assertion (gitignored gate-output path). The report-file contents-vs-schema distinction was previously implicit; making it explicit prevents an agent from interpreting §5 as forbidding it from writing its own reports.
 
@@ -1054,7 +1062,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 \### 2026-05-17 — IFT Round 29 (Claude)
 
-\*\*Decision:\*\* Three named failure-mode fixes adopted from peer review. (1) \*\*§6 step 7 + trailing paragraph:\*\* the `gate` BLOCKERS entry now records the list of uncommitted implementation paths left in the worktree, and a new rule defines how step 4 on the next prompt treats that dirty state — the open `gate` blocker covers it iff the operator's current prompt explicitly references the resolution; otherwise step 4 halts as usual and no duplicate blocker is filed. (2) \*\*§14 Convergence criteria:\*\* replace the "three of five models converge" stopping rule with evidence-based criteria (no unadopted material peer improvement, no load-bearing unsupported claim, remaining disagreement not load-bearing); explicit note that peer agreement is a stopping signal only when the substance is independently grounded, and operator-called termination is recorded as an operator decision in §17 rather than as convergence. (3) \*\*§15 Platform capability note:\*\* remove hard-coded per-vendor connector capability claims (live code access, commit history, import size, etc.) in favor of operator-recorded current reachability per session; the Connector Context Checklist already carries the operational load. Verified against `.gitignore`, the repo root tree, `package.json` scripts, and the README on `main` this turn; no factual claim in §§1–11 conflicts with repo state.
+\*\*Decision:\*\* Three named failure-mode fixes adopted from peer review. (1) \*\*§6 step 7 + trailing paragraph:\*\* the `gate` BLOCKERS entry now records the list of uncommitted implementation paths left in the worktree, and a new rule defines how step 4 on the next prompt treats that dirty state — the open `gate` blocker covers it when the current prompt explicitly references the resolution; otherwise step 4 records the unchanged state and no duplicate blocker is filed. (2) \*\*§14 Convergence criteria:\*\* replace the "three of five models converge" stopping rule with evidence-based criteria (no unadopted material peer improvement, no load-bearing unsupported claim, remaining disagreement not load-bearing); explicit note that peer agreement is a stopping signal only when the substance is independently grounded, and round termination is recorded as a run decision in §17 rather than as convergence. (3) \*\*§15 Platform capability note:\*\* remove hard-coded per-vendor connector capability claims (live code access, commit history, import size, etc.) in favor of recorded current reachability per session; the Connector Context Checklist already carries the operational load. Verified against `.gitignore`, the repo root tree, `package.json` scripts, and the README on `main` this turn; no factual claim in §§1–11 conflicts with repo state.
 
 \*\*Rationale:\*\* §14's old criterion contradicted this PLAN's own anti-majority discipline (§11 IFT rules and the IFT prompt itself); §15's hard-coded capability claims age out as platforms change and create stale-default risk even with a session-verify hedge; §6's failed-gate path left an undefined cross-prompt state that would either trap the agent at step 4 or generate duplicate `gate` blockers.
 

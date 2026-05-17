@@ -2,6 +2,22 @@
 
 Salesforce Lite CRM is a local proof-of-concept CRM built with Next.js, Prisma, SQLite, Tailwind CSS, and deterministic AI-style note summarization. It proves the daily sales loop: manage accounts and contacts, move deals through a pipeline, record activities, generate simple next steps from rough notes, and run a dealer revenue command center for lead routing and order pacing.
 
+## Project Control
+
+Read these first when working as a CLI agent:
+
+- `PLAN.md` - execution rules, source-of-truth hierarchy, agent zones, gate, report schema, and current sprint status.
+- `CRM-CONTRACT.md` - entity names, route contract, statuses, and adapter signatures. If a branch does not have this file yet, use `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and do not invent a replacement contract.
+- `AGENTS.md` - short agent handoff with worktree paths, branch conventions, zones, and max-YOLO operating policy.
+- `docs/PROJECT-CONTROL.md` - current repo readiness status and next coordination step.
+- `docs/MERGE-PLAYBOOK.md` - merge, conflict, rollback/archive, and final-gate procedure.
+- `docs/DEMO-QA-CHECKLIST.md` - verified demo route checklist.
+- `docs/WORKTREE-SETUP.md` - expected worktree topology and safe creation commands.
+- `docs/LOCAL-GATE.md` - full local gate commands.
+- `prompts/README.md` - versioned prompt folder policy.
+
+The repo is configured for autonomous max-YOLO execution. The current prompt can authorize a one-run exception, but agents should keep changes scoped, document exceptions in SUMMARY/BLOCKERS, and preserve the local gate as the authority for pass/fail.
+
 ## Setup
 
 ```bash
@@ -55,6 +71,22 @@ npx playwright install chromium
 npm run test:e2e
 npm run build
 ```
+
+Full local gate:
+
+```bash
+npm install
+cp .env.example .env # if .env is missing
+npx prisma generate
+npx prisma db push
+npm run seed
+npm run test
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+There are no `lint`, `typecheck`, or `format` package scripts in this repo at this time.
 
 ## Five-Minute Demo Script
 
@@ -111,11 +143,13 @@ Playwright covers one smoke test:
 - No authentication, permissions, or multi-tenant separation.
 - The summarizer is deterministic and local; it is intentionally not an LLM integration.
 - Deal detail is a drawer on `/deals`, not a separate `/deals/[id]` route.
+- `Lead` means a consumer lead routed to a dealer order, not a generic B2B lead conversion object.
 - Dealer orders and areas are seeded and browsable, but this sprint does not include create/edit flows for them.
 - The top search routes to contacts only.
 - SQLite is used for local proof-of-concept data, not production operations.
 - Postal prefix matching is deliberately simple and does not use geocoding or territory polygons.
 - The forecast simulator is transparent and deterministic; it does not persist scenarios.
+- `/tasks`, `/cases`, and `/campaigns` are contract routes for the next UI phase; they are not claimed as implemented app-router pages here unless files exist under `app/`.
 
 ## Switching to Postgres
 
