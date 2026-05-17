@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { moveDealAction } from "@/app/deals/actions";
+import { moveDealAction, updateDealAction } from "@/app/deals/actions";
+import { updateOpportunity } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
 import {
   listOpportunityStageHistory,
@@ -13,6 +14,8 @@ vi.mock("next/cache", () => ({
 
 const dealId = "test-stage-history-deal";
 const actionDealId = "test-stage-history-action-deal";
+const editActionDealId = "test-stage-history-edit-action-deal";
+const adapterDealId = "test-stage-history-adapter-deal";
 const userId = "test-stage-history-user";
 
 describe("opportunity stage history service", () => {
@@ -94,6 +97,45 @@ describe("opportunity stage history service", () => {
     expect(rows[0]?.fromStage).toBe("new");
     expect(rows[0]?.toStage).toBe("proposal");
   });
+
+  it("records history from the deal edit form action when the stage changes", async () => {
+    await createDeal(editActionDealId, "new", userId);
+
+    const result = await updateDealAction(
+      editActionDealId,
+      formData({
+        accountId: "",
+        contactId: "",
+        ownerId: userId,
+        name: "Edited action deal",
+        stage: "qualified",
+        value: "10000",
+        probability: "25",
+        expectedCloseDate: ""
+      })
+    );
+    const rows = await listOpportunityStageHistory(editActionDealId);
+
+    expect(result.ok).toBe(true);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.fromStage).toBe("new");
+    expect(rows[0]?.toStage).toBe("qualified");
+    expect(rows[0]?.changedByUserId).toBe(userId);
+  });
+
+  it("records history from the crmClient opportunity adapter when the stage changes", async () => {
+    await createDeal(adapterDealId, "new", userId);
+
+    await updateOpportunity(adapterDealId, {
+      stage: "negotiation"
+    });
+    const rows = await listOpportunityStageHistory(adapterDealId);
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.fromStage).toBe("new");
+    expect(rows[0]?.toStage).toBe("negotiation");
+    expect(rows[0]?.changedByUserId).toBe(userId);
+  });
 });
 
 async function createDeal(id: string, stage: string, ownerId: string) {
@@ -113,21 +155,21 @@ async function cleanupStageHistory() {
   await prisma.opportunityStageHistory.deleteMany({
     where: {
       dealId: {
-        in: [dealId, actionDealId]
+        in: [dealId, actionDealId, editActionDealId, adapterDealId]
       }
     }
   });
   await prisma.activity.deleteMany({
     where: {
       dealId: {
-        in: [dealId, actionDealId]
+        in: [dealId, actionDealId, editActionDealId, adapterDealId]
       }
     }
   });
   await prisma.deal.deleteMany({
     where: {
       id: {
-        in: [dealId, actionDealId]
+        in: [dealId, actionDealId, editActionDealId, adapterDealId]
       }
     }
   });
@@ -136,4 +178,14 @@ async function cleanupStageHistory() {
       id: userId
     }
   });
+}
+
+function formData(values: Record<string, string>) {
+  const form = new FormData();
+
+  for (const [key, value] of Object.entries(values)) {
+    form.set(key, value);
+  }
+
+  return form;
 }

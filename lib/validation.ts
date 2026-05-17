@@ -69,12 +69,35 @@ export const caseStatusSchema = z.enum(CASE_STATUSES);
 export const casePrioritySchema = z.enum(CASE_PRIORITIES);
 export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
 
-const requiredInteger = (message: string) =>
-  z.coerce
-    .number({
-      invalid_type_error: message
-    })
-    .int(message);
+const blankStringToUndefined = (value: unknown) =>
+  typeof value === "string" && value.trim().length === 0 ? undefined : value;
+
+const requiredInteger = (
+  message: string,
+  refine: (schema: z.ZodNumber) => z.ZodNumber = (schema) => schema
+) =>
+  z.preprocess(
+    blankStringToUndefined,
+    refine(
+      z.coerce
+        .number({
+          invalid_type_error: message
+        })
+        .int(message)
+    )
+  );
+
+const optionalNonNegativeInteger = (message: string) =>
+  z.preprocess(
+    blankStringToUndefined,
+    z.coerce
+      .number({
+        invalid_type_error: message
+      })
+      .int(message)
+      .min(0, message)
+      .optional()
+  );
 
 export const accountFormSchema = z.object({
   name: z.string().trim().min(1, "Account name is required."),
@@ -84,9 +107,11 @@ export const accountFormSchema = z.object({
   region: optionalText,
   status: accountStatusSchema,
   ownerId: optionalText,
-  healthScore: requiredInteger("Health score must be a whole number.")
-    .min(0, "Health score must be at least 0.")
-    .max(100, "Health score cannot exceed 100.")
+  healthScore: requiredInteger("Health score must be a whole number.", (schema) =>
+    schema
+      .min(0, "Health score must be at least 0.")
+      .max(100, "Health score cannot exceed 100.")
+  )
 });
 
 export const contactFormSchema = z.object({
@@ -105,13 +130,14 @@ export const dealFormSchema = z.object({
   ownerId: optionalText,
   name: z.string().trim().min(1, "Deal name is required."),
   stage: dealStageSchema,
-  value: requiredInteger("Value must be a whole number.").min(
-    0,
-    "Value must be 0 or greater."
+  value: requiredInteger("Value must be a whole number.", (schema) =>
+    schema.min(0, "Value must be 0 or greater.")
   ),
-  probability: requiredInteger("Probability must be a whole number.")
-    .min(0, "Probability must be at least 0.")
-    .max(100, "Probability cannot exceed 100."),
+  probability: requiredInteger("Probability must be a whole number.", (schema) =>
+    schema
+      .min(0, "Probability must be at least 0.")
+      .max(100, "Probability cannot exceed 100.")
+  ),
   expectedCloseDate: optionalText
 });
 
@@ -205,9 +231,8 @@ export const noteUpdateSchema = noteCreateSchema.partial();
 export const dealerOrderCreateSchema = z.object({
   accountId: idSchema,
   name: z.string().trim().min(1, "Dealer order name is required."),
-  monthlyQuota: requiredInteger("Monthly quota must be a whole number.").min(
-    0,
-    "Monthly quota must be 0 or greater."
+  monthlyQuota: requiredInteger("Monthly quota must be a whole number.", (schema) =>
+    schema.min(0, "Monthly quota must be 0 or greater.")
   ),
   status: dealerOrderStatusSchema,
   startDate: requiredDate("Start date is required."),
@@ -254,7 +279,7 @@ export const campaignCreateSchema = z.object({
   status: campaignStatusSchema.default("planned"),
   startDate: optionalDate,
   endDate: optionalDate,
-  budget: z.coerce.number().int("Budget must be a whole number.").min(0).optional(),
+  budget: optionalNonNegativeInteger("Budget must be a whole number and 0 or greater."),
   ownerId: optionalText,
   leadIds: z.array(idSchema).optional(),
   contactIds: z.array(idSchema).optional()
