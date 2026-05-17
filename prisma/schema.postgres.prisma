@@ -16,6 +16,10 @@ model User {
   accounts   Account[]
   deals      Deal[]
   activities Activity[]
+  tasks      Task[]
+  cases      Case[]
+  campaigns  Campaign[]
+  opportunityStageChanges OpportunityStageHistory[]
 }
 
 model Account {
@@ -35,6 +39,8 @@ model Account {
   deals       Deal[]
   activities  Activity[]
   dealerOrders DealerOrder[]
+  tasks       Task[]
+  cases       Case[]
 
   @@index([ownerId])
   @@index([status])
@@ -103,6 +109,8 @@ model Lead {
   createdAt        DateTime     @default(now()) @db.Timestamp(3)
   updatedAt        DateTime     @updatedAt @db.Timestamp(3)
   activities       Activity[]
+  tasks            Task[]
+  campaigns        Campaign[]   @relation("CampaignLeads")
 
   @@index([areaId])
   @@index([assignedOrderId])
@@ -124,6 +132,9 @@ model Contact {
   updatedAt  DateTime   @updatedAt @db.Timestamp(3)
   deals      Deal[]
   activities Activity[]
+  tasks      Task[]
+  cases      Case[]
+  campaigns  Campaign[] @relation("CampaignContacts")
 
   @@index([accountId])
   @@index([status])
@@ -146,6 +157,8 @@ model Deal {
   createdAt         DateTime   @default(now()) @db.Timestamp(3)
   updatedAt         DateTime   @updatedAt @db.Timestamp(3)
   activities        Activity[]
+  tasks             Task[]
+  stageHistory      OpportunityStageHistory[]
 
   @@index([accountId])
   @@index([contactId])
@@ -164,6 +177,10 @@ model Activity {
   deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
   leadId    String?  @db.Text
   lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  taskId    String?  @db.Text
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  caseId    String?  @db.Text
+  case      Case?    @relation(fields: [caseId], references: [id], onDelete: SetNull)
   userId    String?  @db.Text
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   type      String   @db.VarChar(50)
@@ -177,7 +194,88 @@ model Activity {
   @@index([contactId])
   @@index([dealId])
   @@index([leadId])
+  @@index([taskId])
+  @@index([caseId])
   @@index([userId])
   @@index([type])
   @@index([createdAt])
+}
+
+model Task {
+  id          String    @id @default(cuid()) @db.Text
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  dueDate     DateTime? @db.Timestamp(3)
+  status      String    @default("open") @db.VarChar(50)
+  priority    String    @default("normal") @db.VarChar(50)
+  ownerId     String?   @db.Text
+  owner       User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  accountId   String?   @db.Text
+  account     Account?  @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId   String?   @db.Text
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  dealId      String?   @db.Text
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  leadId      String?   @db.Text
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  activities  Activity[]
+  createdAt   DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(3)
+
+  @@index([status])
+  @@index([ownerId])
+  @@index([dueDate])
+}
+
+model Case {
+  id          String    @id @default(cuid()) @db.Text
+  subject     String    @db.VarChar(255)
+  description String?   @db.Text
+  status      String    @default("new") @db.VarChar(50)
+  priority    String    @default("normal") @db.VarChar(50)
+  accountId   String?   @db.Text
+  account     Account?  @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contactId   String?   @db.Text
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  ownerId     String?   @db.Text
+  owner       User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  activities  Activity[]
+  createdAt   DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(3)
+
+  @@index([status])
+  @@index([accountId])
+}
+
+model Campaign {
+  id          String    @id @default(cuid()) @db.Text
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  status      String    @default("planned") @db.VarChar(50)
+  startDate   DateTime? @db.Timestamp(3)
+  endDate     DateTime? @db.Timestamp(3)
+  budget      Int?      @db.Integer
+  ownerId     String?   @db.Text
+  owner       User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  leads       Lead[]    @relation("CampaignLeads")
+  contacts    Contact[] @relation("CampaignContacts")
+  createdAt   DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(3)
+
+  @@index([status])
+}
+
+model OpportunityStageHistory {
+  id              String   @id @default(cuid()) @db.Text
+  dealId          String   @db.Text
+  deal            Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fromStage       String?  @db.VarChar(50)
+  toStage         String   @db.VarChar(50)
+  changedAt       DateTime @default(now()) @db.Timestamp(3)
+  changedByUserId String?  @db.Text
+  changedByUser   User?    @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([dealId])
+  @@index([changedAt])
+  @@index([changedByUserId])
 }

@@ -39,10 +39,10 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
   await prisma.account.create({
     data: {
       name: parsed.data.name,
-      domain: parsed.data.domain,
-      industry: parsed.data.industry,
-      city: parsed.data.city,
-      region: parsed.data.region,
+      domain: parsed.data.domain ?? null,
+      industry: parsed.data.industry ?? null,
+      city: parsed.data.city ?? null,
+      region: parsed.data.region ?? null,
       status: parsed.data.status,
       ownerId: parsed.data.ownerId ?? null,
       healthScore: parsed.data.healthScore
@@ -87,10 +87,10 @@ export async function updateAccountAction(
     },
     data: {
       name: parsed.data.name,
-      domain: parsed.data.domain,
-      industry: parsed.data.industry,
-      city: parsed.data.city,
-      region: parsed.data.region,
+      domain: parsed.data.domain ?? null,
+      industry: parsed.data.industry ?? null,
+      city: parsed.data.city ?? null,
+      region: parsed.data.region ?? null,
       status: parsed.data.status,
       ownerId: parsed.data.ownerId ?? null,
       healthScore: parsed.data.healthScore
