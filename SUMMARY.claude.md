@@ -1,139 +1,146 @@
 Agent: claude
 Sprint: 4B
-Feature: Slices 0, 1 and partial Slice 2 (Features 2.4 and 2.5 partial)
+Feature: Slice 2 features 2.1, 2.2, 2.3 shipped; Feature 2.4 partial; Feature 2.5 partial; Feature 2.6 final audit shipped
 Branch: feat/claude-demo-and-route-polish
-Status: blocked (waiting on Codex [UNBLOCK LIB] and Grok [UNBLOCK COMPONENTS])
-Commits this prompt: 2fb5944 — feat(claude): page-level error boundary; 796f776 — docs(claude): readme demo callout and routes refresh
-Gate status: PARTIAL — vitest 93/93 PASS, next build PASS (24 routes), e2e RED on pre-existing visual snapshot drift in Gemini zone
-DoD self-check: PASS for shipped features (Slice 1 docs and Feature 2.5 error boundary), N/A for blocked features
-Timestamp: 2026-05-18T04:30:00-08:00
+Status: done (for Claude scope; soft-blocked items handed back to Grok and Gemini)
+Commits this prompt: 713089a fix(claude): migrate task/case/campaign pages to ListQueryInput shape; df59a04 feat(claude): broken-link page-level guards; fd66012 feat(claude): routing decision detail wiring on leads and orders; d26dc58 feat(claude): postal validation wired into lead form
+Gate status: PASS — pwsh scripts/local-gate.ps1 reports "Local gate completed successfully" (vitest 23 files / 149 tests, next build 24 routes + 7 placeholder pages, playwright 11/11)
+DoD self-check: PASS
+Timestamp: 2026-05-18T09:55:00-08:00
 
 ### Completed this prompt
 
-- Preflight: archived `..\salesforce-lite-crm-sprint-4b-claude-start.zip` at `32faedf`,
-  created branch `feat/claude-demo-and-route-polish` from current HEAD (carries the
-  prior PREP commits forward: DEMO.md plus prior SUMMARY/BLOCKERS).
-- Slice 0: ran the full canonical gate `pwsh scripts/local-gate.ps1`. Vitest 93/93,
-  `next build` clean (24 routes), but the gate exits with code 1 because
-  `e2e/visual-smoke.spec.ts` has 3 pre-existing pixel-diff snapshot failures
-  (`dashboard-desktop`, `areas-desktop`, `areas-mobile`). All three are in
-  Gemini-owned files; not touching them per zone rules. Filed as the
-  baseline-E2E blocker the user prompt described.
-- Slice 1 (Item 52): DEMO.md already shipped as `72e0ad5 docs(claude): five-minute demo
-  walkthrough` in the prior PREP turn — rides along on this branch. No re-commit.
-- Feature 2.5 (page-level polish, partial): added `app/error.tsx` as the
-  catch-all Next.js error boundary. It is a client component, renders a "Something
-  went wrong" message with a Reset button (calls the framework `reset` prop) and a
-  Reload page button, surfaces the error digest when present, and tags itself with
-  `data-testid="page-error-boundary"` plus per-button testids
-  (`page-error-reset`, `page-error-reload`). One root file covers every child route
-  via Next.js error-boundary nesting; per-route error.tsx files were deferred
-  because no route currently needs custom error UI distinct from the catch-all.
-  Verified `next build` still green after adding it.
-- Feature 2.4 (README, partial — no CI badge): added a "Demo" callout near the top
-  of README.md pointing at `DEMO.md` and noting `npm run seed` as the one-click
-  reset. Refreshed the routes table to include the now-live `/tasks`, `/cases`,
-  `/campaigns`, `/reports`, and their detail/create routes (C1–C7 had shipped them
-  on the predecessor branch). Removed two stale notes claiming tasks/cases/campaigns
-  pages "not present in this worktree yet" — those notes were factually wrong on
-  this branch. Added two limitations entries (no CSV import/export, no Lead
-  conversion flow). CI badge intentionally skipped — `.github/workflows/` does not
-  exist yet on this branch (Gemini owns CI workflow files).
+- Consumed Codex `[UNBLOCK LIB]` and Grok `[UNBLOCK COMPONENTS]` by merging
+  `feat/grok-components-and-seed-tuning` (which already merged
+  `feat/codex-services-routing-and-validation` at Grok HEAD `0a11563`) into this
+  branch; then merged `gemini/sprint-4-demo-smoke-gate-hardening` for the e2e
+  gate fixes.
+- Fixed merge-fallout regression in three Claude-owned pages: `app/tasks/page.tsx`,
+  `app/cases/page.tsx`, `app/campaigns/page.tsx`. Codex's new contract for
+  `Task/Case/CampaignListInput` is `ListQueryInput<TSort, TFilters>` (i.e.,
+  `{ pageSize, filters: { ... } }`); the pages still used the legacy bespoke
+  shape `{ status, ownerId, ..., take }`. Migration kept the same filter set per
+  page, just nested under `filters` and replaced `take` with `pageSize`.
+- Feature 2.1 (broken-link guards): added 7 placeholder pages — `app/deals/[id]`,
+  `app/search`, `app/command-palette`, `app/orders/new`, `app/orders/[id]/edit`,
+  `app/areas/new`, `app/areas/[id]/edit`. Each renders Grok's
+  `<ExcludedRoutePlaceholder route="..." reason="..." />` with the wrapper
+  `data-testid="excluded-route-placeholder"` and `data-route="<route>"` for
+  Gemini's e2e assertions. Did NOT add placeholders for `/tasks`, `/cases`,
+  `/campaigns` — those routes ship with full UI on this branch (C1–C3); see
+  BLOCKERS #5.
+- Feature 2.2 (routing detail wiring): `app/leads/page.tsx` and
+  `app/orders/[id]/page.tsx` now fetch `getRoutingDecisionForLead` per visible
+  lead (via `lib/crm/crmClient.ts` SSOT adapter) and render Grok's
+  `<RoutingDecisionDetail>` inline. Each instance carries
+  `data-testid="routing-detail-<leadId>"`. The detail panel is collapsed by
+  default; the component owns the toggle interaction.
+- Feature 2.3 (postal validation): `app/leads/actions.ts` updated to surface a
+  postal-specific toast message when `postalCode` is the only failing field
+  during lead creation. The validation chain itself is already complete —
+  `leadFormSchema` (Codex) composes `postalCodeSchema` from `lib/postal.ts`, and
+  `actions.ts` already returned `fieldErrors` on `safeParse` failure. The form's
+  `<Input id="postalCode">` is still a plain input — wiring Grok's
+  `<PostalCodeInput>` into `components/lead-form.tsx` is the remaining piece
+  (Grok zone; BLOCKERS #9 filed against Grok).
+- Feature 2.4 (README — carried from prior turn): `docs(claude): readme demo
+  callout and routes refresh` (commit `796f776`) added the Demo callout and
+  refreshed the routes table. CI badge still deferred — `.github/workflows/`
+  does not exist on this branch (no Gemini CI workflow file to point at);
+  BLOCKERS #7 remains active.
+- Feature 2.5 (page polish — carried from prior turn): `feat(claude):
+  page-level error boundary` (commit `2fb5944`) added the catch-all
+  `app/error.tsx`. The `dynamic = "force-dynamic"` audit confirmed all 23
+  data-reading pages already have it. Page-wrapper `data-testid` additions
+  happened opportunistically this prompt on `/leads` (`page-leads`) and
+  `/orders/[id]` (`page-order-detail`) as part of Feature 2.2; the wider pass
+  remains deferred until Gemini needs more testids in their specs.
+- Feature 2.6 (final audit):
+  - `rg '\bany\b|@ts-ignore|@ts-expect-error' app` — clean. Only match is the
+    English word "any" in prose at `app/error.tsx:27` ("any client cache").
+  - `rg '/deals/\[id\]|...' app` — only matches are the intentional references
+    in `app/deals/[id]/page.tsx` (the placeholder page).
+  - `rg 'href="/tasks"|href="/cases"|href="/campaigns"' app` — 3 matches at
+    `app/{tasks,campaigns,cases}/page.tsx` for `<Link href="/<route>">Reset</Link>`
+    filter-reset self-links. These are NOT broken nav links — they clear
+    querystring filters on routes that legitimately exist on this branch
+    (C1–C3 shipped them). The CLAUDE-SPRINT-4B.md scan expectation was that
+    these routes would not exist; on this branch they do, and these self-links
+    are correct. Carrying BLOCKERS #5 forward.
+  - Full gate: PASS.
 
-### Pre-existing audit findings (no edits this prompt)
+### Sprint 4B testid catalog (new this sprint, for Gemini)
 
-- `export const dynamic = "force-dynamic"` is already present on all 23 data-reading
-  pages under `app/`. Only `app/page.tsx` (a redirect to `/dashboard`) lacks it,
-  which is correct.
-- 20 of 23 pages wrap content in `<div className="crm-page">`; `app/forecast/page.tsx`,
-  `app/deals/page.tsx`, and `app/orders/page.tsx` use bespoke wrappers. No
-  page-level `data-testid="page-<slug>"` exists yet on any page. The wider testid
-  pass was deferred — it clusters naturally with the Slice 2 Feature 2.1/2.2/2.3
-  wiring, which explicitly introduces feature-specific testids
-  (`routing-detail-toggle-{leadId}`, `lead-form-postal-input`,
-  `excluded-route-placeholder`). Doing the page-wrapper testids in the same
-  commit as the unblock wiring keeps the e2e-supporting test surface coherent and
-  avoids a separate noisy mass edit before Gemini's specs need them.
+- `excluded-route-placeholder` — wrapper on all 7 broken-link guard pages
+  (`/deals/[id]`, `/search`, `/command-palette`, `/orders/new`,
+  `/orders/[id]/edit`, `/areas/new`, `/areas/[id]/edit`). Combine with
+  `data-route="<route>"` to disambiguate per page.
+- `routing-detail-<leadId>` — per-lead `<RoutingDecisionDetail>` wrapper. Used
+  on `/leads` (one per lead row, in a spanning sub-`<tr>`) and on `/orders/[id]`
+  (one per lead in the "Assigned Leads This Month" section). The inner toggle
+  button is `data-testid="routing-detail-toggle"` (component-owned; same across
+  instances — scope by parent in tests).
+- `routing-detail-<leadId>-empty` — fallback wrapper when
+  `getRoutingDecisionForLead` returns null. Component-owned.
+- `page-leads` — wrapper on `/leads`.
+- `page-order-detail` — wrapper on `/orders/[id]`.
+- `page-error-boundary`, `page-error-reset`, `page-error-reload` —
+  `app/error.tsx` catch-all (added in commit `2fb5944` prior turn).
+- `postal-input-error` — component-owned by `<PostalCodeInput>`; available
+  once Grok wires the component into `<LeadForm>`.
 
-### Sprint 4B safe-vs-blocked task triage (current state)
+### Route inventory (current, after Feature 2.1)
 
-**Shipped this prompt (cumulative including prior PREP):**
-- Slice 1 / Item 52 — DEMO.md ✅
-- Feature 2.5 — `app/error.tsx` catch-all error boundary ✅
-- Feature 2.4 — README "Demo" callout, refreshed routes table, limitations update ✅
+`next build` route table reflects 24 + 7 placeholder pages = 31 routes:
 
-**Blocked on Codex `[UNBLOCK LIB]`:**
-- Feature 2.1 — needs `EXCLUDED_ROUTES`, `FEATURE_FLAGS`, `isEnabled()` from `lib/featureFlags.ts`
-- Feature 2.2 — needs `getRoutingDecisionForLead` on `crmClient.leads` + `RoutingDecision` type
-- Feature 2.3 — needs `lib/postal.ts` and extended lead schema in `lib/validation.ts`
-
-**Blocked on Grok `[UNBLOCK COMPONENTS]`:**
-- Feature 2.1 page wiring — needs `<ExcludedRoutePlaceholder route={...} />`
-- Feature 2.2 wiring — needs `<RoutingDecisionDetail decision={...} />`
-- Feature 2.3 wiring — needs `<PostalCodeInput value onChange country error />`
-
-**Blocked on Gemini:**
-- Feature 2.4 CI badge — needs `.github/workflows/<file>.yml` (workflow file
-  currently absent; cannot derive URL)
-- Canonical gate — `pwsh scripts/local-gate.ps1` exits 1 on `e2e/visual-smoke.spec.ts`
-  pixel-diff drift; Gemini-owned, awaiting their fix
-- Feature 2.5 `<PageSkeleton />`-based loading.tsx — not strictly required as a
-  blocker; existing `loading.tsx` files in `app/` use `<Skeleton>` primitives
-  directly and render the demo-acceptable busy state
-
-### Coordination tension (carried from prior turn)
-
-The Sprint 4B coordination plan (`prompts/shared/SPRINT-4B-COORDINATION.md`
-"Item 54 — Broken-link guard") lists `/tasks`, `/cases`, `/campaigns` plus
-`/deals/[id]` as EXCLUDED_ROUTES, but this branch already ships
-`/tasks`, `/cases`, `/campaigns` UI and E2E coverage (C1–C7). Wiring Feature 2.1
-will require Codex's `EXCLUDED_ROUTES` to omit those three routes, or an
-explicit human/IFT retraction of C1–C7. Filed as BLOCKERS entry #5.
-
-### Route inventory (app/ vs CRM-CONTRACT.md, refreshed)
-
-Pages built into the production bundle (`next build` route table):
-
-`/`, `/dashboard`, `/accounts`, `/accounts/[id]`, `/accounts/new`,
+Live: `/`, `/dashboard`, `/accounts`, `/accounts/[id]`, `/accounts/new`,
 `/activities`, `/areas`, `/contacts`, `/contacts/[id]`, `/deals`, `/deals/new`,
 `/forecast`, `/leads`, `/leads/[id]`, `/orders`, `/orders/[id]`,
-`/tasks`, `/tasks/new`, `/cases`, `/cases/new`, `/campaigns`, `/campaigns/new`,
-`/reports`, `/reports/[slug]`, `/_not-found` (Next.js implicit).
+`/reports`, `/reports/[slug]`, `/tasks`, `/tasks/new`, `/cases`, `/cases/new`,
+`/campaigns`, `/campaigns/new`, `/_not-found`.
 
-CRM-CONTRACT.md v1 ROUTE_REGISTRY currently lists all of these. There is no
-`/deals/[id]` per contract (drawer-canonical). Sidebar nav is
-registry-driven (`components/sidebar-nav.tsx`, Grok-owned), so no `app/`-side
-nav editing is required for that policy to hold.
+Placeholder (new this sprint): `/deals/[id]`, `/search`, `/command-palette`,
+`/orders/new`, `/orders/[id]/edit`, `/areas/new`, `/areas/[id]/edit`.
 
-### Prior shipped on this branch (carried context, not changed this prompt)
+### Dependency unblocks consumed
 
-C1–C7 (Sprint 4A line) live on this branch:
-- C1 `feat(ui): tasks list detail and form`
-- C2 `feat(ui): cases list detail and form`
-- C3 `feat(ui): campaigns list detail and form`
-- C4 `feat(ui): registry-driven sidebar nav`
-- C5 `feat(ui): global command palette`
-- C6 `feat(ui): reports index and detail pages`
-- C7 `test(ui): e2e coverage for tasks cases campaigns reports`
+- Codex `[UNBLOCK LIB]` (`336aa6d`) — consumed via Grok merge ancestry.
+  Specifically `lib/featureFlags.ts` (EXCLUDED_ROUTES, FEATURE_FLAGS),
+  `lib/postal.ts`, `lib/services/leads.ts` (getRoutingDecisionForLead),
+  `lib/crm/crmClient.ts` (getRoutingDecision adapter), extended `lib/validation.ts`.
+- Grok `[UNBLOCK COMPONENTS]` (`3f7ed00`) and audit (`38aa7c0`) — consumed via
+  direct merge. Specifically `<ExcludedRoutePlaceholder>`,
+  `<RoutingDecisionDetail>`, `<PostalCodeInput>`, plus other report cards and
+  helpers I did not need this prompt.
+- Gemini gate fix (`gemini/sprint-4-demo-smoke-gate-hardening`) — consumed via
+  direct merge. Visual-smoke snapshots now match; e2e is green on all 11 specs.
 
-### Next action
+### Coordination tension still open
 
-Wait for Codex `[UNBLOCK LIB]` commit and Grok `[UNBLOCK COMPONENTS]` commit
-on their respective branches (or on `main`). Once both are visible to this
-branch, proceed with Feature 2.1 (broken-link guards conditional on
-EXCLUDED_ROUTES resolution per coordination-tension blocker), Feature 2.2
-(routing detail wiring on `/leads` and `/orders/[id]`), Feature 2.3 (postal
-validation in `app/leads/actions.ts` and the lead form on `/leads`). Feature 2.4
-CI badge resumes once Gemini ships `.github/workflows/<file>.yml`.
+- BLOCKERS #5 — `lib/featureFlags.ts` `EXCLUDED_ROUTES` lists `/tasks`,
+  `/cases`, `/campaigns`, but those routes ship with full UI and E2E coverage
+  on this branch (C1–C3). My Feature 2.1 honored the live UI and did NOT
+  replace those pages with placeholders. Codex's contract and the live UI
+  disagree; needs human/IFT decision before merge to main.
+
+### Final action
+
+Sprint 4B Claude scope is complete to the extent possible without crossing
+zones. Remaining surfaces:
+- Grok: wire `<PostalCodeInput>` into `components/lead-form.tsx` (BLOCKERS #9
+  on Grok), and address EXCLUDED_ROUTES vs C1–C3 tension on the lib side.
+- Gemini: ship `.github/workflows/<file>.yml` so the README CI badge can land,
+  and consider an `e2e/excluded-routes.spec.ts` consuming the new
+  `data-testid="excluded-route-placeholder"` markers across the 7 placeholder
+  pages.
+- Codex (and IFT): resolve EXCLUDED_ROUTES content (BLOCKERS #5).
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (touched only Claude-owned files this prompt:
-`app/error.tsx`, `README.md`, `SUMMARY.claude.md`, `BLOCKERS.claude.md`)
+No cross-ownership edits: YES (this prompt touched only Claude-owned files —
+`app/error.tsx` was added prior; this prompt edited `app/{tasks,cases,
+campaigns,leads,orders/[id]}/page.tsx`, `app/leads/actions.ts`, the 7 new
+`app/<excluded>/page.tsx` placeholder pages, plus the report files. The
+merges from Grok and Gemini are merge-commits, not edits of other agents'
+files.)
 CRM-CONTRACT.md honored: YES (read-only this prompt; no contract edits)
-
-### Type-safety self-scan
-
-`rg '\bany\b|@ts-ignore|@ts-expect-error|as unknown as' app/error.tsx` returned
-only one match: the English word "any" in prose ("any client cache"), not the
-`any` TypeScript type. Clean.
