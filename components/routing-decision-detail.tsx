@@ -95,7 +95,11 @@ function formatStep(step: string, result: unknown): string {
     if (step.includes("rank") || step.includes("pace")) {
       if (Array.isArray(r)) {
         return r
-          .map((item: any) => `${item.dealerName ?? item.orderId} (${item.paceGap})`)
+          .map((item: Record<string, unknown>) => {
+            const dealer = item.dealerName ?? item.orderId;
+            const gap = item.paceGap;
+            return `${dealer} (${gap})`;
+          })
           .join(" · ");
       }
     }

@@ -57,4 +57,12 @@
 
 **Additional note (this prompt):** Full `prompts/grok/GROK-SPRINT-4B.md` (364 lines, including STOPPING CONDITIONS + GO section) read to completion and internalized. Key nuance recorded: Item 54 (excluded-route-placeholder) + Track B (seed) have partial independence paths. Prep artifacts (inventory + manifest) are up to date in SUMMARY.
 
-**Honest status per operator:** Grok has only completed Slice 0 prep + documentation. The actual 4B feature deliverables (the four components, report helpers, [UNBLOCK] handoff to Claude) have not been started. This is the correct current state.
+**Final Handoff Status:**
+
+- Codex [UNBLOCK LIB] (336aa6d on feat/codex-services-routing-and-validation) → **CONSUMED**
+- Grok Slice 1 [UNBLOCK] (3f7ed00) → **SHIPPED**
+- Old "Codex pending" blocker → **STALE / RESOLVED**
+
+No active blockers remain for Grok in Sprint 4B.
+
+All priority work (Slice 1 + 2.1 + 2.3) completed with green gates and clean type scans. Feature 2.4 deferred per prompt guidance.
