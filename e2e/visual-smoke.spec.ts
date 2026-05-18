@@ -22,6 +22,11 @@ const visualRoutes = [
 ];
 
 test.describe("visual smoke", () => {
+  test.skip(
+    process.platform !== "win32",
+    "Visual snapshots are currently baselined for the Windows local gate."
+  );
+
   for (const route of visualRoutes) {
     test(`${route.name} renders a stable viewport`, async ({ page }) => {
       await page.setViewportSize(route.viewport);
