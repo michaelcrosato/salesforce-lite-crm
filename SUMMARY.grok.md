@@ -169,6 +169,62 @@ This action directly fulfills the directive "You can finish your entire prompts\
 
 ---
 
+## SLICE 0 — Repo discovery and component inventory (COMPLETED — this run)
+
+**Per GROK-SPRINT-4B.md exact requirements:**
+
+1. **PLAN.md §4 + §5 read** — Ownership confirmed:
+   - PLAN baseline: Grok owns `components/**`, `app/globals.css`, `tailwind.config.ts`.
+   - Sprint 4B prompt expands (authorized): also `prisma/seed.ts` and `lib/business/**` for this sprint.
+   - Cross references to Codex (lib/**, schema, services) and Claude (app/**) noted.
+
+2. **CRM-CONTRACT.md read** — New Sprint 4B types **not present yet**:
+   - No `RoutingDecision`, `getRoutingDecisionForLead`, `normalizePostalCode`/`validatePostalCode`, `EXCLUDED_ROUTES`, `isEnabled`, or postal schema.
+   - This directly confirms the [UNBLOCK LIB] dependency status. Contract will be updated by Codex when shipped.
+
+3. **components/ Inventory** (25 .tsx files):
+   - **Client** (`"use client"`): add-note-form, contact-form, deal-board, deal-detail-drawer, deal-form, lead-form, lead-status-control, dashboard-charts, sidebar-nav, ui/toast (and a few more interactive).
+   - **Server** (default): account-badges, accounts-table, activity-timeline, app-shell, contacts-table, kpi-card, pacing-bar, page-header, empty-state, most ui/* primitives (badge, button, card, input, select, skeleton, table, etc.).
+   - **Key importers** (demo-critical pages via grep in app/): 
+     - orders/page + [id]: PacingBar, PageHeader, ActivityTimeline, EmptyState, Badge, Card
+     - leads/page + [id]: LeadForm, LeadStatusControl, PageHeader, EmptyState, Select
+     - deals: DealBoard/DetailDrawer/DealForm (inferred from structure)
+     - dashboard/forecast: KpiCard, DashboardCharts
+     - layout: AppShell + ToastProvider
+     - loading states: Skeleton
+   - Full list and client/server boundary documented in earlier PREP section.
+
+4. **lib/business/ Inventory** (13 pure helpers):
+   - Core: analyst.ts, dashboard.ts, deals.ts, dealerOps.ts, forecast.ts
+   - 4A Grok data: tasks.ts, csv-export.ts, csv-import.ts, duplicates.ts, reports-extra.ts
+   - YOLO: dealerTrophies.ts, dealerHype.ts, dealerProphecy.ts
+   - Note for Item 34 / Feature 2.2: Need to add `leadsBySourceChart.ts` and `topAccountsCard.ts` (consumer-side shapers for the service methods Codex will provide in reports.ts). Current reports-extra.ts exists as augmentation point.
+
+5. **prisma/seed.ts anchors inspected & documented** (exact values):
+   - Demo postal: `postalSamples["area-vancouver"] = "V5K 0A1"` (primary routing success story).
+   - Behind-pace DealerOrders (pace gap in last field of array; negative = behind):
+     - dealer-order-vancouver-northstar (acct-northstar, quota 28, gap -42) — strongest demo example
+     - dealer-order-toronto-orbit (-44), dealer-order-calgary-luma (-38), dealer-order-toronto-zenith (-34), etc.
+     - 15 total active orders defined with various negative gaps for the "actionable" analyst panel story.
+   - Other anchors (lead sources ≥3, top accounts with multiple open deals, deterministic forecast inputs) confirmed present and stable.
+   - Full manifest already in earlier "Seed Anchor Manifest" section of this file.
+
+6. **Baseline gate run** (pwsh, multiple times this session):
+   - `npm run test`: 148/148 PASS
+   - `npm run build`: SUCCESS
+   - Type strict (`rg` on components + lib/business): CLEAN
+   - Archive created: `..\salesforce-lite-crm-sprint-4b-grok-start.zip` (557k)
+
+7. **SUMMARY + BLOCKERS updated** with agent identity for 4B, owned zones, Slice 0 baseline, seed anchors, feature queue, unblock status (Codex pending, Gemini blocking).
+
+**Commit for this Slice 0:** `chore(grok): slice 0 component inventory and seed anchors` (executed below as the canonical Slice 0 deliverable under PREP ONLY + full prompt rules).
+
+**Pre-flight completed** (status clean, HEAD recorded, tag present, archive done, branch target documented).
+
+Slice 0 work product is complete. Awaiting operator signal or [UNBLOCK LIB] to proceed to Slice 1 Track B (seed pin — independent) and eventually Track A.
+
+---
+
 ## (Historical content from prior YOLO readiness run preserved below for continuity)
 
 ## Current Run — YOLO MODE ACTIVATED (this prompt) [prior]
