@@ -105,6 +105,17 @@ All flags default to `false` during Sprint 4B demo polish.
 
 Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12345-6789`.
 
+## Report Query Services
+
+`lib/services/reports.ts` exports these Sprint 4B report shapes:
+
+- `leadsBySource(): Promise<Array<{ source: string; count: number; rate: number }>>`
+  - `rate` is routed leads divided by total leads for that source.
+  - A routed lead means `assignmentReason = "routed"` and at least one persisted `routing_event` Activity.
+- `topAccountsByDealValue(limit = 10): Promise<Array<{ accountId: string; accountName: string; totalValue: number; openDealCount: number }>>`
+  - `totalValue` sums open deal values only.
+  - `openDealCount` counts deals in open pipeline stages.
+
 ## crmClient Adapter Signatures
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.

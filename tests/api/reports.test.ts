@@ -6,6 +6,7 @@ import {
   overdueTasks,
   pipelineByStage,
   staleOpportunities,
+  topAccountsByDealValue,
   topAccountsByOpportunityValue
 } from "@/lib/services/reports";
 
@@ -19,6 +20,7 @@ const leadOneId = "test-report-lead-one";
 const leadTwoId = "test-report-lead-two";
 const activityOneId = "test-report-activity-one";
 const activityTwoId = "test-report-activity-two";
+const routingActivityId = "test-report-routing-activity";
 const overdueTaskId = "test-report-overdue-task";
 const doneTaskId = "test-report-done-task";
 
@@ -47,6 +49,7 @@ describe("reports query service", () => {
     const row = rows.find((source) => source.source === "report-source");
 
     expect(row?.count).toBeGreaterThanOrEqual(2);
+    expect(row?.rate).toBeCloseTo(0.5);
   });
 
   it("returns activity volume by day for the last 30 days", async () => {
@@ -67,6 +70,17 @@ describe("reports query service", () => {
       route: `/accounts/${accountId}`
     });
     expect(rows[0]?.totalValue).toBe(10_250_000);
+  });
+
+  it("returns top accounts by open deal value", async () => {
+    const rows = await topAccountsByDealValue(1);
+
+    expect(rows[0]).toEqual({
+      accountId,
+      accountName: "Report Account",
+      totalValue: 10_250_000,
+      openDealCount: 2
+    });
   });
 
   it("returns stale opportunities", async () => {
@@ -153,7 +167,8 @@ async function createReportFixtures() {
         firstName: "Report",
         lastName: "Lead One",
         source: "report-source",
-        status: "new"
+        status: "assigned",
+        assignmentReason: "routed"
       },
       {
         id: leadTwoId,
@@ -177,6 +192,13 @@ async function createReportFixtures() {
         title: "Report activity two",
         type: "call",
         createdAt: new Date("2026-05-16T09:00:00Z")
+      },
+      {
+        id: routingActivityId,
+        leadId: leadOneId,
+        title: "Report routing activity",
+        type: "routing_event",
+        createdAt: new Date("2026-05-16T10:00:00Z")
       }
     ]
   });
@@ -211,7 +233,7 @@ async function cleanupReportFixtures() {
   await prisma.activity.deleteMany({
     where: {
       id: {
-        in: [activityOneId, activityTwoId]
+        in: [activityOneId, activityTwoId, routingActivityId]
       }
     }
   });

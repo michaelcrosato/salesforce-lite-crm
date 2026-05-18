@@ -34,9 +34,10 @@ Timestamp: 2026-05-18T01:11:30-07:00
 - Feature 2.1 verified existing opportunity stage-history wiring and tests, then added `crmClient.deals.getStageHistory(dealId)` with contract documentation.
 - Feature 2.2 standardized Task, Case, and Campaign list inputs around `{ page, pageSize, sortBy, sortOrder, filters }`, retained legacy flat service input compatibility, and added list filter-key JSDoc to crmClient adapters.
 - Feature 2.3 writes structured routing-event payloads to `Activity.rawText`, keeps `Activity.summary` readable, and parses payload `steps` plus `summary` in `getRoutingDecisionForLead`.
+- Feature 2.4 expanded report services with lead-source routing rates and top accounts by open deal value; added focused tests in `tests/api/reports.test.ts` per Codex prompt cross-zone exception.
 
 ### Next action
-Run gate for Feature 2.3, commit `feat(codex): structured routing event reason payload`, then continue to Feature 2.4.
+Run gate for Feature 2.4, commit `feat(codex): reports leads-by-source and top-accounts`, then continue to Feature 2.5.
 
 ### Scope confirmation
 No cross-ownership edits: YES

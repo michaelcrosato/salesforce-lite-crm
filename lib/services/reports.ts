@@ -1,6 +1,6 @@
 import { DEAL_STAGES } from "@/lib/crm-constants";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
-import { isStaleDeal, stageSortIndex } from "@/lib/business/deals";
+import { isOpenDealStage, isStaleDeal, stageSortIndex } from "@/lib/business/deals";
 import { prisma } from "@/lib/prisma";
 
 export type PipelineByStageRow = {
@@ -13,6 +13,7 @@ export type PipelineByStageRow = {
 export type LeadsBySourceRow = {
   source: string;
   count: number;
+  rate: number;
 };
 
 export type ActivityVolumeByDayRow = {
@@ -26,6 +27,13 @@ export type TopAccountByOpportunityValueRow = {
   opportunityCount: number;
   totalValue: number;
   route: string;
+};
+
+export type TopAccountByDealValueRow = {
+  accountId: string;
+  accountName: string;
+  totalValue: number;
+  openDealCount: number;
 };
 
 export type StaleOpportunityRow = {
@@ -84,23 +92,48 @@ export async function pipelineByStage(): Promise<PipelineByStageRow[]> {
   return [...rows.values()].sort((left, right) => stageSortIndex(left.stage) - stageSortIndex(right.stage));
 }
 
+/**
+ * Groups leads by source. `rate` is routed leads divided by total leads for the
+ * source; in this vertical, routed means `assignmentReason = "routed"` with a
+ * persisted `routing_event` Activity.
+ */
 export async function leadsBySource(): Promise<LeadsBySourceRow[]> {
   const leads = await prisma.lead.findMany({
     select: {
-      source: true
+      source: true,
+      assignmentReason: true,
+      activities: {
+        where: {
+          type: "routing_event"
+        },
+        select: {
+          id: true
+        }
+      }
     }
   });
-  const counts = new Map<string, number>();
+  const counts = new Map<string, { total: number; converted: number }>();
 
   for (const lead of leads) {
     const source = lead.source?.trim() || "Unknown";
-    counts.set(source, (counts.get(source) ?? 0) + 1);
+    const existing = counts.get(source) ?? {
+      total: 0,
+      converted: 0
+    };
+    existing.total += 1;
+
+    if (lead.assignmentReason === "routed" && lead.activities.length > 0) {
+      existing.converted += 1;
+    }
+
+    counts.set(source, existing);
   }
 
   return [...counts.entries()]
     .map(([source, count]) => ({
       source,
-      count
+      count: count.total,
+      rate: count.total > 0 ? count.converted / count.total : 0
     }))
     .sort((left, right) => right.count - left.count || left.source.localeCompare(right.source));
 }
@@ -165,6 +198,39 @@ export async function topAccountsByOpportunityValue(
     }))
     .filter((account) => account.opportunityCount > 0)
     .sort((left, right) => right.totalValue - left.totalValue || left.accountName.localeCompare(right.accountName))
+    .slice(0, limit);
+}
+
+export async function topAccountsByDealValue(
+  limit = 10
+): Promise<TopAccountByDealValueRow[]> {
+  const accounts = await prisma.account.findMany({
+    include: {
+      deals: {
+        select: {
+          stage: true,
+          value: true
+        }
+      }
+    }
+  });
+
+  return accounts
+    .map((account) => {
+      const openDeals = account.deals.filter((deal) => isOpenDealStage(deal.stage));
+
+      return {
+        accountId: account.id,
+        accountName: account.name,
+        totalValue: openDeals.reduce((total, deal) => total + deal.value, 0),
+        openDealCount: openDeals.length
+      };
+    })
+    .filter((account) => account.openDealCount > 0)
+    .sort(
+      (left, right) =>
+        right.totalValue - left.totalValue || left.accountName.localeCompare(right.accountName)
+    )
     .slice(0, limit);
 }
 
