@@ -163,6 +163,7 @@ type RoutingDecision = {
 ```
 
 The getter reads the latest existing `routing_event` Activity for the lead and does not re-run routing. Legacy human-readable routing summaries are surfaced through `reason`, `summary`, and a single `legacy_summary` step.
+New routing events write the structured JSON payload to `Activity.rawText` and keep `Activity.summary` human-readable for existing activity surfaces. The payload has `version`, `input`, `steps`, and `summary` fields; `steps` includes `normalize`, `extract_prefix`, `match_area`, `filter_orders`, `rank_pace_gap`, and `select`.
 
 ### Activity
 - `listActivities(opts?: ActivityListOptions): Promise<Activity[]>`

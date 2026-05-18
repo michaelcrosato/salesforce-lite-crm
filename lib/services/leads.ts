@@ -72,8 +72,10 @@ export async function getRoutingDecisionForLead(
   }
 
   const postal = resolvePostal(lead.postalCode);
-  const parsedPayload = parseRoutingPayload(routingEvent.summary);
-  const candidateOrders = buildLegacyCandidateOrders(lead, parsedPayload.summary);
+  const parsedPayload = parseRoutingPayload(routingEvent.rawText ?? routingEvent.summary);
+  const candidateOrders =
+    buildCandidateOrdersFromSteps(parsedPayload.steps) ??
+    buildLegacyCandidateOrders(lead, parsedPayload.summary);
 
   return {
     leadId: parsedLeadId,
@@ -254,6 +256,47 @@ function buildLegacyCandidateOrders(
       rank: 1
     }
   ];
+}
+
+function buildCandidateOrdersFromSteps(
+  steps: RoutingDecisionStep[]
+): RoutingDecision["candidateOrders"] | null {
+  const rankStep = steps.find((step) => step.step === "rank_pace_gap");
+
+  if (!rankStep || !Array.isArray(rankStep.result)) {
+    return null;
+  }
+
+  const candidateOrders: RoutingDecision["candidateOrders"] = [];
+
+  for (const result of rankStep.result) {
+    if (!isRecord(result)) {
+      continue;
+    }
+
+    const orderId = result.orderId;
+    const dealerName = result.dealerName;
+    const paceGap = result.paceGap;
+    const rank = result.rank;
+
+    if (
+      typeof orderId !== "string" ||
+      typeof dealerName !== "string" ||
+      typeof paceGap !== "number" ||
+      typeof rank !== "number"
+    ) {
+      continue;
+    }
+
+    candidateOrders.push({
+      id: orderId,
+      dealerName,
+      paceGap,
+      rank
+    });
+  }
+
+  return candidateOrders;
 }
 
 function parsePaceGap(summary: string): number {
