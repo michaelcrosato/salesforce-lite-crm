@@ -1,18 +1,32 @@
 Agent: claude
 Sprint: 4B
-Feature: Slice 2 complete; postal client-wiring now consumed; only Codex coordination tension and Gemini CI workflow remain
+Feature: Slice 2 complete; all Claude-side blockers consumed; CI badge shipped
 Branch: feat/claude-demo-and-route-polish
-Timestamp: 2026-05-18T10:35:00-08:00
+Timestamp: 2026-05-18T11:10:00-08:00
 Escalation required: NO
 
 ### Active blockers
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|--------------|------|-------------|----------|---------|-----------------|
-| 5 | `lib/featureFlags.ts` `EXCLUDED_ROUTES` content | contract | Codex's shipped `EXCLUDED_ROUTES` lists `/tasks`, `/cases`, `/campaigns`, but those routes are live on this branch with full UI (C1–C3) and e2e coverage. Cannot wire page-level placeholders for those three without deleting shipped, demo-relevant features. My Feature 2.1 honored the live UI and only added placeholders for the 7 truly-absent routes. | `lib/featureFlags.ts` lines 17–19 list `/tasks`, `/cases`, `/campaigns`; `app/{tasks,cases,campaigns}/page.tsx` exist with passing e2e specs (`e2e/tasks.spec.ts`, `e2e/cases.spec.ts`, `e2e/campaigns.spec.ts`). | Codex to remove `/tasks`, `/cases`, `/campaigns` from `EXCLUDED_ROUTES`, OR explicit human/IFT decision to retract C1–C3. | DEMO.md, README, and the broken-link page guards reflect actual repo state (the three routes are live). Will not regress the shipped UI without explicit instruction. |
-| 7 | `.github/workflows/<file>.yml` (Gemini) | dependency | Feature 2.4 README CI badge cannot be added — no workflow file exists to point the badge URL at. The rest of Feature 2.4 (Demo callout, routes refresh, limitations update) shipped in commit `796f776`. | `ls .github/workflows/` → No such file or directory. | Gemini to ship a CI workflow file. | None until Gemini lands; README is correct otherwise. |
+
+(no active blockers)
 
 ### Resolved this prompt
+
+- **Blocker #7 (Gemini `.github/workflows/<file>.yml`):** consumed via Gemini
+  merge `3879aaf`. `.github/workflows/ci.yml` ("CI Gate" workflow) is now
+  present. README CI badge added in this prompt pointing at
+  `https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml`.
+- **Blocker #5 (Codex `EXCLUDED_ROUTES` content):** resolved transitively —
+  Gemini's merge (`6804fb9 merge(gemini): consume codex excluded-route
+  reconciliation`) brought in Codex's reconciliation that removed `/tasks`,
+  `/cases`, `/campaigns` from `EXCLUDED_ROUTES`. The list now contains only
+  truly-absent routes: `/deals/[id]`, `/search`, `/command-palette`,
+  `/orders/new`, `/orders/[id]/edit`, `/areas/new`, `/areas/[id]/edit` — i.e.,
+  exactly the 7 routes I covered with placeholder pages in Feature 2.1.
+
+### Resolved in prior prompts (carried for context)
 
 - **Blocker #9 (Grok `<PostalCodeInput>` wiring into `components/lead-form.tsx`):**
   consumed via Grok merge `4d34708` / `cf69810` (now part of merge commit
@@ -48,11 +62,4 @@ Escalation required: NO
 
 ### Blockers filed against other agents (current outstanding)
 
-- **On Codex (`feat/codex-services-routing-and-validation`):**
-  #5 reconcile `EXCLUDED_ROUTES` content vs the live `/tasks`, `/cases`,
-  `/campaigns` UI shipped in C1–C3.
-- **On Gemini (`feat/gemini-gate-and-coverage` / their Sprint 4B branch):**
-  #7 ship `.github/workflows/<file>.yml` so the README CI badge can be added.
-  Also: consider an `e2e/excluded-routes.spec.ts` consuming the new
-  `data-testid="excluded-route-placeholder"` markers on the 7 placeholder
-  pages.
+None. All Claude-filed blockers resolved.

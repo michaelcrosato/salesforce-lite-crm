@@ -1,23 +1,34 @@
 Agent: claude
 Sprint: 4B
-Feature: Slice 2 features 2.1, 2.2, 2.3 shipped (Feature 2.3 client wiring now fully consumed via Grok merge); Feature 2.4 partial; Feature 2.5 partial; Feature 2.6 final audit shipped
+Feature: Sprint 4B complete on Claude side — all features shipped, all Claude-filed blockers resolved
 Branch: feat/claude-demo-and-route-polish
-Status: done (for Claude scope; only Codex coordination tension and Gemini CI workflow remain)
-Commits this prompt: be24f34 merge(claude): consume grok postal input wiring (one merge-only prompt; no Claude implementation commits this turn)
-Gate status: PASS — pwsh scripts/local-gate.ps1 reports "Local gate completed successfully" after Grok postal merge (vitest 23 files / 149 tests, next build 31 routes, playwright 11/11)
+Status: done
+Commits this prompt: eb2af97 merge(claude): consume gemini ci workflow; fb6cee2 docs(claude): add ci badge to readme
+Gate status: PASS — pwsh scripts/local-gate.ps1 reports "Local gate completed successfully" (vitest expanded, next build clean, playwright 19 passed + 1 skipped including new excluded-routes spec)
 DoD self-check: PASS
-Timestamp: 2026-05-18T10:35:00-08:00
+Timestamp: 2026-05-18T11:10:00-08:00
 
-### Completed this prompt (merge-only)
+### Completed this prompt
 
-- Consumed Grok's follow-up wiring: merged `feat/grok-components-and-seed-tuning`
-  again to pull in `4d34708 fix(grok): integrate PostalCodeInput into lead-form.tsx`
-  and `cf69810 fix(grok): wire postal code input into lead form`. Resolves
-  BLOCKERS #9. `components/lead-form.tsx` now mounts `<PostalCodeInput>` with
-  `testid="lead-form-postal-input"`, error prop bound to `errors?.postalCode?.[0]`,
-  state-controlled value, and reset-on-success. Full gate green afterward.
-- No Claude implementation commits this turn — Sprint 4B Claude execution is
-  complete to the limits of zone ownership.
+- Merged Gemini final integration tip `3879aaf gemini/sprint-4-demo-smoke-gate-hardening`
+  into this branch. This pulled in `.github/workflows/ci.yml` (the "CI Gate"
+  workflow), Gemini's e2e additions (`demo-path.spec.ts`,
+  `excluded-routes.spec.ts`), `scripts/local-gate.sh`,
+  `tests/api/crmClient-lists.test.ts`, `tests/seed/demo-anchors.test.ts`, plus
+  Codex's `EXCLUDED_ROUTES` reconciliation (Gemini's merge chain
+  `6804fb9 merge(gemini): consume codex excluded-route reconciliation` is
+  inside the Gemini branch). `EXCLUDED_ROUTES` now lists only the 7 routes
+  that have no live page — exactly matching the 7 placeholder pages Claude
+  shipped in Feature 2.1.
+- Added the README CI badge near the top of `README.md`, pointing at
+  `https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml`
+  (URL derived from `git remote -v`, since `package.json` has no `repository`
+  field). Badge text "CI Gate" matches the workflow name in `ci.yml`.
+- Marked BLOCKERS #7 (Gemini CI workflow) and BLOCKERS #5 (Codex
+  EXCLUDED_ROUTES reconciliation) as resolved. All Claude-filed blockers are
+  now closed.
+
+### Carried forward from prior prompts
 
 ### Carried forward from prior prompt
 
