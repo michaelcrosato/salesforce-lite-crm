@@ -58,10 +58,12 @@ export default async function CampaignsPage({
   const startDateTo = params.startTo?.trim() ? params.startTo : undefined;
 
   const listOptions: CampaignListOptions = {
-    status: statusFilter,
-    startDateFrom,
-    startDateTo,
-    take: 100
+    pageSize: 100,
+    filters: {
+      status: statusFilter,
+      startDateFrom,
+      startDateTo
+    }
   };
 
   const [campaigns, owners] = await Promise.all([

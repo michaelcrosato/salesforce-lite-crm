@@ -62,10 +62,12 @@ export default async function CasesPage({
   const accountFilter = params.accountId?.trim() ? params.accountId : undefined;
 
   const listOptions: CaseListOptions = {
-    status: statusFilter,
-    ownerId: ownerFilter,
-    accountId: accountFilter,
-    take: 100
+    pageSize: 100,
+    filters: {
+      status: statusFilter,
+      ownerId: ownerFilter,
+      accountId: accountFilter
+    }
   };
 
   const [cases, owners, accountsList, contactsList] = await Promise.all([

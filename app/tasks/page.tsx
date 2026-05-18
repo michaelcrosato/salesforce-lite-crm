@@ -65,11 +65,13 @@ export default async function TasksPage({
   const dueDateTo = params.dueTo?.trim() ? params.dueTo : undefined;
 
   const listOptions: TaskListOptions = {
-    status: statusFilter,
-    ownerId: ownerFilter,
-    dueDateFrom,
-    dueDateTo,
-    take: 100
+    pageSize: 100,
+    filters: {
+      status: statusFilter,
+      ownerId: ownerFilter,
+      dueDateFrom,
+      dueDateTo
+    }
   };
 
   const [tasks, owners, accountsList, contactsList, dealsList, leadsList] =
