@@ -9,6 +9,9 @@ interface PostalCodeInputProps {
   country: PostalCountry;
   error?: string;
   testid?: string;
+  name?: string;
+  id?: string;
+  placeholder?: string;
   required?: boolean;
   disabled?: boolean;
 }
@@ -19,6 +22,9 @@ export function PostalCodeInput({
   country,
   error,
   testid,
+  name,
+  id,
+  placeholder,
   required,
   disabled
 }: PostalCodeInputProps) {
@@ -48,9 +54,11 @@ export function PostalCodeInput({
         onChange={handleChange}
         onBlur={handleBlur}
         data-testid={testid}
+        name={name}
+        id={id}
         disabled={disabled}
         required={required}
-        placeholder={country === "CA" ? "A1A 1A1" : "12345"}
+        placeholder={placeholder ?? (country === "CA" ? "A1A 1A1" : "12345")}
         className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
           error ? "border-destructive" : "border-input"
         }`}

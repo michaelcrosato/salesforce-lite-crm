@@ -61,6 +61,7 @@
 
 - Codex [UNBLOCK LIB] (336aa6d on feat/codex-services-routing-and-validation) → **CONSUMED**
 - Grok Slice 1 [UNBLOCK] (3f7ed00) → **SHIPPED**
+- **Claude blocker #9 resolved** (2026-05-18): Swapped plain postal Input for `<PostalCodeInput>` in lead-form.tsx + enhanced the input component for form compatibility (name, id). This unblocks Claude's lead form client-side normalize experience while keeping server validation.
 - Old "Codex pending" blocker → **STALE / RESOLVED**
 
 No active blockers remain for Grok in Sprint 4B.

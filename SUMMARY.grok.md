@@ -102,6 +102,7 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - Components: ExcludedRoutePlaceholder, RoutingDecisionDetail, PostalCodeInput, PageSkeleton, 4 Report Cards
 - Helpers: leadsBySourceChart, topAccountsCard
 - EmptyState: Enhanced with loading/error variants
+- **Claude blocker #9 resolved**: Integrated `<PostalCodeInput>` (with form name/id support) into `components/lead-form.tsx` (replacing plain Input for postalCode field). Added controlled state for postalCode + reset on success. data-testid="lead-form-postal-input" as specified. Backend validation + toast already in place on Claude side. Gate green after change.
 - All type-strict, data-testid compliant, server/client correct.
 
 - Merged `feat/codex-services-routing-and-validation` (commit 336aa6d) into `feat/grok-components-and-seed-tuning`
