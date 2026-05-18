@@ -130,6 +130,8 @@ List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and ar
 - `createOpportunity(input: OpportunityCreateInput): Promise<Opportunity>`
 - `updateOpportunity(id: string, input: OpportunityUpdateInput): Promise<Opportunity>`
 - `deleteOpportunity(id: string): Promise<Opportunity>`
+- `getOpportunityStageHistory(dealId: string): Promise<OpportunityStageHistory[]>`
+- Object adapter: `crmClient.deals.getStageHistory(dealId): Promise<OpportunityStageHistory[]>`
 
 ### Lead
 - `listLeads(opts?: LeadListOptions): Promise<Lead[]>`

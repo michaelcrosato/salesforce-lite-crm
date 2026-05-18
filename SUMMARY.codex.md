@@ -31,9 +31,10 @@ Timestamp: 2026-05-18T01:11:30-07:00
 - Slice 1 shipped postal normalization and validation helpers in `lib/postal.ts`, composed into lead creation validation.
 - Slice 1 shipped `getRoutingDecisionForLead` in `lib/services/leads.ts` and exposed `crmClient.leads.getRoutingDecision(id)`.
 - Slice 1 updated `CRM-CONTRACT.md` with feature flags, excluded routes, postal helper signatures, and routing decision shape.
+- Feature 2.1 verified existing opportunity stage-history wiring and tests, then added `crmClient.deals.getStageHistory(dealId)` with contract documentation.
 
 ### Next action
-Commit Slice 1 with the required `[UNBLOCK]` marker, then continue to Slice 2.
+Run gate for Feature 2.1, commit `feat(codex): opportunity stage history audit and getter`, then continue to Feature 2.2.
 
 ### Scope confirmation
 No cross-ownership edits: YES

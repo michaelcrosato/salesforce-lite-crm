@@ -7,6 +7,7 @@ import type {
   Contact,
   DealerOrder,
   Lead,
+  OpportunityStageHistory,
   Prisma,
   Task
 } from "@prisma/client";
@@ -53,6 +54,7 @@ import {
   getRoutingDecisionForLead as getRoutingDecisionForLeadService,
   type RoutingDecision
 } from "@/lib/services/leads";
+import { listOpportunityStageHistory as listOpportunityStageHistoryService } from "@/lib/services/opportunityStageHistory";
 import type { TaskListInput as TaskServiceListInput } from "@/lib/services/tasks";
 import {
   accountCreateSchema,
@@ -480,6 +482,12 @@ export async function deleteOpportunity(id: string): Promise<Opportunity> {
   return prisma.deal.delete({ where: { id: parseId(id) } });
 }
 
+export async function getOpportunityStageHistory(
+  dealId: string
+): Promise<OpportunityStageHistory[]> {
+  return listOpportunityStageHistoryService(dealId);
+}
+
 export async function listLeads(opts: LeadListOptions = {}): Promise<Lead[]> {
   return prisma.lead.findMany(leadListQuery(opts));
 }
@@ -706,6 +714,14 @@ export async function deleteCampaign(id: string): Promise<Campaign> {
 }
 
 export const crmClient = {
+  deals: {
+    list: listOpportunities,
+    get: getOpportunity,
+    create: createOpportunity,
+    update: updateOpportunity,
+    delete: deleteOpportunity,
+    getStageHistory: getOpportunityStageHistory
+  },
   leads: {
     list: listLeads,
     get: getLead,
