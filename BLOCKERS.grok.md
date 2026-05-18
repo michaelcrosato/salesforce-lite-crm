@@ -1,24 +1,30 @@
 # BLOCKERS.grok.md — Grok Agent Blockers & Requests
 
 **Agent:** Grok
-**Branch:** feat/grok-crm-data-reports
-**Timestamp:** 2026-05-18T00:46:00Z
-**Status:** No active blockers. YOLO mode re-confirmed via user declaration. All verifications green via PowerShell gate.
+**Branch (current session):** feat/grok-crm-data-reports (target 4B: feat/grok-components-and-seed-tuning per prompt)
+**Timestamp:** 2026-05-18 (Sprint 4B PREP ONLY run)
+**Status:** One active blocker — external (Codex [UNBLOCK LIB] pending; Gemini fixing baseline E2E gate per user directive). All local verifications green. PREP ONLY mode — no dependent code attempted.
 
-**Escalation required:** NO
+**Escalation required:** NO (dependency is expected per SPRINT-4B-COORDINATION.md)
 
 ---
 
-## Current Run Notes (YOLO MODE — this prompt)
-- User invoked Grok CLI in YOLO mode with "Use PowerShell-compatible commands only."
-- Full orientation + pwsh verification completed:
-  - `pwsh -NoProfile -Command 'npm run test ...'`: 148/148 PASS
-  - `pwsh -NoProfile -Command 'npm run build ...'`: SUCCESS
-  - rg type scan on Grok zones (components + prior data): CLEAN
-  - git status clean, .env present, correct branch
-- No implementation work, no edits to any source (only this report + SUMMARY rewrite)
-- Scope respected: readiness pass + S4-F3 queued (components polish not started)
-- No SCHEMA_REQUEST or CONTRACT_REQUEST
+## Sprint 4B PREP ONLY — Current Blocker (this prompt)
+
+**Primary Blocker:** Codex has not shipped `[UNBLOCK LIB]`
+- **Type:** dependency / contract
+- **Evidence:** 
+  - Grep for `RoutingDecision`, `postal`, `featureFlags`, `EXCLUDED_ROUTES`, `normalizePostalCode`, `getRoutingDecisionForLead` in CRM-CONTRACT.md and lib/ → no matches.
+  - User statement: "Codex has not yet shipped [UNBLOCK LIB] because Gemini is fixing a baseline E2E gate blocker."
+  - Per COORDINATION.md: Codex Slice 1 on `feat/codex-services-routing-and-validation` must land first (featureFlags.ts, postal.ts, routing decision types + service, reports enhancements).
+- **Files affected if unblocked:** Grok would then implement `components/excluded-route-placeholder.tsx`, `routing-decision-detail.tsx`, `postal-code-input.tsx`, `page-skeleton.tsx` + later report helpers/cards.
+- **Awaiting:** Codex [UNBLOCK LIB] commit (with exports for the three coordination items 54/55/56) + rebase/availability on Grok's 4B branch.
+- **Safe next action (PREP ONLY):** Complete Slice 0 inventory + doc updates (this SUMMARY/BLOCKERS refresh), record seed anchors, component map, and full safe-vs-blocked task list. Re-verify gate with pwsh. Do not create or edit any component or seed logic that depends on the missing types.
+
+**Secondary status items (not blockers):**
+- Branch mismatch: Current tree on historical `feat/grok-crm-data-reports` (YOLO data work). Official 4B Grok branch per prompt is `feat/grok-components-and-seed-tuning`. Will follow pre-flight branch create/switch when operator directs or [UNBLOCK] is present.
+- sprint-4b-start tag: present (good for rollback safety).
+- No local code issues; 148 tests + build green via prior pwsh runs.
 
 ---
 
@@ -26,35 +32,25 @@
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|---------------|------|-------------|----------|----------|------------------|
-| (none) | — | — | — | — | — | — |
+| 1 | Codex lib layer (featureFlags.ts, postal.ts, leads.ts services, reports.ts enhancements) + CRM-CONTRACT updates | dependency | [UNBLOCK LIB] not present — blocks all Grok Items 54/55/56 components and report helper work | Grep zero matches for required types/signatures; user directive + COORDINATION.md dependency graph | Codex [UNBLOCK LIB] on his branch + merge/rebase visibility here | PREP ONLY inventory, doc, seed manifest capture, pwsh gate, rg scans. Record everything in SUMMARY. Wait for signal. |
 
 ---
 
 ## Resolved this prompt
-- N/A — tree was already clean; prior pre-flight notes (e.g. .env post-rebase, artifact removal) remain historical only.
+- N/A — this is the initial PREP snapshot for Sprint 4B. Historical YOLO pre-flight notes remain below.
 
 ---
 
-## Pre-Flight / Setup Notes (Historical — Resolved)
-- **Dirty tree pre-flight (prior):** `grok-cli-prompt.txt` removed via PS `Remove-Item` for clean status.
-- **Prisma client/db after rebase (prior):** `cp .env.example .env`; `npx prisma generate`; `npx prisma db push --accept-data-loss` — all green since.
-- These enabled baseline 82 -> final 148 tests.
+## Historical (YOLO / prior readiness — resolved)
+- All prior setup ( .env, prisma, baseline gate 148/148, type clean) resolved in previous runs.
+- No SCHEMA_REQUEST or CONTRACT_REQUEST from Grok (we consume, do not author lib/services).
 
 ---
 
-## SCHEMA_REQUEST: (none)
-No missing fields needed. All YOLO data + helpers used existing models + relations. Component polish (if prompted) will use existing props/styling.
+## Other Notes (Sprint 4B PREP)
+- Full Grok ownership per GROK-SPRINT-4B.md respected: only touched SUMMARY + BLOCKERS (doc only).
+- PowerShell-compatible commands used for all checks (pwsh -NoProfile -Command ... with Test-Path, git, etc.).
+- Will append to AGENTS.md (Grok section) only if required during final audit (Feature 2.5).
+- Seed discipline: manifest captured before any future value changes.
 
----
-
-## CONTRACT_REQUEST: (none)
-Reports surface, business helpers, and components/ui primitives sufficient. No service or registry extensions required.
-
----
-
-## Other Issues
-- None. Strict no-`any` / no-`@ts-*` discipline maintained across all Grok-owned .ts/.tsx (verified this run via rg in pwsh).
-- E2E: Prior smoke had unrelated locator flake (Claude/Gemini zone); not blocking data or component ownership.
-- YOLO policy: one-run exception authorized by current prompt; used only for verification autonomy and report updates. No product feature expansion.
-
-*Last updated: YOLO re-entry confirmation run. All clear. Turbo Llama approves.*
+*Grok Sprint 4B PREP ONLY — blocked cleanly on expected external unblock. All local state excellent. Ready when Codex + Gemini clear the path.*

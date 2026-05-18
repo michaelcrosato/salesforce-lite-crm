@@ -1,102 +1,159 @@
 # SUMMARY.grok.md — Grok Agent Execution Summary
 
 **Project:** Salesforce Lite CRM POC (Dealer Revenue Command Center vertical)  
-**Agent:** Grok (components, globals.css, tailwind.config.ts, data seeds, pure helpers, CSV, duplicates, YOLO easter eggs)  
-**Branch:** feat/grok-crm-data-reports  
-**Collaborators:** Codex (contract/schema/services), Claude Code (UI/e2e)
+**Agent:** Grok (components/**, prisma/seed.ts, lib/business/**, app/globals.css, tailwind.config.ts) — Sprint 4B ownership per GROK-SPRINT-4B.md  
+**Current Branch (this session):** feat/grok-crm-data-reports  
+**Target 4B Branch (per prompt):** feat/grok-components-and-seed-tuning  
+**Collaborators:** Codex (lib/** + [UNBLOCK LIB]), Claude Code (app/** wiring), Gemini CLI (gate/e2e/tests)
 
 ---
 
-## Current Run — YOLO MODE ACTIVATED (this prompt)
+## Sprint 4B — PREP ONLY Status (current user prompt)
 
-**User prompt:** "You are Grok CLI running in YOLO mode in this repo: C:\dev\salesforce-lite-crm-grok — Use PowerShell-compatible commands only."
+**User directive:** "Sprint 4B is active, but Codex has not yet shipped [UNBLOCK LIB] because Gemini is fixing a baseline E2E gate blocker."  
+Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependent feature implementation.
 
-**Pre-Flight (PASS)**
-- Branch: `feat/grok-crm-data-reports`
-- `git status --short`: clean (no uncommitted changes)
-- Location: C:\dev\salesforce-lite-crm-grok (pwsh confirmed)
-- .env: present
-- Node/npm: v24 / 11.14
+### First-Output Required Data (pwsh-verified)
+- **Current branch:** `feat/grok-crm-data-reports`
+- **HEAD:** `e45e46e` — chore(grok): report-only — YOLO mode re-entry + PowerShell gate verification (148/148 test, build SUCCESS, type clean, clean tree)
+- **git status:** clean (empty)
+- **Prompt files exist:** YES — all 5 confirmed via `Test-Path` in pwsh:
+  - prompts/shared/SPRINT-4B-COORDINATION.md
+  - prompts/grok/GROK-SPRINT-4B.md
+  - prompts/codex/CODEX-SPRINT-4B.md
+  - prompts/claude/CLAUDE-SPRINT-4B.md
+  - prompts/gemini/GEMINI-SPRINT-4B.md
+- **sprint-4b-start tag:** EXISTS (`a12c77981f8908f307991c6a58fe228b6a...`)
+- **Gate baseline (prior pwsh run this session):** 148/148 vitest PASS + build SUCCESS + type-strict clean on Grok zones
 
-**Gate status this prompt (pwsh-invoked, PowerShell-compatible):**
-- `npm run test`: **148/148 PASS** (all 23 test files, including all YOLO helpers + seed integrity + api + business)
-- `npm run build`: **SUCCESS** (Next.js 16, all routes prerendered/dynamic listed, no TS errors)
-- Type strict scan (rg on components/, lib/business/, tests/helpers/, seed-integrity): **CLEAN** — only prose "any" in comments/tests, zero `any` types or `@ts-ignore` directives
-- Partial gate (test + build) authoritative for this readiness/YOLO confirmation run. Full e2e not re-run (prior flake noted as pre-existing, unrelated)
+### Grok Tasks SAFE to do NOW (PREP ONLY, independent of Codex [UNBLOCK LIB])
+1. **PRE-FLIGHT checks** (no commit per prompt): git status/HEAD/tag/archive (archive optional), pwsh gate runs, rg scans.
+2. **SLICE 0 — Repo discovery + component/seed inventory** (doc commit allowed):
+   - Read PLAN.md §4/§5 + CRM-CONTRACT.md (noted: RoutingDecision / postal / featureFlags not present yet — confirms blocked).
+   - Full inventory of `components/` (25+ .tsx files; client vs server classification).
+   - Inventory of `lib/business/` (13 pure helpers, including prior YOLO + report extras).
+   - Inspect `prisma/seed.ts` — extract and document current demo anchors (see Seed Anchor Manifest below).
+   - Re-run baseline gate via pwsh.
+   - Update this SUMMARY + BLOCKERS with 4B context, ownership, queue, unblock status, safe/blocked breakdown.
+3. **Documentation / status / inventory commits only** (this one + any follow-ups that touch only SUMMARY/BLOCKERS/AGENTS.md appends).
+4. **Seed anchor manifest** capture (for Gemini's future anchor tests) — current values only.
+5. Any pure prep that does not create/edit component code, does not edit seed VALUES yet, does not import non-existent Codex types.
 
-**Schema / Contract / Ownership:** Honored. No edits outside Grok zone. No schema/contract changes.
+**Branch note (status):** Current tree is prior sprint YOLO data branch. The official 4B Grok branch per coordination is `feat/grok-components-and-seed-tuning`. Actual feature work should occur after proper branch switch/create per pre-flight in GROK-SPRINT-4B.md (once [UNBLOCK LIB] lands or per operator instruction). Prep inventory is valid on any clean tree.
 
-**Active Sprint Context (from PLAN.md §4):**
-- Repo readiness pass active by current prompt (hygiene, docs, gate, no product features)
-- Sprint 4 queued: S4-F3 — Component polish (Grok zone: components/**, app/globals.css, tailwind.config.ts) — stable spacing, readable empty states, deterministic ordering, no broken links/orphaned actions.
+### Grok Tasks BLOCKED until Codex [UNBLOCK LIB] exists on branch
+- **SLICE 1 Track A (components for items 54/55/56):** 
+  - `components/excluded-route-placeholder.tsx` (needs EXCLUDED_ROUTES / isEnabled from lib/featureFlags.ts)
+  - `components/routing-decision-detail.tsx` (needs `RoutingDecision` type + `getRoutingDecisionForLead` shape from Codex lib/services)
+  - `components/postal-code-input.tsx` (needs `normalizePostalCode` / `validatePostalCode` / schema from lib/postal.ts + validation)
+  - `components/page-skeleton.tsx` (supporting, but part of the dependent Slice 1 bundle)
+  - Reason: Types and helpers do not exist in current tree (confirmed by grep in CRM-CONTRACT + lib/). User rule: "Do not run into dependent Slice work until Codex [UNBLOCK LIB] exists on this branch." Even placeholder scaffolding is out of scope for this PREP prompt.
+- **SLICE 1 combined commit + [UNBLOCK] tag** for Claude (cannot ship components without the Track A pieces).
+- **SLICE 2 Feature 2.2 (report helpers):** `lib/business/leadsBySourceChart.ts` + `topAccountsCard.ts` — depend on Codex Feature 2.4 adding `leadsBySource()` and `topAccountsByDealValue()` to `lib/services/reports.ts`.
+- **SLICE 2 Feature 2.3 (report cards):** The 4 report cards that consume the above helpers + existing data.
+- **Feature 2.4 CSV** (conditional CANDIDATE-S5 anyway).
+- Any code that would `import` the not-yet-shipped Codex lib items (featureFlags, postal, RoutingDecision, new report methods).
 
-**YOLO Status:** Re-declared active. Prior Full YOLO waves (trophies, hype engine, prophecy oracle, 8 mascots incl. Turbo Llama, Viking Volvo, etc.) remain in tree and tested. No new YOLO features added this prompt (scope: verification + report snapshot only).
-
-**Commits this prompt:** none (report-only run; no implementation changes)
-
-**Gate status:** PASS (core verification)
-**DoD self-check:** N/A (no feature work assigned by this prompt)
-**Timestamp:** 2026-05-18T00:45:00Z (approx, local)
-
----
-
-## Completed this prompt
-- Oriented per CLAUDE.md / AGENTS.md / PLAN §6: read PLAN.md, CRM-CONTRACT.md, AGENTS.md, README, GROK-NOTES.md, SUMMARY/BLOCKERS, docs/*
-- Ran all verification using **PowerShell-compatible commands only** (pwsh -NoProfile -Command '...' with proper quoting for pipes/conditionals)
-- Confirmed 148 vitest + successful Next build + strict TS discipline in owned zones
-- Git tree clean, branch correct, no blockers
-- Rewrote this SUMMARY + BLOCKERS per §6/§13 protocol (snapshot, not append)
-- No code, no features, no cross-zone — pure readiness/YOLO re-entry confirmation
-
----
-
-## Next action
-On next prompt: If S4-F3 assigned or explicit "polish components" / "YOLO UI wave" scope given, target components/ui/* (esp. empty-state, tables, badges, kpi), globals.css, tailwind.config for spacing/empty-state/demo polish while preserving all existing behavior. Otherwise continue verification or await feature prompt. Always re-run pwsh gate + rg type scan before any edit.
-
----
-
-## Scope confirmation
-- No cross-ownership edits: **YES**
-- CRM-CONTRACT.md honored: **YES**
-- Product guardrails (no /deals/[id], no new auth/AI/dealer CRUD, consumer lead routing preserved): **YES**
-- YOLO mode operating policy followed (high autonomy, repo-local evidence, PS gate authority)
+**Coordination context (from SPRINT-4B-COORDINATION.md):**
+- Gemini currently blocking Codex → no [UNBLOCK LIB] yet.
+- Grok Slice 0 + Slice 1 Track B (seed) were intended as early independent work.
+- Grok + Claude are paired on Items 54 (excluded routes), 55 (routing decision detail), 56 (postal validation).
+- Grok must ship components **before** Claude can wire them.
 
 ---
 
-## Execution Log (Prior Slices — preserved for continuity)
+## Seed Anchor Manifest (current state — HEAD e45e46e, for Gemini Item 53)
+Documented from `prisma/seed.ts` inspection (prep-only; values not modified):
 
-### Pre-Flight (PASS) [historical]
-- Branch: `feat/grok-crm-data-reports`
-- ... (see git history for full prior slices 0-9 YOLO waves)
+- **Demo postal (V5K 0A1 routing story):** `postalSamples["area-vancouver"] = "V5K 0A1"` (used for lead generation into Vancouver area; expected to route successfully to active DealerOrder).
+- **Behind-pace DealerOrders (analyst actionable / "at risk"):** 
+  - `dealer-order-vancouver-northstar` (acct-northstar, monthlyQuota=28, pace gap=-42) — largest negative, primary demo example.
+  - `dealer-order-vancouver-cascade` (-30)
+  - `dealer-order-burnaby-orbit` (-26)
+  - `dealer-order-victoria-apex` (-20)
+  - `dealer-order-kelowna-riverbend` (-18)
+- **Lead sources:** At least 3+ (from `leadSources` array in buildDealerLeads; covers dealer-routed consumer leads).
+- **Top accounts by deal value:** Multiple accounts (northstar, luma, summit, apex, etc.) have multiple open deals in `dealSeeds`; northstar and summit have high-value open pipeline.
+- **Forecast baseline:** Deals have fixed values + stage probabilities (no faker.random in critical paths for determinism within ±5%).
+- **Dashboard KPIs (computed from seed):** Pipeline totals, weighted forecast, activity volume, analyst panel items all derive deterministically from the above dealerOrders + deals + activities.
+- **Other:** 5 active behind-pace orders for the "focus" story; V5K 0A1 must always hit a known area.
 
-**Key Domain Preserved:** Consumer lead→DealerOrder routing via Area postal matching; /deals?deal= ; no generic lead conv. Turbo Llama still winning.
+**Verification note:** `npm run seed` succeeds; anchors produce the expected demo behavior (behind-pace cards, Vancouver routing success, non-empty charts). Full numeric KPIs (e.g. exact pipeline $) are runtime-computed — captured in SUMMARY after any future seed pin.
 
----
-
-## YOLO PHASE — ACTIVATED (prior)
-User: ":yolo" → "1" → Full Yolo Mode! (multiple waves)
-
-**Delivered (prior runs):**
-- Dealer Trophies & Mascots Easter Egg (`lib/business/dealerTrophies.ts` + tests)
-- Dealer Hype Engine (`lib/business/dealerHype.ts`) — 12 war cries, roastDealer, victory speeches
-- Quota Prophecy Oracle (`lib/business/dealerProphecy.ts`) — 7 fates, council, Turbo Llama overrides
-- Expanded Pantheon: Neon Narwhal, Savage Sloth, Crypto Coyote, Viking Volvo + legendary titles
-- Ceremonial seeded Tasks + Campaigns (Mascot Draft Night 2026, etc.)
-- Final Full Yolo gate: 137+/148 tests, build clean, e2e smoke (with unrelated flake noted)
-
-**The Dealer Revenue Command Center is operating at 100% unhinged capacity. Turbo Llama has ascended.**
-
-*Prior YOLO complete. This prompt re-affirms YOLO mode for future scoped chaos in Grok's component zone if authorized.*
+**Gemini contract:** Any future seed edit by Grok must be preceded by manifest update here so anchor tests do not break.
 
 ---
 
-## Final Verification (Historical)
-- Full gate (prior): 148/148 vitest, build SUCCESS, e2e smoke 1/1 (flake pre-existing)
-- RG scan: **CLEAN**
-- `git status --short`: clean
-- 10+ Grok commits in history (data + 4+ YOLO feat)
-- All owned pure helpers, seed data, tests strict no-any
+## Component Inventory (Grok-owned — current tree, prep for S4-F3 + 4B Items 54-56)
+(Full list via pwsh + rg; 25 .tsx files under components/)
 
-**Result:** All execution discipline followed. No blockers. Ready for component polish (S4-F3) or next YOLO UI wave.
+**Client components** (`"use client"` — interactivity required):
+- add-note-form.tsx, contact-form.tsx, deal-board.tsx, deal-detail-drawer.tsx, deal-form.tsx, lead-form.tsx, lead-status-control.tsx, dashboard-charts.tsx, sidebar-nav.tsx, ui/toast.tsx
 
-*Grok YOLO mode standing by. Quota will be met. Llama out.*
+**Server components** (default — most tables, cards, primitives):
+- account-badges.tsx, account-form.tsx, accounts-table.tsx, activity-timeline.tsx, app-shell.tsx, contacts-table.tsx, kpi-card.tsx, pacing-bar.tsx, page-header.tsx, deal-form.tsx (some overlap), 
+- ui/*: badge, button, card, empty-state, input, label, select, skeleton, table, textarea  (most are pure; some may be used in client contexts)
+
+**Key demo-used (Claude pages import these):**
+- EmptyState (used in accounts, contacts, deals, leads, orders, areas, activities lists)
+- Tables (AccountsTable, ContactsTable, etc.)
+- DealBoard, DealDetailDrawer, LeadForm, LeadStatusControl, PacingBar, KPI cards, DashboardCharts
+- Forms for create/edit
+
+**Current state for S4-F3 polish + 4B:** Many already have basic empty states; loading/error coverage varies. New 4B components (excluded placeholder, routing detail, postal input, page skeleton) do not exist yet — will be added only after [UNBLOCK LIB].
+
+No `components/reports/` subdir yet (will be created in Slice 2 2.3 when unblocked).
+
+**data-testid discipline (prep observation):** Existing interactive components have some testids; full audit is part of Feature 2.5 final (safe doc scan only now).
+
+---
+
+## lib/business/ Inventory (Grok pure helpers — current)
+13 files (all pure, no Prisma, deterministic):
+- analyst.ts, dashboard.ts, deals.ts, dealerOps.ts, forecast.ts (existing core)
+- tasks.ts, csv-export.ts, csv-import.ts, duplicates.ts, reports-extra.ts (Sprint 4A Grok data work)
+- dealerTrophies.ts, dealerHype.ts, dealerProphecy.ts (Full YOLO easter eggs — still present, tested, delightful)
+- reports-extra.ts augments Codex reports service
+
+Future 4B additions (blocked): leadsBySourceChart.ts, topAccountsCard.ts (and possibly csvExport refinement).
+
+All pass current type-strict + test gates.
+
+---
+
+## Active Sprint Context & Queue (from GROK-SPRINT-4B.md + COORDINATION)
+- **PREP ONLY** (this prompt) → complete Slice 0 inventory + doc, record unblock status.
+- When [UNBLOCK LIB] lands + we are on correct 4B branch: proceed to Slice 1 (Track B seed pin independent; Track A components after types exist) → ship with [UNBLOCK] for Claude.
+- Slice 2 polish + report helpers/cards (parallel with Claude wiring).
+- Final audit 2.5.
+
+**Ownership per 4B prompt (overrides prior):** components/** (all), prisma/seed.ts (anchors + new sections), lib/business/** (pure helpers), globals.css + tailwind.config.ts.
+
+**Strict rules followed:** No any/@ts-*, server components default, data-testid on interactive, existing tokens only, seed high-risk (manifest first).
+
+---
+
+## Prior YOLO / Data Work (historical, preserved)
+(See previous "Current Run — YOLO..." and "YOLO PHASE" sections below for the 148-test green state, dealer mascots, hype, prophecy, trophies. All still in tree and passing.)
+
+**Gate this session remains green** (pwsh verified).
+
+**No cross-zone edits, no Codex/Claude/Gemini files touched.**
+
+---
+
+## Next Action (PREP ONLY complete)
+- Once operator confirms or [UNBLOCK LIB] appears on a rebased/ switched `feat/grok-components-and-seed-tuning` branch: begin safe independent Track B seed stabilization + full Slice 1 after types available.
+- Continue only doc/status updates or pure inventory until then.
+- Will re-run pwsh gate + rg before any future edit.
+
+**Scope confirmation:** All work this prompt limited to Grok whitelist + doc files. No implementation of blocked items. PowerShell-compatible commands used exclusively for checks.
+
+---
+
+## (Historical content from prior YOLO readiness run preserved below for continuity)
+
+## Current Run — YOLO MODE ACTIVATED (this prompt) [prior]
+... (previous content retained for git history; see commit e45e46e for full prior YOLO verification details)
+
+*Grok Sprint 4B PREP ONLY complete for this prompt. Awaiting [UNBLOCK LIB] + branch alignment for dependent work. Turbo Llama stands by.*
