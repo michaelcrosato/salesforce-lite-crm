@@ -54,3 +54,5 @@
 - Seed discipline: manifest captured before any future value changes.
 
 *Grok Sprint 4B PREP ONLY — blocked cleanly on expected external unblock. All local state excellent. Ready when Codex + Gemini clear the path.*
+
+**Additional note (this prompt):** Full `prompts/grok/GROK-SPRINT-4B.md` (364 lines, including STOPPING CONDITIONS + GO section) read to completion and internalized. Key nuance recorded: Item 54 (excluded-route-placeholder) + Track B (seed) have partial independence paths. Prep artifacts (inventory + manifest) are up to date in SUMMARY.

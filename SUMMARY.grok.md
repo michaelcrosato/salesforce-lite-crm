@@ -151,6 +151,24 @@ All pass current type-strict + test gates.
 
 ---
 
+## Full GROK-SPRINT-4B.md — INGESTED (2026-05-18 PREP run)
+**Status:** Entire prompt file (364 lines) read to completion via read_file (full content from line 1 through the final "GO" / priority instructions and stopping conditions).
+
+**Key late instructions internalized (beyond earlier partial reads):**
+- Stopping conditions: Slice 0 baseline gate red, 3 consecutive failure-loop limits, Codex [UNBLOCK] absent within first 6h *and* seed work done → fall back to Feature 2.1 (component polish on *existing* components only), seed anchor test breakage >2 times, working tree unrecoverable, out of features.
+- Explicit GO guidance at end of file:
+  - "Track B (seed anchor stabilization) is INDEPENDENT of Codex's unblock — start it immediately in parallel with Slice 0."
+  - "For Item 54's placeholder, you can ship without unblock — it doesn't import from Codex's new modules."
+  - "Begin Pre-flight now. Slice 0 → Slice 1." "Do not pause between features once unblocks land."
+  - Priority within Slice 2: 2.1 (polish) ships fastest (no dependencies). 2.2 + 2.3 wait on Codex reports service. 2.4 (CSV) only if P0/P1 complete early.
+- Pre-flight includes the branch switch/create to `feat/grok-components-and-seed-tuning` (we have documented the current mismatch on `feat/grok-crm-data-reports`).
+
+This action directly fulfills the directive "You can finish your entire prompts\grok\GROK-SPRINT-4B.md if you haven't already". The complete instruction set (including YOLO discipline, component rules, seed high-risk contract with Gemini, failure-loop protocol, and fallback paths) is now fully loaded for use the moment the PREP ONLY restriction is lifted or [UNBLOCK LIB] arrives.
+
+**PREP work product:** Inventory, seed manifest, component/client-server map, safe-vs-blocked matrix, and full prompt internalization are captured here for clean handoff.
+
+---
+
 ## (Historical content from prior YOLO readiness run preserved below for continuity)
 
 ## Current Run — YOLO MODE ACTIVATED (this prompt) [prior]
