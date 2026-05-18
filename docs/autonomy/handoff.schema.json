@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "task_id", "from_agent", "failure_type", "attempt", "captured_at", "changed_files", "supervisor_recommendation"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "task_id": { "type": "string" },
+    "from_agent": { "enum": ["codex", "claude", "grok", "gemini"] },
+    "failure_type": { "enum": ["gate", "timeout", "heartbeat", "quota", "crash", "validation", "blocker", "cli-not-configured"] },
+    "failed_command": { "type": ["string", "null"] },
+    "exit_code": { "type": ["integer", "null"] },
+    "attempt": { "type": "integer" },
+    "captured_at": { "type": "string" },
+    "changed_files": { "type": "array", "items": { "type": "string" } },
+    "zone_violations": { "type": "array", "items": { "type": "string" } },
+    "diff_path": { "type": ["string", "null"] },
+    "stdout_log": { "type": ["string", "null"] },
+    "stderr_log": { "type": ["string", "null"] },
+    "recommended_next_agents": { "type": "array", "items": { "type": "string" } },
+    "supervisor_recommendation": { "enum": ["retry", "transfer", "park", "review-only", "stop"] }
+  },
+  "additionalProperties": false
+}
