@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("daily CRM loop smoke test", async ({ page }) => {
+test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await expect(page.getByText("Dealer Ops", { exact: true })).toBeVisible();
@@ -11,7 +11,7 @@ test("daily CRM loop smoke test", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Contacts" })).toBeVisible();
 
   await page.getByRole("link", { name: "Maya Singh" }).click();
-  await expect(page.getByRole("heading", { name: "Maya Singh" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Maya Singh", exact: true })).toBeVisible();
 
   const noteText =
     "Smoke summary first sentence. Smoke summary second sentence. Hidden raw third sentence asks to follow up next week with pricing.";
@@ -38,16 +38,19 @@ test("daily CRM loop smoke test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Leads" }).first().click();
   await expect(page.getByRole("heading", { name: "Lead Inbox" })).toBeVisible();
+  const leadSuffix = `${Date.now().toString(36)}-${testInfo.workerIndex}`;
+  const leadLastName = `Route ${leadSuffix}`;
+  const leadName = `E2E ${leadLastName}`;
   await page.getByLabel("First name").fill("E2E");
-  await page.getByLabel("Last name").fill("Route");
+  await page.getByLabel("Last name").fill(leadLastName);
   await page.getByLabel("Phone").fill("604-555-9191");
-  await page.getByLabel("Email").fill("e2e.route@dealerlead.example");
+  await page.getByLabel("Email").fill(`e2e.route.${leadSuffix}@dealerlead.example`);
   await page.getByLabel("Postal code").fill("V5K 0A1");
   await page.getByLabel("Province").fill("BC");
   await page.getByLabel("Source").fill("e2e");
   await page.getByRole("button", { name: "Create lead" }).click();
 
-  const leadRow = page.getByRole("row").filter({ hasText: "E2E Route" });
+  const leadRow = page.getByRole("row").filter({ hasText: leadName });
   await expect(leadRow).toContainText("Routed");
   const assignedOrderHref = await leadRow.locator('a[href^="/orders/"]').getAttribute("href");
   expect(assignedOrderHref).toBe("/orders/dealer-order-vancouver-northstar");
@@ -63,7 +66,7 @@ test("daily CRM loop smoke test", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Vancouver fleet lead package", exact: true })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "E2E Route", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: leadName, exact: true })).toBeVisible();
 
   await page.goto("/forecast");
   await expect(page.getByRole("heading", { name: "Forecast Simulator" })).toBeVisible();
