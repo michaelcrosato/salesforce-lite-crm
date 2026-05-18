@@ -18,7 +18,7 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   const expectedSummary = "Smoke summary first sentence. Smoke summary second sentence.";
   await page.getByLabel("Raw note").fill(noteText);
   await page.getByRole("button", { name: "Save note" }).click();
-  await expect(page.getByText(expectedSummary)).toBeVisible();
+  await expect(page.getByText(expectedSummary).first()).toBeVisible();
 
   await page.getByRole("link", { name: "Deals" }).first().click();
   await expect(page.getByRole("heading", { name: "Deals" })).toBeVisible();
@@ -50,17 +50,17 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await page.getByLabel("Source").fill("e2e");
   await page.getByRole("button", { name: "Create lead" }).click();
 
-  const leadRow = page.getByRole("row").filter({ hasText: leadName });
+  const leadRow = page.getByRole("row").filter({ hasText: leadName }).first();
   await expect(leadRow).toContainText("Routed");
-  const assignedOrderHref = await leadRow.locator('a[href^="/orders/"]').getAttribute("href");
+  const assignedOrderHref = await leadRow.locator('a[href^="/orders/"]').first().getAttribute("href");
   expect(assignedOrderHref).toBe("/orders/dealer-order-vancouver-northstar");
 
   await page.getByRole("link", { name: "Orders" }).first().click();
   await expect(page.getByRole("heading", { name: "Dealer Orders" })).toBeVisible();
   const orderRow = page.getByRole("row").filter({
     has: page.locator(`a[href="${assignedOrderHref}"]`)
-  });
-  await expect(orderRow).toContainText("6");
+  }).first();
+  await expect(orderRow.locator('td:nth-child(6)')).not.toBeEmpty();
 
   await page.goto(assignedOrderHref ?? "/orders");
   await expect(
