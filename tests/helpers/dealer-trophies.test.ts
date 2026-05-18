@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   awardMonthlyTrophies,
+  forgeLegendaryDealerTitle,
   getDealerMascot,
   getMostImprovedPacing,
   type TrophyOrder
@@ -47,5 +48,19 @@ describe("YOLO Dealer Trophies & Mascots", () => {
     const sadOrders = mockOrders.map((o) => ({ ...o, deliveredThisMonth: 1 }));
     const trophies = awardMonthlyTrophies(sadOrders);
     expect(trophies.find((t) => t.name === "Turbo Llama")).toBeUndefined();
+  });
+
+  it("forgeLegendaryDealerTitle returns gloriously unhinged titles for over-performers", () => {
+    const highOrder: TrophyOrder = { ...mockOrders[0], deliveredThisMonth: 42 };
+    const title = forgeLegendaryDealerTitle(highOrder, 150);
+    expect(title.length).toBeGreaterThan(15);
+    expect(title).toMatch(/Arch-|Grand-|Mythic-|Omega-|Ultra-|Blood-|Neon-|Storm-/);
+  });
+
+  it("new sacred mascots (Narwhal, Sloth, Coyote, Volvo) are selectable", () => {
+    const names = Array.from({ length: 30 }, (_, i) => getDealerMascot({ name: `Dealer${i}` }).name);
+    const newOnes = ["Neon Narwhal", "Savage Sloth", "Crypto Coyote", "Viking Volvo"];
+    const found = newOnes.some((n) => names.includes(n));
+    expect(found).toBe(true);
   });
 });

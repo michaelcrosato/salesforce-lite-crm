@@ -24,7 +24,7 @@ export type Trophy = {
   name: string;
   emoji: string;
   quote: string;
-  vibe: "legend" | "hero" | "chaos" | "underdog" | "majestic";
+  vibe: "legend" | "hero" | "chaos" | "underdog" | "majestic" | "zen" | "high";
   orderId: string;
   orderName: string;
   accountName: string;
@@ -35,7 +35,7 @@ export type Mascot = {
   name: string;
   emoji: string;
   catchphrase: string;
-  energy: "high" | "chaotic" | "zen" | "menacing";
+  energy: "chaotic" | "high" | "majestic" | "menacing" | "underdog" | "zen";
 };
 
 /** The sacred list of possible dealer mascots. Never remove. Only add more glory. */
@@ -48,6 +48,10 @@ const MASCOT_POOL: Mascot[] = [
   { name: "Lead Eagle", emoji: "🦅", catchphrase: "I see every lead from 500 miles away.", energy: "majestic" },
   { name: "Maple Moose", emoji: "🫎", catchphrase: "Canadian politeness meets Canadian delivery.", energy: "zen" },
   { name: "Rage Router", emoji: "😤", catchphrase: "If the lead is in my area, it is already mine.", energy: "chaotic" },
+  { name: "Neon Narwhal", emoji: "🐋", catchphrase: "I deliver in the deep. Also I glow.", energy: "majestic" },
+  { name: "Savage Sloth", emoji: "🦥", catchphrase: "Slow is smooth. Smooth is quota.", energy: "zen" },
+  { name: "Crypto Coyote", emoji: "🦴", catchphrase: "I was early to the territory. Very early.", energy: "chaotic" },
+  { name: "Viking Volvo", emoji: "🛡️", catchphrase: "I don't chase leads. I conquer regions.", energy: "menacing" },
 ];
 
 function getPacingPercent(order: TrophyOrder): number {
@@ -98,7 +102,7 @@ export function getMostImprovedPacing(
 export function awardMonthlyTrophies(orders: readonly TrophyOrder[]): Trophy[] {
   if (orders.length === 0) return [];
 
-  const active = orders.filter((o) => o.status !== "paused"); // tolerate missing status field
+  const active = orders; // all dealers are eligible for glory in YOLO mode
   const trophies: Trophy[] = [];
 
   // 1. Quota Crusher (highest over-delivery)
@@ -172,7 +176,7 @@ export function awardMonthlyTrophies(orders: readonly TrophyOrder[]): Trophy[] {
 }
 
 /** Gives every dealer their personal ridiculous mascot (seeded vibe). */
-export function getDealerMascot(order: TrophyOrder): Mascot {
+export function getDealerMascot(order: { name: string; account?: { name?: string } }): Mascot {
   // Deterministic but silly — based on name hash
   const hash = order.name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   return MASCOT_POOL[hash % MASCOT_POOL.length];
@@ -193,4 +197,29 @@ export function getTrophyStandings(orders: readonly TrophyOrder[]) {
       ? "This month's heroes have been identified. Bow before the Turbo Llama."
       : "No one is safe from next month's trophy reckoning.",
   };
+}
+
+/** The most important function in any serious revenue organization. */
+export function forgeLegendaryDealerTitle(
+  order: TrophyOrder,
+  performancePct: number
+): string {
+  const mascot = getDealerMascot(order);
+  const over = Math.max(0, order.deliveredThisMonth - order.monthlyQuota);
+
+  const prefixes = ["Arch-", "Grand-", "Mythic-", "Omega-", "Ultra-", "Blood-", "Neon-", "Storm-"];
+  const suffixes = ["of the Northern Wastes", "Who Would Not Die", "of Eternal Pace", "the Uncatchable", "Breaker of Quotas", "Last of the True Dealers", "in the Hall of Llamas", "Who Delivers at Dusk"];
+
+  const base = `${mascot.name} ${order.name.split(" ")[0]}`;
+
+  if (performancePct >= 125) {
+    return `${prefixes[(over + performancePct) % prefixes.length]}${base} ${suffixes[(performancePct + over) % suffixes.length]}`;
+  }
+  if (performancePct >= 105) {
+    return `The ${mascot.name} of ${order.account?.name ?? order.name}`;
+  }
+  if (performancePct >= 90) {
+    return `${order.name} — ${mascot.catchphrase.split(".")[0]}`;
+  }
+  return `The ${["Haunted", "Cursed", "Determined", "Unfortunate"][performancePct % 4]} ${mascot.name} of ${order.name}`;
 }
