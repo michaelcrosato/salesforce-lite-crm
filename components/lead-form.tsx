@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PostalCodeInput } from "@/components/postal-code-input";
 import { useToast } from "@/components/ui/toast";
 
 export function LeadForm() {
@@ -16,6 +17,7 @@ export function LeadForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<ActionResult | null>(null);
+  const [postalCode, setPostalCode] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,6 +35,7 @@ export function LeadForm() {
 
         if (actionResult.ok) {
           formRef.current?.reset();
+          setPostalCode("");
           router.refresh();
         }
       })();
@@ -70,7 +73,17 @@ export function LeadForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="postalCode">Postal code</Label>
-            <Input id="postalCode" name="postalCode" placeholder="V5K 0A1" />
+            <PostalCodeInput
+              value={postalCode}
+              onChange={setPostalCode}
+              country="CA"
+              error={errors?.postalCode?.[0]}
+              testid="lead-form-postal-input"
+              name="postalCode"
+              id="postalCode"
+              placeholder="V5K 0A1"
+              required={false}
+            />
             <FieldError errors={errors?.postalCode} />
           </div>
           <div className="space-y-2">
