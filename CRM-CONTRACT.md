@@ -1,5 +1,8 @@
 # CRM Contract
 
+Version: v2.0
+Last audited: 2026-05-18
+
 This file is the source of truth for CRM entity names, routes, status values, and server-side data access.
 
 ## Entity Model
@@ -74,7 +77,21 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- Existing UI routes are preserved. New `/tasks`, `/cases`, and `/campaigns` routes are contract routes for the UI owner to implement.
+- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are backend contract routes, but their Sprint 4B UI routes are in `EXCLUDED_ROUTES`.
+
+## Status Constants
+
+Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/crm/registry.ts`:
+
+- Account: `ACCOUNT_STATUSES`
+- Contact: `CONTACT_STATUSES`
+- Opportunity/Deal: `DEAL_STAGES`
+- Activity: `ACTIVITY_TYPES`
+- Lead: `LEAD_STATUSES`
+- DealerOrder: `DEALER_ORDER_STATUSES`
+- Task: `TASK_STATUSES`
+- Case: `CASE_STATUSES`
+- Campaign: `CAMPAIGN_STATUSES`
 
 ## Feature Flags And Excluded Routes
 
