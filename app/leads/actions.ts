@@ -30,10 +30,15 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
   });
 
   if (!parsed.success) {
+    const errors = fieldErrors(parsed.error);
+    const postalIssue = errors.postalCode?.[0];
+    const onlyPostal =
+      postalIssue && Object.values(errors).filter((entry) => entry?.length).length === 1;
+
     return {
       ok: false,
-      message: "Check the highlighted fields.",
-      fieldErrors: fieldErrors(parsed.error)
+      message: onlyPostal ? postalIssue : "Check the highlighted fields.",
+      fieldErrors: errors
     };
   }
 
