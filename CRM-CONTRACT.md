@@ -109,6 +109,8 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.
 List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and are translated to Prisma `where`, `orderBy`, `skip`, and `take` clauses by `lib/services/listQuery.ts`.
+Supported list filter keys are documented in JSDoc above each `list*` adapter in `lib/crm/crmClient.ts`.
+Task, Case, and Campaign service modules also retain legacy flat `skip` / `take` inputs for existing callers, but their exported crmClient list option types use the standard list shape.
 
 ### Account
 - `listAccounts(opts?: AccountListOptions): Promise<Account[]>`
