@@ -58,3 +58,14 @@
 - `prisma/seed.ts` except minimal additions if needed for API tests.
 - `lib/business/**`.
 - `e2e/smoke.spec.ts` and other e2e specs.
+
+## Sprint 4B Slice 0 - 2026-05-18
+- Branch: `feat/codex-services-routing-and-validation`.
+- Baseline HEAD after Gemini fixes: `e57e879`.
+- `sprint-4b-start` tag exists and rollback archive was created at `..\salesforce-lite-crm-sprint-4b-start.zip`.
+- Schema inventory confirmed in `prisma/schema.prisma`: `Task`, `Case`, `Campaign`, and `OpportunityStageHistory` are present alongside the dealer routing models.
+- Service inventory: `campaigns.ts`, `cases.ts`, `listQuery.ts`, `opportunityStageHistory.ts`, `reports.ts`, `search.ts`, and `tasks.ts`.
+- Contract version/status: `CRM-CONTRACT.md` is pre-Sprint-4B v1 surface; `/deals?deal=<id>` remains drawer-canonical and `/deals/[id]` remains excluded.
+- Sprint 4A blocker status: previous baseline E2E blocker is resolved by Gemini commits `f909c60` and `e57e879`; the first local rerun reused a stale port-3000 dev server, and a fresh server gate passed after stopping that listener.
+- Seed routing inventory: `prisma/seed.ts` creates `routing_event` Activity rows with human-readable summaries; demo postal samples include `V5K 0A1` for `area-vancouver`, `V3N 2B2` for `area-burnaby`, and `T2P 1J9` for `area-calgary`.
+- Baseline gate: PASS via `pwsh scripts/local-gate.ps1` with 93 Vitest tests, build pass, and 7 Playwright tests passing.

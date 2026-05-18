@@ -1,39 +1,44 @@
-Agent: codex
-Sprint: repo readiness/documentation pass
-Feature: README product repositioning and Sprint 4 prompt preparation
-Branch: chore/claude-hooks-r23
+Agent: Codex
+Sprint: Sprint 4B
+Feature: Final audit and handoff
+Branch: feat/codex-services-routing-and-validation
 Status: complete
-Commits this prompt: none
-Gate status: PASS
+Commits this prompt: `1eed7a7`, `336aa6d`, `7800a53`, `a262bc1`, `f20f7b9`, `45c020e`, `970b7b5`, final audit commit at HEAD
+Gate status: PASS - final `pwsh scripts/local-gate.ps1`
 DoD self-check: PASS
-Timestamp: 2026-05-17T21:53:51.8364345-07:00
+Timestamp: 2026-05-18T01:26:30-07:00
+
+### Slice 0 preflight
+- Required Sprint 4B prompt files exist and were read in the requested order.
+- Current HEAD after Gemini fixes: `e57e879`.
+- `sprint-4b-start` tag exists.
+- Rollback archive exists: `..\salesforce-lite-crm-sprint-4b-start.zip`.
+- Branch confirmed: `feat/codex-services-routing-and-validation`.
+
+### Repo state confirmation
+- Previous baseline gate blocker is cleared by Gemini commits `f909c60` and `e57e879`.
+- A stale Node dev server on port 3000 caused the first local gate reruns to reuse old app state; stopping that listener allowed the canonical gate to pass.
+- `prisma/schema.prisma` contains `Task`, `Case`, `Campaign`, and `OpportunityStageHistory`.
+- Seed data includes Activity records of type `routing_event`; new routing events now persist structured payloads in `Activity.rawText`.
 
 ### Completed this prompt
-- Rewrote `README.md` so the project is framed as a full-fledged,
-  AI-adaptive Salesforce-style CRM for small business requirements, not as a
-  demo or proof-of-concept.
-- Added the required AI-agent Read First list, local setup commands, local URL,
-  database notes, Postgres switching notes, Dealer Revenue Command Center
-  capabilities, core routes/workflows, scripts, full gate, Vitest/Playwright
-  coverage, known limitations, and roadmap to `README.md`.
-- Updated `docs/PROJECT-CONTROL.md` to mark the readiness/documentation pass
-  complete and record that README reflects the updated product vision.
-- Prepared `docs/NEXT-PROMPTS.md` for Sprint 4 while keeping the prompts aligned
-  with `PLAN.md` and `CRM-CONTRACT.md`.
-- Ran the full local gate successfully:
-  `npm install`; `if (-not (Test-Path .env)) { Copy-Item .env.example .env }`;
-  `npx prisma generate`; `npx prisma db push`; `npm run seed`;
-  `npm run test`; `npm run build`; `npx playwright install chromium`;
-  `npm run test:e2e`.
-- Restored the `next-env.d.ts` build-generated side effect so the final diff
-  remains limited to documentation and Codex report files.
+- Slice 0 committed state confirmation and blocker clearance.
+- Slice 1 shipped `[UNBLOCK]` with `lib/featureFlags.ts`, `lib/postal.ts`, `lib/services/leads.ts`, `crmClient.leads.getRoutingDecision(id)`, and contract updates.
+- Feature 2.1 verified opportunity stage-history action wiring and tests, then added `crmClient.deals.getStageHistory(dealId)`.
+- Feature 2.2 standardized Task, Case, and Campaign list inputs around `{ page, pageSize, sortBy, sortOrder, filters }`, retained flat service input compatibility, and added list filter-key JSDoc to crmClient adapters.
+- Feature 2.3 writes structured routing-event payloads to `Activity.rawText`, keeps `Activity.summary` readable, and parses payload `steps` plus `summary` in `getRoutingDecisionForLead`.
+- Feature 2.4 expanded report services with lead-source routing rates and top accounts by open deal value; added focused tests in `tests/api/reports.test.ts` per Codex prompt cross-zone exception.
+- Feature 2.5 audited entity/schema, routes/exclusions, crmClient signatures, status constants, postal helpers, routing decision, report shapes, and bumped `CRM-CONTRACT.md` to v2.0.
+- Feature 2.6 final scans passed: `rg '\bany\b|@ts-ignore|@ts-expect-error' lib`, route scan for forbidden deal-detail routes, `npx tsc --noEmit`, and full local gate.
+
+### Deferred / skipped
+- No schema changes were needed.
+- No Claude, Grok, or Gemini feature work was performed except the Codex-prompted report service tests in `tests/api/reports.test.ts`.
 
 ### Next action
-Start Sprint 4 using `docs/NEXT-PROMPTS.md`, then run the relevant local gate
-before any merge.
+Merge Codex first per Sprint 4B coordination, then let Grok and Claude consume the `[UNBLOCK]` lib surface.
 
 ### Scope confirmation
-No cross-ownership edits: NO - the current prompt explicitly scoped README and
-docs updates.
+No cross-ownership edits: YES - one prompt-authorized test edit for reports service coverage.
 CRM-CONTRACT.md honored: YES
 No product features added: YES

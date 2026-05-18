@@ -1,7 +1,8 @@
 import type { Prisma, Task } from "@prisma/client";
 import { z } from "zod";
-import { TASK_STATUSES } from "@/lib/crm/registry";
+import { TASK_STATUSES, type TaskStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { idSchema, taskCreateSchema, taskUpdateSchema } from "@/lib/validation";
 
 const optionalFilterDate = z.preprocess((value) => {
@@ -20,16 +21,50 @@ const optionalFilterDate = z.preprocess((value) => {
   return new Date(value);
 }, z.date().optional());
 
-export const taskListSchema = z.object({
-  status: z.enum(TASK_STATUSES).optional(),
-  ownerId: idSchema.optional(),
-  dueDateFrom: optionalFilterDate,
-  dueDateTo: optionalFilterDate,
-  skip: z.coerce.number().int().min(0).optional(),
-  take: z.coerce.number().int().min(1).max(100).optional()
-});
+const taskSortByValues = ["dueDate", "createdAt", "updatedAt", "status", "priority"] as const;
+const sortOrderSchema = z.enum(["asc", "desc"]);
+const taskFilterSchema = z
+  .object({
+    status: z.enum(TASK_STATUSES).optional(),
+    ownerId: idSchema.optional(),
+    dueDateFrom: optionalFilterDate,
+    dueDateTo: optionalFilterDate
+  })
+  .strict();
 
-export type TaskListInput = z.input<typeof taskListSchema>;
+export const taskListSchema = z
+  .object({
+    page: z.coerce.number().int().min(1).optional(),
+    pageSize: z.coerce.number().int().min(1).max(100).optional(),
+    sortBy: z.enum(taskSortByValues).optional(),
+    sortOrder: sortOrderSchema.optional(),
+    filters: taskFilterSchema.optional()
+  })
+  .strict();
+
+const legacyTaskListSchema = taskFilterSchema
+  .extend({
+    skip: z.coerce.number().int().min(0).optional(),
+    take: z.coerce.number().int().min(1).max(100).optional()
+  })
+  .strict();
+
+type TaskSortBy = (typeof taskSortByValues)[number];
+type TaskFilterInput = {
+  status: TaskStatus;
+  ownerId: string;
+  dueDateFrom: Date | string | number;
+  dueDateTo: Date | string | number;
+};
+type ParsedTaskFilters = {
+  status: TaskStatus;
+  ownerId: string;
+  dueDateFrom: Date;
+  dueDateTo: Date;
+};
+type ParsedTaskListInput = ListQueryInput<TaskSortBy, ParsedTaskFilters>;
+
+export type TaskListInput = ListQueryInput<TaskSortBy, TaskFilterInput>;
 export type TaskCreateInput = z.input<typeof taskCreateSchema>;
 export type TaskUpdateInput = z.input<typeof taskUpdateSchema>;
 
@@ -39,31 +74,58 @@ export async function createTask(input: unknown): Promise<Task> {
 }
 
 export async function listTasks(input: unknown = {}): Promise<Task[]> {
-  const { dueDateFrom, dueDateTo, ownerId, skip, status, take } = taskListSchema.parse(input);
-  const where: Prisma.TaskWhereInput = {
-    ownerId,
-    status,
-    dueDate:
-      dueDateFrom || dueDateTo
-        ? {
-            gte: dueDateFrom,
-            lte: dueDateTo
-          }
-        : undefined
-  };
+  return prisma.task.findMany(taskListQuery(parseTaskListInput(input)));
+}
 
-  return prisma.task.findMany({
-    where,
-    orderBy: [
-      {
-        dueDate: "asc"
-      },
-      {
-        createdAt: "desc"
-      }
-    ],
-    skip,
-    take
+function parseTaskListInput(input: unknown): ParsedTaskListInput {
+  const standard = taskListSchema.safeParse(input);
+
+  if (standard.success) {
+    return standard.data;
+  }
+
+  const legacy = legacyTaskListSchema.parse(input);
+  const { skip, take, ...filters } = legacy;
+
+  return {
+    page: skip !== undefined && take !== undefined ? Math.floor(skip / take) + 1 : undefined,
+    pageSize: take,
+    filters
+  };
+}
+
+function taskListQuery(input: ParsedTaskListInput) {
+  return buildListQuery<
+    TaskSortBy,
+    ParsedTaskFilters,
+    Prisma.TaskWhereInput,
+    Prisma.TaskOrderByWithRelationInput[]
+  >(input, {
+    defaultSortBy: "dueDate",
+    defaultSortOrder: "asc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      dueDate: (order) => [{ dueDate: order }, { createdAt: "desc" }],
+      createdAt: (order) => [{ createdAt: order }],
+      updatedAt: (order) => [{ updatedAt: order }],
+      status: (order) => [{ status: order }, { createdAt: "desc" }],
+      priority: (order) => [{ priority: order }, { createdAt: "desc" }]
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      ownerId: (ownerId) => ({ ownerId }),
+      dueDateFrom: (dueDateFrom) => ({
+        dueDate: {
+          gte: dueDateFrom
+        }
+      }),
+      dueDateTo: (dueDateTo) => ({
+        dueDate: {
+          lte: dueDateTo
+        }
+      })
+    }
   });
 }
 
