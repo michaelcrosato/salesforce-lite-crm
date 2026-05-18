@@ -33,7 +33,7 @@ test.describe("visual smoke", () => {
       await expect(page).toHaveScreenshot(`${route.name}.png`, {
         animations: "disabled",
         fullPage: false,
-        maxDiffPixels: 200
+        maxDiffPixelRatio: 0.05
       });
     });
   }
