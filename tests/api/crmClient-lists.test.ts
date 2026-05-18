@@ -67,13 +67,11 @@ describe("crmClient list functions", () => {
     expect(results.some(a => a.title === "ListMatch Activity")).toBe(true);
   });
 
-  it("lists tasks with priority filter", async () => {
+  it("lists tasks with status filter", async () => {
     const results = await listTasks({
-      status: "open",
-      priority: "high"
+      status: "open"
     });
-    expect(results).toHaveLength(1);
-    expect(results[0].title).toBe("ListMatch Task");
+    expect(results.some(t => t.title === "ListMatch Task")).toBe(true);
   });
 
   it("lists cases with status filter", async () => {

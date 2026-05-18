@@ -2,10 +2,13 @@ import { expect, test } from "@playwright/test";
 
 test.describe("excluded-route guard rails", () => {
   const excludedRoutes = [
-    { path: "/tasks", name: "Tasks" },
-    { path: "/cases", name: "Cases" },
-    { path: "/campaigns", name: "Campaigns" },
     { path: "/deals/any-id", name: "Deal Detail Page" },
+    { path: "/search", name: "Global Search" },
+    { path: "/command-palette", name: "Command Palette" },
+    { path: "/orders/new", name: "New Order" },
+    { path: "/orders/any-id/edit", name: "Edit Order" },
+    { path: "/areas/new", name: "New Area" },
+    { path: "/areas/any-id/edit", name: "Edit Area" },
   ];
 
   for (const route of excludedRoutes) {

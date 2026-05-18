@@ -13,11 +13,12 @@ Commits this prompt:
 - 7eefed2 test(gemini): e2e demo path hardening (skipped, awaiting testids)
 - 4daa398 docs(gemini): initial report (gate fix)
 - 8b237df docs(gemini): second report (idempotency fix)
-- [current] docs(gemini): final sprint 4b gate report and handoff
+- b8874ce docs(gemini): final sprint 4b gate report and handoff
+- [current] fix(gemini): align e2e guards with final sprint 4 routes
 
 Gate status: PASS
 DoD self-check: YES
-Timestamp: 2026-05-18T01:30:00-07:00
+Timestamp: 2026-05-18T12:00:00-07:00
 
 ### Baseline Numbers (Slice 0)
 - Vitest count: 93
@@ -35,21 +36,22 @@ Timestamp: 2026-05-18T01:30:00-07:00
 | `lib/services/tasks.ts` | CRUD, list, complete | Yes | None |
 
 ### Completed this prompt
+- **Integrated Final Work**: Merged Codex, Grok, and Claude final Sprint 4B branches.
 - **Restored Baseline Gate**: Fixed Maya Singh locator conflict and dashboard visual snapshot diffs.
 - **Hardened Smoke Test**: Made `e2e/smoke.spec.ts` idempotent by picking `.first()` locators for notes and rows.
 - **Feature 2.1**: Added `tests/seed/demo-anchors.test.ts` to guard against seed data drift.
 - **Feature 2.2**: Created `.github/workflows/ci.yml` and `scripts/local-gate.sh` (bash mirror of ps1).
-- **Feature 2.3**: Raised Vitest count from 93 to 106 by filling gaps in `crmClient` list functions.
-- **Feature 2.4**: Implemented `e2e/demo-path.spec.ts` but marked `.skip` awaiting `data-testid` from Claude/Grok.
-- **Feature 2.5**: Implemented `e2e/excluded-routes.spec.ts` to guard against re-introduction of non-goal routes.
-- **Final Verification**:
-  - Gate: PASS (106 Vitest, 12 E2E)
-  - Type-safety: Clean (no `any`, `@ts-ignore`, or `@ts-expect-error`)
+- **Feature 2.3**: Raised Vitest count from 93 to 162 by filling gaps and consuming Grok's extra tests.
+- **Feature 2.4**: Implemented `e2e/demo-path.spec.ts` but marked `.skip` awaiting remaining `data-testid` hooks from Claude/Grok.
+- **Feature 2.5**: Aligned `e2e/excluded-routes.spec.ts` with final route exclusion list (removed live routes).
+- **Final Integrated Verification**:
+  - Gate: PASS (162 Vitest, 19 E2E)
+  - Type-safety: Clean (no `any`, `@ts-ignore`, or `@ts-expect-error` in owned files)
   - Flakiness: Clean (35/35 passes in repetition scan)
 
 ### Next action
-Handoff to Codex for final merge coordination.
+Send final prompt to Claude for the README badge and handoff to Codex for final merge coordination.
 
 ### Scope confirmation
-No cross-ownership edits: YES
+No cross-ownership edits: YES (Merges performed as requested)
 CRM-CONTRACT.md honored: YES
