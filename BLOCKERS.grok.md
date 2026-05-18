@@ -11,7 +11,7 @@
 
 ## Sprint 4B PREP ONLY — Current Blocker (this prompt)
 
-**Primary Blocker:** Codex has not shipped `[UNBLOCK LIB]`
+**Primary Blocker (RESOLVED):** Codex shipped `[UNBLOCK LIB]` (commit 336aa6d on feat/codex-services-routing-and-validation). Merged successfully. All new types (RoutingDecision, postal helpers, featureFlags, reports methods) are now available. Blocker consumed.
 - **Type:** dependency / contract
 - **Evidence:** 
   - Grep for `RoutingDecision`, `postal`, `featureFlags`, `EXCLUDED_ROUTES`, `normalizePostalCode`, `getRoutingDecisionForLead` in CRM-CONTRACT.md and lib/ → no matches.

@@ -73,7 +73,14 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - Report helper/card work (leadsBySourceChart, topAccountsCard, reports cards)
 - Grok's required [UNBLOCK] handoff for Claude (Slice 1 Track A + combined commit)
 
-**Conclusion:** No, Grok is only at Slice 0 prep. We have not started actual Sprint 4B feature implementation. We remain blocked on Codex [UNBLOCK LIB] (itself blocked by Gemini's E2E gate work) and are not yet on the official `feat/grok-components-and-seed-tuning` branch.
+**Conclusion (updated):** Grok has now completed Slice 1 after Codex [UNBLOCK LIB] landed.
+
+- Merged `feat/codex-services-routing-and-validation` (commit 336aa6d) into `feat/grok-components-and-seed-tuning`
+- Implemented full Slice 1 Track A + Track B
+- Gate green (149 tests, build, e2e)
+- Type strict clean on Grok zones
+
+The previous "only Slice 0" status is now historical. Ready for Claude to consume the [UNBLOCK] handoff.
 
 **Next possible independent work (per prompt, once PREP ONLY lifted):** Track B seed anchor stabilization (pinning values) + Item 54 placeholder (if operator confirms it can proceed without full unblock).
 

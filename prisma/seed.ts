@@ -121,6 +121,14 @@ const dealerAreas = [
   ["area-london", "London Southwest", "ON", "Southwestern Ontario", "N5,N6"]
 ] as const;
 
+/**
+ * PINNED DEMO ANCHORS — DO NOT RANDOMIZE
+ * These values are the contract for Gemini's anchor tests and the live demo story.
+ * - V5K 0A1 must always resolve to area-vancouver and route successfully.
+ * - Multiple DealerOrders must have negative pace gaps (behind-pace) for the analyst panel.
+ * - Lead sources must include routed + other sources.
+ * - Top accounts must have multiple open deals.
+ */
 const dealerOrders = [
   ["dealer-order-vancouver-northstar", "acct-northstar", "Vancouver fleet lead package", 28, "active", -42],
   ["dealer-order-vancouver-cascade", "acct-cascade", "Vancouver robotics dealer program", 18, "active", -30],
