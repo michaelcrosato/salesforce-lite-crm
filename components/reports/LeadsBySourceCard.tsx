@@ -1,12 +1,31 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { LeadsBySourceRow } from "@/lib/services/reports";
 import { leadsBySourceChart } from "@/lib/business/leadsBySourceChart";
 
 interface LeadsBySourceCardProps {
   data: LeadsBySourceRow[];
+  isLoading?: boolean;
 }
 
-export function LeadsBySourceCard({ data }: LeadsBySourceCardProps) {
+export function LeadsBySourceCard({ data, isLoading }: LeadsBySourceCardProps) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Leads by Source</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyState
+            variant="loading"
+            title="Loading leads by source"
+            description="Fetching the latest lead distribution..."
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   const chart = leadsBySourceChart(data);
 
   if (chart.labels.length === 0) {
@@ -16,7 +35,10 @@ export function LeadsBySourceCard({ data }: LeadsBySourceCardProps) {
           <CardTitle>Leads by Source</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No lead source data yet.</p>
+          <EmptyState
+            title="No lead source data"
+            description="No leads have been recorded yet for this period."
+          />
         </CardContent>
       </Card>
     );

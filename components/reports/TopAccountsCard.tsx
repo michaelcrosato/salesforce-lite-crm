@@ -1,13 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { TopAccountByDealValueRow } from "@/lib/services/reports";
 import { topAccountsCard } from "@/lib/business/topAccountsCard";
 
 interface TopAccountsCardProps {
   data: TopAccountByDealValueRow[];
   limit?: number;
+  isLoading?: boolean;
 }
 
-export function TopAccountsCard({ data, limit = 8 }: TopAccountsCardProps) {
+export function TopAccountsCard({ data, limit = 8, isLoading }: TopAccountsCardProps) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Accounts by Pipeline</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyState
+            variant="loading"
+            title="Loading top accounts"
+            description="Calculating pipeline value by account..."
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   const result = topAccountsCard(data, limit);
 
   if (result.rows.length === 0) {
@@ -17,7 +36,10 @@ export function TopAccountsCard({ data, limit = 8 }: TopAccountsCardProps) {
           <CardTitle>Top Accounts by Pipeline</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No account data yet.</p>
+          <EmptyState
+            title="No account data"
+            description="No open deals found for top accounts calculation."
+          />
         </CardContent>
       </Card>
     );

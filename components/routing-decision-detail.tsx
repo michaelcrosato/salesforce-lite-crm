@@ -44,16 +44,17 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
       {expanded && (
         <div className="border-t px-4 py-4 text-sm">
           <div className="space-y-3">
-            {decision.steps.map((step, index) => (
-              <div key={index} className="rounded border bg-muted/40 p-3">
-                <div className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
-                  {step.step}
+            {decision.steps.map((step, index) => {
+              const label = formatStep(step.step, step.result);
+              return (
+                <div key={index} className="rounded border bg-muted/40 p-3">
+                  <div className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">
+                    {step.step}
+                  </div>
+                  <div className="text-sm text-foreground">{label}</div>
                 </div>
-                <pre className="mt-1 whitespace-pre-wrap break-words text-xs text-foreground">
-                  {JSON.stringify(step.result, null, 2)}
-                </pre>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {decision.summary && (
@@ -66,3 +67,47 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
     </div>
   );
 }
+
+function formatStep(step: string, result: unknown): string {
+  if (typeof result === "string") return result;
+  if (typeof result === "number" || typeof result === "boolean") return String(result);
+
+  if (Array.isArray(result)) {
+    return result.map((r) => (typeof r === "object" ? JSON.stringify(r) : String(r))).join(", ");
+  }
+
+  if (result && typeof result === "object") {
+    const r = result as Record<string, unknown>;
+
+    if (step.includes("normalize") || step.includes("postal")) {
+      return `${r.raw ?? ""} → ${r.normalized ?? r.prefix ?? ""}`;
+    }
+    if (step.includes("prefix")) {
+      return String(r.prefix ?? "");
+    }
+    if (step.includes("area")) {
+      return r.areaName ? String(r.areaName) : "no match";
+    }
+    if (step.includes("filter") || step.includes("candidate")) {
+      const count = Array.isArray(r.candidates) ? r.candidates.length : 0;
+      return `${count} candidate orders`;
+    }
+    if (step.includes("rank") || step.includes("pace")) {
+      if (Array.isArray(r)) {
+        return r
+          .map((item: any) => `${item.dealerName ?? item.orderId} (${item.paceGap})`)
+          .join(" · ");
+      }
+    }
+    if (step.includes("select")) {
+      return r.selectedOrderId ? `Selected ${r.selectedOrderId}` : "No selection";
+    }
+
+    return Object.entries(r)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(" | ");
+  }
+
+  return JSON.stringify(result);
+}
+

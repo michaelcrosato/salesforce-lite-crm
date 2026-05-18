@@ -73,7 +73,14 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - Report helper/card work (leadsBySourceChart, topAccountsCard, reports cards)
 - Grok's required [UNBLOCK] handoff for Claude (Slice 1 Track A + combined commit)
 
-**Conclusion (updated):** Grok has now completed Slice 1 after Codex [UNBLOCK LIB] landed.
+**Conclusion (updated):** Grok has completed Slice 1 + Feature 2.1 + Feature 2.2 after Codex [UNBLOCK LIB] landed.
+
+Recent work:
+- Slice 1: 4 components + seed stabilization + `[UNBLOCK]` commit (3f7ed00)
+- Feature 2.2: report helpers + LeadsBySourceCard + TopAccountsCard (8bee26f)
+- Feature 2.1: Enhanced EmptyState with loading/error variants, updated report cards and routing detail for consistent states (in progress)
+
+Gate + type scan clean after each step.
 
 - Merged `feat/codex-services-routing-and-validation` (commit 336aa6d) into `feat/grok-components-and-seed-tuning`
 - Implemented full Slice 1 Track A + Track B
