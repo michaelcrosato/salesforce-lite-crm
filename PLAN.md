@@ -238,7 +238,7 @@ Every CLI agent runs this on every prompt. No exceptions.
 
 6\. Execute the assigned work.
 
-7\. Run the local gate per §9 — full sequence or change-type subset as appropriate. If it fails, do not commit implementation changes. File a BLOCKERS entry (type: `gate`) recording the failing command, exit code, the relevant final output (typically the last meaningful error block; do not paste megabytes of trace), and the list of uncommitted implementation paths left in the worktree.
+7\. Run the local gate per §9 — full sequence or change-type subset as appropriate. If it fails, follow the gate-failure policy in §9 before deciding whether a `gate` blocker is needed.
 
 8\. If checks pass and implementation files changed, commit the implementation work per §7. Record the implementation commit SHA(s).
 
@@ -254,7 +254,7 @@ Every CLI agent runs this on every prompt. No exceptions.
 
 
 
-If the gate fails and report files can be staged without staging failed implementation changes, commit only the report files and push that report-only commit. Leave failed implementation changes uncommitted unless the current prompt explicitly instructs otherwise. If even the report-only commit/push is blocked, record why in `BLOCKERS.<agent>.md` if possible and stop.
+If a gate failure remains unresolved after the §9 repair-first policy and report files can be staged without staging failed implementation changes, commit only the report files and push that report-only commit. Leave unresolved failed implementation changes uncommitted unless the current prompt explicitly instructs otherwise. If even the report-only commit/push is blocked, record why in `BLOCKERS.<agent>.md` if possible and stop.
 
 
 
@@ -426,7 +426,9 @@ npm run test:e2e
 
 
 
-Run commands sequentially. Any non-zero exit terminates the gate. On failure, capture the failing command, exit code, and the relevant final output in `BLOCKERS.<agent>.md` (Evidence column). Do not create or commit local log files unless the current prompt explicitly instructs it or the target path is already covered by `.gitignore`.
+Run commands sequentially. Gate failure is not automatically a stop condition. In max-YOLO mode, first attempt reasonable repo-local fixes within the current scope. Re-run the failing command or the relevant gate subset. File a blocker only when the failure cannot be resolved without outside information, unsafe/destructive action, missing credentials, unavailable services, unclear product decisions, or broad out-of-scope changes.
+
+When filing a `gate` blocker, capture the failing command, exit code, the relevant final output in `BLOCKERS.<agent>.md` (Evidence column), and the list of uncommitted implementation paths left in the worktree. Do not create or commit local log files unless the current prompt explicitly instructs it or the target path is already covered by `.gitignore`.
 
 
 
