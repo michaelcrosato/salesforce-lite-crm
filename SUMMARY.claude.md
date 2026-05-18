@@ -1,14 +1,25 @@
 Agent: claude
 Sprint: 4B
-Feature: Slice 2 features 2.1, 2.2, 2.3 shipped; Feature 2.4 partial; Feature 2.5 partial; Feature 2.6 final audit shipped
+Feature: Slice 2 features 2.1, 2.2, 2.3 shipped (Feature 2.3 client wiring now fully consumed via Grok merge); Feature 2.4 partial; Feature 2.5 partial; Feature 2.6 final audit shipped
 Branch: feat/claude-demo-and-route-polish
-Status: done (for Claude scope; soft-blocked items handed back to Grok and Gemini)
-Commits this prompt: 713089a fix(claude): migrate task/case/campaign pages to ListQueryInput shape; df59a04 feat(claude): broken-link page-level guards; fd66012 feat(claude): routing decision detail wiring on leads and orders; d26dc58 feat(claude): postal validation wired into lead form
-Gate status: PASS — pwsh scripts/local-gate.ps1 reports "Local gate completed successfully" (vitest 23 files / 149 tests, next build 24 routes + 7 placeholder pages, playwright 11/11)
+Status: done (for Claude scope; only Codex coordination tension and Gemini CI workflow remain)
+Commits this prompt: be24f34 merge(claude): consume grok postal input wiring (one merge-only prompt; no Claude implementation commits this turn)
+Gate status: PASS — pwsh scripts/local-gate.ps1 reports "Local gate completed successfully" after Grok postal merge (vitest 23 files / 149 tests, next build 31 routes, playwright 11/11)
 DoD self-check: PASS
-Timestamp: 2026-05-18T09:55:00-08:00
+Timestamp: 2026-05-18T10:35:00-08:00
 
-### Completed this prompt
+### Completed this prompt (merge-only)
+
+- Consumed Grok's follow-up wiring: merged `feat/grok-components-and-seed-tuning`
+  again to pull in `4d34708 fix(grok): integrate PostalCodeInput into lead-form.tsx`
+  and `cf69810 fix(grok): wire postal code input into lead form`. Resolves
+  BLOCKERS #9. `components/lead-form.tsx` now mounts `<PostalCodeInput>` with
+  `testid="lead-form-postal-input"`, error prop bound to `errors?.postalCode?.[0]`,
+  state-controlled value, and reset-on-success. Full gate green afterward.
+- No Claude implementation commits this turn — Sprint 4B Claude execution is
+  complete to the limits of zone ownership.
+
+### Carried forward from prior prompt
 
 - Consumed Codex `[UNBLOCK LIB]` and Grok `[UNBLOCK COMPONENTS]` by merging
   `feat/grok-components-and-seed-tuning` (which already merged
@@ -125,15 +136,14 @@ Placeholder (new this sprint): `/deals/[id]`, `/search`, `/command-palette`,
 
 ### Final action
 
-Sprint 4B Claude scope is complete to the extent possible without crossing
-zones. Remaining surfaces:
-- Grok: wire `<PostalCodeInput>` into `components/lead-form.tsx` (BLOCKERS #9
-  on Grok), and address EXCLUDED_ROUTES vs C1–C3 tension on the lib side.
+Sprint 4B Claude scope is complete. Remaining surfaces are not on Claude:
+- Codex (and IFT): resolve EXCLUDED_ROUTES content (BLOCKERS #5) — the only
+  coordination decision left.
 - Gemini: ship `.github/workflows/<file>.yml` so the README CI badge can land,
   and consider an `e2e/excluded-routes.spec.ts` consuming the new
   `data-testid="excluded-route-placeholder"` markers across the 7 placeholder
   pages.
-- Codex (and IFT): resolve EXCLUDED_ROUTES content (BLOCKERS #5).
+- Grok blocker #9 is resolved this prompt by their `4d34708` / `cf69810` commits.
 
 ### Scope confirmation
 
