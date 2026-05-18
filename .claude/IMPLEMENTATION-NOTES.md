@@ -10,7 +10,7 @@ Cross-checked against https://code.claude.com/docs/en/hooks on 2026-05-17.
 - [x] `hookSpecificOutput.permissionDecision` values: allow|deny|ask|defer
 - [x] PreToolUse `matcher` field
 - [x] `if` field permission-rule syntax (e.g. `Bash(rm *)`, `Edit(*.ts)`)
-- [ ] Stop `stop_hook_active` field — **UNDOCUMENTED in current docs**. Kept the guard anyway: `if (undefined)` is falsy and harmless if the field is absent; if it IS present we get the loop break that R23 required. Worst case: degrades to no guard, no behavior change. See `validate-stop.mjs`.
+- [x] Stop `stop_hook_active` field
 - [x] PostToolUseFailure event (tool-level matcher)
 - [x] ConfigChange event + matchers (`user_settings|project_settings|local_settings|policy_settings|skills`), blockable via top-level `decision: "block"`
 - [x] SessionStart matcher values: startup|resume|clear|compact
@@ -20,7 +20,7 @@ Cross-checked against https://code.claude.com/docs/en/hooks on 2026-05-17.
 
 ## Drift found
 
-Only one drift: `stop_hook_active` is not in the public docs. Kept the field check as a defensive no-op (works if present, harmless if absent).
+`stop_hook_active` is documented in current Claude Code hooks docs and should remain in validate-stop.mjs.
 
 ## Adaptations from R23
 
