@@ -1,8 +1,8 @@
-Agent: codex
-Sprint: repo readiness/documentation pass
-Feature: README product repositioning and Sprint 4 prompt preparation
-Branch: chore/claude-hooks-r23
-Timestamp: 2026-05-17T21:53:51.8364345-07:00
+Agent: Codex
+Sprint: Sprint 4B
+Feature: EXCLUDED_ROUTES reconciliation
+Branch: feat/codex-services-routing-and-validation
+Timestamp: 2026-05-18T10:58:31-07:00
 Escalation required: NO
 
 ### Active blockers
@@ -12,9 +12,6 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Previous `next-env.d.ts` generated-state blocker is not active in the final
-  worktree; the build-generated import change was restored and `git status
-  --short` no longer lists `next-env.d.ts`.
-- Previous `.git/index.lock` blocker was not reproduced by this prompt's git
-  status and diff checks. No staging or commit was attempted because this task
-  did not request commits.
+- Sprint 4B blocker #5 resolved: `EXCLUDED_ROUTES` no longer contains `/tasks`, `/cases`, or `/campaigns`, and `CRM-CONTRACT.md` now records those routes as live Sprint 4B demo routes.
+- Verification passed: `pwsh scripts/local-gate.ps1`; `rg '\bany\b|@ts-ignore|@ts-expect-error' lib` found no matches.
+- No Sprint 4B Codex blockers remain open.

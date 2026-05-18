@@ -1,5 +1,9 @@
 import type { Area, DealerOrder, Prisma } from "@prisma/client";
 import type { AssignmentReason } from "@/lib/crm-constants";
+import {
+  extractPostalPrefix,
+  normalizePostalCode as normalizeDisplayPostalCode
+} from "@/lib/postal";
 import { prisma } from "@/lib/prisma";
 
 type RoutableLead = {
@@ -28,6 +32,23 @@ type RouteResult = {
 };
 
 type TransactionClient = Prisma.TransactionClient;
+type RoutingLead = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  postalCode: string | null;
+};
+type RoutingPayloadJson =
+  | string
+  | number
+  | boolean
+  | null
+  | { readonly [key: string]: RoutingPayloadJson }
+  | readonly RoutingPayloadJson[];
+type RoutingPayloadStep = {
+  step: string;
+  result: RoutingPayloadJson;
+};
 
 const millisecondsPerDay = 86_400_000;
 
@@ -152,7 +173,7 @@ export async function routeLead(
     const area = resolveAreaForLead(lead, areas);
 
     if (!area) {
-      await markUnrouted(tx, lead.id, "no_area_match", null, now);
+      await markUnrouted(tx, lead, "no_area_match", null, [], [], now);
       return {
         order: null,
         reason: "no_area_match"
@@ -179,7 +200,7 @@ export async function routeLead(
     });
 
     if (activeOrders.length === 0) {
-      await markUnrouted(tx, lead.id, "no_matching_active_order", area.id, now);
+      await markUnrouted(tx, lead, "no_matching_active_order", area, [], [], now);
       return {
         order: null,
         reason: "no_matching_active_order"
@@ -198,7 +219,15 @@ export async function routeLead(
     const rankedOrders = rankEligibleOrders(ordersWithCounts, now);
 
     if (rankedOrders.length === 0) {
-      await markUnrouted(tx, lead.id, "all_orders_at_quota", area.id, now);
+      await markUnrouted(
+        tx,
+        lead,
+        "all_orders_at_quota",
+        area,
+        activeOrders,
+        [],
+        now
+      );
       return {
         order: null,
         reason: "all_orders_at_quota"
@@ -206,11 +235,20 @@ export async function routeLead(
     }
 
     const winningOrder = rankedOrders[0];
+    const rankedOrderSummaries = rankedOrders.map((order, index) => ({
+      orderId: order.id,
+      dealerName: order.name,
+      paceGap: Number(
+        calculatePaceGap(order, order.deliveredThisMonth, now).toFixed(2)
+      ),
+      rank: index + 1
+    }));
     const paceGap = calculatePaceGap(
       winningOrder,
       winningOrder.deliveredThisMonth,
       now
     );
+    const routingSummary = `Resolved ${area.name}; selected ${winningOrder.name} for ${winningOrder.account.name} with ${winningOrder.deliveredThisMonth}/${winningOrder.monthlyQuota} leads delivered and pace gap ${paceGap.toFixed(2)}.`;
 
     await tx.lead.update({
       where: {
@@ -230,7 +268,15 @@ export async function routeLead(
         leadId: lead.id,
         type: "routing_event",
         title: `${lead.firstName} ${lead.lastName} routed to ${winningOrder.name}`,
-        summary: `Resolved ${area.name}; selected ${winningOrder.name} for ${winningOrder.account.name} with ${winningOrder.deliveredThisMonth}/${winningOrder.monthlyQuota} leads delivered and pace gap ${paceGap.toFixed(2)}.`,
+        rawText: routingPayloadString({
+          lead,
+          area,
+          filteredOrders: activeOrders,
+          rankedOrders: rankedOrderSummaries,
+          selectedOrderId: winningOrder.id,
+          summary: routingSummary
+        }),
+        summary: routingSummary,
         nextStep: "Dealer should contact the assigned lead.",
         createdAt: now
       }
@@ -279,29 +325,45 @@ async function countCurrentMonthLeads(
 
 async function markUnrouted(
   tx: TransactionClient,
-  leadId: string,
+  inputLead: RoutingLead,
   reason: Exclude<AssignmentReason, "routed">,
-  areaId: string | null,
+  area: Pick<Area, "id" | "name"> | null,
+  filteredOrders: readonly Pick<DealerOrder, "id">[],
+  rankedOrders: readonly {
+    orderId: string;
+    dealerName: string;
+    paceGap: number;
+    rank: number;
+  }[],
   now: Date
 ) {
   const lead = await tx.lead.update({
     where: {
-      id: leadId
+      id: inputLead.id
     },
     data: {
       status: "new",
-      areaId,
+      areaId: area?.id ?? null,
       assignedOrderId: null,
       assignmentReason: reason
     }
   });
+  const routingSummary = failureSummary(reason);
 
   await tx.activity.create({
     data: {
-      leadId,
+      leadId: lead.id,
       type: "routing_event",
       title: `${lead.firstName} ${lead.lastName} was not routed`,
-      summary: failureSummary(reason),
+      rawText: routingPayloadString({
+        lead,
+        area,
+        filteredOrders,
+        rankedOrders,
+        selectedOrderId: null,
+        summary: routingSummary
+      }),
+      summary: routingSummary,
       nextStep: "Review routing coverage and active order capacity.",
       createdAt: now
     }
@@ -316,4 +378,76 @@ function failureSummary(reason: Exclude<AssignmentReason, "routed">) {
   };
 
   return summaries[reason];
+}
+
+function routingPayloadString(input: {
+  lead: RoutingLead;
+  area: Pick<Area, "id" | "name"> | null;
+  filteredOrders: readonly Pick<DealerOrder, "id">[];
+  rankedOrders: readonly {
+    orderId: string;
+    dealerName: string;
+    paceGap: number;
+    rank: number;
+  }[];
+  selectedOrderId: string | null;
+  summary: string;
+}) {
+  const postal = postalTrace(input.lead.postalCode);
+  const steps: RoutingPayloadStep[] = [
+    {
+      step: "normalize",
+      result: postal.normalized
+    },
+    {
+      step: "extract_prefix",
+      result: postal.prefix
+    },
+    {
+      step: "match_area",
+      result: input.area ? { id: input.area.id, name: input.area.name } : null
+    },
+    {
+      step: "filter_orders",
+      result: {
+        count: input.filteredOrders.length,
+        orderIds: input.filteredOrders.map((order) => order.id)
+      }
+    },
+    {
+      step: "rank_pace_gap",
+      result: input.rankedOrders
+    },
+    {
+      step: "select",
+      result: {
+        orderId: input.selectedOrderId
+      }
+    }
+  ];
+
+  return JSON.stringify({
+    version: 1,
+    input: {
+      postal: postal.compact,
+      leadId: input.lead.id
+    },
+    steps,
+    summary: input.summary
+  });
+}
+
+function postalTrace(postalCode: string | null) {
+  const compact = normalizePostalCode(postalCode ?? "");
+  const normalized = normalizeDisplayPostalCode(postalCode ?? "", "CA") ?? compact;
+  const prefix =
+    normalized.includes(" ")
+      ? extractPostalPrefix(normalized, "CA")
+      : compact.slice(0, 3);
+
+  return {
+    compact,
+    normalized,
+    prefix
+  };
 }
