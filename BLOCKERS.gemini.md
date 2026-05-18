@@ -1,8 +1,8 @@
 Agent: gemini
 Sprint: Sprint 4B - Demo Polish
-Feature: Baseline E2E Gate Fix
+Feature: Smoke Test Idempotency Fix
 Branch: gemini/sprint-4-demo-smoke-gate-hardening
-Timestamp: 2026-05-18T00:43:00-07:00
+Timestamp: 2026-05-18T00:58:00-07:00
 Escalation required: NO
 
 ### Active blockers
@@ -15,3 +15,4 @@ Escalation required: NO
 
 - Fixed Maya Singh locator conflict in `e2e/smoke.spec.ts`.
 - Restored baseline E2E gate passing status.
+- Made smoke test repeat-run safe by fixing strict mode violation for duplicate note summaries and hardening other locators.
