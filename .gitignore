@@ -20,3 +20,5 @@ prisma/dev.db-shm
 
 # Local agent identity override (optional - uncomment to ignore)
 # .claude/active-agent
+agent-runs/
+status/
