@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "config": {
+    "playwright_browsers_path": "0"
+  },
   "scripts": {
     "postinstall": "node scripts/ensure-sqlite-db.mjs",
     "dev": "next dev",
