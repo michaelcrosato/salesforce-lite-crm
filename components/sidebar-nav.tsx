@@ -6,16 +6,28 @@ import {
   Building2,
   ContactRound,
   Handshake,
+  LifeBuoy,
+  ListTodo,
+  type LucideIcon,
   MapPinned,
+  Megaphone,
+  PieChart,
   Route,
   ScrollText,
   TrendingUp
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ENTITY_REGISTRY } from "@/lib/crm/registry";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+const baseNavItems: readonly NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/contacts", label: "Contacts", icon: ContactRound },
   { href: "/accounts", label: "Accounts", icon: Building2 },
@@ -25,6 +37,30 @@ const navItems = [
   { href: "/areas", label: "Areas", icon: MapPinned },
   { href: "/forecast", label: "Forecast", icon: TrendingUp },
   { href: "/activities", label: "Activities", icon: Activity }
+];
+
+const REGISTRY_ICONS: Record<string, LucideIcon> = {
+  ListTodo,
+  LifeBuoy,
+  Megaphone,
+  PieChart
+};
+
+const registryNavItems: readonly NavItem[] = ENTITY_REGISTRY
+  .filter((entity) => !baseNavItems.some((item) => item.href === entity.route))
+  .filter((entity) => entity.iconName in REGISTRY_ICONS)
+  .map((entity) => ({
+    href: entity.route,
+    label: entity.listLabel,
+    icon: REGISTRY_ICONS[entity.iconName]
+  }));
+
+const reportsItem: NavItem = { href: "/reports", label: "Reports", icon: PieChart };
+
+const navItems: readonly NavItem[] = [
+  ...baseNavItems,
+  ...registryNavItems,
+  reportsItem
 ];
 
 export function SidebarNav({ mobile = false }: { mobile?: boolean }) {

@@ -1,11 +1,14 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { LeadForm } from "@/components/lead-form";
 import { PageHeader } from "@/components/page-header";
+import { RoutingDecisionDetail } from "@/components/routing-decision-detail";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
+import { getRoutingDecisionForLead } from "@/lib/crm/crmClient";
 import {
   ASSIGNMENT_REASON_LABELS,
   LEAD_STATUSES,
@@ -95,8 +98,15 @@ export default async function LeadsPage({
     })
   ]);
 
+  const routingDecisions = await Promise.all(
+    leads.map((lead) => getRoutingDecisionForLead(lead.id))
+  );
+  const decisionsByLeadId = new Map(
+    leads.map((lead, index) => [lead.id, routingDecisions[index] ?? null])
+  );
+
   return (
-    <div className="crm-page">
+    <div className="crm-page" data-testid="page-leads">
       <PageHeader
         title="Lead Inbox"
         description="Create postal-code leads and review deterministic dealer routing decisions."
@@ -168,38 +178,48 @@ export default async function LeadsPage({
                 </thead>
                 <tbody>
                   {leads.map((lead) => (
-                    <tr key={lead.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium">
-                        <Link href={`/leads/${lead.id}`} className="text-primary hover:underline">
-                          {lead.firstName} {lead.lastName}
-                        </Link>
-                      </td>
-                      <td className="py-3 pr-4">{lead.postalCode ?? "No postal"}</td>
-                      <td className="py-3 pr-4">{lead.area?.name ?? "Unresolved"}</td>
-                      <td className="py-3 pr-4">
-                        {lead.assignedOrder ? (
-                          <Link
-                            href={`/orders/${lead.assignedOrder.id}`}
-                            className="text-primary hover:underline"
-                          >
-                            {lead.assignedOrder.account.name}
+                    <Fragment key={lead.id}>
+                      <tr className="border-b last:border-0">
+                        <td className="py-3 pr-4 font-medium">
+                          <Link href={`/leads/${lead.id}`} className="text-primary hover:underline">
+                            {lead.firstName} {lead.lastName}
                           </Link>
-                        ) : (
-                          <span className="text-muted-foreground">Unassigned</span>
-                        )}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <Badge variant={lead.status === "assigned" ? "success" : "secondary"}>
-                          {isLeadStatus(lead.status)
-                            ? LEAD_STATUS_LABELS[lead.status as LeadStatus]
-                            : lead.status}
-                        </Badge>
-                      </td>
-                      <td className="py-3 pr-4">
-                        {reasonBadge(lead.assignmentReason)}
-                      </td>
-                      <td className="py-3 pr-4">{formatDate(lead.createdAt)}</td>
-                    </tr>
+                        </td>
+                        <td className="py-3 pr-4">{lead.postalCode ?? "No postal"}</td>
+                        <td className="py-3 pr-4">{lead.area?.name ?? "Unresolved"}</td>
+                        <td className="py-3 pr-4">
+                          {lead.assignedOrder ? (
+                            <Link
+                              href={`/orders/${lead.assignedOrder.id}`}
+                              className="text-primary hover:underline"
+                            >
+                              {lead.assignedOrder.account.name}
+                            </Link>
+                          ) : (
+                            <span className="text-muted-foreground">Unassigned</span>
+                          )}
+                        </td>
+                        <td className="py-3 pr-4">
+                          <Badge variant={lead.status === "assigned" ? "success" : "secondary"}>
+                            {isLeadStatus(lead.status)
+                              ? LEAD_STATUS_LABELS[lead.status as LeadStatus]
+                              : lead.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 pr-4">
+                          {reasonBadge(lead.assignmentReason)}
+                        </td>
+                        <td className="py-3 pr-4">{formatDate(lead.createdAt)}</td>
+                      </tr>
+                      <tr className="border-b last:border-0">
+                        <td colSpan={7} className="pb-3 pr-4">
+                          <RoutingDecisionDetail
+                            decision={decisionsByLeadId.get(lead.id) ?? null}
+                            testid={`routing-detail-${lead.id}`}
+                          />
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>

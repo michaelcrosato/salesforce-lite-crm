@@ -11,15 +11,16 @@ C:\dev\salesforce-lite-crm-grok
 C:\dev\salesforce-lite-crm-gemini
 ```
 
-Observed during this readiness pass:
+Observed during this readiness pass after Gemini bootstrap:
 
 ```text
-C:/dev/salesforce-lite-crm        b3c6ffd [feat/codex-crm-contract-api]
-C:/dev/salesforce-lite-crm-claude 54965da [feat/claude-crm-ui-e2e]
-C:/dev/salesforce-lite-crm-grok   b5c7cd9 [feat/grok-crm-data-reports]
+C:/dev/salesforce-lite-crm        [chore/claude-hooks-r23]
+C:/dev/salesforce-lite-crm-claude [feat/claude-crm-ui-e2e]
+C:/dev/salesforce-lite-crm-gemini [gemini/sprint-4-demo-smoke-gate-hardening]
+C:/dev/salesforce-lite-crm-grok   [feat/grok-crm-data-reports]
 ```
 
-`C:\dev\salesforce-lite-crm-gemini` is expected by `PLAN.md` but was not present in `git worktree list`.
+Use `git worktree list` for the current commit SHA at each path.
 
 ## Inspect Worktrees
 

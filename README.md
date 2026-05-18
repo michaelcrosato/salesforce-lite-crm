@@ -1,5 +1,7 @@
 # Salesforce Lite CRM
 
+[![CI Gate](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml)
+
 Salesforce Lite CRM is a full-fledged, AI-adaptive Salesforce-style CRM for
 small business revenue operations. It combines account, contact, opportunity,
 activity, lead-routing, dealer-order, forecasting, and analyst workflows in a
@@ -9,6 +11,15 @@ This repository is no longer framed as a demo or proof-of-concept. It is a CRM
 application foundation designed for autonomous AI coding agents to customize for
 small business requirements while preserving a shared product contract,
 repeatable local gate, and clear ownership boundaries.
+
+## Demo
+
+A five-minute reviewer walkthrough lives in [DEMO.md](DEMO.md). It assumes a
+freshly seeded local database and a running dev server. One-click reset:
+
+```powershell
+npm run seed
+```
 
 ## Read First For AI Agents
 
@@ -123,6 +134,14 @@ local workflow until that cutover is explicitly promoted.
 | `/orders/<id>` | Dealer order detail with delivered leads and routing events. |
 | `/areas` | Postal-prefix routing coverage. |
 | `/forecast` | Pipeline and dealer delivery forecast simulator. |
+| `/tasks` | Task list with filters; detail via `/tasks?task=<id>` drawer. |
+| `/tasks/new` | Task creation. |
+| `/cases` | Case list with filters; detail via `/cases?case=<id>` drawer. |
+| `/cases/new` | Case creation. |
+| `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
+| `/campaigns/new` | Campaign creation. |
+| `/reports` | Report index with KPI cards. |
+| `/reports/<slug>` | Report detail for a named report slug. |
 
 Primary workflows:
 
@@ -134,9 +153,10 @@ Primary workflows:
 - Move an opportunity through the board/drawer flow and update forecast values.
 - Adjust forecast assumptions to see month-end delivery and pipeline outcomes.
 
-`CRM-CONTRACT.md` also defines Task, Case, and Campaign entities and service
-contracts. App-router pages for `/tasks`, `/cases`, and `/campaigns` are not
-present in this worktree yet.
+Task, Case, and Campaign entities are now wired into the app-router pages
+listed above. Detail flows for those entities use the drawer pattern
+(`/<entity>?<entity>=<id>`) to stay consistent with the existing `/deals`
+drawer flow.
 
 ## Dealer Revenue Command Center
 
@@ -226,6 +246,8 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - dealer order pacing/detail verification
 - forecast simulator input changes
 - toast/result feedback
+- task, case, and campaign creation and status updates via drawer flow
+- report index and detail rendering
 - screenshot smoke coverage for stable dashboard and area views
 
 ## Known Limitations
@@ -247,8 +269,9 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - Postal-prefix matching is intentionally simple and does not use geocoding or
   territory polygons.
 - Forecast scenarios are transparent and deterministic, but they do not persist.
-- `/tasks`, `/cases`, and `/campaigns` are contract routes without app-router
-  pages in this worktree.
+- No CSV import/export.
+- No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
+  leads route to dealer orders instead.
 
 ## Roadmap
 
