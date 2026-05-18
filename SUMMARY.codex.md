@@ -1,12 +1,12 @@
 Agent: Codex
 Sprint: Sprint 4B
-Feature: Slice 1 foundation unblock
+Feature: Final audit and handoff
 Branch: feat/codex-services-routing-and-validation
-Status: in progress - Slice 1 ready to commit
-Commits this prompt: `1eed7a7` plus pending Slice 1 [UNBLOCK]
-Gate status: PASS - Slice 1 `pwsh scripts/local-gate.ps1`
-DoD self-check: PASS for Slice 1
-Timestamp: 2026-05-18T01:11:30-07:00
+Status: complete
+Commits this prompt: `1eed7a7`, `336aa6d`, `7800a53`, `a262bc1`, `f20f7b9`, `45c020e`, `970b7b5`, final audit commit at HEAD
+Gate status: PASS - final `pwsh scripts/local-gate.ps1`
+DoD self-check: PASS
+Timestamp: 2026-05-18T01:26:30-07:00
 
 ### Slice 0 preflight
 - Required Sprint 4B prompt files exist and were read in the requested order.
@@ -18,29 +18,27 @@ Timestamp: 2026-05-18T01:11:30-07:00
 ### Repo state confirmation
 - Previous baseline gate blocker is cleared by Gemini commits `f909c60` and `e57e879`.
 - A stale Node dev server on port 3000 caused the first local gate reruns to reuse old app state; stopping that listener allowed the canonical gate to pass.
-- `CRM-CONTRACT.md` is still the pre-Sprint-4B v1 surface and documents `/deals?deal=<id>` as drawer-canonical.
 - `prisma/schema.prisma` contains `Task`, `Case`, `Campaign`, and `OpportunityStageHistory`.
-- `lib/services/` contains `campaigns.ts`, `cases.ts`, `listQuery.ts`, `opportunityStageHistory.ts`, `reports.ts`, `search.ts`, and `tasks.ts`.
-- Seed data includes Activity records of type `routing_event`; current seed summaries are human-readable strings.
+- Seed data includes Activity records of type `routing_event`; new routing events now persist structured payloads in `Activity.rawText`.
 
 ### Completed this prompt
-- Revalidated the repaired baseline with `pwsh scripts/local-gate.ps1`.
-- Updated `CODEX-NOTES.md` with Slice 0 schema, service, contract, seed, and blocker status.
-- Cleared the Codex blocker file for the prior baseline E2E failure.
-- Slice 1 shipped feature flag and excluded-route exports in `lib/featureFlags.ts`.
-- Slice 1 shipped postal normalization and validation helpers in `lib/postal.ts`, composed into lead creation validation.
-- Slice 1 shipped `getRoutingDecisionForLead` in `lib/services/leads.ts` and exposed `crmClient.leads.getRoutingDecision(id)`.
-- Slice 1 updated `CRM-CONTRACT.md` with feature flags, excluded routes, postal helper signatures, and routing decision shape.
-- Feature 2.1 verified existing opportunity stage-history wiring and tests, then added `crmClient.deals.getStageHistory(dealId)` with contract documentation.
-- Feature 2.2 standardized Task, Case, and Campaign list inputs around `{ page, pageSize, sortBy, sortOrder, filters }`, retained legacy flat service input compatibility, and added list filter-key JSDoc to crmClient adapters.
+- Slice 0 committed state confirmation and blocker clearance.
+- Slice 1 shipped `[UNBLOCK]` with `lib/featureFlags.ts`, `lib/postal.ts`, `lib/services/leads.ts`, `crmClient.leads.getRoutingDecision(id)`, and contract updates.
+- Feature 2.1 verified opportunity stage-history action wiring and tests, then added `crmClient.deals.getStageHistory(dealId)`.
+- Feature 2.2 standardized Task, Case, and Campaign list inputs around `{ page, pageSize, sortBy, sortOrder, filters }`, retained flat service input compatibility, and added list filter-key JSDoc to crmClient adapters.
 - Feature 2.3 writes structured routing-event payloads to `Activity.rawText`, keeps `Activity.summary` readable, and parses payload `steps` plus `summary` in `getRoutingDecisionForLead`.
 - Feature 2.4 expanded report services with lead-source routing rates and top accounts by open deal value; added focused tests in `tests/api/reports.test.ts` per Codex prompt cross-zone exception.
 - Feature 2.5 audited entity/schema, routes/exclusions, crmClient signatures, status constants, postal helpers, routing decision, report shapes, and bumped `CRM-CONTRACT.md` to v2.0.
+- Feature 2.6 final scans passed: `rg '\bany\b|@ts-ignore|@ts-expect-error' lib`, route scan for forbidden deal-detail routes, `npx tsc --noEmit`, and full local gate.
+
+### Deferred / skipped
+- No schema changes were needed.
+- No Claude, Grok, or Gemini feature work was performed except the Codex-prompted report service tests in `tests/api/reports.test.ts`.
 
 ### Next action
-Run gate for Feature 2.5, commit `docs(codex): crm-contract v2 audit and version bump`, then continue to Feature 2.6.
+Merge Codex first per Sprint 4B coordination, then let Grok and Claude consume the `[UNBLOCK]` lib surface.
 
 ### Scope confirmation
-No cross-ownership edits: YES
+No cross-ownership edits: YES - one prompt-authorized test edit for reports service coverage.
 CRM-CONTRACT.md honored: YES
 No product features added: YES
