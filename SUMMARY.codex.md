@@ -1,28 +1,39 @@
 Agent: codex
-Sprint: autonomous QA implementation
-Feature: Automated QA layer for demo website features
+Sprint: repo readiness/documentation pass
+Feature: README product repositioning and Sprint 4 prompt preparation
 Branch: chore/claude-hooks-r23
-Status: blocked
+Status: complete
 Commits this prompt: none
 Gate status: PASS
-DoD self-check: FAIL
-Timestamp: 2026-05-17T21:05:59-07:00
+DoD self-check: PASS
+Timestamp: 2026-05-17T21:53:51.8364345-07:00
 
 ### Completed this prompt
-- Scope: added automated QA coverage for the verified README/app-router demo routes and deterministic business logic. `git diff main --name-only` on this branch showed process/hook files, not app route/component changes, so coverage targets the existing demo website surface.
-- Files changed: `docs/QA-AUTOMATION.md`, `tests/qa-automation.test.ts`, `e2e/demo-routes.spec.ts`, `e2e/visual-smoke.spec.ts`, `e2e/visual-smoke.spec.ts-snapshots/*.png`, `package.json`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`.
-- One-run exception reason: the current prompt explicitly authorized Codex to edit Gemini-owned `tests/**` and `e2e/**` for this QA implementation.
-- Added Vitest coverage for forecast math, validation normalization/rejection, dealer pacing/order focus calculations, route-link contracts, and deterministic note summary precedence.
-- Added Playwright functional E2E coverage for primary navigation, `/deals?deal=<id>` drawer flow, and lead-detail status transition feedback.
-- Added Playwright screenshot smoke coverage for stable demo-critical dashboard/areas desktop and mobile viewports, with `maxDiffPixels: 200` documented.
-- Added `package.json` test tooling config `playwright_browsers_path=0` so the exact gate command `npx playwright install chromium` installs to the repo-local Playwright browser cache instead of the user AppData cache.
-- Commands run: `git status --short`; `git diff main --name-only`; `git merge-base HEAD main`; `git diff --name-status main...HEAD`; `npm run seed`; attempted Playwright MCP navigation/inspection but the MCP tool calls returned `user cancelled MCP tool call`; `npm run test`; `npx playwright install chromium` (initially failed on AppData lock creation, then passed after the package config); `npx playwright test e2e/visual-smoke.spec.ts --update-snapshots`; `npm run test:e2e`; `git diff --check -- docs/QA-AUTOMATION.md e2e/demo-routes.spec.ts e2e/visual-smoke.spec.ts tests/qa-automation.test.ts package.json`; full gate sequence twice after final test changes: `npm install`, `.env` copy guard, `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run test`, `npm run build`, `npx playwright install chromium`, `npm run test:e2e`; `git add ...` for the QA implementation files, which failed with `.git/index.lock` permission denied.
-- Gate status: the final full local gate completed successfully. `npm install` reported existing audit findings (12 vulnerabilities) but exited 0.
-- Remaining blockers: commit/report DoD is blocked by Git index lock creation permissions, and `next-env.d.ts` remains modified by the final `next build` generated state outside the allowed edit scope.
+- Rewrote `README.md` so the project is framed as a full-fledged,
+  AI-adaptive Salesforce-style CRM for small business requirements, not as a
+  demo or proof-of-concept.
+- Added the required AI-agent Read First list, local setup commands, local URL,
+  database notes, Postgres switching notes, Dealer Revenue Command Center
+  capabilities, core routes/workflows, scripts, full gate, Vitest/Playwright
+  coverage, known limitations, and roadmap to `README.md`.
+- Updated `docs/PROJECT-CONTROL.md` to mark the readiness/documentation pass
+  complete and record that README reflects the updated product vision.
+- Prepared `docs/NEXT-PROMPTS.md` for Sprint 4 while keeping the prompts aligned
+  with `PLAN.md` and `CRM-CONTRACT.md`.
+- Ran the full local gate successfully:
+  `npm install`; `if (-not (Test-Path .env)) { Copy-Item .env.example .env }`;
+  `npx prisma generate`; `npx prisma db push`; `npm run seed`;
+  `npm run test`; `npm run build`; `npx playwright install chromium`;
+  `npm run test:e2e`.
+- Restored the `next-env.d.ts` build-generated side effect so the final diff
+  remains limited to documentation and Codex report files.
 
 ### Next action
-Resolve Git index write permissions and the generated `next-env.d.ts` state, then commit the QA implementation and report files in separate commits.
+Start Sprint 4 using `docs/NEXT-PROMPTS.md`, then run the relevant local gate
+before any merge.
 
 ### Scope confirmation
-No cross-ownership edits: NO
+No cross-ownership edits: NO - the current prompt explicitly scoped README and
+docs updates.
 CRM-CONTRACT.md honored: YES
+No product features added: YES
