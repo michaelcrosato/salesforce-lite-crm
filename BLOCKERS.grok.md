@@ -64,6 +64,10 @@
 - **Claude blocker #9 resolved** (2026-05-18): Swapped plain postal Input for `<PostalCodeInput>` in lead-form.tsx + enhanced the input component for form compatibility (name, id). This unblocks Claude's lead form client-side normalize experience while keeping server validation.
 - Old "Codex pending" blocker → **STALE / RESOLVED**
 
+**Codex/contract decision needed before final merge (excluded-route tension):**
+- EXCLUDED_ROUTES currently includes /tasks, /cases, /campaigns (and others) but those have live, demo-shipped UI (C1-C3) with passing e2e.
+- Recommended resolution: Clean the list in lib/featureFlags.ts to only list routes that are intentionally not part of the current demo (so the placeholder guard rails apply only to truly excluded ones). Grok's guard rail components are ready.
+
 No active blockers remain for Grok in Sprint 4B.
 
-All priority work (Slice 1 + 2.1 + 2.3) completed with green gates and clean type scans. Feature 2.4 deferred per prompt guidance.
+All priority work completed with green gates and clean type scans. Feature 2.4 deferred per prompt guidance.

@@ -103,6 +103,10 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - Helpers: leadsBySourceChart, topAccountsCard
 - EmptyState: Enhanced with loading/error variants
 - **Claude blocker #9 resolved** (this task): Wired `<PostalCodeInput>` into `components/lead-form.tsx` on `feat/grok-components-and-seed-tuning`. Used existing component + Codex postal path. Preserved all prior form behavior (FormData submit, reset, errors, toasts). Added `name`/`id` support to PostalCodeInput for form compatibility. Full gate + type scan passed. testid="lead-form-postal-input".
+
+**Excluded-route guard rails & Codex/contract decision:**
+- The tension on EXCLUDED_ROUTES (/tasks, /cases, /campaigns listed as excluded but have live demo UI C1-C3 with e2e coverage) is noted.
+- Decision: EXCLUDED_ROUTES list should be cleaned to only include routes without live demo pages (remove /tasks, /cases, /campaigns and any other live ones). The Grok guard rail components (ExcludedRoutePlaceholder, routing detail, postal input, page skeleton) are fully delivered and ready for the truly excluded routes. This resolves the contract mismatch before final merge. The placeholder and wiring are in place; Codex or coordination decision on the list content is the remaining step.
 - All type-strict, data-testid compliant, server/client correct.
 
 - Merged `feat/codex-services-routing-and-validation` (commit 336aa6d) into `feat/grok-components-and-seed-tuning`
