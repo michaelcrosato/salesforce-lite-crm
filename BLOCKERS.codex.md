@@ -1,8 +1,8 @@
 Agent: codex
 Sprint: repo-readiness; process cleanup
-Feature: Repair gate-failure policy
+Feature: Configure agent permission and instruction files
 Branch: main
-Timestamp: 2026-05-17T18:12:31-07:00
+Timestamp: 2026-05-17T18:18:22-07:00
 Escalation required: NO
 
 ### Active blockers
@@ -12,4 +12,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Updated `PLAN.md` gate-failure policy to require reasonable repo-local fixes before filing a blocker.
+- Added repo-local agent config/instruction files after checking current official syntax for Claude Code, Cursor, GitHub Copilot, and Gemini CLI.
