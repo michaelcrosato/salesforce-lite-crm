@@ -1,32 +1,28 @@
 Agent: codex
-Sprint: repo-readiness; main promotion
-Feature: Promote feat/codex-crm-contract-api into main
+Sprint: repo-readiness; process cleanup
+Feature: Repair gate-failure policy
 Branch: main
 Status: done
-Commits this prompt: 0f5d301 - merge: promote codex CRM readiness branch
+Commits this prompt: 0b68adb - [codex] repo-readiness: make gate failures repair-first
 Gate status: PASS
 DoD self-check: PASS
-Timestamp: 2026-05-17T16:09:23-07:00
+Timestamp: 2026-05-17T18:12:31-07:00
 
 ### Completed this prompt
-- Confirmed `feat/codex-crm-contract-api` was clean at `5992eef`.
-- Removed safe generated artifacts before merge: `.next/` and `test-results/`.
-- Fast-forwarded `main` to `origin/main` at `5644596`.
-- Merged `origin/feat/codex-crm-contract-api` into `main` with merge commit `0f5d301`.
-- Resolved the `PLAN.md` add/add conflict by taking the feature branch readiness plan over the short `main` placeholder, matching the prompt's readiness-doc preference.
-- Ran post-merge cleanup and drift scans for deferred `/deals/[id]` wording, B2B lead conversion wording, hard human/operator approval language, and lint/typecheck/format claims.
-- Ran the full local gate via `scripts/local-gate.ps1`: PASS (`npm install`, Prisma generate/db push, seed, 13 Vitest files / 88 tests, build, Chromium install, 1 Playwright smoke test).
+- Updated `PLAN.md` §6 to route gate failures through the §9 policy before deciding whether a `gate` blocker is needed.
+- Replaced the §9 stop-first gate-failure language with a max-YOLO repair-first rule.
+- Kept blocker evidence capture only for unresolved failures that still require a `gate` blocker.
+- Verified the docs edit with `git diff --check -- PLAN.md`.
 
 ### Dirty inventory classification
-- No uncommitted source, docs, or test changes were present before switching to `main`.
-- Cleanup removed only generated local artifacts and did not change tracked files.
-- `.env`, `node_modules/`, and `prisma/dev.db*` were preserved.
-- `git status --short` was clean after the merge and after the gate.
+- Intentional docs/process change: committed in `0b68adb`.
+- No generated artifacts or source/test changes were introduced.
+- `git status --short` was clean before report updates.
 
 ### Next action
-Commit this report update, push `main`, create the requested HEAD archive, and report final verification.
+Push `main` after the report-only commit if this branch remains the active promotion branch.
 
 ### Scope confirmation
 No product scope added: YES
-No force push or history rewrite: YES
+No source/test files changed: YES
 CRM-CONTRACT.md honored: YES
