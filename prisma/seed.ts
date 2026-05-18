@@ -817,6 +817,64 @@ async function main() {
       ownerId: "user-elena",
     }
   });
+
+  // === FULL YOLO MODE: More ceremonial chaos (Grok special) ===
+  const moreTrophyTasks = [
+    {
+      id: "task-trophy-004",
+      title: "🐋 Neon Narwhal Deep-Dive Strategy Session",
+      description: "The narwhal has spoken. We go to the bottom of the territory map and surface with closed deals.",
+      dueDate: new Date(Date.now() + 2 * 86400000),
+      status: "open",
+      priority: "high",
+      ownerId: "user-marcus",
+      accountId: "acct-cascade",
+      contactId: "contact-7",
+      dealId: null,
+      leadId: null,
+    },
+    {
+      id: "task-trophy-005",
+      title: "🦥 Savage Sloth Slow-Quota Intervention",
+      description: "Sometimes the fastest path to quota is the one that looks like you're doing nothing. Teach the younglings.",
+      dueDate: new Date(Date.now() + 9 * 86400000),
+      status: "in_progress",
+      priority: "normal",
+      ownerId: "user-ava",
+      accountId: "acct-luma",
+      contactId: "contact-3",
+      dealId: "deal-4",
+      leadId: null,
+    },
+    {
+      id: "task-trophy-006",
+      title: "🦴 Crypto Coyote Territory Origin Story Recording",
+      description: "Document how the coyote got in early on the Cascade postal codes. Future dealers must know the lore.",
+      dueDate: new Date(Date.now() + 14 * 86400000),
+      status: "open",
+      priority: "low",
+      ownerId: "user-elena",
+      accountId: "acct-northstar",
+      contactId: "contact-1",
+      dealId: null,
+      leadId: null,
+    },
+  ];
+
+  await prisma.task.createMany({ data: moreTrophyTasks });
+
+  await prisma.campaign.create({
+    data: {
+      id: "campaign-trophy-002",
+      name: "Mascot Draft Night 2026 — Live from the Llama Lounge",
+      description: "The annual bloodless bloodbath where dealers fight (verbally) over which mascot represents their brand for the next quarter. Streaming on internal only. Bring your own chant.",
+      status: "planned",
+      startDate: new Date(Date.now() + 12 * 86400000),
+      endDate: new Date(Date.now() + 13 * 86400000),
+      budget: 1337,
+      ownerId: "user-ava",
+    }
+  });
 }
 
 function routingFailureSummary(reason: string) {
