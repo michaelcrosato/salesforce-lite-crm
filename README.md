@@ -1,5 +1,7 @@
 # Salesforce Lite CRM
 
+[![CI Gate](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml)
+
 Salesforce Lite CRM is a full-fledged, AI-adaptive Salesforce-style CRM for
 small business revenue operations. It combines account, contact, opportunity,
 activity, lead-routing, dealer-order, forecasting, and analyst workflows in a
