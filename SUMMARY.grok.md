@@ -54,6 +54,31 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - **Feature 2.4 CSV** (conditional CANDIDATE-S5 anyway).
 - Any code that would `import` the not-yet-shipped Codex lib items (featureFlags, postal, RoutingDecision, new report methods).
 
+**Current Sprint 4B Completion Status (as of this run):**
+
+**Completed by Grok:**
+- Slice 0 inventory/prep (full component + lib/business + seed inspection)
+- Seed anchor manifest (current values documented for Gemini)
+- Component / lib-business inventory with client/server classification and importers
+- Documentation of blocked vs safe work
+- Pre-flight (status, tag, archive, branch target)
+- Full GROK-SPRINT-4B.md read (364 lines, including stopping conditions)
+- All via pwsh commands + doc-only commits on current branch
+
+**Not completed by Grok:**
+- `components/excluded-route-placeholder.tsx`
+- `components/routing-decision-detail.tsx`
+- `components/postal-code-input.tsx`
+- `components/page-skeleton.tsx`
+- Report helper/card work (leadsBySourceChart, topAccountsCard, reports cards)
+- Grok's required [UNBLOCK] handoff for Claude (Slice 1 Track A + combined commit)
+
+**Conclusion:** No, Grok is only at Slice 0 prep. We have not started actual Sprint 4B feature implementation. We remain blocked on Codex [UNBLOCK LIB] (itself blocked by Gemini's E2E gate work) and are not yet on the official `feat/grok-components-and-seed-tuning` branch.
+
+**Next possible independent work (per prompt, once PREP ONLY lifted):** Track B seed anchor stabilization (pinning values) + Item 54 placeholder (if operator confirms it can proceed without full unblock).
+
+---
+
 **Coordination context (from SPRINT-4B-COORDINATION.md):**
 - Gemini currently blocking Codex → no [UNBLOCK LIB] yet.
 - Grok Slice 0 + Slice 1 Track B (seed) were intended as early independent work.
