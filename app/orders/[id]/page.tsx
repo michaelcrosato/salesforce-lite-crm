@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { ActivityTimeline } from "@/components/activity-timeline";
 import { PacingBar } from "@/components/pacing-bar";
 import { PageHeader } from "@/components/page-header";
+import { RoutingDecisionDetail } from "@/components/routing-decision-detail";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRoutingDecisionForLead } from "@/lib/crm/crmClient";
 import {
   DEALER_ORDER_STATUS_LABELS,
   type DealerOrderStatus
@@ -106,8 +108,15 @@ export default async function OrderDetailPage({
     deliveredThisMonth
   };
 
+  const leadRoutingDecisions = await Promise.all(
+    order.leads.map((lead) => getRoutingDecisionForLead(lead.id))
+  );
+  const decisionsByLeadId = new Map(
+    order.leads.map((lead, index) => [lead.id, leadRoutingDecisions[index] ?? null])
+  );
+
   return (
-    <div className="crm-page">
+    <div className="crm-page" data-testid="page-order-detail">
       <PageHeader
         title={order.name}
         description="Dealer order quota, assigned leads, areas, and recent routing events."
@@ -123,18 +132,23 @@ export default async function OrderDetailPage({
               {order.leads.length > 0 ? (
                 <div className="divide-y rounded-md border">
                   {order.leads.map((lead) => (
-                    <Link
-                      key={lead.id}
-                      href={`/leads/${lead.id}`}
-                      className="grid gap-1 p-3 transition-colors hover:bg-muted/50 md:grid-cols-[1fr_auto]"
-                    >
-                      <span className="font-medium">
-                        {lead.firstName} {lead.lastName}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {lead.postalCode ?? "No postal"} · {formatDate(lead.createdAt)}
-                      </span>
-                    </Link>
+                    <div key={lead.id} className="space-y-2 p-3">
+                      <Link
+                        href={`/leads/${lead.id}`}
+                        className="grid gap-1 transition-colors hover:bg-muted/50 md:grid-cols-[1fr_auto]"
+                      >
+                        <span className="font-medium">
+                          {lead.firstName} {lead.lastName}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {lead.postalCode ?? "No postal"} · {formatDate(lead.createdAt)}
+                        </span>
+                      </Link>
+                      <RoutingDecisionDetail
+                        decision={decisionsByLeadId.get(lead.id) ?? null}
+                        testid={`routing-detail-${lead.id}`}
+                      />
+                    </div>
                   ))}
                 </div>
               ) : (
