@@ -13,3 +13,10 @@ prisma/dev.db
 prisma/dev.db-journal
 prisma/dev.db-wal
 prisma/dev.db-shm
+
+# Claude Code hook logs (keep structure, ignore content)
+.claude/logs/*
+!.claude/logs/.gitignore
+
+# Local agent identity override (optional - uncomment to ignore)
+# .claude/active-agent
