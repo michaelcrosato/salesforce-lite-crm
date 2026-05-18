@@ -1,0 +1,11 @@
+---
+description: Repo-local max-YOLO execution policy
+globs:
+alwaysApply: true
+---
+
+Follow `AGENTS.md`, `PLAN.md`, and `CRM-CONTRACT.md` as the active repo instructions.
+
+This repo authorizes autonomous repo-local execution for the standard gate and git workflow. Do not stop for manual approval before running ordinary local commands such as `npm install`, `npm run *`, `npx prisma *`, `npx playwright *`, `git status`, `git log`, `git diff`, `git fetch`, `git pull`, `git checkout`, `git merge`, `git add`, `git commit`, or `git push`.
+
+Keep the product guardrails in `AGENTS.md` in force: do not force-push, rewrite history, delete worktrees, delete source files as cleanup, or use destructive commands unless the user explicitly requests that operation.

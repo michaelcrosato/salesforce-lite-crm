@@ -45,7 +45,15 @@ export async function createContactAction(formData: FormData): Promise<ActionRes
 
   try {
     await prisma.contact.create({
-      data: parsed.data
+      data: {
+        accountId: parsed.data.accountId ?? null,
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        email: parsed.data.email ?? null,
+        phone: parsed.data.phone ?? null,
+        title: parsed.data.title ?? null,
+        status: parsed.data.status
+      }
     });
     revalidatePath("/contacts");
     revalidatePath("/dashboard");
@@ -89,7 +97,15 @@ export async function updateContactAction(
       where: {
         id: contactId
       },
-      data: parsed.data
+      data: {
+        accountId: parsed.data.accountId ?? null,
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        email: parsed.data.email ?? null,
+        phone: parsed.data.phone ?? null,
+        title: parsed.data.title ?? null,
+        status: parsed.data.status
+      }
     });
     revalidatePath("/contacts");
     revalidatePath(`/contacts/${contactId}`);

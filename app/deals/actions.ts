@@ -155,6 +155,16 @@ export async function updateDealAction(
           createdAt: now
         }
       });
+
+      await tx.opportunityStageHistory.create({
+        data: {
+          dealId,
+          fromStage: existing.stage,
+          toStage: parsed.data.stage,
+          changedAt: now,
+          changedByUserId: parsed.data.ownerId ?? existing.ownerId
+        }
+      });
     }
   });
 

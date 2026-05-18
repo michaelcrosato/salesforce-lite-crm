@@ -1,21 +1,39 @@
-# Codex Summary
+Agent: codex
+Sprint: repo readiness/documentation pass
+Feature: README product repositioning and Sprint 4 prompt preparation
+Branch: chore/claude-hooks-r23
+Status: complete
+Commits this prompt: none
+Gate status: PASS
+DoD self-check: PASS
+Timestamp: 2026-05-17T21:53:51.8364345-07:00
 
-- Slice 0 shipped: repo patterns confirmed; baseline gate green.
-- Slice 1 shipped: CRM contract, registry, additive schema, validation, and crmClient adapter; full gate green.
-- Feature 2.1 shipped: tasks service, crmClient complete adapter, and task API tests; full gate green.
-- Feature 2.2 shipped: cases service, crmClient resolve adapter, and case API tests; full gate green.
-- Feature 2.3 shipped: campaigns service, relation-aware crmClient adapter, and campaign API tests; full gate green.
-- Feature 2.4 shipped: opportunity stage history schema, service, moveDealAction recording, and tests; full gate green.
-- Feature 2.5 shipped: global CRM search service with route-safe results and search tests; full gate green.
-- Feature 2.6 shipped: typed list query helper wired into crmClient list adapters; full gate green.
-- Feature 2.7 shipped: validation rejection coverage and crmClient CRUD smoke tests; full gate green with 73 Vitest tests.
-- Feature 2.8 shipped: Activity links to Task and Case plus automatic task completion activity logging; full gate green.
-- Feature 2.9 shipped: report query service data shapes and report tests; full gate green with 82 Vitest tests.
+### Completed this prompt
+- Rewrote `README.md` so the project is framed as a full-fledged,
+  AI-adaptive Salesforce-style CRM for small business requirements, not as a
+  demo or proof-of-concept.
+- Added the required AI-agent Read First list, local setup commands, local URL,
+  database notes, Postgres switching notes, Dealer Revenue Command Center
+  capabilities, core routes/workflows, scripts, full gate, Vitest/Playwright
+  coverage, known limitations, and roadmap to `README.md`.
+- Updated `docs/PROJECT-CONTROL.md` to mark the readiness/documentation pass
+  complete and record that README reflects the updated product vision.
+- Prepared `docs/NEXT-PROMPTS.md` for Sprint 4 while keeping the prompts aligned
+  with `PLAN.md` and `CRM-CONTRACT.md`.
+- Ran the full local gate successfully:
+  `npm install`; `if (-not (Test-Path .env)) { Copy-Item .env.example .env }`;
+  `npx prisma generate`; `npx prisma db push`; `npm run seed`;
+  `npm run test`; `npm run build`; `npx playwright install chromium`;
+  `npm run test:e2e`.
+- Restored the `next-env.d.ts` build-generated side effect so the final diff
+  remains limited to documentation and Codex report files.
 
-## Final Audit
-- Shipped features: Slice 0 through Feature 2.10.
-- Deferred items: UI pages for `/tasks`, `/cases`, and `/campaigns` remain for Claude Code per the agent handoff.
-- Current Vitest count: 82.
-- Final Feature 2.10 gate status: green (`npm run test`, `npm run build`, `npm run test:e2e`).
-- Type-safety scan: clean for `lib/crm`, `lib/services`, and `tests/api`.
-- Deal route scan: clean for implemented code and contract references.
+### Next action
+Start Sprint 4 using `docs/NEXT-PROMPTS.md`, then run the relevant local gate
+before any merge.
+
+### Scope confirmation
+No cross-ownership edits: NO - the current prompt explicitly scoped README and
+docs updates.
+CRM-CONTRACT.md honored: YES
+No product features added: YES
