@@ -10,7 +10,7 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await page.getByRole("link", { name: "Contacts" }).first().click();
   await expect(page.getByRole("heading", { name: "Contacts" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Maya Singh" }).click();
+  await page.getByRole("link", { name: "Maya Singh" }).first().click();
   await expect(page.getByRole("heading", { name: "Maya Singh", exact: true })).toBeVisible();
 
   const noteText =
