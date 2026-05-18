@@ -1,30 +1,39 @@
 Agent: codex
-Sprint: repo-readiness; process cleanup
-Feature: Configure agent permission and instruction files
-Branch: main
-Status: done
-Commits this prompt: fc3e998 - [codex] repo-readiness: add agent permission configs
+Sprint: repo readiness/documentation pass
+Feature: README product repositioning and Sprint 4 prompt preparation
+Branch: chore/claude-hooks-r23
+Status: complete
+Commits this prompt: none
 Gate status: PASS
 DoD self-check: PASS
-Timestamp: 2026-05-17T18:18:22-07:00
+Timestamp: 2026-05-17T21:53:51.8364345-07:00
 
 ### Completed this prompt
-- Verified current Claude Code docs: shared project settings live at `.claude/settings.json`; `permissions.allow` uses rules such as `Bash(npm run *)`.
-- Verified current Cursor docs: project rules now live in `.cursor/rules/*.mdc`; root `.cursorrules` is legacy/deprecated.
-- Verified current GitHub Copilot docs: repository-wide instructions live at `.github/copilot-instructions.md`.
-- Verified current Gemini CLI docs: workspace settings live at `.gemini/settings.json`; `tools.allowed` can bypass confirmation for command prefixes; `GEMINI.md` is the project context file.
-- Added `.claude/settings.json`, `.cursor/rules/max-yolo.mdc`, `.github/copilot-instructions.md`, `.gemini/settings.json`, and `GEMINI.md`.
-- Validated JSON with PowerShell `ConvertFrom-Json` and ran `git diff --cached --check`.
-
-### Dirty inventory classification
-- Intentional agent config/instruction changes: committed in `fc3e998`.
-- No product source, runtime behavior, tests, or generated artifacts changed.
-- `git status --short` was clean before report updates.
+- Rewrote `README.md` so the project is framed as a full-fledged,
+  AI-adaptive Salesforce-style CRM for small business requirements, not as a
+  demo or proof-of-concept.
+- Added the required AI-agent Read First list, local setup commands, local URL,
+  database notes, Postgres switching notes, Dealer Revenue Command Center
+  capabilities, core routes/workflows, scripts, full gate, Vitest/Playwright
+  coverage, known limitations, and roadmap to `README.md`.
+- Updated `docs/PROJECT-CONTROL.md` to mark the readiness/documentation pass
+  complete and record that README reflects the updated product vision.
+- Prepared `docs/NEXT-PROMPTS.md` for Sprint 4 while keeping the prompts aligned
+  with `PLAN.md` and `CRM-CONTRACT.md`.
+- Ran the full local gate successfully:
+  `npm install`; `if (-not (Test-Path .env)) { Copy-Item .env.example .env }`;
+  `npx prisma generate`; `npx prisma db push`; `npm run seed`;
+  `npm run test`; `npm run build`; `npx playwright install chromium`;
+  `npm run test:e2e`.
+- Restored the `next-env.d.ts` build-generated side effect so the final diff
+  remains limited to documentation and Codex report files.
 
 ### Next action
-Commit this report update and push `main`.
+Start Sprint 4 using `docs/NEXT-PROMPTS.md`, then run the relevant local gate
+before any merge.
 
 ### Scope confirmation
-No product scope added: YES
-No source/test files changed: YES
+No cross-ownership edits: NO - the current prompt explicitly scoped README and
+docs updates.
 CRM-CONTRACT.md honored: YES
+No product features added: YES
