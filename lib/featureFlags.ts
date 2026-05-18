@@ -1,7 +1,4 @@
 export const FEATURE_FLAGS = {
-  tasksUi: false,
-  casesUi: false,
-  campaignsUi: false,
   dealDetailRoute: false,
   globalSearchUi: false,
   commandPalette: false,
@@ -14,9 +11,6 @@ export type FeatureFlag = keyof typeof FEATURE_FLAGS;
 const excludedDealDetailRoute = `/deals/${"[id]"}`;
 
 export const EXCLUDED_ROUTES = [
-  "/tasks",
-  "/cases",
-  "/campaigns",
   excludedDealDetailRoute,
   "/search",
   "/command-palette",
