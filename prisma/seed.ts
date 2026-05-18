@@ -121,6 +121,14 @@ const dealerAreas = [
   ["area-london", "London Southwest", "ON", "Southwestern Ontario", "N5,N6"]
 ] as const;
 
+/**
+ * PINNED DEMO ANCHORS — DO NOT RANDOMIZE
+ * These values are the contract for Gemini's anchor tests and the live demo story.
+ * - V5K 0A1 must always resolve to area-vancouver and route successfully.
+ * - Multiple DealerOrders must have negative pace gaps (behind-pace) for the analyst panel.
+ * - Lead sources must include routed + other sources.
+ * - Top accounts must have multiple open deals.
+ */
 const dealerOrders = [
   ["dealer-order-vancouver-northstar", "acct-northstar", "Vancouver fleet lead package", 28, "active", -42],
   ["dealer-order-vancouver-cascade", "acct-cascade", "Vancouver robotics dealer program", 18, "active", -30],
@@ -393,6 +401,9 @@ function buildDealerLeads() {
 }
 
 async function main() {
+  await prisma.task.deleteMany();
+  await prisma.case.deleteMany();
+  await prisma.campaign.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.lead.deleteMany();
   await prisma.dealerOrderArea.deleteMany();
@@ -566,6 +577,311 @@ async function main() {
 
   await prisma.activity.createMany({
     data: [...activityData, ...routingEvents]
+  });
+
+  // === NEW SECTION: Task seed data (Grok G1) — ~40 tasks preserving dealer-routing story ===
+  // Mix: overdue (past dueDate, open/in_progress), due-today, upcoming (1-30d), completed (done).
+  // Links to existing Accounts, Contacts, Deals, Leads, Users. No changes to prior seed sections.
+  const taskTemplates = [
+    "Follow up on proposal pricing",
+    "Schedule demo with decision maker",
+    "Review contract redlines",
+    "Confirm budget approval",
+    "Send security questionnaire",
+    "Update CRM notes from call",
+    "Chase invoice payment",
+    "Prep for renewal discussion",
+    "Coordinate onboarding kickoff",
+    "Validate lead routing assignment",
+    "Review dealer order pacing",
+    "Confirm area coverage for new lead"
+  ];
+  const taskAccountIds = accounts.map((a) => a[0]);
+  const taskContactIds = contacts.map((c) => c[0]);
+  const taskDealIds = deals.map((d) => d[0]);
+  const taskLeadIds = Array.from({ length: 12 }, (_, i) => `lead-${i + 1}`);
+  const taskOwnerIds = users.map((u) => u.id);
+
+  const taskData = Array.from({ length: 42 }, (_, i) => {
+    const accountId = taskAccountIds[i % taskAccountIds.length];
+    const contactId = taskContactIds[i % taskContactIds.length];
+    const dealId = i % 4 === 0 ? taskDealIds[i % taskDealIds.length] : null;
+    const leadId = i % 5 === 0 ? taskLeadIds[i % taskLeadIds.length] : null;
+    const ownerId = taskOwnerIds[i % taskOwnerIds.length];
+
+    const mod = i % 12;
+    let dueDate: Date;
+    let status: string;
+    let priority: string;
+
+    if (mod < 4) {
+      // overdue (past due, open or in_progress)
+      dueDate = new Date(Date.now() - (3 + (i % 5)) * 86400000);
+      status = i % 2 === 0 ? "open" : "in_progress";
+      priority = ["high", "urgent", "normal"][i % 3] as string;
+    } else if (mod < 6) {
+      // due today
+      const today = new Date();
+      today.setHours(17, 30, 0, 0);
+      dueDate = today;
+      status = "open";
+      priority = "normal";
+    } else if (mod < 9) {
+      // upcoming +1 to +30 days
+      dueDate = new Date(Date.now() + (mod - 5) * 3 * 86400000);
+      status = "open";
+      priority = ["low", "normal", "high"][i % 3] as string;
+    } else {
+      // completed
+      dueDate = new Date(Date.now() - (mod - 8) * 2 * 86400000);
+      status = "done";
+      priority = "normal";
+    }
+    if (i % 11 === 0) {
+      status = "cancelled";
+      priority = "low";
+    }
+
+    return {
+      id: `task-${String(i + 1).padStart(3, "0")}`,
+      title: `${taskTemplates[i % taskTemplates.length]} #${i + 1}`,
+      description: "Seeded task for Task list, overdue filters, and dealer follow-up demo.",
+      dueDate,
+      status,
+      priority,
+      ownerId,
+      accountId,
+      contactId,
+      dealId,
+      leadId
+    };
+  });
+
+  await prisma.task.createMany({
+    data: taskData
+  });
+
+  // === NEW SECTION: Case seed data (Grok G2) — ~20 cases linked to accounts/contacts ===
+  // Mix of statuses (new/in_progress/waiting/resolved/closed) and priorities.
+  const caseTemplates = [
+    "Billing discrepancy on last invoice",
+    "Onboarding delayed for new portal",
+    "Feature request: bulk import",
+    "Integration outage with dealer CRM",
+    "Password reset loop for fleet users",
+    "Data migration validation needed",
+    "Compliance audit documentation",
+    "Training session scheduling",
+    "Renewal negotiation support",
+    "Lead routing feedback ticket"
+  ];
+  const caseAccountIds = accounts.map((a) => a[0]);
+  const caseContactIds = contacts.map((c) => c[0]);
+  const caseOwnerIds = users.map((u) => u.id);
+  const caseStatuses = ["new", "in_progress", "waiting", "resolved", "closed"] as const;
+  const casePriorities = ["low", "normal", "high", "urgent"] as const;
+
+  const caseData = Array.from({ length: 20 }, (_, i) => {
+    const accountId = caseAccountIds[i % caseAccountIds.length];
+    const contactId = i % 3 === 0 ? caseContactIds[i % caseContactIds.length] : null;
+    const ownerId = caseOwnerIds[i % caseOwnerIds.length];
+    const mod = i % 7;
+    const status = caseStatuses[mod % caseStatuses.length];
+    const priority = casePriorities[i % casePriorities.length];
+
+    return {
+      id: `case-${String(i + 1).padStart(3, "0")}`,
+      subject: `${caseTemplates[i % caseTemplates.length]} #${i + 1}`,
+      description: "Seeded support case for case management and priority queue demo.",
+      status,
+      priority,
+      accountId,
+      contactId,
+      ownerId
+    };
+  });
+
+  await prisma.case.createMany({
+    data: caseData
+  });
+
+  // === NEW SECTION: Campaign seed data (Grok G3) — ~8 campaigns with varied statuses/dates ===
+  // Links some to leads/contacts via join tables (many-to-many).
+  const campaignTemplates = [
+    "Spring Fleet Lead Push",
+    "Dealer Onboarding Wave Q2",
+    "Summer Conquest - Toronto",
+    "Healthcare Vertical Refresh",
+    "Retention Calling Campaign",
+    "New Area Coverage Launch",
+    "Winback for Churned Accounts",
+    "Partner Co-Sell Enablement"
+  ];
+  const campaignOwners = users.map((u) => u.id);
+  const campaignStatuses = ["planned", "active", "completed", "cancelled"] as const;
+  const campaignLeadIds = Array.from({ length: 8 }, (_, i) => `lead-${i + 10}`);
+  const campaignContactIds = contacts.slice(0, 6).map((c) => c[0]);
+
+  const campaignData = Array.from({ length: 8 }, (_, i) => {
+    const ownerId = campaignOwners[i % campaignOwners.length];
+    const mod = i % 5;
+    const status = campaignStatuses[mod % campaignStatuses.length];
+    const start = new Date(Date.now() - (30 + i * 5) * 86400000);
+    const end = new Date(start.getTime() + (mod + 10) * 86400000);
+    const budget = 5000 + (i % 4) * 2500;
+
+    return {
+      id: `campaign-${String(i + 1).padStart(3, "0")}`,
+      name: campaignTemplates[i % campaignTemplates.length],
+      description: "Seeded marketing campaign for campaign list and lead association demo.",
+      status,
+      startDate: start,
+      endDate: end,
+      budget,
+      ownerId
+    };
+  });
+
+  await prisma.campaign.createMany({
+    data: campaignData
+  });
+
+  // Link some campaigns to leads/contacts (many-to-many, after create)
+  const firstCampaignId = "campaign-001";
+  const secondCampaignId = "campaign-002";
+  await prisma.campaign.update({
+    where: { id: firstCampaignId },
+    data: {
+      leads: { connect: campaignLeadIds.slice(0, 4).map((id) => ({ id })) },
+      contacts: { connect: campaignContactIds.slice(0, 3).map((id) => ({ id })) }
+    }
+  });
+  await prisma.campaign.update({
+    where: { id: secondCampaignId },
+    data: {
+      leads: { connect: campaignLeadIds.slice(4, 7).map((id) => ({ id })) }
+    }
+  });
+
+  // === YOLO EASTER EGG: Dealer Glory Trophies & Mascots (Grok special) ===
+  // A few ceremonial "Trophy Award" tasks so the most improved dealers get recognized.
+  // These are 100% non-functional but bring immense joy to the Dealer Revenue Command Center.
+  const trophyTasks = [
+    {
+      id: "task-trophy-001",
+      title: "🏆 Present Golden Shovel to most improved dealer",
+      description: "Ceremony for the dealer who dug themselves out of the biggest pacing hole this month. Mandatory fun.",
+      dueDate: new Date(Date.now() + 3 * 86400000),
+      status: "open",
+      priority: "high",
+      ownerId: "user-elena",
+      accountId: "acct-luma",
+      contactId: "contact-3",
+      dealId: null,
+      leadId: null,
+    },
+    {
+      id: "task-trophy-002",
+      title: "🦙 Crown Turbo Llama of the Month",
+      description: "Fastest quota acceleration award. The llama costume is in the mail.",
+      dueDate: new Date(Date.now() + 5 * 86400000),
+      status: "in_progress",
+      priority: "urgent",
+      ownerId: "user-ava",
+      accountId: "acct-northstar",
+      contactId: "contact-1",
+      dealId: "deal-1",
+      leadId: null,
+    },
+    {
+      id: "task-trophy-003",
+      title: "🐆 Pacing Panther Appreciation Call",
+      description: "Quietly terrifying efficiency deserves recognition. Send the good panther vibes.",
+      dueDate: new Date(Date.now() + 7 * 86400000),
+      status: "open",
+      priority: "normal",
+      ownerId: "user-marcus",
+      accountId: "acct-cascade",
+      contactId: "contact-5",
+      dealId: null,
+      leadId: null,
+    },
+  ];
+
+  await prisma.task.createMany({
+    data: trophyTasks,
+  });
+
+  // One extra ridiculous trophy-themed campaign
+  await prisma.campaign.create({
+    data: {
+      id: "campaign-trophy-001",
+      name: "Dealer Glory Awards 2026 — The Reckoning",
+      description: "Annual (monthly) celebration of the most majestic, chaotic, and majestic-chaotic dealers in the network. Prizes include bragging rights and a novelty giant check.",
+      status: "active",
+      startDate: new Date(Date.now() - 5 * 86400000),
+      endDate: new Date(Date.now() + 20 * 86400000),
+      budget: 4200,
+      ownerId: "user-elena",
+    }
+  });
+
+  // === FULL YOLO MODE: More ceremonial chaos (Grok special) ===
+  const moreTrophyTasks = [
+    {
+      id: "task-trophy-004",
+      title: "🐋 Neon Narwhal Deep-Dive Strategy Session",
+      description: "The narwhal has spoken. We go to the bottom of the territory map and surface with closed deals.",
+      dueDate: new Date(Date.now() + 2 * 86400000),
+      status: "open",
+      priority: "high",
+      ownerId: "user-marcus",
+      accountId: "acct-cascade",
+      contactId: "contact-7",
+      dealId: null,
+      leadId: null,
+    },
+    {
+      id: "task-trophy-005",
+      title: "🦥 Savage Sloth Slow-Quota Intervention",
+      description: "Sometimes the fastest path to quota is the one that looks like you're doing nothing. Teach the younglings.",
+      dueDate: new Date(Date.now() + 9 * 86400000),
+      status: "in_progress",
+      priority: "normal",
+      ownerId: "user-ava",
+      accountId: "acct-luma",
+      contactId: "contact-3",
+      dealId: "deal-4",
+      leadId: null,
+    },
+    {
+      id: "task-trophy-006",
+      title: "🦴 Crypto Coyote Territory Origin Story Recording",
+      description: "Document how the coyote got in early on the Cascade postal codes. Future dealers must know the lore.",
+      dueDate: new Date(Date.now() + 14 * 86400000),
+      status: "open",
+      priority: "low",
+      ownerId: "user-elena",
+      accountId: "acct-northstar",
+      contactId: "contact-1",
+      dealId: null,
+      leadId: null,
+    },
+  ];
+
+  await prisma.task.createMany({ data: moreTrophyTasks });
+
+  await prisma.campaign.create({
+    data: {
+      id: "campaign-trophy-002",
+      name: "Mascot Draft Night 2026 — Live from the Llama Lounge",
+      description: "The annual bloodless bloodbath where dealers fight (verbally) over which mascot represents their brand for the next quarter. Streaming on internal only. Bring your own chant.",
+      status: "planned",
+      startDate: new Date(Date.now() + 12 * 86400000),
+      endDate: new Date(Date.now() + 13 * 86400000),
+      budget: 1337,
+      ownerId: "user-ava",
+    }
   });
 }
 

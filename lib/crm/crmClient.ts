@@ -7,6 +7,7 @@ import type {
   Contact,
   DealerOrder,
   Lead,
+  OpportunityStageHistory,
   Prisma,
   Task
 } from "@prisma/client";
@@ -49,6 +50,11 @@ import {
   updateTask as updateTaskService
 } from "@/lib/services/tasks";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
+import {
+  getRoutingDecisionForLead as getRoutingDecisionForLeadService,
+  type RoutingDecision
+} from "@/lib/services/leads";
+import { listOpportunityStageHistory as listOpportunityStageHistoryService } from "@/lib/services/opportunityStageHistory";
 import type { TaskListInput as TaskServiceListInput } from "@/lib/services/tasks";
 import {
   accountCreateSchema,
@@ -161,6 +167,7 @@ export type CaseCreateInput = z.input<typeof caseCreateSchema>;
 export type CaseUpdateInput = z.input<typeof caseUpdateSchema>;
 export type CampaignCreateInput = z.input<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.input<typeof campaignUpdateSchema>;
+export type { RoutingDecision } from "@/lib/services/leads";
 
 function parseId(id: string): string {
   return idSchema.parse(id);
@@ -375,6 +382,7 @@ function toNote(activity: Activity): Note {
   return { ...activity, type: "note" };
 }
 
+/** Lists accounts. Supported filter keys: `status`, `ownerId`, `search`. */
 export async function listAccounts(opts: AccountListOptions = {}): Promise<Account[]> {
   return prisma.account.findMany(accountListQuery(opts));
 }
@@ -397,6 +405,7 @@ export async function deleteAccount(id: string): Promise<Account> {
   return prisma.account.delete({ where: { id: parseId(id) } });
 }
 
+/** Lists contacts. Supported filter keys: `status`, `accountId`, `search`. */
 export async function listContacts(opts: ContactListOptions = {}): Promise<Contact[]> {
   return prisma.contact.findMany(contactListQuery(opts));
 }
@@ -419,6 +428,7 @@ export async function deleteContact(id: string): Promise<Contact> {
   return prisma.contact.delete({ where: { id: parseId(id) } });
 }
 
+/** Lists opportunities. Supported filter keys: `stage`, `accountId`, `ownerId`, `search`. */
 export async function listOpportunities(opts: OpportunityListOptions = {}): Promise<Opportunity[]> {
   return prisma.deal.findMany(opportunityListQuery(opts));
 }
@@ -475,6 +485,13 @@ export async function deleteOpportunity(id: string): Promise<Opportunity> {
   return prisma.deal.delete({ where: { id: parseId(id) } });
 }
 
+export async function getOpportunityStageHistory(
+  dealId: string
+): Promise<OpportunityStageHistory[]> {
+  return listOpportunityStageHistoryService(dealId);
+}
+
+/** Lists leads. Supported filter keys: `status`, `assignedOrderId`, `areaId`, `search`. */
 export async function listLeads(opts: LeadListOptions = {}): Promise<Lead[]> {
   return prisma.lead.findMany(leadListQuery(opts));
 }
@@ -497,6 +514,13 @@ export async function deleteLead(id: string): Promise<Lead> {
   return prisma.lead.delete({ where: { id: parseId(id) } });
 }
 
+export async function getRoutingDecisionForLead(
+  leadId: string
+): Promise<RoutingDecision | null> {
+  return getRoutingDecisionForLeadService(leadId);
+}
+
+/** Lists activities. Supported filter keys: `type`, `accountId`, `contactId`, `dealId`, `leadId`, `taskId`, `caseId`. */
 export async function listActivities(opts: ActivityListOptions = {}): Promise<Activity[]> {
   return prisma.activity.findMany(activityListQuery(opts));
 }
@@ -533,6 +557,7 @@ export async function addActivityToCase(
   return createActivity({ ...input, caseId: parseId(caseId) });
 }
 
+/** Lists notes. Supported filter keys match activities and force `type = "note"`. */
 export async function listNotes(opts: ActivityListOptions = {}): Promise<Note[]> {
   const query = activityListQuery(opts);
   const where: Prisma.ActivityWhereInput = {
@@ -578,6 +603,7 @@ export async function deleteNote(id: string): Promise<Note | null> {
   return toNote(await prisma.activity.delete({ where: { id: note.id } }));
 }
 
+/** Lists dealer orders. Supported filter keys: `status`, `accountId`. */
 export async function listDealerOrders(opts: DealerOrderListOptions = {}): Promise<DealerOrder[]> {
   return prisma.dealerOrder.findMany(dealerOrderListQuery(opts));
 }
@@ -600,6 +626,7 @@ export async function deleteDealerOrder(id: string): Promise<DealerOrder> {
   return prisma.dealerOrder.delete({ where: { id: parseId(id) } });
 }
 
+/** Lists areas. Supported filter keys: `province`, `search`. */
 export async function listAreas(opts: AreaListOptions = {}): Promise<Area[]> {
   return prisma.area.findMany(areaListQuery(opts));
 }
@@ -622,6 +649,7 @@ export async function deleteArea(id: string): Promise<Area> {
   return prisma.area.delete({ where: { id: parseId(id) } });
 }
 
+/** Lists tasks. Supported filter keys: `status`, `ownerId`, `dueDateFrom`, `dueDateTo`. */
 export async function listTasks(opts: TaskListOptions = {}): Promise<Task[]> {
   return listTasksService(opts);
 }
@@ -646,6 +674,7 @@ export async function deleteTask(id: string): Promise<Task> {
   return deleteTaskService(id);
 }
 
+/** Lists cases. Supported filter keys: `status`, `ownerId`, `accountId`, `contactId`. */
 export async function listCases(opts: CaseListOptions = {}): Promise<Case[]> {
   return listCasesService(opts);
 }
@@ -670,6 +699,7 @@ export async function deleteCase(id: string): Promise<Case> {
   return deleteCaseService(id);
 }
 
+/** Lists campaigns. Supported filter keys: `status`, `ownerId`, `startDateFrom`, `startDateTo`. */
 export async function listCampaigns(opts: CampaignListOptions = {}): Promise<Campaign[]> {
   return listCampaignsService(opts);
 }
@@ -693,3 +723,22 @@ export async function completeCampaign(id: string): Promise<Campaign> {
 export async function deleteCampaign(id: string): Promise<Campaign> {
   return deleteCampaignService(id);
 }
+
+export const crmClient = {
+  deals: {
+    list: listOpportunities,
+    get: getOpportunity,
+    create: createOpportunity,
+    update: updateOpportunity,
+    delete: deleteOpportunity,
+    getStageHistory: getOpportunityStageHistory
+  },
+  leads: {
+    list: listLeads,
+    get: getLead,
+    create: createLead,
+    update: updateLead,
+    delete: deleteLead,
+    getRoutingDecision: getRoutingDecisionForLead
+  }
+} as const;

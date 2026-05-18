@@ -1,5 +1,8 @@
 # CRM Contract
 
+Version: v2.0
+Last audited: 2026-05-18
+
 This file is the source of truth for CRM entity names, routes, status values, and server-side data access.
 
 ## Entity Model
@@ -74,12 +77,68 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- Existing UI routes are preserved. New `/tasks`, `/cases`, and `/campaigns` routes are contract routes for the UI owner to implement.
+- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are backend contract routes, but their Sprint 4B UI routes are in `EXCLUDED_ROUTES`.
+
+## Status Constants
+
+Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/crm/registry.ts`:
+
+- Account: `ACCOUNT_STATUSES`
+- Contact: `CONTACT_STATUSES`
+- Opportunity/Deal: `DEAL_STAGES`
+- Activity: `ACTIVITY_TYPES`
+- Lead: `LEAD_STATUSES`
+- DealerOrder: `DEALER_ORDER_STATUSES`
+- Task: `TASK_STATUSES`
+- Case: `CASE_STATUSES`
+- Campaign: `CAMPAIGN_STATUSES`
+
+## Feature Flags And Excluded Routes
+
+`lib/featureFlags.ts` exports `FEATURE_FLAGS`, `EXCLUDED_ROUTES`, and `isEnabled(flag)`.
+All flags default to `false` during Sprint 4B demo polish.
+
+| Flag | Purpose | Excluded route(s) | Authority |
+|---|---|---|---|
+| `tasksUi` | Backend Task support exists, but the Task UI is excluded from this demo slice. | `/tasks` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `casesUi` | Backend Case support exists, but the Case UI is excluded from this demo slice. | `/cases` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `campaignsUi` | Backend Campaign support exists, but the Campaign UI is excluded from this demo slice. | `/campaigns` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md section 4 line 137. |
+| `globalSearchUi` | Top search remains contacts-only; no expanded search route ships. | `/search` | PLAN.md section 4 line 139. |
+| `commandPalette` | No command palette route ships in Sprint 4B. | `/command-palette` | PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md section 4 line 135. |
+| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md section 4 line 135. |
+
+`EXCLUDED_ROUTES` is the source of truth for routes that should either 404 or render the demo placeholder.
+
+## Postal Validation
+
+`lib/postal.ts` exports:
+
+- `normalizePostalCode(input: string, country: "CA" | "US"): string | null`
+- `extractPostalPrefix(normalized: string, country: "CA" | "US"): string`
+- `validatePostalCode(input: string, country: "CA" | "US"): { ok: true; normalized: string; prefix: string } | { ok: false; reason: string }`
+- `postalCodeSchema`, a Zod schema used by lead creation validation for the Canadian dealer routing form.
+
+Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12345-6789`.
+
+## Report Query Services
+
+`lib/services/reports.ts` exports these Sprint 4B report shapes:
+
+- `leadsBySource(): Promise<Array<{ source: string; count: number; rate: number }>>`
+  - `rate` is routed leads divided by total leads for that source.
+  - A routed lead means `assignmentReason = "routed"` and at least one persisted `routing_event` Activity.
+- `topAccountsByDealValue(limit = 10): Promise<Array<{ accountId: string; accountName: string; totalValue: number; openDealCount: number }>>`
+  - `totalValue` sums open deal values only.
+  - `openDealCount` counts deals in open pipeline stages.
 
 ## crmClient Adapter Signatures
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.
 List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and are translated to Prisma `where`, `orderBy`, `skip`, and `take` clauses by `lib/services/listQuery.ts`.
+Supported list filter keys are documented in JSDoc above each `list*` adapter in `lib/crm/crmClient.ts`.
+Task, Case, and Campaign service modules also retain legacy flat `skip` / `take` inputs for existing callers, but their exported crmClient list option types use the standard list shape.
 
 ### Account
 - `listAccounts(opts?: AccountListOptions): Promise<Account[]>`
@@ -101,6 +160,8 @@ List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and ar
 - `createOpportunity(input: OpportunityCreateInput): Promise<Opportunity>`
 - `updateOpportunity(id: string, input: OpportunityUpdateInput): Promise<Opportunity>`
 - `deleteOpportunity(id: string): Promise<Opportunity>`
+- `getOpportunityStageHistory(dealId: string): Promise<OpportunityStageHistory[]>`
+- Object adapter: `crmClient.deals.getStageHistory(dealId): Promise<OpportunityStageHistory[]>`
 
 ### Lead
 - `listLeads(opts?: LeadListOptions): Promise<Lead[]>`
@@ -108,6 +169,29 @@ List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and ar
 - `createLead(input: LeadCreateInput): Promise<Lead>`
 - `updateLead(id: string, input: LeadUpdateInput): Promise<Lead>`
 - `deleteLead(id: string): Promise<Lead>`
+- `getRoutingDecisionForLead(leadId: string): Promise<RoutingDecision | null>`
+- Object adapter: `crmClient.leads.getRoutingDecision(id): Promise<RoutingDecision | null>`
+
+`RoutingDecision` is exported from `lib/services/leads.ts` and re-exported by `lib/crm/crmClient.ts`:
+
+```
+type RoutingDecision = {
+  leadId: string;
+  normalizedPostal: string;
+  prefix: string;
+  matchedAreaId: string | null;
+  matchedAreaName: string | null;
+  candidateOrders: Array<{ id: string; dealerName: string; paceGap: number; rank: number }>;
+  selectedOrderId: string | null;
+  decidedAt: Date;
+  reason: string;
+  summary: string;
+  steps: Array<{ step: string; result: RoutingDecisionJson }>;
+};
+```
+
+The getter reads the latest existing `routing_event` Activity for the lead and does not re-run routing. Legacy human-readable routing summaries are surfaced through `reason`, `summary`, and a single `legacy_summary` step.
+New routing events write the structured JSON payload to `Activity.rawText` and keep `Activity.summary` human-readable for existing activity surfaces. The payload has `version`, `input`, `steps`, and `summary` fields; `steps` includes `normalize`, `extract_prefix`, `match_area`, `filter_orders`, `rank_pace_gap`, and `select`.
 
 ### Activity
 - `listActivities(opts?: ActivityListOptions): Promise<Activity[]>`

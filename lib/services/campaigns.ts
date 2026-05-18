@@ -1,7 +1,8 @@
 import type { Campaign, Prisma } from "@prisma/client";
 import { z } from "zod";
-import { CAMPAIGN_STATUSES } from "@/lib/crm/registry";
+import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import {
   campaignCreateSchema,
   campaignUpdateSchema,
@@ -24,16 +25,50 @@ const optionalFilterDate = z.preprocess((value) => {
   return new Date(value);
 }, z.date().optional());
 
-export const campaignListSchema = z.object({
-  status: z.enum(CAMPAIGN_STATUSES).optional(),
-  ownerId: idSchema.optional(),
-  startDateFrom: optionalFilterDate,
-  startDateTo: optionalFilterDate,
-  skip: z.coerce.number().int().min(0).optional(),
-  take: z.coerce.number().int().min(1).max(100).optional()
-});
+const campaignSortByValues = ["startDate", "createdAt", "status", "name", "budget"] as const;
+const sortOrderSchema = z.enum(["asc", "desc"]);
+const campaignFilterSchema = z
+  .object({
+    status: z.enum(CAMPAIGN_STATUSES).optional(),
+    ownerId: idSchema.optional(),
+    startDateFrom: optionalFilterDate,
+    startDateTo: optionalFilterDate
+  })
+  .strict();
 
-export type CampaignListInput = z.input<typeof campaignListSchema>;
+export const campaignListSchema = z
+  .object({
+    page: z.coerce.number().int().min(1).optional(),
+    pageSize: z.coerce.number().int().min(1).max(100).optional(),
+    sortBy: z.enum(campaignSortByValues).optional(),
+    sortOrder: sortOrderSchema.optional(),
+    filters: campaignFilterSchema.optional()
+  })
+  .strict();
+
+const legacyCampaignListSchema = campaignFilterSchema
+  .extend({
+    skip: z.coerce.number().int().min(0).optional(),
+    take: z.coerce.number().int().min(1).max(100).optional()
+  })
+  .strict();
+
+type CampaignSortBy = (typeof campaignSortByValues)[number];
+type CampaignFilterInput = {
+  status: CampaignStatus;
+  ownerId: string;
+  startDateFrom: Date | string | number;
+  startDateTo: Date | string | number;
+};
+type ParsedCampaignFilters = {
+  status: CampaignStatus;
+  ownerId: string;
+  startDateFrom: Date;
+  startDateTo: Date;
+};
+type ParsedCampaignListInput = ListQueryInput<CampaignSortBy, ParsedCampaignFilters>;
+
+export type CampaignListInput = ListQueryInput<CampaignSortBy, CampaignFilterInput>;
 export type CampaignCreateInput = z.input<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.input<typeof campaignUpdateSchema>;
 
@@ -50,32 +85,58 @@ export async function createCampaign(input: unknown): Promise<Campaign> {
 }
 
 export async function listCampaigns(input: unknown = {}): Promise<Campaign[]> {
-  const { ownerId, skip, startDateFrom, startDateTo, status, take } =
-    campaignListSchema.parse(input);
-  const where: Prisma.CampaignWhereInput = {
-    ownerId,
-    status,
-    startDate:
-      startDateFrom || startDateTo
-        ? {
-            gte: startDateFrom,
-            lte: startDateTo
-          }
-        : undefined
-  };
+  return prisma.campaign.findMany(campaignListQuery(parseCampaignListInput(input)));
+}
 
-  return prisma.campaign.findMany({
-    where,
-    orderBy: [
-      {
-        startDate: "asc"
-      },
-      {
-        createdAt: "desc"
-      }
-    ],
-    skip,
-    take
+function parseCampaignListInput(input: unknown): ParsedCampaignListInput {
+  const standard = campaignListSchema.safeParse(input);
+
+  if (standard.success) {
+    return standard.data;
+  }
+
+  const legacy = legacyCampaignListSchema.parse(input);
+  const { skip, take, ...filters } = legacy;
+
+  return {
+    page: skip !== undefined && take !== undefined ? Math.floor(skip / take) + 1 : undefined,
+    pageSize: take,
+    filters
+  };
+}
+
+function campaignListQuery(input: ParsedCampaignListInput) {
+  return buildListQuery<
+    CampaignSortBy,
+    ParsedCampaignFilters,
+    Prisma.CampaignWhereInput,
+    Prisma.CampaignOrderByWithRelationInput[]
+  >(input, {
+    defaultSortBy: "startDate",
+    defaultSortOrder: "asc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      startDate: (order) => [{ startDate: order }, { createdAt: "desc" }],
+      createdAt: (order) => [{ createdAt: order }],
+      status: (order) => [{ status: order }, { createdAt: "desc" }],
+      name: (order) => [{ name: order }],
+      budget: (order) => [{ budget: order }, { createdAt: "desc" }]
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      ownerId: (ownerId) => ({ ownerId }),
+      startDateFrom: (startDateFrom) => ({
+        startDate: {
+          gte: startDateFrom
+        }
+      }),
+      startDateTo: (startDateTo) => ({
+        startDate: {
+          lte: startDateTo
+        }
+      })
+    }
   });
 }
 
