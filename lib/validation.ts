@@ -14,6 +14,7 @@ import {
   TASK_PRIORITIES,
   TASK_STATUSES
 } from "@/lib/crm/registry";
+import { postalCodeSchema } from "@/lib/postal";
 
 const optionalText = z.preprocess((value) => {
   if (typeof value !== "string") {
@@ -71,6 +72,11 @@ export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
 
 const blankStringToUndefined = (value: unknown) =>
   typeof value === "string" && value.trim().length === 0 ? undefined : value;
+
+const optionalPostalCode = z.preprocess(
+  blankStringToUndefined,
+  postalCodeSchema.optional()
+);
 
 const requiredInteger = (
   message: string,
@@ -157,7 +163,7 @@ export const leadFormSchema = z.object({
   lastName: z.string().trim().min(1, "Last name is required."),
   phone: optionalText,
   email: optionalText.pipe(z.string().email("Enter a valid email.").optional()),
-  postalCode: optionalText,
+  postalCode: optionalPostalCode,
   province: optionalText,
   source: optionalText
 });

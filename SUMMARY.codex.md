@@ -1,12 +1,12 @@
 Agent: Codex
 Sprint: Sprint 4B
-Feature: Slice 0 state confirmation
+Feature: Slice 1 foundation unblock
 Branch: feat/codex-services-routing-and-validation
-Status: in progress - Slice 0 complete, Slice 1 next
-Commits this prompt: pending
-Gate status: PASS - baseline `pwsh scripts/local-gate.ps1`
-DoD self-check: PASS for Slice 0
-Timestamp: 2026-05-18T01:05:00-07:00
+Status: in progress - Slice 1 ready to commit
+Commits this prompt: `1eed7a7` plus pending Slice 1 [UNBLOCK]
+Gate status: PASS - Slice 1 `pwsh scripts/local-gate.ps1`
+DoD self-check: PASS for Slice 1
+Timestamp: 2026-05-18T01:11:30-07:00
 
 ### Slice 0 preflight
 - Required Sprint 4B prompt files exist and were read in the requested order.
@@ -27,9 +27,13 @@ Timestamp: 2026-05-18T01:05:00-07:00
 - Revalidated the repaired baseline with `pwsh scripts/local-gate.ps1`.
 - Updated `CODEX-NOTES.md` with Slice 0 schema, service, contract, seed, and blocker status.
 - Cleared the Codex blocker file for the prior baseline E2E failure.
+- Slice 1 shipped feature flag and excluded-route exports in `lib/featureFlags.ts`.
+- Slice 1 shipped postal normalization and validation helpers in `lib/postal.ts`, composed into lead creation validation.
+- Slice 1 shipped `getRoutingDecisionForLead` in `lib/services/leads.ts` and exposed `crmClient.leads.getRoutingDecision(id)`.
+- Slice 1 updated `CRM-CONTRACT.md` with feature flags, excluded routes, postal helper signatures, and routing decision shape.
 
 ### Next action
-Execute Slice 1 and ship `feat(codex): slice 1 feature flags postal helper and routing decision exposure [UNBLOCK]`.
+Commit Slice 1 with the required `[UNBLOCK]` marker, then continue to Slice 2.
 
 ### Scope confirmation
 No cross-ownership edits: YES

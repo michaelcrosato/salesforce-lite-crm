@@ -76,6 +76,35 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
 - Existing UI routes are preserved. New `/tasks`, `/cases`, and `/campaigns` routes are contract routes for the UI owner to implement.
 
+## Feature Flags And Excluded Routes
+
+`lib/featureFlags.ts` exports `FEATURE_FLAGS`, `EXCLUDED_ROUTES`, and `isEnabled(flag)`.
+All flags default to `false` during Sprint 4B demo polish.
+
+| Flag | Purpose | Excluded route(s) | Authority |
+|---|---|---|---|
+| `tasksUi` | Backend Task support exists, but the Task UI is excluded from this demo slice. | `/tasks` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `casesUi` | Backend Case support exists, but the Case UI is excluded from this demo slice. | `/cases` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `campaignsUi` | Backend Campaign support exists, but the Campaign UI is excluded from this demo slice. | `/campaigns` | Sprint 4B Item 54; PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md section 4 line 137. |
+| `globalSearchUi` | Top search remains contacts-only; no expanded search route ships. | `/search` | PLAN.md section 4 line 139. |
+| `commandPalette` | No command palette route ships in Sprint 4B. | `/command-palette` | PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
+| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md section 4 line 135. |
+| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md section 4 line 135. |
+
+`EXCLUDED_ROUTES` is the source of truth for routes that should either 404 or render the demo placeholder.
+
+## Postal Validation
+
+`lib/postal.ts` exports:
+
+- `normalizePostalCode(input: string, country: "CA" | "US"): string | null`
+- `extractPostalPrefix(normalized: string, country: "CA" | "US"): string`
+- `validatePostalCode(input: string, country: "CA" | "US"): { ok: true; normalized: string; prefix: string } | { ok: false; reason: string }`
+- `postalCodeSchema`, a Zod schema used by lead creation validation for the Canadian dealer routing form.
+
+Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12345-6789`.
+
 ## crmClient Adapter Signatures
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.
@@ -108,6 +137,28 @@ List adapter options use `{ page, pageSize, sortBy, sortOrder, filters }` and ar
 - `createLead(input: LeadCreateInput): Promise<Lead>`
 - `updateLead(id: string, input: LeadUpdateInput): Promise<Lead>`
 - `deleteLead(id: string): Promise<Lead>`
+- `getRoutingDecisionForLead(leadId: string): Promise<RoutingDecision | null>`
+- Object adapter: `crmClient.leads.getRoutingDecision(id): Promise<RoutingDecision | null>`
+
+`RoutingDecision` is exported from `lib/services/leads.ts` and re-exported by `lib/crm/crmClient.ts`:
+
+```
+type RoutingDecision = {
+  leadId: string;
+  normalizedPostal: string;
+  prefix: string;
+  matchedAreaId: string | null;
+  matchedAreaName: string | null;
+  candidateOrders: Array<{ id: string; dealerName: string; paceGap: number; rank: number }>;
+  selectedOrderId: string | null;
+  decidedAt: Date;
+  reason: string;
+  summary: string;
+  steps: Array<{ step: string; result: RoutingDecisionJson }>;
+};
+```
+
+The getter reads the latest existing `routing_event` Activity for the lead and does not re-run routing. Legacy human-readable routing summaries are surfaced through `reason`, `summary`, and a single `legacy_summary` step.
 
 ### Activity
 - `listActivities(opts?: ActivityListOptions): Promise<Activity[]>`

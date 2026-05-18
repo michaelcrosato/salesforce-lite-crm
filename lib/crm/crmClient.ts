@@ -49,6 +49,10 @@ import {
   updateTask as updateTaskService
 } from "@/lib/services/tasks";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
+import {
+  getRoutingDecisionForLead as getRoutingDecisionForLeadService,
+  type RoutingDecision
+} from "@/lib/services/leads";
 import type { TaskListInput as TaskServiceListInput } from "@/lib/services/tasks";
 import {
   accountCreateSchema,
@@ -161,6 +165,7 @@ export type CaseCreateInput = z.input<typeof caseCreateSchema>;
 export type CaseUpdateInput = z.input<typeof caseUpdateSchema>;
 export type CampaignCreateInput = z.input<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.input<typeof campaignUpdateSchema>;
+export type { RoutingDecision } from "@/lib/services/leads";
 
 function parseId(id: string): string {
   return idSchema.parse(id);
@@ -497,6 +502,12 @@ export async function deleteLead(id: string): Promise<Lead> {
   return prisma.lead.delete({ where: { id: parseId(id) } });
 }
 
+export async function getRoutingDecisionForLead(
+  leadId: string
+): Promise<RoutingDecision | null> {
+  return getRoutingDecisionForLeadService(leadId);
+}
+
 export async function listActivities(opts: ActivityListOptions = {}): Promise<Activity[]> {
   return prisma.activity.findMany(activityListQuery(opts));
 }
@@ -693,3 +704,14 @@ export async function completeCampaign(id: string): Promise<Campaign> {
 export async function deleteCampaign(id: string): Promise<Campaign> {
   return deleteCampaignService(id);
 }
+
+export const crmClient = {
+  leads: {
+    list: listLeads,
+    get: getLead,
+    create: createLead,
+    update: updateLead,
+    delete: deleteLead,
+    getRoutingDecision: getRoutingDecisionForLead
+  }
+} as const;
