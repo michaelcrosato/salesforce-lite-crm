@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json",
+  "tools": {
+    "allowed": [
+      "run_shell_command(npm install)",
+      "run_shell_command(npm run)",
+      "run_shell_command(npx prisma)",
+      "run_shell_command(npx playwright)",
+      "run_shell_command(git add)",
+      "run_shell_command(git commit)",
+      "run_shell_command(git push)",
+      "run_shell_command(git checkout)",
+      "run_shell_command(git status)",
+      "run_shell_command(git log)",
+      "run_shell_command(git diff)",
+      "run_shell_command(git fetch)",
+      "run_shell_command(git pull)",
+      "run_shell_command(git merge)",
+      "run_shell_command(git rev-parse)",
+      "run_shell_command(git archive)"
+    ]
+  }
+}

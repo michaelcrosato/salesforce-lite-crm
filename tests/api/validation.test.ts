@@ -133,4 +133,32 @@ describe("CRM validation schemas", () => {
   it.each(invalidCases)("rejects invalid $entity input", ({ input, schema }) => {
     expect(schema.safeParse(input).success).toBe(false);
   });
+
+  it("rejects blank required integer fields instead of coercing them to zero", () => {
+    expect(
+      accountCreateSchema.safeParse({
+        name: "Blank Health",
+        status: "active",
+        healthScore: ""
+      }).success
+    ).toBe(false);
+    expect(
+      opportunityCreateSchema.safeParse({
+        name: "Blank Value",
+        stage: "new",
+        value: "",
+        probability: 10
+      }).success
+    ).toBe(false);
+  });
+
+  it("treats a blank optional campaign budget as absent", () => {
+    const parsed = campaignCreateSchema.safeParse({
+      name: "Optional Budget",
+      budget: ""
+    });
+
+    expect(parsed.success).toBe(true);
+    expect(parsed.success ? parsed.data.budget : "parse failed").toBeUndefined();
+  });
 });

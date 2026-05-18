@@ -433,8 +433,42 @@ export async function createOpportunity(input: OpportunityCreateInput): Promise<
 }
 
 export async function updateOpportunity(id: string, input: OpportunityUpdateInput): Promise<Opportunity> {
-  const data: Prisma.DealUncheckedUpdateInput = opportunityUpdateSchema.parse(input);
-  return prisma.deal.update({ where: { id: parseId(id) }, data });
+  const opportunityId = parseId(id);
+  const parsed = opportunityUpdateSchema.parse(input);
+  const data: Prisma.DealUncheckedUpdateInput = parsed;
+
+  const nextStage = parsed.stage;
+
+  if (!nextStage) {
+    return prisma.deal.update({ where: { id: opportunityId }, data });
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.deal.findUnique({
+      where: {
+        id: opportunityId
+      }
+    });
+    const updated = await tx.deal.update({
+      where: {
+        id: opportunityId
+      },
+      data
+    });
+
+    if (existing && existing.stage !== nextStage) {
+      await tx.opportunityStageHistory.create({
+        data: {
+          dealId: opportunityId,
+          fromStage: existing.stage,
+          toStage: nextStage,
+          changedByUserId: parsed.ownerId ?? existing.ownerId
+        }
+      });
+    }
+
+    return updated;
+  });
 }
 
 export async function deleteOpportunity(id: string): Promise<Opportunity> {
