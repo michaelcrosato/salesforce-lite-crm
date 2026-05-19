@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/lib/action-result";
 import { ASSIGNMENT_REASON_LABELS, type AssignmentReason } from "@/lib/crm-constants";
@@ -16,6 +17,13 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
+}
+
+function prismaErrorMessage(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    return "A record with that unique value already exists.";
+  }
+  return "The lead could not be saved.";
 }
 
 export async function createLeadAction(formData: FormData): Promise<ActionResult> {
@@ -42,18 +50,26 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
     };
   }
 
-  const lead = await prisma.lead.create({
-    data: {
-      firstName: parsed.data.firstName,
-      lastName: parsed.data.lastName,
-      phone: parsed.data.phone,
-      email: parsed.data.email,
-      postalCode: parsed.data.postalCode,
-      province: parsed.data.province,
-      source: parsed.data.source,
-      status: "new"
-    }
-  });
+  let lead;
+  try {
+    lead = await prisma.lead.create({
+      data: {
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        phone: parsed.data.phone,
+        email: parsed.data.email,
+        postalCode: parsed.data.postalCode,
+        province: parsed.data.province,
+        source: parsed.data.source,
+        status: "new"
+      }
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      message: prismaErrorMessage(error)
+    };
+  }
 
   const routeResult = await routeLead(lead.id);
   revalidateDealerOpsPaths();
@@ -84,14 +100,21 @@ export async function updateLeadStatusAction(input: {
     };
   }
 
-  await prisma.lead.update({
-    where: {
-      id: parsed.data.leadId
-    },
-    data: {
-      status: parsed.data.status
-    }
-  });
+  try {
+    await prisma.lead.update({
+      where: {
+        id: parsed.data.leadId
+      },
+      data: {
+        status: parsed.data.status
+      }
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      message: prismaErrorMessage(error)
+    };
+  }
 
   revalidateDealerOpsPaths();
   revalidatePath(`/leads/${parsed.data.leadId}`);
