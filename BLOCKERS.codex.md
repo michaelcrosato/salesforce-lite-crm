@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: S4-F1 - Demo seed tuning
+Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T02:23:31-07:00
+Timestamp: 2026-05-19T06:45:08-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,6 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active blockers. Continuous Mode stopped because the Codex-owned Sprint 4 work is already done and no further safe Codex-owned queued work remains in `PLAN.md` Section 4.
+- No active blockers.
+- Cross-zone exception documented: `scripts/clean-local-artifacts.ps1` is Gemini-owned, but the current prompt granted repo-wide improvement authority and the dry run proved `-Apply` could remove the tracked `.claude` safety-hook directory. The fix was narrow and full local gate passed.
+- Resumed from prior autonomy stop state by committing the already-present `AUTONOMY.STOP` deletion; the removed marker instructed deletion once dispatch resumed.

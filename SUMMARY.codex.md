@@ -2,37 +2,36 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: S4-F1 - Demo seed tuning
+Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: none
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T02:23:31-07:00
+Timestamp: 2026-05-19T06:45:08-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the Codex LOOP pre-flight against the registered Codex worktree `C:\dev\salesforce-lite-crm` after confirming `C:\dev\salesforce-lite-crm-codex` is not the repo worktree.
-- Confirmed `STOP` is absent and `next-env.d.ts` is neither tracked nor staged before edits.
-- Verified required baseline commands passed this prompt: `npm install`, `.env` presence check, `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run test` (140/140 pass), and `npm run build`.
-- Reconciled current state: `PLAN.md` still lists S4-F1 as queued, while this branch's S4-F1 implementation and prior full required gate are already complete.
-- Left the pre-existing dirty deletion of `AUTONOMY.STOP` unstaged because it was present before this prompt and is outside S4-F1 implementation/report scope.
-- Reached the Continuous Mode stop condition for Codex: no further safe Codex-owned queued work remains in `PLAN.md` Section 4.
+- Loaded repo-local canon from the registered Codex worktree after confirming `C:\dev\salesforce-lite-crm-codex` is not a git repository and contains only generated `.next` output.
+- Ran drift scans for forbidden live `/deals/[id]` behavior, B2B lead conversion language, and false lint/typecheck/format claims; findings were expected contract/documentation references or placeholder-only route coverage.
+- Verified the baseline and final state with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`: `npm install`, Prisma generate/db push, seed, 140/140 Vitest tests, build, Playwright Chromium install, and 19/19 e2e tests all passed.
+- Cross-zone exception: updated Gemini-owned `scripts/clean-local-artifacts.ps1` because the current prompt authorized repo-wide safety work and the script's dry run showed `.claude` as a deletion candidate; the script now preserves tracked `.claude` hook/config files and only offers ignored `.claude/logs` files.
+- Cleared the stale tracked `AUTONOMY.STOP` marker because its contents instructed deletion once dispatch resumed, and this run resumed repo work outside the prior sandbox stop condition.
 
 ### Next action
 
-Idle / awaiting branch review, merge planning, or a new Codex-owned PLAN scope.
+Continue current-prompt repo hygiene by selecting the next safe, contract-preserving improvement with local-gate verification.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES
+No cross-ownership edits: NO  (current prompt authorized the narrow script safety exception; see BLOCKERS)
 
-CRM-CONTRACT.md honored: YES
+CRM-CONTRACT.md honored:  YES
