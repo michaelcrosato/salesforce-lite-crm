@@ -88,7 +88,7 @@ export function AddNoteForm({
             ) : null}
           </div>
           <div className="flex items-center justify-end gap-3">
-            <Button type="submit" disabled={isPending} data-testid="contact-note-submit">
+            <Button type="submit" loading={isPending} data-testid="contact-note-submit">
               {isPending ? "Summarizing..." : "Save note"}
             </Button>
           </div>
