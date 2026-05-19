@@ -5,7 +5,10 @@ import { CommandPalette } from "@/components/command-palette";
 import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
-  title: "Salesforce Lite CRM",
+  title: {
+    default: "Salesforce Lite CRM",
+    template: "%s | Salesforce Lite CRM"
+  },
   description:
     "Salesforce-style CRM application foundation for small business revenue operations."
 };
