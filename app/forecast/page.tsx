@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -211,48 +212,57 @@ export default async function ForecastPage({
           <CardTitle>Order Projection</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[980px] text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs uppercase text-muted-foreground">
-                  <th className="py-3 pr-4 font-medium">Dealer</th>
-                  <th className="py-3 pr-4 font-medium">Order</th>
-                  <th className="py-3 pr-4 font-medium">Areas</th>
-                  <th className="py-3 pr-4 font-medium">Current</th>
-                  <th className="py-3 pr-4 font-medium">Quota</th>
-                  <th className="py-3 pr-4 font-medium">Projected</th>
-                  <th className="py-3 pr-4 font-medium">Needed</th>
-                  <th className="py-3 pr-4 font-medium">Risk</th>
-                </tr>
-              </thead>
-              <tbody>
-                {forecast.rows.map((row) => (
-                  <tr key={row.orderId} className="border-b last:border-0">
-                    <td className="py-3 pr-4">
-                      <Link href={`/accounts/${row.accountId}`} className="text-primary hover:underline">
-                        {row.accountName}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4 font-medium">
-                      <Link href={`/orders/${row.orderId}`} className="text-primary hover:underline">
-                        {row.orderName}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4">{row.areas.join(", ")}</td>
-                    <td className="py-3 pr-4">{formatNumber(row.currentDelivered)}</td>
-                    <td className="py-3 pr-4">{formatNumber(row.monthlyQuota)}</td>
-                    <td className="py-3 pr-4" data-forecast-projected={row.orderId}>
-                      {formatNumber(row.projectedDelivered)}
-                    </td>
-                    <td className="py-3 pr-4">{formatNumber(row.additionalLeadsNeeded)}</td>
-                    <td className="py-3 pr-4">
-                      <RiskBadge risk={row.risk} />
-                    </td>
+          {forecast.rows.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-3 pr-4 font-medium">Dealer</th>
+                    <th className="py-3 pr-4 font-medium">Order</th>
+                    <th className="py-3 pr-4 font-medium">Areas</th>
+                    <th className="py-3 pr-4 font-medium">Current</th>
+                    <th className="py-3 pr-4 font-medium">Quota</th>
+                    <th className="py-3 pr-4 font-medium">Projected</th>
+                    <th className="py-3 pr-4 font-medium">Needed</th>
+                    <th className="py-3 pr-4 font-medium">Risk</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {forecast.rows.map((row) => (
+                    <tr key={row.orderId} className="border-b last:border-0">
+                      <td className="py-3 pr-4">
+                        <Link href={`/accounts/${row.accountId}`} className="text-primary hover:underline">
+                          {row.accountName}
+                        </Link>
+                      </td>
+                      <td className="py-3 pr-4 font-medium">
+                        <Link href={`/orders/${row.orderId}`} className="text-primary hover:underline">
+                          {row.orderName}
+                        </Link>
+                      </td>
+                      <td className="py-3 pr-4">{row.areas.join(", ")}</td>
+                      <td className="py-3 pr-4">{formatNumber(row.currentDelivered)}</td>
+                      <td className="py-3 pr-4">{formatNumber(row.monthlyQuota)}</td>
+                      <td className="py-3 pr-4" data-forecast-projected={row.orderId}>
+                        {formatNumber(row.projectedDelivered)}
+                      </td>
+                      <td className="py-3 pr-4">{formatNumber(row.additionalLeadsNeeded)}</td>
+                      <td className="py-3 pr-4">
+                        <RiskBadge risk={row.risk} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState
+              title="No active dealer orders"
+              description="The forecast projects against active dealer orders. Activate or seed orders to populate this view."
+              actionHref="/orders"
+              actionLabel="Open orders"
+            />
+          )}
         </CardContent>
       </Card>
 
