@@ -8,28 +8,27 @@ Branch: codex/r8-r9-managed-autonomy-bootstrap
 
 Status: done
 
-Commits this prompt: 9fe8dc4 - [codex] SLC-AUTONOMY-R5: add continuous autonomy mode
+Commits this prompt: 6ac35ee - Stop tracking generated Next env file; 6c991ea - [codex] SLC-AUTONOMY-R5: refresh autonomy docs
 
-Gate status: PASS
+Gate status: NOT RUN
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-18T20:38:41.8051994-07:00
+Timestamp: 2026-05-18T21:01:43.1256177-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added the `PLAN.md` Continuous document-control flag, the 6A Continuous / Unattended Mode override, and set `Continuous` to `ON` after the local gate passed.
-- Replaced the AGENTS maximum-YOLO policy with the requested Default/Continuous distinction and appended the continuous chaining rule to `.cursor/rules/max-yolo.mdc`.
-- Created `prompts/manager/continuous.md` and ran the requested manager audit; only the new continuous prompt matched the audit terms.
-- Updated `.claude/settings.json` with `permissions.defaultMode: acceptEdits` and narrow helper allow entries while preserving existing hooks and scoped permissions.
-- Created `scripts/autonomy-loop.ps1` and added the optional `npm run autonomy:overnight` package script.
-- Full local gate passed: `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 after npm install, Prisma generate/db push, seed, 22 Vitest files / 140 tests, Next build, Chromium install, and 19 Playwright tests.
+- Recorded the `next-env.d.ts` policy fix from `6ac35ee`, which removed the generated file from tracking and added it to `.gitignore`.
+- Clarified `PLAN.md` section 5 so `next-env.d.ts` is intentionally untracked/ignored and any tracked or staged reappearance is a dependency blocker.
+- Updated `README.md` and `docs/LOCAL-GATE.md` script listings to include `autonomy:overnight`.
+- Verified local generated-file policy state before edits: `git status --short` was empty, `git ls-files next-env.d.ts` returned nothing, and `git check-ignore -v next-env.d.ts` pointed to `.gitignore`.
+- Ran docs-only checks for this refresh: `git diff --check` exited 0. Full local gate was not rerun after these docs/report updates.
 
 ### Next action
 
-Launch continuous mode with `claude --permission-mode acceptEdits -p prompts/manager/continuous.md` or `powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1` after deciding how to handle the pre-existing `next-env.d.ts` generated-file dirty state.
+Continue with continuous/autonomy launch only after reports are refreshed and worktree remains clean.
 
 ### Scope confirmation
 
