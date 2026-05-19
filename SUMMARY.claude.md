@@ -1,70 +1,53 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — action error-handling parity + dashboard description
+Feature: S4-F2 route visual QA — back-to-list nav on form pages + global 404 tab title
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 45a5398 — [claude] S4-F2: broaden dashboard description to cover analyst and dealer ops surfaces; aed2ea2 — [claude] S4-F2: add Prisma error handling to account create/update actions; b382f36 — [claude] S4-F2: add Prisma error handling to deal create/update/move actions; 8be5bd7 — [claude] S4-F2: add Prisma error handling to lead create/status actions
+Commits this prompt: 6963f5f — [claude] S4-F2: add back-to-list nav button on entity creation pages; 501c6be — [claude] S4-F2: set tab title on global not-found page
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:16:30-08:00
+Timestamp: 2026-05-19T07:24:30-08:00
 
 ### Completed this prompt
 
-- `/dashboard` `PageHeader` description previously read "A live view
-  of accounts, contacts, pipeline, and sales follow-up." which
-  undersold the page (it shows Analyst Panel + Dealer Ops + Today's
-  Focus in addition to the basic CRUD KPIs). Broadened to "Pipeline
-  health, dealer routing, deterministic analyst actions, and today's
-  focus." This mirrors the actual visible cards/section titles on the
-  page (Analyst Panel, Dealer Ops Focus, Today's Focus, Pipeline by
-  Stage chart) and uses noun-phrase form consistent with peer list
-  pages.
-- Added `Prisma.PrismaClientKnownRequestError` try/catch wrapping to
-  the three server-action files that lacked it, matching the
-  established pattern already present in `app/contacts/actions.ts`,
-  `app/tasks/actions.ts`, `app/cases/actions.ts`, and
-  `app/campaigns/actions.ts`:
-  - `app/accounts/actions.ts` — `createAccountAction`,
-    `updateAccountAction`
-  - `app/deals/actions.ts` — `createDealAction`, `updateDealAction`,
-    `moveDealAction` (the `$transaction` block is wrapped)
-  - `app/leads/actions.ts` — `createLeadAction` (lead.create call;
-    `routeLead` continues to run after, see note), `updateLeadStatusAction`
-- Each file gained a local `prismaErrorMessage(error: unknown)`
-  helper that maps `P2002` unique-constraint failures to "A record
-  with that unique value already exists." and falls back to an
-  entity-specific generic ("The account/deal/lead could not be
-  saved.") for any other Prisma error. This mirrors the contacts
-  pattern exactly except for the entity-name suffix in the generic
-  message.
-- Happy-path behavior is unchanged: each action still returns
-  `{ ok: true, message }` on success and runs the existing
-  `revalidatePath()` calls. Only the previously-uncaught Prisma
-  error path now resolves to an `ActionResult` instead of an
-  unhandled exception bubble; this matches what the form components
-  already expect (since they handle `ok: false` toasts for the four
-  entities that already had error handling).
-- Note on `createLeadAction`: I kept `routeLead` outside the try/catch
-  so that routing failures continue to fall through to the existing
-  `Lead created but not routed: <reason>` branch rather than being
-  remapped to a generic save-failure message. The original code's
-  semantics for routing-step errors are preserved.
+- Added a `<Button asChild variant="outline">` "Back to <entity>" link
+  to each `/<entity>/new` `PageHeader` children slot. Previously, users
+  who reached a `/new` page (via the sidebar or a list-page CTA) had no
+  in-page way back to the list — they had to use the sidebar or
+  browser back. Now every entity creation page has an explicit escape
+  hatch in the page header, matching the "Back to All Reports" pattern
+  already in `app/reports/[slug]/page.tsx`.
+  - `/accounts/new` → "Back to accounts" → `/accounts`
+  - `/deals/new` → "Back to deals" → `/deals`
+  - `/tasks/new` → "Back to tasks" → `/tasks`
+  - `/cases/new` → "Back to cases" → `/cases`
+  - `/campaigns/new` → "Back to campaigns" → `/campaigns`
+- Added `export const metadata = { title: "Page not found" }` to
+  `app/not-found.tsx`. The root 404 is reached two ways: (a) a detail
+  page calls `notFound()` after its `generateMetadata` already ran
+  (those cases set their own "Account not found", "Contact not
+  found", etc. titles); (b) the user types an unmatched URL like
+  `/banana`, in which case no page-level metadata fires and the tab
+  would otherwise fall back to the layout default
+  `"Salesforce Lite CRM"`. With this addition, case (b) shows
+  `"Page not found | Salesforce Lite CRM"` so the browser tab still
+  disambiguates 404s from successful pages.
+- Each `/new` page also gained two imports (`Link` from `next/link`,
+  `Button` from `@/components/ui/button`) where missing. The
+  `not-found.tsx` gained one import (`Metadata` from `next`).
+- No business logic, schema, route, or contract changes. No new
+  dependencies, no test changes, no cross-zone edits.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; no new dependencies, no
-  TypeScript regressions; `Prisma` namespace import resolves
-  cleanly).
-- `npm run test`  → 162 passed / 162 total (Vitest, 25 files). No
-  test consumed the previously-uncaught error path, so adding the
-  catch does not change any existing test assertion.
+- `npm run build` → SUCCESS (32 routes; no TypeScript regressions).
+- `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
 - `git status --short` clean before each implementation commit
   aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
-Implementation commits on this branch since `cc00d6c` (20 total
-including this prompt):
+Implementation commits on this branch since `cc00d6c` (22 total):
 
 | SHA | Subject |
 |---|---|
@@ -87,25 +70,34 @@ including this prompt):
 | `aed2ea2` | Prisma error handling on account actions |
 | `b382f36` | Prisma error handling on deal actions |
 | `8be5bd7` | Prisma error handling on lead actions |
+| `6963f5f` | back-to-list nav button on entity creation pages |
+| `501c6be` | set tab title on global not-found page |
 
-Nine categories of polish:
+Plus pre-session `81f438f`, `9b98e72`, `d51d817` make 25 Claude-zone
+S4-F2 commits on this branch.
+
+Ten categories of polish:
 1. metadata + product framing alignment
-2. copy precision on form/empty/header surfaces
+2. copy precision (form/empty/header surfaces)
 3. perceived-perf parity (loading skeletons)
-4. graceful 404 boundary
+4. graceful 404 boundary (now with disambiguating tab title)
 5. interactive filter parity
-6. internal documentation clarity
-7. complete browser tab title coverage
-8. **NEW** server-action error-handling parity across all entities
-9. plus prior testid/header/case work from earlier prompts.
+6. internal documentation clarity (forecast formula)
+7. complete browser tab title coverage (every reachable URL)
+8. server-action error-handling parity (all 7 entity actions)
+9. **NEW** explicit back-to-list nav on /new pages
+10. plus prior testid/header/case work from earlier prompts.
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued`; the local gate
-has been green for every commit. The visual QA sweep is materially
-complete for the Claude-owned surface and now extends into
-server-action reliability parity. The next sprint rollover prompt
-should consider promoting S4-F2 to `done`.
+PLAN.md §4 still lists S4-F2 with `Status: queued`. Gemini's branch
+(`gemini/autonomy`) has a commit `9560bc6` titled
+"[gemini] repo-readiness: mark Sprint 4 features done in PLAN.md"
+that would promote all Sprint 4 features to `done` once merged. Per
+PLAN.md §2 the local gate is authoritative and that gate has been
+green for every commit on this branch; the visual QA sweep is
+complete for the Claude-owned surface across all coverage
+categories listed above.
 
 ### Outstanding cross-agent dependency
 
@@ -115,18 +107,17 @@ zone; no action from Claude this prompt.
 
 ### Next action
 
-S4-F2 is materially complete on the Claude-owned surface across
-both visual coherence (metadata, copy, skeletons, 404, filter Apply
-button) and code-quality parity (server-action error handling).
-Best next move: re-read other agents' SUMMARY/BLOCKERS for any new
-S4-F2 ask before continuing to micro-polish.
+S4-F2 is comprehensively complete for the Claude-owned surface
+across visual coherence, copy accuracy, perceived performance,
+error resilience, and navigation affordances. Best next move: stand
+by for SPRINT-ROLLOVER prompt to promote S4-F2 to `done` and queue
+the next Claude-owned feature, or for the operator to coordinate a
+merge of this branch + Gemini's PLAN.md update.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all four edited files live in
+No cross-ownership edits: YES (all six edited files live in
 `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — server actions still return the same
-`ActionResult` shape on every code path; the catch block adds
-graceful error mapping for paths that previously bubbled
-uncaught).
+signature changes — every edit is a UI affordance or Next.js
+metadata API usage within Claude's zone).
