@@ -1,54 +1,41 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — detail-page loading skeletons + contacts description term cleanup
+Feature: S4-F2 route visual QA — custom 404 page
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 07a19cb — [claude] S4-F2: add loading skeletons for account/contact/report detail pages; 642ed78 — [claude] S4-F2: drop stakeholders term from /contacts description
+Commits this prompt: 0fba7d3 — [claude] S4-F2: add custom 404 page with dashboard and accounts links
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T06:49:30-08:00
+Timestamp: 2026-05-19T06:52:30-08:00
 
 ### Completed this prompt
 
-- Added three previously missing detail-page `loading.tsx` files. The
-  prior `app/**` inventory had `loading.tsx` parity on every list
-  route and on `/leads/[id]`, `/orders/[id]`, but the three remaining
-  Prisma-backed detail surfaces (`/accounts/[id]`, `/contacts/[id]`,
-  `/reports/[slug]`) shipped no skeleton, so cold navigations showed a
-  blank `crm-page` until the server query resolved.
-  - `app/accounts/[id]/loading.tsx` — header + summary card + two-up
-    grid + activity card, matching `/accounts/[id]/page.tsx` layout
-    (PageHeader, Account Summary, Related Contacts + Related Deals
-    grid, Recent Activities).
-  - `app/contacts/[id]/loading.tsx` — header + two-column
-    `[1fr_360px]` grid with three skeleton cards on the left and two
-    on the right, matching `/contacts/[id]/page.tsx` layout (Contact
-    Summary, Related Deals, Activity Timeline | Edit form, Add note
-    form).
-  - `app/reports/[slug]/loading.tsx` — header with right-aligned "All
-    reports" button placeholder + a single tall table-card skeleton,
-    matching `/reports/[slug]/page.tsx` layout.
-  - All three follow the inline `animate-pulse rounded-md bg-muted`
-    style used by the existing `/leads/[id]/loading.tsx` and
-    `/orders/[id]/loading.tsx` skeletons, so detail-route loadings
-    now use the same visual treatment across the app.
-- Fixed `/contacts` list page description: "Search contacts, create
-  new stakeholders, and open detail timelines." → "Search contacts,
-  create new ones, and open detail timelines." The prior phrasing
-  switched register mid-list ("stakeholders" is used elsewhere only
-  inside `/accounts/[id]` description), making the action verb's
-  object ambiguous on the canonical Contacts surface.
-- All edits live in `app/**`. No new dependencies, no test changes,
-  no schema or contract changes. Loading-skeleton files use only
-  primitive `<div>` with Tailwind classes — they import nothing.
+- Added `app/not-found.tsx` so the global 404 surface renders inside
+  the AppShell + ToastProvider layout instead of falling back to the
+  Next.js default unstyled "This page could not be found." page.
+- Five Claude-owned detail pages call `notFound()` directly:
+  `app/accounts/[id]/page.tsx`, `app/contacts/[id]/page.tsx`,
+  `app/leads/[id]/page.tsx`, `app/orders/[id]/page.tsx`, and
+  `app/reports/[slug]/page.tsx`. All five now resolve to the new
+  custom 404 instead of the bare default, so bad-ID navigations stay
+  visually inside the CRM shell with sidebar nav intact.
+- The new page mirrors `app/error.tsx`: `crm-page` class, semantic
+  `<h1>` + muted description paragraph, then a two-button action row
+  ("Return to dashboard", "Browse accounts") using the existing
+  `Button asChild` pattern with `Link`. Adds three `data-testid`
+  hooks (`page-not-found`, `page-not-found-dashboard`,
+  `page-not-found-accounts`) for future Gemini E2E coverage; pattern
+  matches `app/error.tsx` test-id conventions.
+- No new dependencies. No business logic, schema, route, or contract
+  change. No cross-zone edits.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; new loading.tsx files compile
-  cleanly and do not introduce new dynamic segments).
+- `npm run build` → SUCCESS (32 routes; the existing `_not-found`
+  build target now picks up the custom page).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before each implementation commit aside
-  from the carry-forward `tsconfig.tsbuildinfo` artifact.
+- `git status --short` clean before commit aside from the
+  carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
@@ -62,21 +49,42 @@ Implementation commits on this branch since `cc00d6c`:
 | `2b7f8da` | reframe orders/areas empty-state copy as deferred not demo |
 | `07a19cb` | add loading skeletons for account/contact/report detail pages |
 | `642ed78` | drop stakeholders term from /contacts description |
+| `0fba7d3` | add custom 404 page with dashboard and accounts links |
 
-The branch now extends the original S4-F2 sweep (`81f438f`,
-`9b98e72`, `d51d817`) with three categories of polish:
+The branch now adds four categories of visual QA polish on top of the
+prior S4-F2 sweep (`81f438f`, `9b98e72`, `d51d817`):
 1. metadata + product framing alignment (e0f138c, 2b7f8da)
 2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78)
 3. perceived-perf parity for detail routes (07a19cb)
+4. graceful 404 boundary (0fba7d3)
+
+### Audit observations (no fix this prompt)
+
+- List-page `loading.tsx` files split between two visual styles: the
+  `<Skeleton />` component (10 files: accounts, activities, campaigns,
+  cases, contacts, dashboard, deals, reports, tasks, root) and inline
+  `animate-pulse div` (4 files: areas, forecast, leads, orders). Both
+  render the same Tailwind classes under the hood, so this is pure
+  refactoring with zero behavior change. Deferred — bikeshed risk.
+- Page-header descriptions mix imperative-verb form ("Drag cards
+  across stages...", "Search contacts...", "Create postal-code
+  leads...") with noun-phrase form ("A live view of...", "Recent
+  notes, calls...", "Postal prefix coverage..."). Both are valid copy
+  styles. No clear win to unify.
+- Per-segment `error.tsx` boundaries do not exist; the root
+  `app/error.tsx` handles every server-render failure. Adding
+  per-segment boundaries would isolate failures but is debatable for
+  a single-tenant CRM foundation. Deferred.
 
 ### Reconciliation note
 
 PLAN.md §4 still lists S4-F2 with `Status: queued` while Claude has
-landed ten S4-F2 implementation commits across recent iterations. Per
-PLAN.md §2 the local gate is authoritative; the visual QA sweep is
-materially complete on demo-critical routes and is extending into
-non-demo-critical copy and perceived-perf surfaces. No PLAN.md §4
-edit attempted from this prompt — the planning zone is shared.
+landed eleven S4-F2 implementation commits across recent iterations.
+Per PLAN.md §2 the local gate is authoritative; the visual QA sweep
+is materially complete on demo-critical routes and is extending into
+non-demo-critical copy, perceived-perf, and error-boundary surfaces.
+No PLAN.md §4 edit attempted from this prompt — the planning zone is
+shared.
 
 ### Outstanding cross-agent dependency
 
@@ -89,21 +97,18 @@ Claude this prompt.
 
 ### Next action
 
-Continue the S4-F2 sweep into:
-- list-page `loading.tsx` skeleton parity — some list loadings use the
-  `Skeleton` component, others use inline `animate-pulse` div. The
-  `Skeleton` style is fine but the existing `accounts/loading.tsx` is
-  notably sparser than peer pages (just a header + one body
-  rectangle). A consistency pass would balance them without changing
-  behavior.
-- Review `app/error.tsx` and per-route error boundaries for parity.
-  Confirm there is no per-segment `error.tsx` mismatch that swallows
-  data-loading failures on detail pages.
+Continue the S4-F2 sweep into the remaining list-page action button
+copy and link patterns. Specifically: `/deals/page.tsx` "Create a
+deal to start the pipeline board." empty state vs the upper-right
+"New deal" button on the same page; and the `app/contacts/page.tsx`
+inline ContactForm-as-create-pattern that uses a `<details>` /
+header tab on other list pages but a plain inline form here. Then
+return to merge readiness review against PLAN.md §8 once S4-F2
+incremental wins exhaust.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all four edited/added files live in
-`app/**`).
+No cross-ownership edits: YES (single new file lives in `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — new loading.tsx files are non-functional UI
-placeholders; copy edit is pure text).
+signature changes — new not-found.tsx is a Next.js framework
+convention file in the Claude-owned `app/**` zone).
