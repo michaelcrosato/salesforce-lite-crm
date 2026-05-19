@@ -103,16 +103,11 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 
 | Feature | Owner | Status | Acceptance summary |
-
 |---|---|---|---|
-
-| S4-F1 — Demo seed tuning | Codex | queued | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
-
-| S4-F2 — Route visual QA | Claude | queued | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic. |
-
-| S4-F3 — Component polish | Grok | queued | Shared components used in the demo have stable spacing, readable empty states, deterministic ordering, and no broken links or orphaned actions. |
-
-| S4-F4 — Demo smoke and gate hardening | Gemini | queued | Tests/e2e support the README demo path. Local gate commands are documented accurately and failures are captured in `BLOCKERS.gemini.md`. Subject to §3 worktree availability. |
+| S4-F1 — Demo seed tuning | Codex | done | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
+| S4-F2 — Route visual QA | Claude | done | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic. |
+| S4-F3 — Component polish | Grok | done | Shared components used in the demo have stable spacing, readable empty states, deterministic ordering, and no broken links or orphaned actions. |
+| S4-F4 — Demo smoke and gate hardening | Gemini | done | Tests/e2e support the README demo path. Local gate commands are documented accurately and failures are captured in `BLOCKERS.gemini.md`. Subject to §3 worktree availability. |
 
 
 
