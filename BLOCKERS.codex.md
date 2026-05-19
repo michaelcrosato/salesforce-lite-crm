@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:04:10-07:00
+Timestamp: 2026-05-19T07:07:40-07:00
 
 Escalation required: NO
 
@@ -27,3 +27,4 @@ Escalation required: NO
 - E2E tooling exception documented: `e2e/visual-smoke.spec.ts` was updated under repo-hygiene scope to remove Playwright-induced hydration noise from visual screenshots; full local gate passed.
 - Coordination-doc exception updated: `AGENTS.md`, `docs/PROJECT-CONTROL.md`, `docs/WORKTREE-SETUP.md`, and `REVIEW.CODEX.md` were refreshed from live worktree/audit evidence under repo-hygiene scope.
 - Forecast hardening documented: `lib/business/forecast.ts` and `tests/forecast-analyst.test.ts` changed under Codex repo-hygiene scope; full local gate passed with 141 Vitest tests and 19 e2e tests.
+- CSV helper hardening documented: `lib/business/csv-import.ts` and `tests/helpers/csv-import.test.ts` changed under repo-hygiene scope; final full local gate passed with 142 Vitest tests and 19 e2e tests.
