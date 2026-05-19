@@ -1,45 +1,70 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — excluded-route metadata titles
+Feature: S4-F2 route visual QA — action error-handling parity + dashboard description
 Branch: claude/autonomy
 Status: active
-Commits this prompt: c175bbe — [claude] S4-F2: add metadata titles for excluded route placeholders
+Commits this prompt: 45a5398 — [claude] S4-F2: broaden dashboard description to cover analyst and dealer ops surfaces; aed2ea2 — [claude] S4-F2: add Prisma error handling to account create/update actions; b382f36 — [claude] S4-F2: add Prisma error handling to deal create/update/move actions; 8be5bd7 — [claude] S4-F2: add Prisma error handling to lead create/status actions
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:10:30-08:00
+Timestamp: 2026-05-19T07:16:30-08:00
 
 ### Completed this prompt
 
-- Added static `metadata: Metadata = { title: "<route> (Unavailable)" }`
-  exports to all seven Claude-owned excluded-route placeholder pages:
-  - `/deals/[id]` → "Deal Detail (Unavailable)"
-  - `/search` → "Search (Unavailable)"
-  - `/command-palette` → "Command Palette (Unavailable)"
-  - `/areas/new` → "New Area (Unavailable)"
-  - `/areas/[id]/edit` → "Edit Area (Unavailable)"
-  - `/orders/new` → "New Order (Unavailable)"
-  - `/orders/[id]/edit` → "Edit Order (Unavailable)"
-- These pages render the Grok-owned
-  `<ExcludedRoutePlaceholder route=... reason=... />` component
-  unchanged; the metadata addition is title-only. With this iter, the
-  per-page title coverage for all Claude-owned routes is complete —
-  every reachable Claude-owned URL now sets its own browser tab
-  title via the Iter 7 `title.template`.
-- Each excluded page gained one `import type { Metadata } from "next";`
-  line and a four-line metadata export block. No render output
-  changed.
+- `/dashboard` `PageHeader` description previously read "A live view
+  of accounts, contacts, pipeline, and sales follow-up." which
+  undersold the page (it shows Analyst Panel + Dealer Ops + Today's
+  Focus in addition to the basic CRUD KPIs). Broadened to "Pipeline
+  health, dealer routing, deterministic analyst actions, and today's
+  focus." This mirrors the actual visible cards/section titles on the
+  page (Analyst Panel, Dealer Ops Focus, Today's Focus, Pipeline by
+  Stage chart) and uses noun-phrase form consistent with peer list
+  pages.
+- Added `Prisma.PrismaClientKnownRequestError` try/catch wrapping to
+  the three server-action files that lacked it, matching the
+  established pattern already present in `app/contacts/actions.ts`,
+  `app/tasks/actions.ts`, `app/cases/actions.ts`, and
+  `app/campaigns/actions.ts`:
+  - `app/accounts/actions.ts` — `createAccountAction`,
+    `updateAccountAction`
+  - `app/deals/actions.ts` — `createDealAction`, `updateDealAction`,
+    `moveDealAction` (the `$transaction` block is wrapped)
+  - `app/leads/actions.ts` — `createLeadAction` (lead.create call;
+    `routeLead` continues to run after, see note), `updateLeadStatusAction`
+- Each file gained a local `prismaErrorMessage(error: unknown)`
+  helper that maps `P2002` unique-constraint failures to "A record
+  with that unique value already exists." and falls back to an
+  entity-specific generic ("The account/deal/lead could not be
+  saved.") for any other Prisma error. This mirrors the contacts
+  pattern exactly except for the entity-name suffix in the generic
+  message.
+- Happy-path behavior is unchanged: each action still returns
+  `{ ok: true, message }` on success and runs the existing
+  `revalidatePath()` calls. Only the previously-uncaught Prisma
+  error path now resolves to an `ActionResult` instead of an
+  unhandled exception bubble; this matches what the form components
+  already expect (since they handle `ok: false` toasts for the four
+  entities that already had error handling).
+- Note on `createLeadAction`: I kept `routeLead` outside the try/catch
+  so that routing failures continue to fall through to the existing
+  `Lead created but not routed: <reason>` branch rather than being
+  remapped to a generic save-failure message. The original code's
+  semantics for routing-step errors are preserved.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; all excluded routes still
-  generate correctly).
-- `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before the implementation commit aside
-  from the carry-forward `tsconfig.tsbuildinfo` artifact.
+- `npm run build` → SUCCESS (32 routes; no new dependencies, no
+  TypeScript regressions; `Prisma` namespace import resolves
+  cleanly).
+- `npm run test`  → 162 passed / 162 total (Vitest, 25 files). No
+  test consumed the previously-uncaught error path, so adding the
+  catch does not change any existing test assertion.
+- `git status --short` clean before each implementation commit
+  aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
-Implementation commits on this branch since `cc00d6c` (19 total):
+Implementation commits on this branch since `cc00d6c` (20 total
+including this prompt):
 
 | SHA | Subject |
 |---|---|
@@ -58,50 +83,50 @@ Implementation commits on this branch since `cc00d6c` (19 total):
 | `0632bfd` | dynamic generateMetadata titles for detail pages |
 | `63d9ff9` | add metadata titles for entity creation pages |
 | `c175bbe` | add metadata titles for excluded route placeholders |
+| `45a5398` | broaden dashboard description |
+| `aed2ea2` | Prisma error handling on account actions |
+| `b382f36` | Prisma error handling on deal actions |
+| `8be5bd7` | Prisma error handling on lead actions |
 
-Plus the pre-session `81f438f`, `9b98e72`, `d51d817` work makes 18
-Claude-zone S4-F2 commits on this branch.
-
-Eight categories of polish, all gate-green:
-1. metadata + product framing alignment (e0f138c, 2b7f8da)
-2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78, a93f85a)
-3. perceived-perf parity for detail routes (07a19cb)
-4. graceful 404 boundary (0fba7d3)
-5. interactive filter parity across list pages (0a33253)
-6. internal documentation clarity (bd6468a)
-7. complete browser tab title coverage (2098a38, dba0fce, 0632bfd, 63d9ff9, c175bbe)
-8. plus prior testid/header/case work from earlier prompts.
+Nine categories of polish:
+1. metadata + product framing alignment
+2. copy precision on form/empty/header surfaces
+3. perceived-perf parity (loading skeletons)
+4. graceful 404 boundary
+5. interactive filter parity
+6. internal documentation clarity
+7. complete browser tab title coverage
+8. **NEW** server-action error-handling parity across all entities
+9. plus prior testid/header/case work from earlier prompts.
 
 ### Reconciliation note
 
 PLAN.md §4 still lists S4-F2 with `Status: queued`; the local gate
-has been green for every commit and the entire Claude-owned route
-surface has full per-page browser-tab title coverage. Per PLAN.md §2
-the local gate is authoritative.
+has been green for every commit. The visual QA sweep is materially
+complete for the Claude-owned surface and now extends into
+server-action reliability parity. The next sprint rollover prompt
+should consider promoting S4-F2 to `done`.
 
 ### Outstanding cross-agent dependency
 
 Gemini BLOCKERS #3 still tracks remaining `components/**`-side testids
-(`lead-form-submit`, `routing-detail-success`, `routing-detail-link`,
-`contact-note-input`, `contact-note-submit`,
-`activity-timeline-summary`) that gate un-skipping
-`e2e/demo-path.spec.ts`. Those live in Grok's zone; no action from
-Claude this prompt.
+that gate un-skipping `e2e/demo-path.spec.ts`. Those live in Grok's
+zone; no action from Claude this prompt.
 
 ### Next action
 
-S4-F2 is materially complete for the Claude-owned surface. Remaining
-incremental polish options exist (loading-skeleton style
-unification, post-create redirects on `/<entity>/new` actions) but
-each is either bikeshed risk or requires coordination. Best next
-action: re-read the merged-to-`main` history for S4-F2 expectations
-and either close S4-F2 with a SPRINT-ROLLOVER hand-off prompt, or
-pick up another sprint feature whose Owner column matches Claude.
+S4-F2 is materially complete on the Claude-owned surface across
+both visual coherence (metadata, copy, skeletons, 404, filter Apply
+button) and code-quality parity (server-action error handling).
+Best next move: re-read other agents' SUMMARY/BLOCKERS for any new
+S4-F2 ask before continuing to micro-polish.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all seven edited files live in
+No cross-ownership edits: YES (all four edited files live in
 `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — Next.js metadata additions only; render output
-of each placeholder page is unchanged).
+signature changes — server actions still return the same
+`ActionResult` shape on every code path; the catch block adds
+graceful error mapping for paths that previously bubbled
+uncaught).
