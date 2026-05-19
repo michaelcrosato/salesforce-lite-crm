@@ -863,7 +863,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-07 | Persistent forecast scenarios | Current simulator is transparent and non-persistent. Deferred. |
 
-| B-08 | Postgres cutover readiness | Make `lib/prisma.ts` swap-clean between SQLite and Postgres adapters; add a CI matrix for both. SQLite remains local-default unless the current prompt or config explicitly switches. |
+| B-08 | Postgres cutover readiness | Completed. `lib/prisma.ts` dynamically swaps adapters and a CI matrix tests both SQLite and Postgres. |
 
 | B-09 | External AI provider integration | Deterministic local summarizer/routing/analyst remains default. Deferred. |
 
