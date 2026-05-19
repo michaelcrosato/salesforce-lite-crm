@@ -52,6 +52,16 @@ describe("deal business logic", () => {
         now
       )
     ).toBe(false);
+    expect(
+      isStaleDeal(
+        {
+          stage: "proposal",
+          createdAt: "not-a-date",
+          lastActivityAt: null
+        },
+        now
+      )
+    ).toBe(false);
   });
 
   it("maps stages to default probabilities", () => {
@@ -182,6 +192,33 @@ describe("today focus ranking", () => {
       "/contacts/buyer-1"
     );
     expect(items).toHaveLength(4);
+  });
+
+  it("keeps malformed activity dates from poisoning focus scores", () => {
+    const items = rankTodaysFocus({
+      now: new Date("2026-05-16T12:00:00Z"),
+      deals: [],
+      accounts: [],
+      activities: [
+        {
+          id: "activity",
+          title: "Imported note",
+          type: "note",
+          nextStep: "Call the buyer.",
+          createdAt: "not-a-date",
+          contactName: "Buyer",
+          contactId: "buyer-1"
+        }
+      ]
+    });
+
+    expect(items).toEqual([
+      expect.objectContaining({
+        href: "/contacts/buyer-1",
+        score: 25,
+        title: "Call the buyer."
+      })
+    ]);
   });
 });
 

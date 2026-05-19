@@ -128,10 +128,7 @@ export function rankTodaysFocus(input: {
 
   for (const activity of input.activities) {
     if (activity.nextStep) {
-      const ageInDays = Math.max(
-        0,
-        Math.floor((now.getTime() - new Date(activity.createdAt).getTime()) / 86_400_000)
-      );
+      const ageInDays = ageInDaysSince(activity.createdAt, now);
 
       items.push({
         id: `activity-${activity.id}`,
@@ -157,4 +154,13 @@ export function rankTodaysFocus(input: {
   return items
     .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
     .slice(0, limit);
+}
+
+function ageInDaysSince(value: Date | string, now: Date) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor((now.getTime() - date.getTime()) / 86_400_000));
 }
