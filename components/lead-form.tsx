@@ -97,7 +97,7 @@ export function LeadForm() {
             <FieldError errors={errors?.source} />
           </div>
           <div className="flex justify-end md:col-span-2">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} data-testid="lead-form-submit">
               {isPending ? "Routing..." : "Create lead"}
             </Button>
           </div>
