@@ -24,3 +24,4 @@ agent-runs/
 status/
 
 next-env.d.ts
+*.tsbuildinfo
