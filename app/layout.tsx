@@ -10,7 +10,11 @@ export const metadata: Metadata = {
     template: "%s | Salesforce Lite CRM"
   },
   description:
-    "Salesforce-style CRM application foundation for small business revenue operations."
+    "Salesforce-style CRM application foundation for small business revenue operations.",
+  robots: {
+    index: false,
+    follow: false
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
