@@ -6,7 +6,8 @@ import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Salesforce Lite CRM",
-  description: "AI-native CRM proof of concept for daily sales workflows."
+  description:
+    "Salesforce-style CRM application foundation for small business revenue operations."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
