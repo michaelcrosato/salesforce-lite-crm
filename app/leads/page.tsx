@@ -18,6 +18,7 @@ import {
 } from "@/lib/crm-constants";
 import { formatDate } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
+import { allQueryParam } from "@/lib/queryParams";
 import { isLeadStatus } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -29,9 +30,9 @@ export default async function LeadsPage({
 }) {
   const params = await searchParams;
   const status = params.status && isLeadStatus(params.status) ? params.status : "all";
-  const areaId = params.area ?? "all";
-  const orderId = params.order ?? "all";
-  const source = params.source ?? "all";
+  const areaId = allQueryParam(params.area);
+  const orderId = allQueryParam(params.order);
+  const source = allQueryParam(params.source);
   const [leads, areas, orders, sources] = await Promise.all([
     prisma.lead.findMany({
       where: {

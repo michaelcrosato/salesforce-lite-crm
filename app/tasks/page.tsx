@@ -24,6 +24,7 @@ import {
   type TaskStatus
 } from "@/lib/crm/registry";
 import type { TaskListOptions } from "@/lib/crm/crmClient";
+import { dateQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
 
@@ -60,9 +61,9 @@ export default async function TasksPage({
 }) {
   const params = await searchParams;
   const statusFilter = isTaskStatus(params.status) ? params.status : undefined;
-  const ownerFilter = params.ownerId?.trim() ? params.ownerId : undefined;
-  const dueDateFrom = params.dueFrom?.trim() ? params.dueFrom : undefined;
-  const dueDateTo = params.dueTo?.trim() ? params.dueTo : undefined;
+  const ownerFilter = nonEmptyQueryParam(params.ownerId);
+  const dueDateFrom = dateQueryParam(params.dueFrom);
+  const dueDateTo = dateQueryParam(params.dueTo);
 
   const listOptions: TaskListOptions = {
     pageSize: 100,
@@ -212,7 +213,7 @@ export default async function TasksPage({
           <form action="/tasks" className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select id="status" name="status" defaultValue={statusFilter ?? ""}>
                 <option value="">All</option>
                 {TASK_STATUSES.map((status) => (
                   <option key={status} value={status}>
@@ -223,7 +224,7 @@ export default async function TasksPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ownerId">Owner</Label>
-              <Select id="ownerId" name="ownerId" defaultValue={params.ownerId ?? ""}>
+              <Select id="ownerId" name="ownerId" defaultValue={ownerFilter ?? ""}>
                 <option value="">Any owner</option>
                 {owners.map((owner) => (
                   <option key={owner.id} value={owner.id}>
@@ -234,11 +235,11 @@ export default async function TasksPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueFrom">Due from</Label>
-              <Input id="dueFrom" name="dueFrom" type="date" defaultValue={params.dueFrom ?? ""} />
+              <Input id="dueFrom" name="dueFrom" type="date" defaultValue={dueDateFrom ?? ""} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueTo">Due to</Label>
-              <Input id="dueTo" name="dueTo" type="date" defaultValue={params.dueTo ?? ""} />
+              <Input id="dueTo" name="dueTo" type="date" defaultValue={dueDateTo ?? ""} />
             </div>
             <div className="flex items-end gap-3 md:col-span-4">
               <Button type="submit">Apply filters</Button>

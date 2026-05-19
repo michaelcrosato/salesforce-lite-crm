@@ -23,6 +23,7 @@ import {
   CAMPAIGN_STATUSES,
   type CampaignStatus
 } from "@/lib/crm/registry";
+import { dateQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
 
@@ -54,8 +55,8 @@ export default async function CampaignsPage({
 }) {
   const params = await searchParams;
   const statusFilter = isCampaignStatus(params.status) ? params.status : undefined;
-  const startDateFrom = params.startFrom?.trim() ? params.startFrom : undefined;
-  const startDateTo = params.startTo?.trim() ? params.startTo : undefined;
+  const startDateFrom = dateQueryParam(params.startFrom);
+  const startDateTo = dateQueryParam(params.startTo);
 
   const listOptions: CampaignListOptions = {
     pageSize: 100,
@@ -137,7 +138,7 @@ export default async function CampaignsPage({
           <form action="/campaigns" className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select id="status" name="status" defaultValue={statusFilter ?? ""}>
                 <option value="">All</option>
                 {CAMPAIGN_STATUSES.map((status) => (
                   <option key={status} value={status}>
@@ -152,7 +153,7 @@ export default async function CampaignsPage({
                 id="startFrom"
                 name="startFrom"
                 type="date"
-                defaultValue={params.startFrom ?? ""}
+                defaultValue={startDateFrom ?? ""}
               />
             </div>
             <div className="space-y-2">
@@ -161,7 +162,7 @@ export default async function CampaignsPage({
                 id="startTo"
                 name="startTo"
                 type="date"
-                defaultValue={params.startTo ?? ""}
+                defaultValue={startDateTo ?? ""}
               />
             </div>
             <div className="flex items-end gap-3 md:col-span-3">

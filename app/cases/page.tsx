@@ -26,6 +26,7 @@ import {
   type CasePriority,
   type CaseStatus
 } from "@/lib/crm/registry";
+import { nonEmptyQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
 
@@ -58,8 +59,8 @@ export default async function CasesPage({
 }) {
   const params = await searchParams;
   const statusFilter = isCaseStatus(params.status) ? params.status : undefined;
-  const ownerFilter = params.ownerId?.trim() ? params.ownerId : undefined;
-  const accountFilter = params.accountId?.trim() ? params.accountId : undefined;
+  const ownerFilter = nonEmptyQueryParam(params.ownerId);
+  const accountFilter = nonEmptyQueryParam(params.accountId);
 
   const listOptions: CaseListOptions = {
     pageSize: 100,
@@ -175,7 +176,7 @@ export default async function CasesPage({
           <form action="/cases" className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select id="status" name="status" defaultValue={statusFilter ?? ""}>
                 <option value="">All</option>
                 {CASE_STATUSES.map((status) => (
                   <option key={status} value={status}>
@@ -186,7 +187,7 @@ export default async function CasesPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="accountId">Account</Label>
-              <Select id="accountId" name="accountId" defaultValue={params.accountId ?? ""}>
+              <Select id="accountId" name="accountId" defaultValue={accountFilter ?? ""}>
                 <option value="">Any account</option>
                 {accountsList.map((account) => (
                   <option key={account.id} value={account.id}>
@@ -197,7 +198,7 @@ export default async function CasesPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ownerId">Owner</Label>
-              <Select id="ownerId" name="ownerId" defaultValue={params.ownerId ?? ""}>
+              <Select id="ownerId" name="ownerId" defaultValue={ownerFilter ?? ""}>
                 <option value="">Any owner</option>
                 {owners.map((owner) => (
                   <option key={owner.id} value={owner.id}>
