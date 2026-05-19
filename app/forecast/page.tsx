@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
@@ -20,6 +21,10 @@ import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { forecastQuerySchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Forecast Simulator"
+};
 
 export default async function ForecastPage({
   searchParams

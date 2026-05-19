@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { TasksView } from "@/components/tasks/tasks-view";
 import { type TaskOptionItem } from "@/components/tasks/task-form";
@@ -26,6 +27,10 @@ import {
 import type { TaskListOptions } from "@/lib/crm/crmClient";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Tasks"
+};
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   open: "Open",

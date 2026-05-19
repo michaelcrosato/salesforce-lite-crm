@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CasesView } from "@/components/cases/cases-view";
 import {
@@ -28,6 +29,10 @@ import {
 } from "@/lib/crm/registry";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Cases"
+};
 
 const STATUS_LABELS: Record<CaseStatus, string> = {
   new: "New",

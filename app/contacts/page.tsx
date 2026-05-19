@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ContactsTable } from "@/components/contacts-table";
 import { ContactForm } from "@/components/contact-form";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -8,6 +9,10 @@ import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Contacts"
+};
 
 export default async function ContactsPage({
   searchParams

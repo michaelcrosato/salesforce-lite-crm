@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import { LeadForm } from "@/components/lead-form";
@@ -21,6 +22,10 @@ import { prisma } from "@/lib/prisma";
 import { isLeadStatus } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Lead Inbox"
+};
 
 export default async function LeadsPage({
   searchParams

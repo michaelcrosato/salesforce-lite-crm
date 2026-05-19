@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,10 @@ import { prisma } from "@/lib/prisma";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Dashboard"
+};
 
 export default async function DashboardPage() {
   const now = new Date();

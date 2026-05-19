@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,10 @@ import {
 } from "@/components/reports/report-registry";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Reports"
+};
 
 export default function ReportsPage() {
   return (

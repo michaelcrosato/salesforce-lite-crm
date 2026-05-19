@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CampaignsView } from "@/components/campaigns/campaigns-view";
 import {
@@ -25,6 +26,10 @@ import {
 } from "@/lib/crm/registry";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Campaigns"
+};
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
   planned: "Planned",

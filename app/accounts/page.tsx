@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AccountsTable } from "@/components/accounts-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,10 @@ import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Accounts"
+};
 
 export default async function AccountsPage({
   searchParams
