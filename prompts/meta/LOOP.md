@@ -32,11 +32,12 @@ halting on the first non-zero exit:
   npx prisma generate
   npx prisma db push
   npm run seed
+  npm run lint
   npm run test
   npm run build
 
-Pass criteria: clean tree; branch matches `{AGENT}/` prefix; `npm run test`
-exits 0; `npm run build` exits 0.
+Pass criteria: clean tree; branch matches `{AGENT}/` prefix; `npm run lint`
+exits 0; `npm run test` exits 0; `npm run build` exits 0.
 
 Recovery cases:
   - Unexpected dirty files matching an open `gate` blocker's Evidence list
@@ -44,7 +45,7 @@ Recovery cases:
     overwrite, proceed.
   - Other unexpected dirty files: `git stash push -u -m "loop-recovery-<ts>"`.
     Do NOT `git reset --hard` or `git clean -fdx`.
-  - `npm run test` or `npm run build` red on baseline: this iteration's
+  - `npm run lint`, `npm run test`, or `npm run build` red on baseline: this iteration's
     work unit becomes "fix the red gate." Skip Phase 2 selection; go to
     Phase 4 with the failure as the target.
   - Wrong active worktree / wrong branch prefix / recovery fails: STOP and
@@ -162,7 +163,7 @@ Constraints per PLAN.md §§7, 8, 11:
   - No new dependencies; no new package.json scripts.
   - No `any`, `@ts-ignore`, `@ts-expect-error`, or `as unknown as` bypasses
     in files you author or edit.
-  - Do not invent `lint` or `typecheck` script runs — they don't exist
+  - Do not invent `typecheck` or `format` script runs — they don't exist
     in package.json (§9, §11).
   - Do not commit generated DB files, build artifacts, logs, or
     screenshots.
@@ -184,6 +185,7 @@ Full §9 sequence (from worktree root):
   npx prisma generate
   npx prisma db push
   npm run seed
+  npm run lint
   npm run test
   npm run build
   npx playwright install chromium

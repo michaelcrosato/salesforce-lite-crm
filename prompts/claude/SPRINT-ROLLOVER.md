@@ -122,6 +122,7 @@ PHASE 4 — VERIFY GATE
 ============================================================
 
 Planning shouldn't change runtime behavior. Run:
+  npm run lint
   npm run test
   npm run build
 
