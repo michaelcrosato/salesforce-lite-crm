@@ -40,6 +40,8 @@ subject to normal human diff review before commit/push.
   filter params with focused Vitest tests.
 - Hardened forecast scenario query parsing so invalid multiplier or assignment
   params do not erase valid area or sibling numeric filters.
+- Hardened shared date formatters so invalid values render empty-state labels
+  instead of throwing or producing `NaN` relative dates.
 
 ## Remaining Risks
 
@@ -60,7 +62,7 @@ subject to normal human diff review before commit/push.
 | `npm run seed` | PASS |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm run test` | PASS, 148 tests |
+| `npm run test` | PASS, 150 tests |
 | `npm run build` | PASS |
 | `npx playwright install chromium` | PASS |
 | `npm run test:e2e` | PASS, 19 passed |

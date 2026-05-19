@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise; 2f136ab - [codex] S4-F1: refresh coordination audit notes; 2215efb - [codex] S4-F1: harden forecast scenario inputs; f31396c - [codex] S4-F1: parse multiline csv fields; c1d7f29 - [codex] S4-F1: harden list query pagination; 7a9a9a2 - [codex] S4-F1: harden list query sorting; 1b45f62 - [codex] S4-F1: wire eslint into local gate; 6268af5 - [codex] S4-F1: refresh lint review notes; 8e68f2f - [codex] S4-F1: fail lint on warnings; 95517a0 - [codex] S4-F1: align prompts with lint gate; d324bb9 - [codex] S4-F1: add typecheck to local gate; cc19bed - [codex] S4-F1: derive excluded route smoke list; f561aff - [codex] S4-F1: sanitize list query params; ef9ce64 - [codex] S4-F1: parse forecast query fields independently
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise; 2f136ab - [codex] S4-F1: refresh coordination audit notes; 2215efb - [codex] S4-F1: harden forecast scenario inputs; f31396c - [codex] S4-F1: parse multiline csv fields; c1d7f29 - [codex] S4-F1: harden list query pagination; 7a9a9a2 - [codex] S4-F1: harden list query sorting; 1b45f62 - [codex] S4-F1: wire eslint into local gate; 6268af5 - [codex] S4-F1: refresh lint review notes; 8e68f2f - [codex] S4-F1: fail lint on warnings; 95517a0 - [codex] S4-F1: align prompts with lint gate; d324bb9 - [codex] S4-F1: add typecheck to local gate; cc19bed - [codex] S4-F1: derive excluded route smoke list; f561aff - [codex] S4-F1: sanitize list query params; ef9ce64 - [codex] S4-F1: parse forecast query fields independently; 1dee04e - [codex] S4-F1: harden date formatters
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T07:49:50-07:00
+Timestamp: 2026-05-19T07:53:18-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -22,7 +22,7 @@ Approximate model tokens/spend this prompt: unknown
 
 - Loaded repo-local canon from the registered Codex worktree after confirming `C:\dev\salesforce-lite-crm-codex` is not a git repository and contains only generated `.next` output.
 - Ran drift scans for forbidden live `/deals/[id]` behavior, B2B lead conversion language, and false lint/typecheck/format claims; findings were expected contract/documentation references or placeholder-only route coverage.
-- Verified the baseline and final state with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`: `npm install`, Prisma generate/db push, seed, lint, typecheck, 148/148 Vitest tests, build, Playwright Chromium install, and 19/19 e2e tests all passed.
+- Verified the baseline and final state with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`: `npm install`, Prisma generate/db push, seed, lint, typecheck, 150/150 Vitest tests, build, Playwright Chromium install, and 19/19 e2e tests all passed.
 - Cross-zone exception: updated Gemini-owned `scripts/clean-local-artifacts.ps1` because the current prompt authorized repo-wide safety work and the script's dry run showed `.claude` as a deletion candidate; the script now preserves tracked `.claude` hook/config files and only offers ignored `.claude/logs` files.
 - Cleared the stale tracked `AUTONOMY.STOP` marker because its contents instructed deletion once dispatch resumed, and this run resumed repo work outside the prior sandbox stop condition.
 - Refreshed `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` from `scripts/check-worktrees.ps1` output so coordination docs now show all four registered worktrees plus the Claude/Gemini dirty-state caveats before unattended dispatch.
@@ -42,6 +42,7 @@ Approximate model tokens/spend this prompt: unknown
 - Refactored `e2e/excluded-routes.spec.ts` to derive concrete smoke paths from `EXCLUDED_ROUTES` so the route-contract list and e2e guard rail cannot drift independently; full local gate passed.
 - Added shared query-param sanitizers and used them on task, case, campaign, and lead list pages so blank or invalid filter params do not leak into service filters or stale form defaults; added focused helper coverage.
 - Updated the forecast page to parse multiplier, assignment rate, and area query params independently so one malformed scenario field does not discard otherwise valid filters; expanded query-param helper coverage.
+- Hardened shared date formatters so malformed date-like values fall back to existing empty-state labels instead of throwing or rendering `NaN days ago`; added focused formatter coverage.
 
 ### Next action
 
