@@ -2,8 +2,8 @@
 
 ## Current Status
 
-- Branch observed this pass: `chore/claude-hooks-r23`
-- Current pass: readiness/documentation pass complete.
+- Branch observed this pass: `gemini/autonomy`
+- Current pass: autonomy repo readiness pass.
 - Product feature work: not changed during this pass.
 - README status: `README.md` now reflects the updated product vision for a
   full-fledged, AI-adaptive Salesforce-style CRM that autonomous AI coding
@@ -51,12 +51,13 @@ Observed with `git worktree list` during the readiness pass:
 C:/dev/salesforce-lite-crm        5b4e0a7 [chore/claude-hooks-r23]
 C:/dev/salesforce-lite-crm-claude 54965da [feat/claude-crm-ui-e2e]
 C:/dev/salesforce-lite-crm-grok   b5c7cd9 [feat/grok-crm-data-reports]
+C:/dev/salesforce-lite-crm-gemini 8c44685 [gemini/autonomy]
 ```
 
 Expected but missing locally:
 
 ```text
-C:/dev/salesforce-lite-crm-gemini [gemini branch pending]
+none
 ```
 
 Use `docs/WORKTREE-SETUP.md` and `scripts/check-worktrees.ps1` before creating
