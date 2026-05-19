@@ -69,7 +69,7 @@ export default async function ActivitiesPage({
       />
 
       <Card>
-        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Activity Feed</CardTitle>
             <div className="mt-2 flex flex-wrap gap-2">

@@ -86,7 +86,7 @@ export default async function AccountsPage({
       />
 
       <Card>
-        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Account List</CardTitle>
           <form action="/accounts" className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-[1fr_160px]">
             <Input name="q" defaultValue={query} placeholder="Search accounts" />

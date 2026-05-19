@@ -104,7 +104,7 @@ export default async function ContactsPage({
       </div>
 
       <Card>
-        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Contact Directory</CardTitle>
           <form action="/contacts" className="w-full sm:max-w-sm">
             <Input name="q" defaultValue={query} placeholder="Search contacts" />
