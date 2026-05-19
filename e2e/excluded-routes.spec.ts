@@ -1,19 +1,14 @@
 import { expect, test } from "@playwright/test";
+import { EXCLUDED_ROUTES } from "@/lib/featureFlags";
 
 test.describe("excluded-route guard rails", () => {
-  const excludedRoutes = [
-    { path: "/deals/any-id", name: "Deal Detail Page" },
-    { path: "/search", name: "Global Search" },
-    { path: "/command-palette", name: "Command Palette" },
-    { path: "/orders/new", name: "New Order" },
-    { path: "/orders/any-id/edit", name: "Edit Order" },
-    { path: "/areas/new", name: "New Area" },
-    { path: "/areas/any-id/edit", name: "Edit Area" },
-  ];
+  const excludedRoutes = EXCLUDED_ROUTES.map((path) =>
+    path.replaceAll("[id]", "any-id")
+  );
 
   for (const route of excludedRoutes) {
-    test(`route ${route.path} is excluded (returns 404 or placeholder)`, async ({ page }) => {
-      const response = await page.goto(route.path);
+    test(`route ${route} is excluded (returns 404 or placeholder)`, async ({ page }) => {
+      const response = await page.goto(route);
       
       // If the page loads, it should show a placeholder.
       // If it doesn't load, it should be a 404.
