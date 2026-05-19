@@ -1,34 +1,34 @@
 Agent: Codex
 
-Sprint: Repo readiness / autonomy
+Sprint: 4
 
-Feature: SLC-AUTONOMY-R5-FINAL - Continuous unattended mode
+Feature: S4-F1 - Demo seed tuning
 
 Branch: codex/r8-r9-managed-autonomy-bootstrap
 
 Status: done
 
-Commits this prompt: 6ac35ee - Stop tracking generated Next env file; 6c991ea - [codex] SLC-AUTONOMY-R5: refresh autonomy docs
+Commits this prompt: 4e421a2 - [codex] autonomy: file STOP marker for sandboxed manager session
 
-Gate status: NOT RUN
+Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-18T21:01:43.1256177-07:00
+Timestamp: 2026-05-19T02:02:00-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Recorded the `next-env.d.ts` policy fix from `6ac35ee`, which removed the generated file from tracking and added it to `.gitignore`.
-- Clarified `PLAN.md` section 5 so `next-env.d.ts` is intentionally untracked/ignored and any tracked or staged reappearance is a dependency blocker.
-- Updated `README.md` and `docs/LOCAL-GATE.md` script listings to include `autonomy:overnight`.
-- Verified local generated-file policy state before edits: `git status --short` was empty, `git ls-files next-env.d.ts` returned nothing, and `git check-ignore -v next-env.d.ts` pointed to `.gitignore`.
-- Ran docs-only checks for this refresh: `git diff --check` exited 0. Full local gate was not rerun after these docs/report updates.
+- Verified S4-F1 substantive seed tuning is in commit cf99362 (stale-deal anchors deal-1=21d, deal-7=23d, deal-13=28d; pinned-anchor docstring extended for stale-deal + low-health rules).
+- Confirmed acceptance anchors on disk: V5K 0A1 routes to area-vancouver (seed.ts:206); five primary behind-pace active dealer orders (-42, -30, -26, -20, -18) plus secondary set; acct-summit healthScore 49 attached to active behind-pace orders; deterministic deal stage probabilities.
+- Ran S4-F1 gate from this worktree: `npx prisma generate` clean, `npx prisma db push` already in sync, `npm run seed` clean, `npm run test` 140/140 pass across 22 files in 5.01s, `npm run build` compiled successfully in 2.2s with 32 routes.
+- Did not flip PLAN.md §4 S4-F1 status this run: the file is tracked as CRLF and the harness Edit tool rewrote it with LF, which produced a whole-file whitespace diff. To keep the report-only contract clean, PLAN.md was restored byte-identical to HEAD; the next manager session running outside this sandbox (or on a worktree with proper line-ending config) should promote S4-F1 to `done` with the gate evidence below.
+- Continuous manager run was performed inside this Codex worktree because the harness sandbox could not reach `C:\dev\salesforce-lite-agent-runs` or the sibling agent worktrees. Other agent dispatches (S4-F2 Claude, S4-F3 Grok, S4-F4 Gemini) remain queued; an AUTONOMY.STOP records the blocker.
 
 ### Next action
 
-Continue with continuous/autonomy launch only after reports are refreshed and worktree remains clean.
+External operator launches the managed-autonomy supervisor (`scripts/run-managed-autonomy.ps1 -Launch -Mode FailSafe` or higher) from an unsandboxed shell to dispatch S4-F2/F3/F4 to their respective worktrees.
 
 ### Scope confirmation
 
