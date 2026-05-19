@@ -1,66 +1,85 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — list page header layout fix
+Feature: S4-F2 route visual QA — list page CardTitle casing alignment
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 9b98e72 — [claude] S4-F2: enable side-by-side header layout on list pages
-Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes) + npm run test:e2e (19 passed, 1 demo-path skipped)
+Commits this prompt: d51d817 — [claude] S4-F2: align CardTitle casing on list pages
+Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T02:25:00-08:00
+Timestamp: 2026-05-19T06:35:00-08:00
 
 ### Completed this prompt
 
-- Route visual QA audit across all S4-F2 demo-critical routes:
-  - `/dashboard`, `/leads`, `/leads/[id]`, `/orders`, `/orders/[id]`,
-    `/areas`, `/forecast`, `/accounts`, `/accounts/[id]`, `/contacts`,
-    `/contacts/[id]`, `/deals`.
-  - All use the shared `crm-page` wrapper, `PageHeader`, Card-based
-    sections, badge variants, and `EmptyState` for empty lists.
-  - `/deals/[id]` correctly renders the `ExcludedRoutePlaceholder` per
-    CRM-CONTRACT.md feature flag — no drawer-flow violation.
-- Found and fixed one real visual-coherence bug at the page level:
-  three list pages declared `sm:flex-row sm:items-center
-  sm:justify-between` on `CardHeader` but never set the base
-  `display:flex`, so the intended title-left/search-right layout
-  silently degraded to a stacked layout at every viewport. Added
-  `sm:flex` to honor the original intent at sm+ breakpoints.
-  - `app/accounts/page.tsx` — Account List header
-  - `app/contacts/page.tsx` — Contact Directory header
-  - `app/activities/page.tsx` — Activity Feed header
-- All changes are attribute-only at the app-router page level. No
-  business logic, no component primitives, no schema, no route
-  contract changes. No cross-zone edits.
+- Continued the S4-F2 visual QA sweep into the non-demo-critical list
+  routes flagged in the prior iteration's "Next action".
+- Identified one page-level coherence drift across the three drawer-flow
+  list pages: the list-section CardTitle strings used sentence case
+  ("Task list", "Case list", "Campaign list") while every other
+  CardTitle in `app/**` uses Title Case ("Account List", "Contact
+  Directory", "Activity Feed", "Pacing Dashboard", "Analyst Panel",
+  "Order Summary", etc.).
+- Fixed in one atomic commit:
+  - `app/tasks/page.tsx` — `Task list` → `Task List`
+  - `app/cases/page.tsx` — `Case list` → `Case List`
+  - `app/campaigns/page.tsx` — `Campaign list` → `Campaign List`
+- All changes are text-only inside `CardTitle` children. No business
+  logic, no component primitives, no schema, no route contract
+  changes. No new dependencies, no test changes. No cross-zone edits.
 
-### Visual coherence findings (no fix needed)
+### Pattern audit (no further fix needed)
 
-| Route | Notes |
+| Route | CardTitle inventory (post-fix) |
 |---|---|
-| `/dashboard` | Coherent. KPI grid, analyst panel cards, Dealer Ops, Today's Focus all use shared Card/Badge primitives and have empty states. |
-| `/leads` | Coherent. Filter form in CardHeader with Apply button; routing-detail row beneath each lead row. EmptyState wired. |
-| `/leads/[id]` | Coherent. Two-column lead summary / activity timeline with assignment sidebar. `lead-status-badge` wrapper in place. |
-| `/orders` | Coherent. Wide pacing table with `max-w-[1500px]`. Pacing bar, status badge, expected-delivered all aligned. |
-| `/orders/[id]` | Coherent. Two-column assigned-leads/timeline with order summary sidebar including pacing bar. |
-| `/areas` | Coherent. Postal prefix table with badge chips and linked order list per row. |
-| `/forecast` | Coherent. Scenario inputs card, KPI grid (including `forecast-projection-value` wrapper), order projection table, "How This Works" explainer. |
-| `/accounts` | Coherent after fix; uses shared `AccountsTable`. Header now properly side-by-side at sm+. |
-| `/accounts/[id]` | Coherent. Summary grid, collapsible edit `<details>`, related contacts/deals tables, recent activities. |
-| `/contacts` | Coherent after fix. Header now properly side-by-side at sm+. Inline ContactForm + ContactsTable. |
-| `/contacts/[id]` | Coherent. Two-column summary/deals/timeline with edit form + add-note sidebar. |
-| `/deals` | Coherent. KPI row + drag-and-drop DealBoard; drawer flow preserved; EmptyState wired. |
+| `/dashboard` | Analyst Panel, Dealer Ops Focus, Today's Focus — Title Case. |
+| `/leads` | Leads — single word. |
+| `/leads/[id]` | Lead Summary, Activity Timeline, Assignment — Title Case. |
+| `/orders` | Pacing Dashboard — Title Case. |
+| `/orders/[id]` | Assigned Leads This Month, Recent Routing Events, Order Summary — Title Case. |
+| `/areas` | Routing Areas — Title Case. |
+| `/forecast` | Scenario Inputs, Order Projection, How This Works — Title Case. |
+| `/accounts` | Account List — Title Case. |
+| `/accounts/[id]` | Account Summary, Related Contacts, Related Deals, Recent Activities — Title Case. |
+| `/contacts` | Contact Directory — Title Case. |
+| `/contacts/[id]` | Contact Summary, Related Deals, Activity Timeline — Title Case. |
+| `/activities` | Activity Feed — Title Case. |
+| `/tasks` | Filters, Task List — Title Case (post-fix). |
+| `/cases` | Filters, Case List — Title Case (post-fix). |
+| `/campaigns` | Filters, Campaign List — Title Case (post-fix). |
+| `/reports`, `/reports/[slug]` | Dynamic from `REPORT_DEFINITIONS` — handled by Grok-owned registry. |
+
+### Reconciliation note
+
+PLAN.md §4 still lists S4-F2 with `Status: queued` while SUMMARY entries
+across prior prompts have treated it as in-flight. Per PLAN.md §2 the
+local gate is authoritative; recent commits (`81f438f`, `9b98e72`, and
+now `d51d817`) demonstrate Claude-zone S4-F2 work is incremental and
+green. No PLAN.md §4 edit attempted from this prompt — the planning
+zone is shared and any sprint status promotion belongs in the
+SPRINT-ROLLOVER prompt.
+
+### Outstanding cross-agent dependency
+
+Gemini BLOCKERS #3 still tracks remaining `components/**`-side testids
+(`lead-form-submit`, `routing-detail-success`, `routing-detail-link`,
+`contact-note-input`, `contact-note-submit`,
+`activity-timeline-summary`) that gate un-skipping
+`e2e/demo-path.spec.ts`. Those live in Grok's zone; no action from
+Claude this prompt.
 
 ### Next action
 
-If next iteration's prompt continues S4-F2, sweep the remaining
-non-demo-critical routes (`/tasks`, `/cases`, `/campaigns`,
-`/reports`, `/activities`) for the same header-flex pattern or other
-page-level coherence issues. Otherwise wait for Gemini to un-skip
-`demo-path.spec.ts` once Grok lands the components/**-side testids
-(`lead-form-submit`, `routing-detail-success`, `routing-detail-link`,
-`contact-note-input`, `contact-note-submit`,
-`activity-timeline-summary`).
+If next iteration's prompt continues S4-F2, scan the remaining
+non-demo-critical routes — `/reports`, `/reports/[slug]`, `/search`,
+`/command-palette`, `/areas/[id]`, `/areas/[id]/edit`, `/areas/new`,
+`/orders/[id]/edit`, `/deals/new`, `/accounts/new`, `/contacts/new` —
+for similar text-level coherence issues (heading casing, button labels,
+empty-state copy). Otherwise S4-F2's demo-critical scope (§4
+acceptance) is verified complete and Claude can stand by until
+SPRINT-ROLLOVER queues a new claude-owned feature.
 
 ### Scope confirmation
 
 No cross-ownership edits: YES (all three edited files live in `app/**`).
 CRM-CONTRACT.md honored: YES (no contract edits; no schema, route, or
-status value changes — pure className additions on CardHeader).
+status value changes — pure text content updates inside CardTitle
+children).
