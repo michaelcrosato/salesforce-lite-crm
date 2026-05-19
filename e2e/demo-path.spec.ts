@@ -29,10 +29,13 @@ test.describe("hardened demo path", () => {
     await expect(leadRow.getByTestId("lead-status-badge")).toHaveText("Assigned");
     await expect(leadRow.getByTestId("lead-assignment-reason-badge")).toHaveText("Routed");
 
-    // 3. Analyst panel surfaces behind-pace order
+    // 3. Analyst panel surfaces behind-pace order, stale deals, and low-health accounts
     await page.goto("/dashboard");
     await expect(page.getByTestId("dashboard-analyst-panel")).toBeVisible();
     await expect(page.getByTestId("analyst-item-behind-pace-order").first()).toContainText("Vancouver");
+    await expect(page.getByTestId("analyst-item-stale-high-value-deal").first()).toBeVisible();
+    await expect(page.getByTestId("analyst-item-low-health-account").first()).toBeVisible();
+    await expect(page.getByTestId("analyst-item-action").first()).toBeVisible();
 
     // 4. Contact note AI summary
     await page.goto("/contacts/contact-1"); // Maya Singh ID from seed
