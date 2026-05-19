@@ -256,9 +256,9 @@ export default async function ForecastPage({
           <CardTitle>How This Works</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Projected delivered leads = current delivered leads / elapsed days in this month * days in
-          month * lead volume multiplier * assignment rate. Area filtering limits the table to
-          active orders linked to that routing area.
+          Projected delivered leads = (current delivered leads &divide; elapsed days in this month)
+          &times; days in month &times; lead volume multiplier &times; assignment rate. Area
+          filtering limits the table to active orders linked to that routing area.
         </CardContent>
       </Card>
     </div>
