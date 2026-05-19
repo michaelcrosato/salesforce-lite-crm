@@ -139,7 +139,7 @@ export default async function OrdersPage() {
           ) : (
             <EmptyState
               title="No dealer orders"
-              description="Dealer orders are seeded and demo-managed for now."
+              description="Seeded dealer orders cover this surface; create and edit flows are deferred."
               actionHref="/dashboard"
               actionLabel="Return to dashboard"
             />

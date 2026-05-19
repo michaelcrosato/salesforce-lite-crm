@@ -95,7 +95,7 @@ export default async function AreasPage() {
           ) : (
             <EmptyState
               title="No areas"
-              description="Routing areas are seeded and demo-managed for now."
+              description="Seeded routing areas cover this surface; create and edit flows are deferred."
               actionHref="/dashboard"
               actionLabel="Return to dashboard"
             />
