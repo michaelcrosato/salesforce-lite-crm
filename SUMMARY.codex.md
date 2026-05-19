@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T06:50:24-07:00
+Timestamp: 2026-05-19T06:51:36-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -27,6 +27,7 @@ Approximate model tokens/spend this prompt: unknown
 - Cleared the stale tracked `AUTONOMY.STOP` marker because its contents instructed deletion once dispatch resumed, and this run resumed repo work outside the prior sandbox stop condition.
 - Refreshed `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` from `scripts/check-worktrees.ps1` output so coordination docs now show all four registered worktrees plus the Claude/Gemini dirty-state caveats before unattended dispatch.
 - Removed the remaining TypeScript `as unknown as` escape hatches from `lib/prisma.ts` and `lib/business/duplicates.ts` by using a typed global cache and a generic duplicate-record helper; `npm run test` and `npm run build` passed after the change.
+- Added `*.tsbuildinfo` to `.gitignore` because `tsconfig.json` has TypeScript incremental compilation enabled and sibling worktrees were surfacing generated `tsconfig.tsbuildinfo` files.
 
 ### Next action
 
