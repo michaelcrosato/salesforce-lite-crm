@@ -176,7 +176,7 @@ export default async function CampaignsPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Campaign list</CardTitle>
+          <CardTitle>Campaign List</CardTitle>
         </CardHeader>
         <CardContent>
           <CampaignsView

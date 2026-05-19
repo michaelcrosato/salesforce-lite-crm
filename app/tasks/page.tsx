@@ -252,7 +252,7 @@ export default async function TasksPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Task list</CardTitle>
+          <CardTitle>Task List</CardTitle>
         </CardHeader>
         <CardContent>
           <TasksView

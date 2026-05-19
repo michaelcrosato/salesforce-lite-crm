@@ -218,7 +218,7 @@ export default async function CasesPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Case list</CardTitle>
+          <CardTitle>Case List</CardTitle>
         </CardHeader>
         <CardContent>
           <CasesView
