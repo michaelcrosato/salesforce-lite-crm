@@ -19,4 +19,10 @@ Prompt files should not:
 - override `PLAN.md` silently
 - invent product scope
 
-No next feature prompts are created by this readiness pass.
+Current next-push prompts live in `docs/NEXT-PROMPTS.md` and
+`prompts/shared/s4-f*.md`.
+
+Older `*-SPRINT-4B.md` prompt files are historical artifacts from a prior
+parallel-agent run. They are retained for provenance only and are superseded by
+`PLAN.md`, `CRM-CONTRACT.md`, `docs/NEXT-PROMPTS.md`, and the shared Sprint 4
+prompt files.

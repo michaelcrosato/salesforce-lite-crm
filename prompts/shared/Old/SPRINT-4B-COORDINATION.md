@@ -1,5 +1,9 @@
 # Sprint 4B — Coordination Overview
 
+> Historical artifact. This coordination plan is superseded by `PLAN.md`,
+> `CRM-CONTRACT.md`, `docs/NEXT-PROMPTS.md`, and `prompts/shared/s4-f*.md`.
+> Do not use it as the active next-push prompt set.
+
 Four prompts, one 36-hour window, four parallel agents on four
 branches. This file is the air-traffic-control view. Each prompt
 is self-contained; this exists so you (the human operator) can

@@ -43,7 +43,7 @@ Do not claim `lint`, `typecheck`, or `format` passed unless those scripts exist 
 
 ## Acceptance Criteria
 
-Tests/e2e support the README demo path. Local gate commands are documented accurately and failures are captured in `BLOCKERS.gemini.md`. Subject to §3 worktree availability.
+Tests/e2e support the README demo path, implemented CRM routes, and excluded-route guard rails. Local gate commands are documented accurately and failures are captured in `BLOCKERS.gemini.md`. Subject to §3 worktree availability.
 
 ## Stop Conditions
 

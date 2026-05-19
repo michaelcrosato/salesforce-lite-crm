@@ -1,4 +1,9 @@
-#CLAUDE-SPRINT-4B
+# CLAUDE-SPRINT-4B
+
+> Historical artifact. This prompt is superseded by `PLAN.md`,
+> `CRM-CONTRACT.md`, `docs/NEXT-PROMPTS.md`, and
+> `prompts/shared/s4-f2-claude-route-visual-qa.md`.
+> Do not use it as the active next-push prompt.
 
 You are Claude Code, working in YOLO mode (danger-full-access,
 never approval) on an EXISTING Salesforce Lite CRM POC at

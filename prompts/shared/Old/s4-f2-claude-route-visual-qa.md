@@ -37,7 +37,7 @@ Do not claim `lint`, `typecheck`, or `format` passed unless those scripts exist 
 
 ## Acceptance Criteria
 
-Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic.
+Demo-critical routes render coherently: `/dashboard`, `/leads`, `/leads/<id>`, `/orders`, `/orders/<id>`, `/areas`, `/forecast`, `/accounts`, `/accounts/<id>`, `/contacts`, `/contacts/<id>`, `/deals`, `/activities`, `/tasks`, `/cases`, `/campaigns`, `/reports`, and representative report detail pages. Excluded routes remain placeholder-only or 404. Visual fixes must not change business logic.
 
 ## Stop Conditions
 
