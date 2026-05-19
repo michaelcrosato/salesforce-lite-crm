@@ -12,13 +12,14 @@
     "build": "next build",
     "seed": "tsx prisma/seed.ts",
     "test": "vitest run --maxWorkers=1 --minWorkers=1",
+    "test:coverage": "vitest run --coverage --maxWorkers=1 --minWorkers=1",
     "test:e2e": "npm run seed && playwright test",
     "prisma:postgres": "node scripts/prisma-postgres.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "7.8.0",
     "@prisma/adapter-better-sqlite3": "7.8.0",
+    "@prisma/client": "7.8.0",
     "@radix-ui/react-slot": "1.1.0",
     "better-sqlite3": "12.5.0",
     "class-variance-authority": "0.7.0",
@@ -39,6 +40,7 @@
     "@types/node": "22.10.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@vitest/coverage-v8": "^2.1.8",
     "autoprefixer": "10.4.20",
     "eslint": "9.39.1",
     "eslint-config-next": "16.2.6",
