@@ -869,7 +869,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-10 | Auth, permissions, multi-tenancy | Replaces README "no authentication" limitation. Significant scope; likely spans multiple sprints when promoted. |
 
-| B-11 | CI mirror of local gate | CI may mirror §9 but never replaces it. The local PowerShell gate stays authoritative. |
+| B-11 | CI mirror of local gate | `ci.yml` is now fully mirroring the local gate sequence. |
 
 | B-12 | Deployment configuration | No deployment target or hosting workflow is in current scope. Deferred. |
 
