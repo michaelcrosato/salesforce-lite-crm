@@ -87,11 +87,13 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     : input.orders;
 
   const rows = orders.map((order) => {
-    const currentRunRate = order.deliveredThisMonth / elapsedDays;
+    const deliveredThisMonth = nonNegativeFinite(order.deliveredThisMonth);
+    const monthlyQuota = nonNegativeFinite(order.monthlyQuota);
+    const currentRunRate = deliveredThisMonth / elapsedDays;
     const projectedDelivered = Math.round(
       currentRunRate * daysInMonth * leadVolumeMultiplier * assignmentRate
     );
-    const risk = forecastRisk(projectedDelivered, order.monthlyQuota);
+    const risk = forecastRisk(projectedDelivered, monthlyQuota);
 
     return {
       orderId: order.id,
@@ -99,11 +101,11 @@ export function buildForecast(input: ForecastInput): ForecastResult {
       accountId: order.account.id,
       accountName: order.account.name,
       areas: order.areas.map((area) => area.name),
-      currentDelivered: order.deliveredThisMonth,
-      monthlyQuota: order.monthlyQuota,
+      currentDelivered: deliveredThisMonth,
+      monthlyQuota,
       projectedDelivered,
       risk,
-      additionalLeadsNeeded: Math.max(0, order.monthlyQuota - projectedDelivered)
+      additionalLeadsNeeded: Math.max(0, monthlyQuota - projectedDelivered)
     };
   });
 
@@ -128,4 +130,8 @@ function forecastRisk(projectedDelivered: number, monthlyQuota: number): Forecas
   }
 
   return "hit";
+}
+
+function nonNegativeFinite(value: number) {
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
 }

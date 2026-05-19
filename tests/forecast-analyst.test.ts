@@ -128,6 +128,29 @@ describe("forecast simulator math", () => {
       })
     ).toBe(0.75);
   });
+
+  it("keeps malformed order quantities from producing NaN projections", () => {
+    const forecast = buildForecast({
+      orders: [
+        {
+          ...forecastOrders[0],
+          deliveredThisMonth: Number.NaN,
+          monthlyQuota: Number.POSITIVE_INFINITY
+        }
+      ],
+      leadVolumeMultiplier: 1,
+      assignmentRate: 1,
+      now
+    });
+
+    expect(forecast.rows[0]).toMatchObject({
+      additionalLeadsNeeded: 0,
+      currentDelivered: 0,
+      monthlyQuota: 0,
+      projectedDelivered: 0
+    });
+    expect(forecast.summary.projectedLeads).toBe(0);
+  });
 });
 
 describe("deterministic analyst ranking", () => {
