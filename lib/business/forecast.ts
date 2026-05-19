@@ -48,20 +48,29 @@ export type ForecastResult = {
   rows: ForecastRow[];
 };
 
+const defaultLeadVolumeMultiplier = 1;
+const defaultAssignmentRate = 0.75;
+
 export function clampLeadVolumeMultiplier(value: number) {
-  return Math.min(3, Math.max(0.5, value));
+  const finiteValue = Number.isFinite(value) ? value : defaultLeadVolumeMultiplier;
+  return Math.min(3, Math.max(0.5, finiteValue));
 }
 
 export function clampAssignmentRate(value: number) {
-  return Math.min(1, Math.max(0.1, value));
+  const finiteValue = Number.isFinite(value) ? value : defaultAssignmentRate;
+  return Math.min(1, Math.max(0.1, finiteValue));
 }
 
 export function calculateDefaultAssignmentRate(input: {
   totalLeads: number;
   routedLeads: number;
 }) {
+  if (!Number.isFinite(input.totalLeads) || !Number.isFinite(input.routedLeads)) {
+    return defaultAssignmentRate;
+  }
+
   if (input.totalLeads <= 0) {
-    return 0.75;
+    return defaultAssignmentRate;
   }
 
   return clampAssignmentRate(input.routedLeads / input.totalLeads);

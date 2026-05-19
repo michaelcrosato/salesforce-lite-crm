@@ -110,6 +110,24 @@ describe("forecast simulator math", () => {
       0.75
     );
   });
+
+  it("falls back to safe defaults for non-finite scenario inputs", () => {
+    const forecast = buildForecast({
+      orders: [forecastOrders[0]],
+      leadVolumeMultiplier: Number.NaN,
+      assignmentRate: Number.POSITIVE_INFINITY,
+      now
+    });
+
+    expect(forecast.rows[0]?.projectedDelivered).toBe(15);
+    expect(forecast.summary.projectedLeads).toBe(15);
+    expect(
+      calculateDefaultAssignmentRate({
+        totalLeads: Number.NaN,
+        routedLeads: 10
+      })
+    ).toBe(0.75);
+  });
 });
 
 describe("deterministic analyst ranking", () => {
