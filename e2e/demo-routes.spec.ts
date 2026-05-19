@@ -12,7 +12,9 @@ const primaryRoutes = [
   { link: "Activities", heading: "Activities", path: "/activities" }
 ];
 
-test("primary navigation reaches every demo-critical route", async ({ page }) => {
+test("primary navigation reaches every demo-critical route", async ({
+  page
+}) => {
   await page.goto("/dashboard");
   const primaryNav = page.getByRole("navigation", { name: "Primary" });
 
@@ -34,9 +36,10 @@ test("deal query opens the detail drawer without a bracket detail route", async 
   await expect(page.getByText("Deal Detail", { exact: true })).toBeVisible();
   // The drawer does not expose a named landmark, so scope to the aside shell.
   await expect(
-    page
-      .locator("aside")
-      .getByRole("heading", { exact: true, name: "Northstar dispatch team rollout" })
+    page.locator("aside").getByRole("heading", {
+      exact: true,
+      name: "Northstar dispatch team rollout"
+    })
   ).toBeVisible();
   // Account links repeat in drawer activity history; href scopes the detail link target.
   const drawerAccountLinks = page
@@ -45,7 +48,9 @@ test("deal query opens the detail drawer without a bracket detail route", async 
   await expect(drawerAccountLinks.first()).toBeVisible();
 });
 
-test("lead detail status transitions show persisted UI feedback", async ({ page }) => {
+test("lead detail status transitions show persisted UI feedback", async ({
+  page
+}) => {
   await page.goto("/leads/lead-1");
 
   await expect(

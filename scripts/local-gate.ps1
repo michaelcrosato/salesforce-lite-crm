@@ -56,6 +56,7 @@ try {
     Invoke-GateStep "npm run seed" { & npm run seed }
     Invoke-GateStep "npm run test" { & npm run test }
     Invoke-GateStep "npm run typecheck" { & npm run typecheck }
+    Invoke-GateStep "npm run format:check" { & npm run format:check }
     Invoke-GateStep "npm run build" { & npm run build }
     Invoke-GateStep "npx playwright install chromium" { & npx playwright install chromium }
     Invoke-GateStep "npm run test:e2e" { & npm run test:e2e }
