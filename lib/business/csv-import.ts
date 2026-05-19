@@ -131,7 +131,7 @@ export function parseCsv(input: string): ParseResult {
 }
 
 export function previewRows(input: string, limit = 5): PreviewResult {
-  const { headers, rows, errors } = parseCsv(input);
+  const { headers, rows } = parseCsv(input);
   return {
     headers,
     rows: rows.slice(0, limit),

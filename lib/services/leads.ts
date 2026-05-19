@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import {
-  extractPostalPrefix,
   normalizePostalCode,
   validatePostalCode
 } from "@/lib/postal";

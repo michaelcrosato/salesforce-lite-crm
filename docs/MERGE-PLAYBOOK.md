@@ -62,6 +62,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 npx prisma generate
 npx prisma db push
 npm run seed
+npm run lint
 npm run test
 npm run build
 npx playwright install chromium

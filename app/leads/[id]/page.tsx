@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ASSIGNMENT_REASON_LABELS,
-  LEAD_STATUS_LABELS,
   type AssignmentReason,
   type LeadStatus
 } from "@/lib/crm-constants";
