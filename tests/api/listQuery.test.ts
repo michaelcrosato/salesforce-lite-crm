@@ -71,6 +71,27 @@ describe("list query helper", () => {
     });
   });
 
+  it("uses safe defaults for non-finite pagination", () => {
+    expect(
+      buildListQuery(
+        {
+          page: Number.NaN,
+          pageSize: Number.NaN,
+          sortBy: "createdAt",
+          sortOrder: "desc"
+        },
+        config
+      )
+    ).toEqual({
+      where: {},
+      orderBy: {
+        createdAt: "desc"
+      },
+      skip: 0,
+      take: 20
+    });
+  });
+
   it("maps non-empty filters into an AND where clause", () => {
     expect(
       buildListQuery(
