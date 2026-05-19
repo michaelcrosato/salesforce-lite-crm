@@ -1,48 +1,62 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — forecast formula grouping + lead detail description scope
+Feature: S4-F2 route visual QA — per-page browser tab titles
 Branch: claude/autonomy
 Status: active
-Commits this prompt: bd6468a — [claude] S4-F2: clarify forecast formula with grouping and unicode operators; a93f85a — [claude] S4-F2: broaden /leads/[id] description to cover full page surface
+Commits this prompt: 2098a38 — [claude] S4-F2: add title template to root metadata for per-page tab titles; dba0fce — [claude] S4-F2: add per-page metadata titles for distinct browser tabs
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T06:57:30-08:00
+Timestamp: 2026-05-19T07:02:30-08:00
 
 ### Completed this prompt
 
-- `/forecast/page.tsx` "How This Works" card explained the projected-
-  delivered-leads formula as a single flat expression:
-  `current delivered leads / elapsed days in this month * days in
-  month * lead volume multiplier * assignment rate`. The five terms
-  read ambiguously without operator grouping (left-to-right is the
-  intent — `(((curr/elapsed)*days)*mult)*rate` — but a reader who
-  parses arithmetic precedence first would split mid-expression).
-  Fixed by parenthesizing the per-day pace and switching from ASCII
-  `/` and `*` to Unicode `&divide;` and `&times;` so the formula
-  visually reads as math rather than as a JS expression. No semantic
-  change to the formula; only typographic clarity.
-- `/leads/[id]/page.tsx` `PageHeader` description was "Lead routing
-  details, assignment reason, and routing event timeline." which
-  undersold the page — it framed it as routing-only, but the page
-  also renders Lead Summary (phone, email, postal, province, source,
-  created), an interactive Lead Status control, the assignment area +
-  dealer assignment, and the full Activity Timeline (not just
-  routing events). Updated to "Lead contact details, status, dealer
-  assignment, and activity timeline." which covers all four cards on
-  the page and matches the term registers used in the sibling cards
-  ("Lead Summary", "Assignment", "Activity Timeline").
-- Both edits are pure text content inside JSX strings — no business
-  logic, schema, route, or contract changes. No new dependencies,
-  no test changes, no cross-zone edits.
+- Root `app/layout.tsx` `Metadata.title` switched from a flat string
+  to a `{ default, template }` object: `default` keeps the existing
+  "Salesforce Lite CRM" branding for pages that do not set their own
+  title (e.g. the home redirect to `/dashboard`), `template` is
+  `"%s | Salesforce Lite CRM"` so any page exporting a string title
+  automatically gets the brand suffix.
+- Added a `metadata: Metadata` export to every Claude-owned list page
+  (13 routes total), each with a one-line title that mirrors the
+  page's `PageHeader` title:
+  - `/dashboard` → "Dashboard"
+  - `/accounts` → "Accounts"
+  - `/contacts` → "Contacts"
+  - `/deals` → "Deals"
+  - `/leads` → "Lead Inbox"
+  - `/activities` → "Activities"
+  - `/tasks` → "Tasks"
+  - `/cases` → "Cases"
+  - `/campaigns` → "Campaigns"
+  - `/orders` → "Dealer Orders"
+  - `/areas` → "Areas"
+  - `/forecast` → "Forecast Simulator"
+  - `/reports` → "Reports"
+- Effect: browser tabs now disambiguate by page (e.g. "Accounts |
+  Salesforce Lite CRM" vs "Dealer Orders | Salesforce Lite CRM")
+  rather than all tabs reading "Salesforce Lite CRM". The change is
+  Next.js metadata API only — no rendered DOM changes, no client-side
+  state, no business logic.
+- Each affected file gained one new import (`import type { Metadata }
+  from "next";`) and four new lines (the metadata export block) right
+  after `export const dynamic = "force-dynamic";`. No imports removed,
+  no existing code changed.
+- Detail pages (`/accounts/[id]`, `/contacts/[id]`, `/leads/[id]`,
+  `/orders/[id]`, `/reports/[slug]`) and form pages (`/accounts/new`,
+  `/contacts/new` n/a, `/deals/new`, `/tasks/new`, `/cases/new`,
+  `/campaigns/new`) intentionally not touched this iteration —
+  dynamic titles per record require `generateMetadata` and a thin
+  extra Prisma query; deferred to next iteration to keep this commit
+  reviewable.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; HTML entity references
-  `&divide;` / `&times;` render correctly in dev preview, build
-  output is clean).
+- `npm run build` → SUCCESS (32 routes; Next.js 16 metadata API
+  accepts the `default`/`template` object plus per-page string
+  titles cleanly).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before each implementation commit
-  aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
+- `git status --short` clean before each implementation commit aside
+  from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
@@ -60,40 +74,26 @@ Implementation commits on this branch since `cc00d6c`:
 | `0a33253` | add Apply button to /accounts filter form |
 | `bd6468a` | clarify forecast formula with grouping and unicode operators |
 | `a93f85a` | broaden /leads/[id] description to cover full page surface |
+| `2098a38` | add title template to root metadata |
+| `dba0fce` | add per-page metadata titles for distinct browser tabs |
 
-Five categories of polish on this branch:
+Seven categories of polish on this branch:
 1. metadata + product framing alignment (e0f138c, 2b7f8da)
 2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78, a93f85a)
 3. perceived-perf parity for detail routes (07a19cb)
 4. graceful 404 boundary (0fba7d3)
 5. interactive filter parity across list pages (0a33253)
 6. internal documentation clarity (bd6468a)
-
-### Audit observations (no fix this prompt)
-
-- `/leads/[id]/page.tsx` line 131 places a `data-testid="lead-status-badge"`
-  on the *reason* badge wrapper, not the actual lead status control
-  (the LeadStatusControl above it is in `components/**`, Grok's
-  zone). Gemini BLOCKERS #3 lists `lead-status-badge` as a needed
-  testid — placement may be off. Not modified this prompt because
-  fixing requires either renaming the existing testid (could break
-  if Gemini E2E references it) or coordinating with Grok's
-  LeadStatusControl. Documented for review at next sprint rollover.
-- `/orders/[id]/page.tsx` line 154 uses a plain `<p>` empty fallback
-  ("No leads have been delivered to this order this month.") where
-  every other Claude-owned list/table empty state uses the
-  `<EmptyState>` component. Consider standardizing in a future
-  polish iteration — single-tenant copy, lower priority.
+7. browser tab disambiguation (2098a38, dba0fce)
 
 ### Reconciliation note
 
 PLAN.md §4 still lists S4-F2 with `Status: queued`; Claude has now
-landed fourteen S4-F2 implementation commits across recent
-iterations. Per PLAN.md §2 the local gate is authoritative; the
-visual QA sweep is materially complete on demo-critical routes and
-is extending into descriptive accuracy, empty-state patterns,
-filter interactions, and documentation copy. No PLAN.md §4 edit
-attempted from this prompt — the planning zone is shared.
+landed sixteen S4-F2 implementation commits across recent iterations.
+Per PLAN.md §2 the local gate is authoritative; the visual QA sweep
+is materially complete on demo-critical routes and is extending into
+metadata, descriptive accuracy, empty-state patterns, filter
+interactions, documentation copy, and browser-tab UX.
 
 ### Outstanding cross-agent dependency
 
@@ -106,19 +106,17 @@ Claude this prompt.
 
 ### Next action
 
-Continue the S4-F2 sweep. Specific candidates remaining:
-- standardize the `/orders/[id]` "no leads" fallback to
-  `<EmptyState>` for visual consistency with all peer empty states.
-- re-read `/dashboard/page.tsx` analyst-panel + dealer-ops cards
-  against the CRM-CONTRACT for term consistency in card titles
-  ("Behind-Pace Orders", "Unrouted Leads", "Stale High-Value Deals",
-  "Low-Health Dealer Accounts").
-- audit `/activities/page.tsx` for the dual-control filter pattern
-  (badge row + select form) — both target the same param and may
-  cause confusing state when used together.
+Add `generateMetadata` exports to the five detail pages
+(`/accounts/[id]`, `/contacts/[id]`, `/leads/[id]`, `/orders/[id]`,
+`/reports/[slug]`) so each open detail tab shows the actual record
+name (Account name, Contact full name, Lead full name, Dealer Order
+name, Report title). This requires a thin extra Prisma query per
+detail page render, deduped via React `cache()` where it makes sense
+(reports/[slug] reads no DB).
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (both edited files live in `app/**`).
+No cross-ownership edits: YES (all fourteen edited files live in
+`app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes; both edits are pure copy/typography).
+signature changes — Next.js metadata API only).
