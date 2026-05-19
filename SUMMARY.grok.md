@@ -8,50 +8,56 @@
 ---
 
 Agent: Grok  
-Sprint: 4  
-Feature: S4-F3 — Component polish  
+Sprint: 4 (noting 4B references in other agents' reports and git history)  
+Feature: S4-F3 — Component polish + demo-path testid enablement  
 Branch: grok/sprint-4-component-polish  
 Status: done  
-Commits this prompt: e8a0ddb — [grok] S4-F3: polish shared components for spacing, empty states, deterministic ordering  
+Commits this prompt: e12f1a9, 7a891d1, 75b1435 — [grok] S4-F3: add lead-form-submit / contact-note-* / activity-timeline-summary data-testid for e2e demo-path  
 Gate status: PASS  
 DoD self-check: PASS  
-Timestamp: 2026-05-19T09:25:00Z
+Timestamp: 2026-05-19T12:45:00Z
 
 ### Completed this prompt
-- Verified next-env.d.ts tracking (was tracked) per prompt "before changing files" requirement; fixed via .gitignore + `git rm --cached` (smallest cross-zone hygiene to unblock; documented).
-- Switched to canonical S4-F3 branch `grok/sprint-4-component-polish`.
-- Polished EmptyState (Grok-owned): added `compact` prop for dense contexts (kanban, cards), `data-testid` support, stable icon/padding variants — improves readable empty states and consistent spacing.
-- Unified 3 inline empty states (ActivityTimeline, RoutingDecisionDetail, DealBoard stage columns) to use shared `<EmptyState compact />` for consistency and better UX in demo flows.
-- Made table sorts deterministic (accounts-table, contacts-table): added id tie-breaker in compare functions so equal primary values always produce stable order by id (no reliance on JS sort stability).
-- All changes strictly in `components/**` + one shared .gitignore entry; no business logic, no schema, no route changes, CRM-CONTRACT.md honored.
-- Ran required checks for UI visual polish (PLAN §9): `npm run build` (exit 0, TS clean, pages generated), `npx playwright install chromium`, `npm run test:e2e` (exit 0, 19/19 relevant passed after seed).
-- No orphaned actions, broken links, or non-deterministic behavior introduced in Grok components.
-- Updated this SUMMARY + BLOCKERS (report-only commit to follow).
+- Executed full Grok LOOP.md pre-flight (Phase 0): clean tree, correct grok/ branch prefix, `npm run test` (162/162 passed), `npm run build` (exit 0, TS clean) as baseline.
+- Phase 1 orient: read all required files (README, PLAN.md §§1-11+13+17, CRM-CONTRACT, AGENTS, LOOP.md + grok/*, docs/PROJECT-CONTROL/LOCAL-GATE/MERGE/NEXT, prompts/*, SUMMARIES/BLOCKERS for all agents, .cursor/rules/max-yolo.mdc, max-yolo policy). Confirmed next-env.d.ts not tracked/staged (git ls-files + check-ignore clean).
+- Reconciled: PLAN.md §4 still lists S4-F* as "queued" and Sprint 4; however git history + other agents' SUMMARY/BLOCKERS document Sprint 4B completion (incl. 4b merges on this branch). Per PLAN §2, local gate + current continuous-mode prompt authoritative; recorded discrepancy without inventing §4 entries.
+- Selected and completed one focused work unit in zone: added required data-testid attributes to support Gemini's skipped e2e/demo-path.spec.ts (addresses Gemini BLOCKERS #3 "Missing data-testid for demo path" in components/**).
+  - components/lead-form.tsx: data-testid="lead-form-submit" on submit Button.
+  - components/add-note-form.tsx: data-testid="contact-note-input" on Textarea, "contact-note-submit" on save Button.
+  - components/activity-timeline.tsx: data-testid="activity-timeline-summary" on summary/rawText paragraphs (supports .first() query post-note).
+- Changes are minimal, test-only attributes (no behavior, no new logic, forwards through existing ui/* primitives that extend HTML attrs). Other listed testids (routing-*, dashboard-analyst-*, forecast-*, lead-status-badge) reside in app/** (Claude zone) or not present in shared components — left for coordination.
+- 3 atomic implementation commits (one logical change per commit per PLAN §7).
+- Ran required checks for UI/demo change (PLAN §9): `npm run build` (exit 0, "Compiled successfully", no TS errors), `npm run test:e2e` (exit 0 after seed, 19 passed / 1 skipped as expected since demo-path still .skip() in Gemini spec).
+- No `any`, `@ts-ignore`, or bypasses introduced (verified via build + manual scan).
+- No cross-zone edits this iteration; CRM-CONTRACT.md, product guardrails (no /deals/[id] addition by Grok, no new routes/features), and ownership honored.
+- Updated reports (this file + BLOCKERS) for handoff.
 
 ### Next action
-Await merge review / next Sprint 4 prompt (S4-F4 Gemini gate hardening) or IFT coordination. S4-F3 scope complete on agent branch; no further component work unless new prompt.
+S4-F3 + e2e support complete on branch. No further valid work units in Grok-owned priorities (no active Grok blockers, S4-F3 done, no contract drift in zone, no pending doc fixes). On next continuous LOOP iteration: emit sprint rollover per LOOP Phase 2 (or run prompts/grok/SPRINT-ROLLOVER.md if authorized). Await IFT/PLAN update or Gemini unskip of demo-path now that hooks exist. Ready for merge review of grok/sprint-4-component-polish.
 
 ### Scope confirmation
-No cross-ownership edits: NO (see BLOCKERS: minimal .gitignore hygiene required to satisfy prompt-mandated next-env.d.ts verify before any Grok file changes; documented reason + smallest direct)  
+No cross-ownership edits: YES (this iteration; prior .gitignore hygiene documented in previous)  
 CRM-CONTRACT.md honored: YES
 
 ---
 
 **Gate evidence (this prompt):**
-- Build: `npm run build` → exit 0, "Compiled successfully", all routes listed, no TS errors from polish changes.
-- E2E: `npm run test:e2e` (after browser install) → exit 0, 19 passed, 1 skipped (visual platform guard). Seed ran cleanly. No test failures attributable to component updates (hydration warnings pre-existing in layout).
-- Dirty paths before commit: .gitignore (M), 6 component .tsx (M), next-env.d.ts (D from rm --cached).
-- Branch: created and pushed as `grok/sprint-4-component-polish` (per NEXT-PROMPTS + PLAN naming).
+- Preflight + verify Build: `npm run build` → exit 0 both times, "Compiled successfully", all routes generated (incl pre-existing /deals/[id] from prior 4B merges, untouched by Grok), TS finished clean.
+- E2E: `npm run test:e2e` (seed + playwright) → exit 0, 19 passed, 1 skipped (demo-path intentionally still skipped in e2e/demo-path.spec.ts). No regressions from testid attrs.
+- Impl commits: e12f1a9 (lead-form), 7a891d1 (add-note-form), 75b1435 (activity-timeline).
+- Dirty paths before any report: clean (post-impl commits).
+- Branch: grok/sprint-4-component-polish (no push yet; report commit + push to follow).
+- Max-YOLO / continuous: followed LOOP phases 0-6 exactly; used repo-local evidence only; no destructive ops; ordinary commands (npm, git, npx) executed without manual stop per .cursor/rules/max-yolo.mdc and AGENTS.md.
 
 **Cross-zone note (ownership):**  
-Edited `.gitignore` (shared coordination zone per PLAN §5) solely to make next-env.d.ts untracked/ignored before editing any Grok-owned implementation files, directly fulfilling the user prompt's "Before changing files, verify next-env.d.ts is not tracked or staged" step + PLAN §5 "auto-generated... treat as dependency blocker if unexpectedly modified/staged". Change is reversible, minimal, and recorded here + in commit body. No other shared/contract files touched.
+None this iteration. All edits confined to components/** (Grok per PLAN §5 and AGENTS.md). The /deals/[id] route visible in build output pre-existed from Sprint 4B merges (Claude app zone); Grok did not author, touch, or promote it — guardrail preserved.
 
-**Files changed in S4-F3 impl (e8a0ddb):**
-- components/ui/empty-state.tsx (core polish)
-- components/activity-timeline.tsx, components/routing-decision-detail.tsx, components/deal-board.tsx (unified empties)
-- components/accounts-table.tsx, components/contacts-table.tsx (deterministic sorts)
-- .gitignore (hygiene enabler)
+**Files changed in this prompt's impl commits:**
+- components/lead-form.tsx (lead-form-submit testid)
+- components/add-note-form.tsx (contact-note-input + submit testids)
+- components/activity-timeline.tsx (activity-timeline-summary testid)
 
-All per S4-F3 acceptance: stable spacing, readable empty states, deterministic ordering, accessible (testids, aria preserved), no broken/orphaned in demo-used components.
+These directly enable portions of the hardened demo path (lead intake, contact note AI summary, activity view) per e2e/demo-path.spec.ts and Gemini BLOCKERS #3. Remaining testids require Claude-owned app/** pages.
 
-*Grok S4-F3 complete. Local gate green. Ready for handoff review.*
+*Grok continuous iteration complete. Local gate green. Testid support shipped. Sprint rollover candidate for next.*
+
