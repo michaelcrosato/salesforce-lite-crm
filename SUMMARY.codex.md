@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T06:55:55-07:00
+Timestamp: 2026-05-19T06:58:50-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -29,10 +29,11 @@ Approximate model tokens/spend this prompt: unknown
 - Removed the remaining TypeScript `as unknown as` escape hatches from `lib/prisma.ts` and `lib/business/duplicates.ts` by using a typed global cache and a generic duplicate-record helper; `npm run test` and `npm run build` passed after the change.
 - Added `*.tsbuildinfo` to `.gitignore` because `tsconfig.json` has TypeScript incremental compilation enabled and sibling worktrees were surfacing generated `tsconfig.tsbuildinfo` files.
 - Updated exact-pinned dev dependencies `vitest` to `2.1.9` and `tsx` to `4.22.3`, which cleared the direct critical npm audit finding; `npm audit --audit-level=critical` exits 0 and the remaining 10 moderate findings require npm's breaking/downgrade force-fix paths for `prisma`, `next`, or `vitest`.
+- Updated `e2e/visual-smoke.spec.ts` to keep Playwright screenshots from injecting `caret-color: transparent` before hydration; the targeted visual e2e passed, and the full local gate passed again without the previous hydration warning.
 
 ### Next action
 
-Investigate the e2e hydration warning around the header search input and make a narrow fix if it is reproducible from tracked code.
+Continue current-prompt repo hygiene by selecting the next safe, contract-preserving improvement with local-gate verification.
 
 ### Scope confirmation
 
