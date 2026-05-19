@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T06:45:08-07:00
+Timestamp: 2026-05-19T06:47:47-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -25,6 +25,7 @@ Approximate model tokens/spend this prompt: unknown
 - Verified the baseline and final state with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`: `npm install`, Prisma generate/db push, seed, 140/140 Vitest tests, build, Playwright Chromium install, and 19/19 e2e tests all passed.
 - Cross-zone exception: updated Gemini-owned `scripts/clean-local-artifacts.ps1` because the current prompt authorized repo-wide safety work and the script's dry run showed `.claude` as a deletion candidate; the script now preserves tracked `.claude` hook/config files and only offers ignored `.claude/logs` files.
 - Cleared the stale tracked `AUTONOMY.STOP` marker because its contents instructed deletion once dispatch resumed, and this run resumed repo work outside the prior sandbox stop condition.
+- Refreshed `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` from `scripts/check-worktrees.ps1` output so coordination docs now show all four registered worktrees plus the Claude/Gemini dirty-state caveats before unattended dispatch.
 
 ### Next action
 
