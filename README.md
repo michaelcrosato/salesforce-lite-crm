@@ -192,6 +192,7 @@ seed             tsx prisma/seed.ts
 test             vitest run --maxWorkers=1 --minWorkers=1
 test:e2e         npm run seed && playwright test
 prisma:postgres  node scripts/prisma-postgres.mjs
+autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
 ```
 
 There are no `lint`, `typecheck`, or `format` scripts unless `package.json`
