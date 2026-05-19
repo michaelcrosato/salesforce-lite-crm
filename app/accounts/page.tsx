@@ -1,4 +1,5 @@
 import { AccountsTable } from "@/components/accounts-table";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
@@ -88,7 +89,7 @@ export default async function AccountsPage({
       <Card>
         <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Account List</CardTitle>
-          <form action="/accounts" className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-[1fr_160px]">
+          <form action="/accounts" className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-[1fr_160px_auto]">
             <Input name="q" defaultValue={query} placeholder="Search accounts" />
             <Select name="status" defaultValue={status}>
               <option value="all">All statuses</option>
@@ -98,6 +99,9 @@ export default async function AccountsPage({
                 </option>
               ))}
             </Select>
+            <Button type="submit" variant="secondary">
+              Apply
+            </Button>
           </form>
         </CardHeader>
         <CardContent>
