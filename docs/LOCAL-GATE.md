@@ -32,7 +32,7 @@ Current `package.json` scripts:
 postinstall      node scripts/ensure-sqlite-db.mjs
 dev              next dev
 build            next build
-lint             eslint .
+lint             eslint . --max-warnings=0
 seed             tsx prisma/seed.ts
 test             vitest run --maxWorkers=1 --minWorkers=1
 test:e2e         npm run seed && playwright test
