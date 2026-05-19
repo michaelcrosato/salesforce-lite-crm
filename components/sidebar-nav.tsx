@@ -63,7 +63,12 @@ const navItems: readonly NavItem[] = [
   reportsItem
 ];
 
-export function SidebarNav({ mobile = false }: { mobile?: boolean }) {
+export interface SidebarNavProps {
+  mobile?: boolean;
+  "data-testid"?: string;
+}
+
+export function SidebarNav({ mobile = false, "data-testid": testid }: SidebarNavProps = {}) {
   const pathname = usePathname();
 
   return (
@@ -72,6 +77,7 @@ export function SidebarNav({ mobile = false }: { mobile?: boolean }) {
         mobile ? "flex gap-1 overflow-x-auto p-2" : "flex flex-col gap-1 p-4"
       )}
       aria-label="Primary"
+      data-testid={testid}
     >
       {navItems.map((item) => {
         const Icon = item.icon;
@@ -81,11 +87,12 @@ export function SidebarNav({ mobile = false }: { mobile?: boolean }) {
           <Link
             key={item.href}
             href={item.href}
+            data-testid={`nav-link-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
             className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all demo-stable",
               active
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-0.5",
               mobile && "min-w-fit"
             )}
           >
