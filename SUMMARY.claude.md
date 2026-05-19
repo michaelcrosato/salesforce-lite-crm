@@ -1,60 +1,45 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — detail page generateMetadata + form page titles
+Feature: S4-F2 route visual QA — excluded-route metadata titles
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 0632bfd — [claude] S4-F2: dynamic generateMetadata titles for detail pages; 63d9ff9 — [claude] S4-F2: add metadata titles for entity creation pages
+Commits this prompt: c175bbe — [claude] S4-F2: add metadata titles for excluded route placeholders
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:06:00-08:00
+Timestamp: 2026-05-19T07:10:30-08:00
 
 ### Completed this prompt
 
-- Added `generateMetadata` to all five Claude-owned dynamic detail
-  pages. Each function awaits the route param, runs a lightweight
-  `findUnique` with `select: { name|firstName/lastName: true }`, and
-  returns `{ title: <human label> }`. Missing-record case returns a
-  not-found label so the tab still disambiguates.
-  - `/accounts/[id]` → `account.name` (fallback "Account not found")
-  - `/contacts/[id]` → `${firstName} ${lastName}` (fallback
-    "Contact not found")
-  - `/leads/[id]` → `${firstName} ${lastName}` (fallback
-    "Lead not found")
-  - `/orders/[id]` → `order.name` (fallback "Dealer order not found")
-  - `/reports/[slug]` → `getReportDefinition(slug).title` (fallback
-    "Report not found"; no Prisma read because the registry is
-    static).
-- Each detail page adds one `import type { Metadata } from "next";`
-  to its top import block and one `generateMetadata` export between
-  the existing `export const dynamic = "force-dynamic"` and the
-  default `export default async function`. No other code is touched;
-  the default page render continues to use its own Prisma query with
-  full `include`/`select`, so the metadata query is a strict addition
-  (a single column lookup with no relations).
-- Added static `metadata: Metadata = { title: "..." }` exports to the
-  five entity creation pages: `/accounts/new`, `/deals/new`,
-  `/tasks/new`, `/cases/new`, `/campaigns/new`. Each title mirrors
-  the page's existing `PageHeader` title ("New Account",
-  "New Deal", etc.). The pattern matches the Iter 7 list-page
-  metadata additions for consistency.
-- Combined with the title.template added in Iter 7, every active
-  Claude-owned page now renders a disambiguating browser tab title.
-  The home redirect at `/` and the seven excluded-route placeholders
-  intentionally fall back to the layout default
-  ("Salesforce Lite CRM") — they're tab-disambiguation low value
-  surfaces (redirect or "unavailable" pages).
+- Added static `metadata: Metadata = { title: "<route> (Unavailable)" }`
+  exports to all seven Claude-owned excluded-route placeholder pages:
+  - `/deals/[id]` → "Deal Detail (Unavailable)"
+  - `/search` → "Search (Unavailable)"
+  - `/command-palette` → "Command Palette (Unavailable)"
+  - `/areas/new` → "New Area (Unavailable)"
+  - `/areas/[id]/edit` → "Edit Area (Unavailable)"
+  - `/orders/new` → "New Order (Unavailable)"
+  - `/orders/[id]/edit` → "Edit Order (Unavailable)"
+- These pages render the Grok-owned
+  `<ExcludedRoutePlaceholder route=... reason=... />` component
+  unchanged; the metadata addition is title-only. With this iter, the
+  per-page title coverage for all Claude-owned routes is complete —
+  every reachable Claude-owned URL now sets its own browser tab
+  title via the Iter 7 `title.template`.
+- Each excluded page gained one `import type { Metadata } from "next";`
+  line and a four-line metadata export block. No render output
+  changed.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; `generateMetadata` compiles
-  cleanly for all five detail routes).
+- `npm run build` → SUCCESS (32 routes; all excluded routes still
+  generate correctly).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before each implementation commit aside
+- `git status --short` clean before the implementation commit aside
   from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
-Implementation commits on this branch since `cc00d6c`:
+Implementation commits on this branch since `cc00d6c` (19 total):
 
 | SHA | Subject |
 |---|---|
@@ -72,27 +57,27 @@ Implementation commits on this branch since `cc00d6c`:
 | `dba0fce` | add per-page metadata titles for distinct browser tabs |
 | `0632bfd` | dynamic generateMetadata titles for detail pages |
 | `63d9ff9` | add metadata titles for entity creation pages |
+| `c175bbe` | add metadata titles for excluded route placeholders |
 
-Eight categories of polish on this branch:
+Plus the pre-session `81f438f`, `9b98e72`, `d51d817` work makes 18
+Claude-zone S4-F2 commits on this branch.
+
+Eight categories of polish, all gate-green:
 1. metadata + product framing alignment (e0f138c, 2b7f8da)
 2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78, a93f85a)
 3. perceived-perf parity for detail routes (07a19cb)
 4. graceful 404 boundary (0fba7d3)
 5. interactive filter parity across list pages (0a33253)
 6. internal documentation clarity (bd6468a)
-7. browser tab disambiguation (2098a38, dba0fce, 0632bfd, 63d9ff9)
-8. plus the prior `81f438f`, `9b98e72`, `d51d817` testid/header/case
-   work from earlier prompts.
+7. complete browser tab title coverage (2098a38, dba0fce, 0632bfd, 63d9ff9, c175bbe)
+8. plus prior testid/header/case work from earlier prompts.
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued`; Claude has now
-landed eighteen S4-F2 implementation commits across recent
-iterations. Per PLAN.md §2 the local gate is authoritative; the
-visual QA sweep is materially complete on demo-critical routes and
-has now extended into a full per-page browser-tab title system, a
-custom 404 boundary, detail-page perceived-perf parity, filter UX
-parity, and product framing/copy alignment with README v2.
+PLAN.md §4 still lists S4-F2 with `Status: queued`; the local gate
+has been green for every commit and the entire Claude-owned route
+surface has full per-page browser-tab title coverage. Per PLAN.md §2
+the local gate is authoritative.
 
 ### Outstanding cross-agent dependency
 
@@ -105,21 +90,18 @@ Claude this prompt.
 
 ### Next action
 
-Pivot from S4-F2 leaf-polish toward S4-F2 closeout work. Candidates:
-- Standardize the `/orders/[id]` "no leads delivered" fallback to
-  `<EmptyState>` for visual consistency with peer detail pages.
-- Sweep `app/error.tsx` and `app/not-found.tsx` for shared layout
-  utilities (both use `crm-page flex flex-col items-start gap-4`;
-  small extract may be premature).
-- Once the next prompt agrees S4-F2 is complete, write a
-  consolidation note to `BLOCKERS.gemini.md` documenting the
-  remaining components/**-side testid blockers Claude needs from
-  Grok before E2E demo-path can be un-skipped.
+S4-F2 is materially complete for the Claude-owned surface. Remaining
+incremental polish options exist (loading-skeleton style
+unification, post-create redirects on `/<entity>/new` actions) but
+each is either bikeshed risk or requires coordination. Best next
+action: re-read the merged-to-`main` history for S4-F2 expectations
+and either close S4-F2 with a SPRINT-ROLLOVER hand-off prompt, or
+pick up another sprint feature whose Owner column matches Claude.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all ten edited files live in
+No cross-ownership edits: YES (all seven edited files live in
 `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — Next.js metadata API additions only; no new
-queries beyond a lightweight name-column lookup per detail page).
+signature changes — Next.js metadata additions only; render output
+of each placeholder page is unchanged).
