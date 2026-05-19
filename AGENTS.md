@@ -21,10 +21,10 @@ handoff.
 
 | Agent | Expected worktree | Branch ownership | Report files | Current local status |
 |---|---|---|---|---|
-| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | registered Git worktree |
-| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | expected path exists locally but is not currently registered by `git worktree list` |
-| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | expected path exists locally but is not currently registered by `git worktree list` |
-| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | expected path exists locally but is not currently registered by `git worktree list` |
+| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | registered at `codex/sprint-4-demo-seed-tuning`; clean as of `scripts/check-worktrees.ps1` on 2026-05-19 |
+| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | registered at `claude/autonomy`; has local untracked `tsconfig.tsbuildinfo` as of `scripts/check-worktrees.ps1` on 2026-05-19 |
+| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | registered at `grok/sprint-4-component-polish`; clean as of `scripts/check-worktrees.ps1` on 2026-05-19 |
+| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | registered at `gemini/autonomy`; has local `next-env.d.ts`, `debug-analyst.ts`, and `tsconfig.tsbuildinfo` changes as of `scripts/check-worktrees.ps1` on 2026-05-19 |
 
 Branch naming convention from `PLAN.md`: `<prefix>sprint-<id>-<feature-slug>`.
 Current Sprint 4 next-push prompts are in `docs/NEXT-PROMPTS.md` and

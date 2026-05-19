@@ -11,16 +11,21 @@ C:\dev\salesforce-lite-crm-grok
 C:\dev\salesforce-lite-crm-gemini
 ```
 
-Observed during the 2026-05-18 Codex readiness pass:
+Observed during the 2026-05-19 Codex repo-hygiene pass:
 
 ```text
-C:/dev/salesforce-lite-crm 2d2110d [codex/r8-r9-managed-autonomy-bootstrap]
+C:/dev/salesforce-lite-crm        bac8264 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm-claude 75d6a28 [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini 32a7385 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   3c604a4 [grok/sprint-4-component-polish]
 ```
 
-The sibling expected paths existed on disk, but only the Codex path was
-registered by `git worktree list` at the time of this pass. Use
-`git worktree list` for the current commit SHA and branch at each registered
-path before creating, repairing, or deleting worktrees.
+All four expected paths are currently registered. Use `git worktree list` and
+`scripts/check-worktrees.ps1` for the current commit SHA, branch, and dirty
+state at each registered path before creating, repairing, or deleting
+worktrees. The 2026-05-19 check found Claude and Gemini worktrees with local
+generated/debug files, so do not launch unattended work there until their
+owners clean or account for those paths.
 
 ## Inspect Worktrees
 

@@ -2,8 +2,9 @@
 
 ## Current Status
 
-- Branch observed this pass: `codex/r8-r9-managed-autonomy-bootstrap`.
-- Current pass: Codex readiness, consistency, and stabilization pass complete.
+- Branch observed this pass: `codex/sprint-4-demo-seed-tuning`.
+- Current pass: Codex repo hygiene continuation active under the current
+  max-YOLO prompt; full local gate passed on 2026-05-19.
 - Product feature work: not expanded. This pass only corrected contract drift,
   stale coordination docs, excluded-route behavior, and non-contract seed/helper
   artifacts.
@@ -17,15 +18,28 @@
 
 The prompt named `C:\dev\salesforce-lite-crm-codex`, but that path was not a
 Git repository and contained only ignored `.next` output at the start of this
-pass. The actual registered project worktree observed by `git worktree list`
-was:
+pass. The active Codex worktree for this pass is:
 
 ```text
-C:/dev/salesforce-lite-crm 2d2110d [codex/r8-r9-managed-autonomy-bootstrap]
+C:/dev/salesforce-lite-crm bac8264 [codex/sprint-4-demo-seed-tuning]
 ```
 
 The readiness pass therefore ran against `C:\dev\salesforce-lite-crm`, which is
 also the Codex worktree path listed in `PLAN.md` and `AGENTS.md`.
+
+As of `scripts/check-worktrees.ps1` on 2026-05-19, all four expected worktrees
+are registered:
+
+```text
+C:/dev/salesforce-lite-crm        bac8264 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm-claude 75d6a28 [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini 32a7385 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   3c604a4 [grok/sprint-4-component-polish]
+```
+
+Claude and Gemini have local dirty generated/debug files in their worktrees;
+do not dispatch unattended work there until those paths are cleaned or
+explicitly accounted for in that agent's reports.
 
 ## Completed Readiness Scope
 
@@ -76,6 +90,7 @@ Do not paste raw chat history into repo files.
 
 ## Exact Next Step
 
-Review `SUMMARY.codex.md`, `BLOCKERS.codex.md`, and `REVIEW.CODEX.md`, then
-start Sprint 4 using `docs/NEXT-PROMPTS.md`. The full local gate passed during
-this readiness pass on 2026-05-18.
+Continue Sprint 4 coordination from `docs/NEXT-PROMPTS.md`. Before launching
+non-Codex agents, inspect their current worktree status with
+`scripts/check-worktrees.ps1`; the full local gate passed in the Codex worktree
+on 2026-05-19.
