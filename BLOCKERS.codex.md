@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:46:49-07:00
+Timestamp: 2026-05-19T07:49:50-07:00
 
 Escalation required: NO
 
@@ -37,3 +37,4 @@ Escalation required: NO
 - Typecheck gate documented: `package.json`, local-gate scripts, active gate docs/prompts, and type-drift tests were updated under repo-hygiene scope so future full gates include `npm run typecheck`; final full local gate passed with lint, typecheck, 144 Vitest tests, build, and 19 e2e tests.
 - Excluded-route e2e alignment documented: `e2e/excluded-routes.spec.ts` now derives smoke paths from `lib/featureFlags.ts`; targeted excluded-route e2e and the full local gate passed.
 - Query-param hardening documented: `lib/queryParams.ts`, focused helper tests, and task/case/campaign/lead list pages were updated under repo-hygiene scope; final full local gate passed with 147 Vitest tests and 19 e2e tests.
+- Forecast query hardening documented: `app/forecast/page.tsx`, `lib/queryParams.ts`, and focused helper tests now parse bounded numeric scenario params independently; final full local gate passed with 148 Vitest tests and 19 e2e tests.

@@ -21,7 +21,7 @@ Git repository and contained only ignored `.next` output at the start of this
 pass. The active Codex worktree for this pass is:
 
 ```text
-C:/dev/salesforce-lite-crm f561aff [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm ef9ce64 [codex/sprint-4-demo-seed-tuning]
 ```
 
 The readiness pass therefore ran against `C:\dev\salesforce-lite-crm`, which is
@@ -31,7 +31,7 @@ As of `scripts/check-worktrees.ps1` on 2026-05-19, all four expected worktrees
 are registered:
 
 ```text
-C:/dev/salesforce-lite-crm        f561aff [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm        ef9ce64 [codex/sprint-4-demo-seed-tuning]
 C:/dev/salesforce-lite-crm-claude c84d34b [claude/autonomy]
 C:/dev/salesforce-lite-crm-gemini fc4f787 [gemini/autonomy]
 C:/dev/salesforce-lite-crm-grok   99c92ae [grok/sprint-4-component-polish]
@@ -69,6 +69,8 @@ cleanup changes:
   route-contract drift between the feature-flag list and Playwright coverage.
 - Added shared query-param sanitizers for task, case, campaign, and lead list
   pages so malformed filter URLs degrade back to unfiltered states.
+- Parsed forecast scenario query fields independently so malformed numeric
+  inputs do not discard valid sibling filters.
 
 ## Sprint Status From PLAN.md
 

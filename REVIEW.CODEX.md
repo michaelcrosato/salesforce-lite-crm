@@ -38,6 +38,8 @@ subject to normal human diff review before commit/push.
   `EXCLUDED_ROUTES`, reducing contract/test drift risk.
 - Added shared query-param sanitizers for list pages and covered blank/invalid
   filter params with focused Vitest tests.
+- Hardened forecast scenario query parsing so invalid multiplier or assignment
+  params do not erase valid area or sibling numeric filters.
 
 ## Remaining Risks
 
@@ -58,7 +60,7 @@ subject to normal human diff review before commit/push.
 | `npm run seed` | PASS |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm run test` | PASS, 147 tests |
+| `npm run test` | PASS, 148 tests |
 | `npm run build` | PASS |
 | `npx playwright install chromium` | PASS |
 | `npm run test:e2e` | PASS, 19 passed |
