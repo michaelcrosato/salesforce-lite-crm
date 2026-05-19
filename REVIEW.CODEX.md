@@ -36,6 +36,8 @@ subject to normal human diff review before commit/push.
   standalone `tsc --noEmit` remains green outside `next build`.
 - Refactored excluded-route e2e coverage to derive its path list from
   `EXCLUDED_ROUTES`, reducing contract/test drift risk.
+- Added shared query-param sanitizers for list pages and covered blank/invalid
+  filter params with focused Vitest tests.
 
 ## Remaining Risks
 
@@ -56,7 +58,7 @@ subject to normal human diff review before commit/push.
 | `npm run seed` | PASS |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm run test` | PASS, 144 tests |
+| `npm run test` | PASS, 147 tests |
 | `npm run build` | PASS |
 | `npx playwright install chromium` | PASS |
 | `npm run test:e2e` | PASS, 19 passed |
