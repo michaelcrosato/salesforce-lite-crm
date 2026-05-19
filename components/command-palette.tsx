@@ -11,6 +11,7 @@ import {
   useState,
   useTransition
 } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import {
   searchCrmAction,
@@ -150,13 +151,15 @@ export function CommandPalette() {
         </div>
         <div className="max-h-[60vh] overflow-y-auto p-2">
           {query.trim().length === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Type to search across accounts, contacts, deals, leads, tasks, cases, and campaigns.
-            </p>
+            <EmptyState
+              title="Search the CRM"
+              description="Type to search across accounts, contacts, deals, leads, tasks, cases, and campaigns."
+              compact
+            />
           ) : isPending && totalResults === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">Searching…</p>
+            <EmptyState variant="loading" title="Searching" description="Querying all entities..." compact />
           ) : totalResults === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">No matches.</p>
+            <EmptyState title="No matches" description="Try a different term or check spelling." compact />
           ) : (
             GROUPS.map((group) => {
               const items = results[group.key];
