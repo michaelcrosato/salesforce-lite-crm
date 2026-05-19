@@ -1,42 +1,38 @@
 Agent: Codex
 
-Sprint: Sprint 4
+Sprint: Repo readiness / autonomy
 
-Feature: S4-F1 - Demo seed tuning
+Feature: SLC-AUTONOMY-R5-FINAL - Continuous unattended mode
 
 Branch: codex/r8-r9-managed-autonomy-bootstrap
 
 Status: done
 
-Commits this prompt: cf99362 - [codex] S4-F1: tune seed anchors for analyst demo
+Commits this prompt: 9fe8dc4 - [codex] SLC-AUTONOMY-R5: add continuous autonomy mode
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-18T18:17:56.0961736-07:00
+Timestamp: 2026-05-18T20:38:41.8051994-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Completed Phase 0 pre-flight on a clean `codex/` branch: `npm install`, `.env` check, Prisma generate/db push, seed, Vitest, and build all exited 0.
-- Tuned `prisma/seed.ts` so `deal-1`, `deal-7`, and `deal-13` are stale high-value open deals for the dashboard analyst panel while leaving schema, routes, routing logic, and forecast values unchanged.
-- Updated the pinned seed-anchor comment to explicitly preserve stale high-value deals and low-health accounts attached to active behind-pace dealer orders.
-- Verified the post-seed analyst anchors: 3 stale high-value deals, 4 low-health dealer-account rows, `dealer-order-vancouver-northstar` remains the first behind-order and first analyst action.
-- Required S4-F1 gate passed: `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run test` (22 files / 140 tests), `npm run build`, `npx playwright install chromium`, and `npm run test:e2e` (19 passed).
-
-### Discovered this prompt
-
-- The other agents' SUMMARY/BLOCKERS files still contain historical Sprint 4B claims, while `PLAN.md` §4 lists Sprint 4 only and keeps S4-F1 through S4-F4 queued. Per the source-of-truth order, this prompt used the current local gate, current prompt, `PLAN.md`, and `CRM-CONTRACT.md`; no new PLAN sprint entries were invented.
-- `npm run build` still reports excluded app-router placeholders such as `/deals/[id]`, `/search`, `/command-palette`, `/orders/new`, `/orders/[id]/edit`, `/areas/new`, and `/areas/[id]/edit`. `CRM-CONTRACT.md` and the e2e excluded-route guard allow placeholder-only/404 behavior for these routes, and `npm run test:e2e` passed.
+- Added the `PLAN.md` Continuous document-control flag, the 6A Continuous / Unattended Mode override, and set `Continuous` to `ON` after the local gate passed.
+- Replaced the AGENTS maximum-YOLO policy with the requested Default/Continuous distinction and appended the continuous chaining rule to `.cursor/rules/max-yolo.mdc`.
+- Created `prompts/manager/continuous.md` and ran the requested manager audit; only the new continuous prompt matched the audit terms.
+- Updated `.claude/settings.json` with `permissions.defaultMode: acceptEdits` and narrow helper allow entries while preserving existing hooks and scoped permissions.
+- Created `scripts/autonomy-loop.ps1` and added the optional `npm run autonomy:overnight` package script.
+- Full local gate passed: `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 after npm install, Prisma generate/db push, seed, 22 Vitest files / 140 tests, Next build, Chromium install, and 19 Playwright tests.
 
 ### Next action
 
-Codex S4-F1 is ready for review/merge; wait for the remaining Sprint 4 agent work or a new PLAN scope before starting another Codex feature.
+Launch continuous mode with `claude --permission-mode acceptEdits -p prompts/manager/continuous.md` or `powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1` after deciding how to handle the pre-existing `next-env.d.ts` generated-file dirty state.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES
+No cross-ownership edits: NO
 
 CRM-CONTRACT.md honored: YES
