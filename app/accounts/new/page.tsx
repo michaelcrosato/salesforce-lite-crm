@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { AccountForm } from "@/components/account-form";
 import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Account"
+};
 
 export default async function NewAccountPage() {
   const owners = await prisma.user.findMany({

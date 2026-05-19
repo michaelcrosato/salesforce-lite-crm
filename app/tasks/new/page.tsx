@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import {
   TaskForm,
@@ -12,6 +13,10 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Task"
+};
 
 export default async function NewTaskPage() {
   const [owners, accounts, contacts, deals, leads] = await Promise.all([

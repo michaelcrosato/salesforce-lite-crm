@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { DealForm } from "@/components/deal-form";
 import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Deal"
+};
 
 export default async function NewDealPage() {
   const [accounts, contacts, owners] = await Promise.all([

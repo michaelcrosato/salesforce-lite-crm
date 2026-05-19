@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   CampaignForm,
   type CampaignOptionItem
@@ -6,6 +7,10 @@ import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Campaign"
+};
 
 export default async function NewCampaignPage() {
   const owners = await prisma.user.findMany({

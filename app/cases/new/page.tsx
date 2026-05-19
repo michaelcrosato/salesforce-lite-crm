@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { CaseForm, type CaseOptionItem } from "@/components/cases/case-form";
 import { PageHeader } from "@/components/page-header";
 import { listAccounts, listContacts } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Case"
+};
 
 export default async function NewCasePage() {
   const [owners, accounts, contacts] = await Promise.all([
