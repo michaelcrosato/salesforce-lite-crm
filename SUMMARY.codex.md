@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise; 2f136ab - [codex] S4-F1: refresh coordination audit notes
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T06:58:50-07:00
+Timestamp: 2026-05-19T07:02:10-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -30,6 +30,7 @@ Approximate model tokens/spend this prompt: unknown
 - Added `*.tsbuildinfo` to `.gitignore` because `tsconfig.json` has TypeScript incremental compilation enabled and sibling worktrees were surfacing generated `tsconfig.tsbuildinfo` files.
 - Updated exact-pinned dev dependencies `vitest` to `2.1.9` and `tsx` to `4.22.3`, which cleared the direct critical npm audit finding; `npm audit --audit-level=critical` exits 0 and the remaining 10 moderate findings require npm's breaking/downgrade force-fix paths for `prisma`, `next`, or `vitest`.
 - Updated `e2e/visual-smoke.spec.ts` to keep Playwright screenshots from injecting `caret-color: transparent` before hydration; the targeted visual e2e passed, and the full local gate passed again without the previous hydration warning.
+- Refreshed `AGENTS.md`, `docs/PROJECT-CONTROL.md`, `docs/WORKTREE-SETUP.md`, and `REVIEW.CODEX.md` from the latest `scripts/check-worktrees.ps1` and audit results so sibling dirty-state and audit-risk notes are no longer stale.
 
 ### Next action
 
