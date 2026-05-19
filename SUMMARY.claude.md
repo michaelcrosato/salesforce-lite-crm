@@ -1,53 +1,48 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — back-to-list nav on form pages + global 404 tab title
+Feature: S4-F2 route visual QA — forecast empty state for no active orders
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 6963f5f — [claude] S4-F2: add back-to-list nav button on entity creation pages; 501c6be — [claude] S4-F2: set tab title on global not-found page
+Commits this prompt: af2ec63 — [claude] S4-F2: add EmptyState to forecast Order Projection when no active orders
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:24:30-08:00
+Timestamp: 2026-05-19T07:27:00-08:00
 
 ### Completed this prompt
 
-- Added a `<Button asChild variant="outline">` "Back to <entity>" link
-  to each `/<entity>/new` `PageHeader` children slot. Previously, users
-  who reached a `/new` page (via the sidebar or a list-page CTA) had no
-  in-page way back to the list — they had to use the sidebar or
-  browser back. Now every entity creation page has an explicit escape
-  hatch in the page header, matching the "Back to All Reports" pattern
-  already in `app/reports/[slug]/page.tsx`.
-  - `/accounts/new` → "Back to accounts" → `/accounts`
-  - `/deals/new` → "Back to deals" → `/deals`
-  - `/tasks/new` → "Back to tasks" → `/tasks`
-  - `/cases/new` → "Back to cases" → `/cases`
-  - `/campaigns/new` → "Back to campaigns" → `/campaigns`
-- Added `export const metadata = { title: "Page not found" }` to
-  `app/not-found.tsx`. The root 404 is reached two ways: (a) a detail
-  page calls `notFound()` after its `generateMetadata` already ran
-  (those cases set their own "Account not found", "Contact not
-  found", etc. titles); (b) the user types an unmatched URL like
-  `/banana`, in which case no page-level metadata fires and the tab
-  would otherwise fall back to the layout default
-  `"Salesforce Lite CRM"`. With this addition, case (b) shows
-  `"Page not found | Salesforce Lite CRM"` so the browser tab still
-  disambiguates 404s from successful pages.
-- Each `/new` page also gained two imports (`Link` from `next/link`,
-  `Button` from `@/components/ui/button`) where missing. The
-  `not-found.tsx` gained one import (`Metadata` from `next`).
-- No business logic, schema, route, or contract changes. No new
-  dependencies, no test changes, no cross-zone edits.
+- `/forecast/page.tsx` Order Projection card previously always
+  rendered the `<table>` (column headers + tbody) regardless of
+  whether any active orders existed. When the seed produced zero
+  active orders (e.g. a fresh setup before seed runs, or an edge
+  state with all orders paused), the table rendered headers only
+  with an empty tbody — confusing UX that gave no signal about what
+  was missing or how to recover.
+- Wrapped the table render in `forecast.rows.length > 0` and added
+  an `<EmptyState>` fallback that titles "No active dealer orders",
+  describes the relationship to the orders surface, and ships an
+  action button linking to `/orders` so the user has an explicit
+  next step. Matches the established list-page empty-state pattern
+  used on `/accounts`, `/contacts`, `/orders`, `/areas`, and
+  `/activities`.
+- Imported `EmptyState` from `@/components/ui/empty-state`. No other
+  imports changed. No business logic change — `buildForecast` still
+  runs and its summary KPI cards still render with whatever
+  projected values fall out (typically zeros) so the page is
+  consistent across the empty / non-empty rows transition.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; no TypeScript regressions).
-- `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before each implementation commit
-  aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
+- `npm run build` → SUCCESS (32 routes; new EmptyState branch
+  compiles cleanly).
+- `npm run test`  → 162 passed / 162 total (Vitest, 25 files). No
+  test exercises the empty-rows branch in /forecast specifically;
+  this change is defensive against an edge state.
+- `git status --short` clean before the implementation commit aside
+  from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
-Implementation commits on this branch since `cc00d6c` (22 total):
+Implementation commits on this branch since `cc00d6c` (23 total):
 
 | SHA | Subject |
 |---|---|
@@ -72,32 +67,46 @@ Implementation commits on this branch since `cc00d6c` (22 total):
 | `8be5bd7` | Prisma error handling on lead actions |
 | `6963f5f` | back-to-list nav button on entity creation pages |
 | `501c6be` | set tab title on global not-found page |
+| `af2ec63` | EmptyState on forecast when no active orders |
 
-Plus pre-session `81f438f`, `9b98e72`, `d51d817` make 25 Claude-zone
-S4-F2 commits on this branch.
+Plus pre-session `81f438f`, `9b98e72`, `d51d817` make 26 Claude-zone
+S4-F2 implementation commits on this branch.
 
 Ten categories of polish:
 1. metadata + product framing alignment
 2. copy precision (form/empty/header surfaces)
 3. perceived-perf parity (loading skeletons)
-4. graceful 404 boundary (now with disambiguating tab title)
+4. graceful 404 boundary
 5. interactive filter parity
 6. internal documentation clarity (forecast formula)
-7. complete browser tab title coverage (every reachable URL)
+7. complete browser tab title coverage
 8. server-action error-handling parity (all 7 entity actions)
-9. **NEW** explicit back-to-list nav on /new pages
-10. plus prior testid/header/case work from earlier prompts.
+9. explicit back-to-list nav on /new pages
+10. **NEW** defensive empty-state coverage on /forecast Order Projection
+
+### Audit observations (no fix this prompt)
+
+- Detail-page sub-list empty states (`/accounts/[id]` Related
+  Contacts/Deals; `/contacts/[id]` Related Deals; `/orders/[id]`
+  Assigned Leads This Month) all use a plain `<p
+  className="text-sm text-muted-foreground">` for the "no items"
+  fallback rather than `<EmptyState>`. This is intentionally
+  consistent across all detail pages — the EmptyState component is
+  reserved for top-level list pages where the empty state IS the
+  whole page. Not changing.
+- `prismaErrorMessage` is now duplicated in four entity action files
+  (contacts, accounts, deals, leads — tasks/cases/campaigns have
+  their own variants). Extracting to a shared helper would require
+  either `app/_lib/` (acceptable in Claude's zone) or `lib/` (Codex's
+  zone). The four-line duplication is mild; defer unless future
+  changes need a single source.
 
 ### Reconciliation note
 
 PLAN.md §4 still lists S4-F2 with `Status: queued`. Gemini's branch
-(`gemini/autonomy`) has a commit `9560bc6` titled
-"[gemini] repo-readiness: mark Sprint 4 features done in PLAN.md"
-that would promote all Sprint 4 features to `done` once merged. Per
-PLAN.md §2 the local gate is authoritative and that gate has been
-green for every commit on this branch; the visual QA sweep is
-complete for the Claude-owned surface across all coverage
-categories listed above.
+(`gemini/autonomy`) has commit `9560bc6` that would promote Sprint 4
+features to `done` once merged. Per PLAN.md §2 the local gate is
+authoritative; gate has been green for every commit on this branch.
 
 ### Outstanding cross-agent dependency
 
@@ -109,15 +118,14 @@ zone; no action from Claude this prompt.
 
 S4-F2 is comprehensively complete for the Claude-owned surface
 across visual coherence, copy accuracy, perceived performance,
-error resilience, and navigation affordances. Best next move: stand
-by for SPRINT-ROLLOVER prompt to promote S4-F2 to `done` and queue
-the next Claude-owned feature, or for the operator to coordinate a
-merge of this branch + Gemini's PLAN.md update.
+error resilience, navigation affordances, and defensive empty-state
+coverage. Best next move: stand by for SPRINT-ROLLOVER prompt, or
+the operator may merge this branch + Gemini's PLAN.md update.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all six edited files live in
+No cross-ownership edits: YES (single edited file lives in
 `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — every edit is a UI affordance or Next.js
-metadata API usage within Claude's zone).
+signature changes — defensive empty-state wraps the existing render
+with no behavior change for the populated case).
