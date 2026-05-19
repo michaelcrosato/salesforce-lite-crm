@@ -92,7 +92,7 @@ export default async function ContactsPage({
     <div className="crm-page">
       <PageHeader
         title="Contacts"
-        description="Search contacts, create new stakeholders, and open detail timelines."
+        description="Search contacts, create new ones, and open detail timelines."
       />
 
       <div id="create-contact">
