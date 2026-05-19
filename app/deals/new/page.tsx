@@ -46,7 +46,7 @@ export default async function NewDealPage() {
     <div className="crm-page">
       <PageHeader
         title="New Deal"
-        description="Create a pipeline opportunity and log the initial stage."
+        description="Create a deal and log the initial pipeline stage."
       />
       <DealForm
         title="Create Deal"
