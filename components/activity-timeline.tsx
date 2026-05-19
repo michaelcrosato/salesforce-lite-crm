@@ -63,9 +63,9 @@ export function ActivityTimeline({ activities }: { activities: TimelineActivity[
             </div>
             <h3 className="mt-3 text-sm font-semibold">{activity.title}</h3>
             {activity.summary ? (
-              <p className="mt-2 text-sm text-muted-foreground">{activity.summary}</p>
+              <p className="mt-2 text-sm text-muted-foreground" data-testid="activity-timeline-summary">{activity.summary}</p>
             ) : activity.rawText ? (
-              <p className="mt-2 text-sm text-muted-foreground">{activity.rawText}</p>
+              <p className="mt-2 text-sm text-muted-foreground" data-testid="activity-timeline-summary">{activity.rawText}</p>
             ) : null}
             {activity.nextStep ? (
               <p className="mt-3 rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground">
