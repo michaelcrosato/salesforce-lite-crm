@@ -37,6 +37,7 @@ test.describe("visual smoke", () => {
 
       await expect(page).toHaveScreenshot(`${route.name}.png`, {
         animations: "disabled",
+        caret: "initial",
         fullPage: false,
         maxDiffPixelRatio: 0.05
       });
