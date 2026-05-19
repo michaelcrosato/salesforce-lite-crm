@@ -27,7 +27,7 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
       <button
         type="button"
         onClick={toggle}
-        data-testid="routing-detail-toggle"
+        data-testid={testid ? `${testid}-toggle` : "routing-detail-toggle"}
         className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-accent/50"
         aria-expanded={expanded}
       >
@@ -35,7 +35,11 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
           <span className="font-medium">Routing decision</span>
           <span className="text-muted-foreground">
             {decision.matchedAreaName ? `→ ${decision.matchedAreaName}` : ""}
-            {decision.selectedOrderId ? " (routed)" : " (no match)"}
+            {decision.selectedOrderId ? (
+              <span data-testid="routing-detail-success"> (routed)</span>
+            ) : (
+              " (no match)"
+            )}
           </span>
         </div>
         {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}

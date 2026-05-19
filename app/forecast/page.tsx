@@ -144,6 +144,7 @@ export default async function ForecastPage({
                 max="3"
                 step="0.1"
                 defaultValue={leadVolumeMultiplier}
+                data-testid="forecast-multiplier-input"
               />
             </div>
             <div className="space-y-2">
@@ -170,7 +171,7 @@ export default async function ForecastPage({
               </Select>
             </div>
             <div className="flex items-end">
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" data-testid="forecast-apply-button">
                 Apply
               </Button>
             </div>
@@ -233,7 +234,7 @@ export default async function ForecastPage({
                     <td className="py-3 pr-4">{row.areas.join(", ")}</td>
                     <td className="py-3 pr-4">{formatNumber(row.currentDelivered)}</td>
                     <td className="py-3 pr-4">{formatNumber(row.monthlyQuota)}</td>
-                    <td className="py-3 pr-4" data-forecast-projected={row.orderId}>
+                    <td className="py-3 pr-4" data-forecast-projected={row.orderId} data-testid="forecast-projection-value">
                       {formatNumber(row.projectedDelivered)}
                     </td>
                     <td className="py-3 pr-4">{formatNumber(row.additionalLeadsNeeded)}</td>

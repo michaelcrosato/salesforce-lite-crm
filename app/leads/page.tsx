@@ -192,6 +192,7 @@ export default async function LeadsPage({
                             <Link
                               href={`/orders/${lead.assignedOrder.id}`}
                               className="text-primary hover:underline"
+                              data-testid="routing-detail-link"
                             >
                               {lead.assignedOrder.account.name}
                             </Link>
@@ -200,7 +201,7 @@ export default async function LeadsPage({
                           )}
                         </td>
                         <td className="py-3 pr-4">
-                          <Badge variant={lead.status === "assigned" ? "success" : "secondary"}>
+                          <Badge variant={lead.status === "assigned" ? "success" : "secondary"} data-testid="lead-status-badge">
                             {isLeadStatus(lead.status)
                               ? LEAD_STATUS_LABELS[lead.status as LeadStatus]
                               : lead.status}
@@ -240,14 +241,14 @@ export default async function LeadsPage({
 
 function reasonBadge(reason: string | null) {
   if (!reason) {
-    return <Badge variant="outline">No decision</Badge>;
+    return <Badge variant="outline" data-testid="lead-assignment-reason-badge">No decision</Badge>;
   }
 
   const knownReason = reason as AssignmentReason;
   const label = ASSIGNMENT_REASON_LABELS[knownReason] ?? reason;
 
   return (
-    <Badge variant={reason === "routed" ? "success" : "warning"}>
+    <Badge variant={reason === "routed" ? "success" : "warning"} data-testid="lead-assignment-reason-badge">
       {label}
     </Badge>
   );
