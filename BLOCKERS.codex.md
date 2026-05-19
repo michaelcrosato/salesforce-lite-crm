@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T06:51:36-07:00
+Timestamp: 2026-05-19T06:55:55-07:00
 
 Escalation required: NO
 
@@ -23,3 +23,4 @@ Escalation required: NO
 - Coordination-doc exception documented: `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` were updated under the current repo-hygiene prompt to replace stale worktree registration claims with live `scripts/check-worktrees.ps1` evidence.
 - Type-safety exception documented: `lib/business/duplicates.ts` is outside the normal Codex zone, but the current prompt authorized repo-wide improvement and the edit removed unsafe casts without changing behavior; `npm run test` and `npm run build` passed.
 - Shared ignore-file exception documented: `.gitignore` was updated under repo-hygiene scope to ignore generated `*.tsbuildinfo` files observed in sibling worktrees.
+- Shared manifest exception documented: `package.json` and `package-lock.json` were updated under repo-hygiene scope to clear the direct critical npm audit finding while preserving exact pins; remaining moderate audit findings require npm's breaking/downgrade force-fix paths.

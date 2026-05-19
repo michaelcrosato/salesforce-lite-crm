@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T06:51:36-07:00
+Timestamp: 2026-05-19T06:55:55-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -28,13 +28,14 @@ Approximate model tokens/spend this prompt: unknown
 - Refreshed `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` from `scripts/check-worktrees.ps1` output so coordination docs now show all four registered worktrees plus the Claude/Gemini dirty-state caveats before unattended dispatch.
 - Removed the remaining TypeScript `as unknown as` escape hatches from `lib/prisma.ts` and `lib/business/duplicates.ts` by using a typed global cache and a generic duplicate-record helper; `npm run test` and `npm run build` passed after the change.
 - Added `*.tsbuildinfo` to `.gitignore` because `tsconfig.json` has TypeScript incremental compilation enabled and sibling worktrees were surfacing generated `tsconfig.tsbuildinfo` files.
+- Updated exact-pinned dev dependencies `vitest` to `2.1.9` and `tsx` to `4.22.3`, which cleared the direct critical npm audit finding; `npm audit --audit-level=critical` exits 0 and the remaining 10 moderate findings require npm's breaking/downgrade force-fix paths for `prisma`, `next`, or `vitest`.
 
 ### Next action
 
-Continue current-prompt repo hygiene by selecting the next safe, contract-preserving improvement with local-gate verification.
+Investigate the e2e hydration warning around the header search input and make a narrow fix if it is reproducible from tracked code.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO  (current prompt authorized the narrow script safety exception; see BLOCKERS)
+No cross-ownership edits: NO  (current prompt authorized narrow repo-hygiene exceptions; see BLOCKERS)
 
 CRM-CONTRACT.md honored:  YES
