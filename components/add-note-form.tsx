@@ -81,13 +81,14 @@ export function AddNoteForm({
               name="rawText"
               placeholder="Follow up next week about pricing and decision maker."
               required
+              data-testid="contact-note-input"
             />
             {errors?.rawText?.length ? (
               <p className="text-xs text-destructive">{errors.rawText[0]}</p>
             ) : null}
           </div>
           <div className="flex items-center justify-end gap-3">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} data-testid="contact-note-submit">
               {isPending ? "Summarizing..." : "Save note"}
             </Button>
           </div>
