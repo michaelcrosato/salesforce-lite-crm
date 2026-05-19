@@ -123,10 +123,11 @@ PHASE 4 — VERIFY GATE
 
 Planning shouldn't change runtime behavior. Run:
   npm run lint
+  npm run typecheck
   npm run test
   npm run build
 
-Both must remain green. If red, investigate; if not resolvable in one
+Each listed check must remain green. If red, investigate; if not resolvable in one
 focused fix, revert the PLAN.md commit, file a `gate` blocker, stop.
 
 ============================================================

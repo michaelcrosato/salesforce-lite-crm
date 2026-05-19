@@ -15,7 +15,7 @@
       "review_agents": ["grok"],
       "parallel_safe": true,
       "prompt_template": "prompts/shared/s4-f1-codex-demo-seed-tuning.md",
-      "gate": ["npx prisma generate", "npx prisma db push", "npm run seed", "npm run lint", "npm run test", "npm run build"],
+      "gate": ["npx prisma generate", "npx prisma db push", "npm run seed", "npm run lint", "npm run typecheck", "npm run test", "npm run build"],
       "max_worker_attempts": 3
     },
     {
@@ -30,7 +30,7 @@
       "review_agents": ["gemini"],
       "parallel_safe": true,
       "prompt_template": "prompts/shared/s4-f2-claude-route-visual-qa.md",
-      "gate": ["npm run build", "npm run lint", "npm run test:e2e"],
+      "gate": ["npm run build", "npm run lint", "npm run typecheck", "npm run test:e2e"],
       "max_worker_attempts": 3
     },
     {
@@ -45,7 +45,7 @@
       "review_agents": ["codex"],
       "parallel_safe": true,
       "prompt_template": "prompts/shared/s4-f3-grok-component-polish.md",
-      "gate": ["npm run build", "npm run lint", "npm run test:e2e"],
+      "gate": ["npm run build", "npm run lint", "npm run typecheck", "npm run test:e2e"],
       "max_worker_attempts": 3
     },
     {
@@ -60,7 +60,7 @@
       "review_agents": ["grok"],
       "parallel_safe": false,
       "prompt_template": "prompts/shared/s4-f4-gemini-demo-smoke-gate.md",
-      "gate": ["npm run seed", "npm run lint", "npm run build", "npx playwright install chromium", "npm run test:e2e"],
+      "gate": ["npm run seed", "npm run lint", "npm run typecheck", "npm run build", "npx playwright install chromium", "npm run test:e2e"],
       "max_worker_attempts": 3
     }
   ]

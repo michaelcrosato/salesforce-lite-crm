@@ -37,11 +37,12 @@ npx prisma generate
 npx prisma db push
 npm run seed
 npm run lint
+npm run typecheck
 npm run test
 npm run build
 ```
 
-Do not claim `typecheck` or `format` passed unless those scripts exist in the repo and the current run prompt asks for them.
+Do not claim `format` passed unless that script exists in the repo and the current run prompt asks for it.
 
 ## Acceptance Criteria
 

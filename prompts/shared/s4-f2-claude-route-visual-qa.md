@@ -31,10 +31,11 @@ Run from the repo root:
 ```powershell
 npm run build
 npm run lint
+npm run typecheck
 npm run test:e2e
 ```
 
-Do not claim `typecheck` or `format` passed unless those scripts exist in the repo and the current run prompt asks for them.
+Do not claim `format` passed unless that script exists in the repo and the current run prompt asks for it.
 
 ## Acceptance Criteria
 

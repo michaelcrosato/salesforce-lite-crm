@@ -38,6 +38,7 @@ try {
     Invoke-GateStep "npx prisma db push" { & npx prisma db push }
     Invoke-GateStep "npm run seed" { & npm run seed }
     Invoke-GateStep "npm run lint" { & npm run lint }
+    Invoke-GateStep "npm run typecheck" { & npm run typecheck }
     Invoke-GateStep "npm run test" { & npm run test }
     Invoke-GateStep "npm run build" { & npm run build }
     Invoke-GateStep "npx playwright install chromium" { & npx playwright install chromium }

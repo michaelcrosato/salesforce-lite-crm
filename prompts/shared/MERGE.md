@@ -89,6 +89,7 @@ After all intended merges:
   npx prisma db push
   npm run seed
   npm run lint
+  npm run typecheck
   npm run test
   npm run build
   npx playwright install chromium

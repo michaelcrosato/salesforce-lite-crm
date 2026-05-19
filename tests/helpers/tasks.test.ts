@@ -49,12 +49,12 @@ describe("task date helpers", () => {
 describe("task stats and grouping", () => {
   const now = new Date("2026-05-15T12:00:00Z");
   const sample: TaskWithOwner[] = [
-    { id: "t1", dueDate: "2026-05-10", status: "open", ownerId: "user-ava" },
-    { id: "t2", dueDate: "2026-05-15T17:00:00Z", status: "in_progress", ownerId: "user-ava" },
-    { id: "t3", dueDate: "2026-05-20", status: "open", ownerId: "user-marcus" },
-    { id: "t4", dueDate: "2026-05-15", status: "done", ownerId: "user-elena" },
-    { id: "t5", dueDate: null, status: "open", ownerId: null },
-    { id: "t6", dueDate: "2026-05-10", status: "done", ownerId: "user-ava" }
+    { dueDate: "2026-05-10", status: "open", ownerId: "user-ava" },
+    { dueDate: "2026-05-15T17:00:00Z", status: "in_progress", ownerId: "user-ava" },
+    { dueDate: "2026-05-20", status: "open", ownerId: "user-marcus" },
+    { dueDate: "2026-05-15", status: "done", ownerId: "user-elena" },
+    { dueDate: null, status: "open", ownerId: null },
+    { dueDate: "2026-05-10", status: "done", ownerId: "user-ava" }
   ];
 
   it("tasksByOwner groups by ownerId or unassigned", () => {

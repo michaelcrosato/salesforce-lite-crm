@@ -63,14 +63,14 @@ npx prisma generate
 npx prisma db push
 npm run seed
 npm run lint
+npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium
 npm run test:e2e
 ```
 
-There are no `typecheck` or `format` package scripts unless `package.json`
-later adds them.
+There is no `format` package script unless `package.json` later adds one.
 
 ## Blocker Protocol
 

@@ -42,6 +42,7 @@ npx prisma generate
 npx prisma db push
 npm run seed
 npm run lint
+npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium
@@ -82,6 +83,7 @@ Required checks:
 ```powershell
 npm run build
 npm run lint
+npm run typecheck
 npx playwright install chromium
 npm run test:e2e
 ```
@@ -114,6 +116,7 @@ Required checks:
 ```powershell
 npm run build
 npm run lint
+npm run typecheck
 npx playwright install chromium
 npm run test:e2e
 ```
@@ -153,6 +156,7 @@ npx prisma generate
 npx prisma db push
 npm run seed
 npm run lint
+npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium
