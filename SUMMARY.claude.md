@@ -1,52 +1,51 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — formatNumber on account summary counts
+Feature: S4-F2 route visual QA — detail-page empty-state tonal parity
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 2ef0780 — [claude] S4-F2: use formatNumber for account summary counts
+Commits this prompt: d18d348 — [claude] S4-F2: add 'yet' to account detail empty fallbacks for tonal parity
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:52:00-08:00
+Timestamp: 2026-05-19T07:53:00-08:00
 
 ### Completed this prompt
 
-- `/accounts/[id]/page.tsx` Account Summary rendered contacts /
-  deals counts as `account.contacts.length.toString()` and
-  `account.deals.length.toString()` — the only `.toString()`-on-a-
-  count pattern remaining in `app/**` (verified via grep on
-  `\.length\.toString\(\)`). Every other count surface in the app
-  uses `formatNumber` from `@/lib/formatters` so values render with
-  consistent thousand-separator formatting.
-- Replaced with `formatNumber(account.contacts.length)` and
-  `formatNumber(account.deals.length)`; added `formatNumber` to the
-  existing formatter import. For seeded accounts with single-digit
-  counts the visual output is unchanged; for larger counts the
-  values now match the formatting of every other numeric KPI in
-  the app.
+- Aligned the Account detail page sub-list empty-state copy with its
+  Contact detail page sibling. Prior wording was:
+  - `/accounts/[id]` Related Contacts: "No contacts are linked."
+  - `/accounts/[id]` Related Deals: "No deals are linked."
+  - `/contacts/[id]` Related Deals: "No deals are linked yet."
+  The "yet" qualifier on the Contact detail empty signals that the
+  state is open to change (the user can link more); the Account
+  detail empties lacked that qualifier, creating a minor tonal
+  inconsistency between the two sibling detail pages.
+- Added "yet" to both Account detail sub-list fallbacks. Final
+  state:
+  - `/accounts/[id]` Related Contacts: "No contacts are linked yet."
+  - `/accounts/[id]` Related Deals: "No deals are linked yet."
+  - `/contacts/[id]` Related Deals: "No deals are linked yet." (unchanged)
+- The `/orders/[id]` Assigned Leads This Month empty fallback
+  ("No leads have been delivered to this order this month.") stays
+  as-is — the "this month" qualifier already gives the message a
+  time-bounded scope that doesn't benefit from "yet".
 
 ### Verification
 
 - `npm run build` → SUCCESS (32 routes).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- Grep follow-up confirmed no further `.length.toString()` patterns
-  remain in `app/**`.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
 Latest implementation commit:
-- `2ef0780` use formatNumber for account summary counts
+- `d18d348` add 'yet' to account detail empty fallbacks
 
-Total Claude-zone S4-F2 implementation commits on this branch: 32
-across 15 LOOP iterations.
-
-Categories of polish stable; this commit fits category #2 (number /
-copy precision).
+Total Claude-zone S4-F2 implementation commits on this branch: 33
+across 16 LOOP iterations.
 
 ### Reconciliation note
 
-`origin/main` is 12 commits ahead of this branch's base with merges
-from `gemini/autonomy` and `grok/autonomy`. Trial merge into this
-branch produces one conflict on `app/layout.tsx` (competing
+`origin/main` is 12 commits ahead of this branch's base. Trial
+merge produces one conflict on `app/layout.tsx` (competing
 description updates). Merge is operator scope per
 `prompts/shared/MERGE.md`.
 
@@ -58,12 +57,15 @@ zone; no action from Claude this prompt.
 
 ### Next action
 
-Continue iter polish if more genuine Claude-zone wins surface;
-otherwise stand by for SPRINT-ROLLOVER prompt or operator merge.
+This iteration is the last clean copy-parity fix I can identify in
+Claude's zone. Subsequent iters would be either bikeshed-risk
+micro-polish or require coordination with other agents'
+zones. Best next move: operator merge to main + Gemini's PLAN.md
+status promotion, or SPRINT-ROLLOVER prompt to queue the next
+Claude-owned feature.
 
 ### Scope confirmation
 
 No cross-ownership edits: YES (single file edited in `app/**`).
-CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — uses already-exported `formatNumber` from
-`@/lib/formatters`).
+CRM-CONTRACT.md honored: YES (pure copy adjustment — no schema,
+route, status, or adapter signature changes).
