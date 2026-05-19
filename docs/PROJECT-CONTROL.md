@@ -60,6 +60,8 @@ cleanup changes:
   breaking/downgrade paths.
 - Removed Playwright-induced screenshot hydration warning noise from the local
   gate output.
+- Added `npm run lint` to the local gate using the installed Next ESLint flat
+  config.
 
 ## Sprint Status From PLAN.md
 
