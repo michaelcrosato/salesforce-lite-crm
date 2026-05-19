@@ -9,11 +9,18 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $candidates = New-Object System.Collections.Generic.List[string]
 
-foreach ($relative in @(".claude", "claude-code-prompt.txt", "playwright-report", "test-results", ".next", "_screenshots")) {
+foreach ($relative in @("claude-code-prompt.txt", "playwright-report", "test-results", ".next", "_screenshots")) {
     $path = Join-Path $RepoRoot $relative
     if (Test-Path -LiteralPath $path) {
         $candidates.Add((Resolve-Path -LiteralPath $path).Path)
     }
+}
+
+$claudeLogDir = Join-Path $RepoRoot ".claude\logs"
+if (Test-Path -LiteralPath $claudeLogDir) {
+    Get-ChildItem -LiteralPath $claudeLogDir -File -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ne ".gitignore" } |
+        ForEach-Object { $candidates.Add($_.FullName) }
 }
 
 foreach ($pattern in @("*.log", "*.zip", "*prompt*.txt")) {
