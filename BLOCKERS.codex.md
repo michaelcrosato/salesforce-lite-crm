@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:37:48-07:00
+Timestamp: 2026-05-19T07:42:07-07:00
 
 Escalation required: NO
 
@@ -35,3 +35,4 @@ Escalation required: NO
 - Lint strictness documented: `package.json`, `README.md`, and `docs/LOCAL-GATE.md` now use/document `eslint . --max-warnings=0`; final full local gate passed.
 - Prompt gate alignment documented: active prompt, queue, merge, and Copilot instruction files were updated under repo-hygiene scope so future runs include `npm run lint`; `git diff --check` and `npm run lint` passed.
 - Typecheck gate documented: `package.json`, local-gate scripts, active gate docs/prompts, and type-drift tests were updated under repo-hygiene scope so future full gates include `npm run typecheck`; final full local gate passed with lint, typecheck, 144 Vitest tests, build, and 19 e2e tests.
+- Excluded-route e2e alignment documented: `e2e/excluded-routes.spec.ts` now derives smoke paths from `lib/featureFlags.ts`; targeted excluded-route e2e and the full local gate passed.

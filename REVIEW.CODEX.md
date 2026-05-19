@@ -34,6 +34,8 @@ subject to normal human diff review before commit/push.
   gate.
 - Added an explicit `npm run typecheck` gate and fixed test-only type drift so
   standalone `tsc --noEmit` remains green outside `next build`.
+- Refactored excluded-route e2e coverage to derive its path list from
+  `EXCLUDED_ROUTES`, reducing contract/test drift risk.
 
 ## Remaining Risks
 
