@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { STAGE_LABELS } from "@/lib/crm-constants";
+import { CONTACT_STATUS_LABELS, STAGE_LABELS, type ContactStatus } from "@/lib/crm-constants";
 import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
@@ -206,7 +206,7 @@ export default async function AccountDetailPage({
                       <TableCell>{contact.email ?? "No email"}</TableCell>
                       <TableCell>
                         <Badge variant={contact.status === "active" ? "success" : "outline"}>
-                          {contact.status}
+                          {CONTACT_STATUS_LABELS[contact.status as ContactStatus] ?? contact.status}
                         </Badge>
                       </TableCell>
                     </TableRow>
