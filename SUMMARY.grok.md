@@ -14,19 +14,20 @@ Sprint: 4 / continuous autonomous polish
 Feature: S4-F3 + SKYNET-level Component Excellence for Modern Agile CRM  
 Branch: grok/sprint-4-component-polish  
 Status: FULLY AUTONOMOUS — running without prompting  
-Commits this session (SKYNET burst): SidebarNav, EmptyState, PageHeader, Button (loading), Input (error), Select (error), plus prior DealBoard/DealDetailDrawer/etc.
+Commits this session (SKYNET burst): Button (loading + adoptions in lead-form & add-note-form), Input (error), Select (error), SidebarNav, EmptyState, PageHeader, plus earlier DealBoard etc.
 Gate status: BUILD GREEN
 DoD self-check: PASS  
-Timestamp: 2026-05-19T16:20:00Z
+Timestamp: 2026-05-19T16:35:00Z
 
 ### Completed this SKYNET session (full autonomous power)
 - User: "stop asking and just keep going, full SKYNET" in scope of building a superior, agile CRM.
 - Executed multiple aggressive, self-directed improvement cycles:
-  - **ui/button.tsx**: Added native `loading` prop with spinner + auto-disable.
-  - **ui/input.tsx** + **ui/select.tsx**: Added `error` prop with destructive styling for consistent form validation.
-  - Prior: SidebarNav, EmptyState (className), PageHeader, DealBoard, DealDetailDrawer, tables, etc.
-- Every change is high-leverage for making this CRM feel like a fast, modern, agent-era Salesforce killer.
-- All in Grok zone. Atomic. Gate-verified. Pushed. No hand-holding requested or given.
+  - **ui/button.tsx**: Added `loading` prop (spinner + disable).
+  - **lead-form.tsx** + **add-note-form.tsx**: Adopted the new Button `loading` prop (real usage).
+  - **ui/input.tsx** + **ui/select.tsx**: Added `error` prop for consistent validation.
+  - Earlier: SidebarNav, EmptyState (className), PageHeader, DealBoard, DealDetailDrawer, tables, CSS.
+- Every change compounds to make forms and UI feel production-grade and agent-friendly.
+- All in Grok zone. Atomic. Gate-verified. Pushed. No hand-holding.
 
 ### Current Status (SKYNET)
 Fully autonomous. Continuing to ship high-quality component improvements for an agile, modern CRM without further input. The loop runs until explicit "stop".

@@ -17,8 +17,8 @@
 ---
 
 ## Resolved this prompt / SKYNET progress
-- Full autonomous execution continues. Added loading state to Button and error state to Input — foundational form UX improvements.
-- No blockers. SKYNET mode: maximum velocity within Grok ownership.
+- Full autonomous execution. Button loading + adoptions in lead-form & add-note-form. Input + Select error states. Form UX significantly improved.
+- No blockers. SKYNET continues at velocity.
 
 ---
 
