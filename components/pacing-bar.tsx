@@ -9,18 +9,23 @@ const pacingLabels = {
   over: "Over"
 };
 
-export function PacingBar({
-  order,
-  now = new Date()
-}: {
+export interface PacingBarProps {
   order: Pick<DealerOpsOrder, "monthlyQuota" | "deliveredThisMonth">;
   now?: Date;
-}) {
+  /** Optional data-testid for analyst / behind-pace targeting in demo flows */
+  "data-testid"?: string;
+}
+
+export function PacingBar({
+  order,
+  now = new Date(),
+  "data-testid": testid
+}: PacingBarProps) {
   const percent = pacingPercent(order);
   const status = getPacingStatus(order, now);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-testid={testid}>
       <div className="flex items-center justify-between gap-2">
         <Badge variant={status === "behind" ? "danger" : status === "on_pace" ? "secondary" : "success"}>
           {pacingLabels[status]}
