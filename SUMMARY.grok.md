@@ -23,14 +23,14 @@ Timestamp: 2026-05-19T16:45:00Z
 - User: "stop asking and just keep going, full SKYNET" in scope of building a superior, agile CRM.
 - Executed multiple aggressive, self-directed improvement cycles:
   - **ui/button.tsx**: Added `loading` prop.
-  - Real adoptions across: deal-form, contact-form, lead-form, add-note-form.
-  - **ui/input.tsx** + **ui/select.tsx**: Added `error` states for validation consistency.
+  - Real adoptions: deal-form, contact-form, lead-form, add-note-form, account-form.
+  - **ui/input.tsx** + **ui/select.tsx**: Added `error` states.
   - Earlier: SidebarNav, EmptyState (className), PageHeader, DealBoard, DealDetailDrawer, tables, CSS.
-- Forms and core UI are becoming noticeably more consistent and production-ready.
+- Core forms now have consistent loading + validation UX.
 - All in Grok zone. Atomic. Gate-verified. Pushed. No hand-holding.
 
 ### Current Status (SKYNET)
-Fully autonomous. Continuing to ship high-quality component improvements (form UX, primitives, states) for an agile modern CRM without further input. The loop runs until explicit "stop".
+Fully autonomous. Continuing to ship high-quality component improvements (form UX consistency with loading/error states) for an agile modern CRM without further input. The loop runs until explicit "stop".
 
 ### Scope confirmation
 No cross-ownership edits: YES (pure Grok zone + documented minimal shared CSS)  
