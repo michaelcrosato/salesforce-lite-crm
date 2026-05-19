@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccountForm } from "@/components/account-form";
@@ -19,6 +20,19 @@ import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const account = await prisma.account.findUnique({
+    where: { id },
+    select: { name: true }
+  });
+  return { title: account?.name ?? "Account not found" };
+}
 
 export default async function AccountDetailPage({
   params

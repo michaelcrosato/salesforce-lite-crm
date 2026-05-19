@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddNoteForm } from "@/components/add-note-form";
@@ -19,6 +20,22 @@ import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const contact = await prisma.contact.findUnique({
+    where: { id },
+    select: { firstName: true, lastName: true }
+  });
+  if (!contact) {
+    return { title: "Contact not found" };
+  }
+  return { title: `${contact.firstName} ${contact.lastName}` };
+}
 
 export default async function ContactDetailPage({
   params

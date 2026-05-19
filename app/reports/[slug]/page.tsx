@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
@@ -29,6 +30,18 @@ import {
 export const dynamic = "force-dynamic";
 
 type ReportParams = { slug: string };
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<ReportParams>;
+}): Promise<Metadata> {
+  const { slug: rawSlug } = await params;
+  if (!isReportSlug(rawSlug)) {
+    return { title: "Report not found" };
+  }
+  return { title: getReportDefinition(rawSlug).title };
+}
 
 export default async function ReportDetailPage({
   params

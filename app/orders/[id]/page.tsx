@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActivityTimeline } from "@/components/activity-timeline";
@@ -17,6 +18,19 @@ import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const order = await prisma.dealerOrder.findUnique({
+    where: { id },
+    select: { name: true }
+  });
+  return { title: order?.name ?? "Dealer order not found" };
+}
 
 export default async function OrderDetailPage({
   params
