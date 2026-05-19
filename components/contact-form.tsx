@@ -156,7 +156,7 @@ export function ContactForm({
             <FieldError errors={errors?.status} />
           </div>
           <div className="flex items-end justify-end gap-3 md:col-span-2">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" loading={isPending}>
               {isPending ? "Saving..." : submitLabel}
             </Button>
           </div>
