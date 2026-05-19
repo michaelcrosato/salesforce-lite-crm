@@ -1,52 +1,48 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — /accounts filter Apply button parity
+Feature: S4-F2 route visual QA — forecast formula grouping + lead detail description scope
 Branch: claude/autonomy
 Status: active
-Commits this prompt: 0a33253 — [claude] S4-F2: add Apply button to /accounts filter form for status submission
+Commits this prompt: bd6468a — [claude] S4-F2: clarify forecast formula with grouping and unicode operators; a93f85a — [claude] S4-F2: broaden /leads/[id] description to cover full page surface
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T06:55:00-08:00
+Timestamp: 2026-05-19T06:57:30-08:00
 
 ### Completed this prompt
 
-- Fixed a genuine UX gap on `/accounts/page.tsx`: the search + status
-  filter form had no submit button, so changing the status `<Select>`
-  produced no visible effect (only Enter from the `<Input>` would
-  submit because of HTMLFormElement default submission). The status
-  select silently failed to filter. Every other multi-field filter
-  form in `app/**` ships an explicit submit button:
-  - `/leads/page.tsx` — `<Button type="submit">Apply</Button>` in a
-    4-column filter grid.
-  - `/tasks/page.tsx` — `<Button type="submit">Apply filters</Button>`
-    + `Reset` link in a 4-column filter card.
-  - `/cases/page.tsx` — same Apply/Reset pair in a 3-column filter
-    card.
-  - `/campaigns/page.tsx` — same Apply/Reset pair in a 3-column filter
-    card.
-  - `/activities/page.tsx` — `<Button type="submit">Apply</Button>`
-    in a 2-column type-filter row.
-- `/accounts/page.tsx` filter is an inline form inside `CardHeader`
-  rather than a dedicated Filters card, so the surgical fix is a new
-  Apply button as a third grid column rather than restructuring into
-  a separate filter card. Form `grid-cols` widened from `[1fr_160px]`
-  to `[1fr_160px_auto]` and a `<Button type="submit" variant="secondary">Apply</Button>`
-  appended; mirrors the inline-CardHeader Apply-button pattern used by
-  `/leads/page.tsx` (4-col + nested `[1fr_auto]` for the rightmost
-  source select + Apply).
-- Added the missing `Button` import from `@/components/ui/button`.
-- No business logic change. The form `action="/accounts"` and field
-  names (`q`, `status`) are unchanged. The change is purely UI:
-  one additional submit affordance with no new state, server action,
-  or query-param shape.
+- `/forecast/page.tsx` "How This Works" card explained the projected-
+  delivered-leads formula as a single flat expression:
+  `current delivered leads / elapsed days in this month * days in
+  month * lead volume multiplier * assignment rate`. The five terms
+  read ambiguously without operator grouping (left-to-right is the
+  intent — `(((curr/elapsed)*days)*mult)*rate` — but a reader who
+  parses arithmetic precedence first would split mid-expression).
+  Fixed by parenthesizing the per-day pace and switching from ASCII
+  `/` and `*` to Unicode `&divide;` and `&times;` so the formula
+  visually reads as math rather than as a JS expression. No semantic
+  change to the formula; only typographic clarity.
+- `/leads/[id]/page.tsx` `PageHeader` description was "Lead routing
+  details, assignment reason, and routing event timeline." which
+  undersold the page — it framed it as routing-only, but the page
+  also renders Lead Summary (phone, email, postal, province, source,
+  created), an interactive Lead Status control, the assignment area +
+  dealer assignment, and the full Activity Timeline (not just
+  routing events). Updated to "Lead contact details, status, dealer
+  assignment, and activity timeline." which covers all four cards on
+  the page and matches the term registers used in the sibling cards
+  ("Lead Summary", "Assignment", "Activity Timeline").
+- Both edits are pure text content inside JSX strings — no business
+  logic, schema, route, or contract changes. No new dependencies,
+  no test changes, no cross-zone edits.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; no new dependencies, no
-  TypeScript regressions).
+- `npm run build` → SUCCESS (32 routes; HTML entity references
+  `&divide;` / `&times;` render correctly in dev preview, build
+  output is clean).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before commit aside from the
-  carry-forward `tsconfig.tsbuildinfo` artifact.
+- `git status --short` clean before each implementation commit
+  aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
@@ -62,24 +58,42 @@ Implementation commits on this branch since `cc00d6c`:
 | `642ed78` | drop stakeholders term from /contacts description |
 | `0fba7d3` | add custom 404 page with dashboard and accounts links |
 | `0a33253` | add Apply button to /accounts filter form |
+| `bd6468a` | clarify forecast formula with grouping and unicode operators |
+| `a93f85a` | broaden /leads/[id] description to cover full page surface |
 
-The branch adds five categories of polish on top of the prior S4-F2
-sweep (`81f438f`, `9b98e72`, `d51d817`):
+Five categories of polish on this branch:
 1. metadata + product framing alignment (e0f138c, 2b7f8da)
-2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78)
+2. copy precision on form/empty surfaces (468fb4a, ca0f472, 642ed78, a93f85a)
 3. perceived-perf parity for detail routes (07a19cb)
 4. graceful 404 boundary (0fba7d3)
 5. interactive filter parity across list pages (0a33253)
+6. internal documentation clarity (bd6468a)
+
+### Audit observations (no fix this prompt)
+
+- `/leads/[id]/page.tsx` line 131 places a `data-testid="lead-status-badge"`
+  on the *reason* badge wrapper, not the actual lead status control
+  (the LeadStatusControl above it is in `components/**`, Grok's
+  zone). Gemini BLOCKERS #3 lists `lead-status-badge` as a needed
+  testid — placement may be off. Not modified this prompt because
+  fixing requires either renaming the existing testid (could break
+  if Gemini E2E references it) or coordinating with Grok's
+  LeadStatusControl. Documented for review at next sprint rollover.
+- `/orders/[id]/page.tsx` line 154 uses a plain `<p>` empty fallback
+  ("No leads have been delivered to this order this month.") where
+  every other Claude-owned list/table empty state uses the
+  `<EmptyState>` component. Consider standardizing in a future
+  polish iteration — single-tenant copy, lower priority.
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued` while Claude has
-landed twelve S4-F2 implementation commits across recent iterations.
-Per PLAN.md §2 the local gate is authoritative; the visual QA sweep
-is materially complete on demo-critical routes and is extending into
-non-demo-critical copy, perceived-perf, error-boundary, and filter-
-interaction surfaces. No PLAN.md §4 edit attempted from this prompt
-— the planning zone is shared.
+PLAN.md §4 still lists S4-F2 with `Status: queued`; Claude has now
+landed fourteen S4-F2 implementation commits across recent
+iterations. Per PLAN.md §2 the local gate is authoritative; the
+visual QA sweep is materially complete on demo-critical routes and
+is extending into descriptive accuracy, empty-state patterns,
+filter interactions, and documentation copy. No PLAN.md §4 edit
+attempted from this prompt — the planning zone is shared.
 
 ### Outstanding cross-agent dependency
 
@@ -92,17 +106,19 @@ Claude this prompt.
 
 ### Next action
 
-Continue the S4-F2 sweep into:
-- `/forecast/page.tsx` and `/deals/page.tsx` — visually re-read for
-  empty-state, header-button, and filter parity issues.
-- `/leads/[id]/page.tsx` and `/orders/[id]/page.tsx` detail pages —
-  same parity sweep against the related list pages.
-- `/dashboard/page.tsx` — re-read for term consistency vs the README
-  and CRM-CONTRACT in the Analyst Panel + Dealer Ops cards.
+Continue the S4-F2 sweep. Specific candidates remaining:
+- standardize the `/orders/[id]` "no leads" fallback to
+  `<EmptyState>` for visual consistency with all peer empty states.
+- re-read `/dashboard/page.tsx` analyst-panel + dealer-ops cards
+  against the CRM-CONTRACT for term consistency in card titles
+  ("Behind-Pace Orders", "Unrouted Leads", "Stale High-Value Deals",
+  "Low-Health Dealer Accounts").
+- audit `/activities/page.tsx` for the dual-control filter pattern
+  (badge row + select form) — both target the same param and may
+  cause confusing state when used together.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single edited file lives in `app/**`).
+No cross-ownership edits: YES (both edited files live in `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — purely an in-form submit affordance added on the
-existing `/accounts` filter surface).
+signature changes; both edits are pure copy/typography).
