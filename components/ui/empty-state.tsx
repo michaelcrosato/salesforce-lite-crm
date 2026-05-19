@@ -1,5 +1,6 @@
 import { AlertCircle, Inbox, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -13,6 +14,7 @@ interface EmptyStateProps {
   compact?: boolean;
   /** Optional data-testid for test targeting of the empty state container */
   "data-testid"?: string;
+  className?: string;
 }
 
 export function EmptyState({
@@ -22,7 +24,8 @@ export function EmptyState({
   actionLabel,
   variant = "empty",
   compact = false,
-  "data-testid": testId
+  "data-testid": testId,
+  className
 }: EmptyStateProps) {
   const iconSize = compact ? "h-4 w-4" : "h-5 w-5";
   const icon =
@@ -43,7 +46,7 @@ export function EmptyState({
   const rootClass = compact ? "border-dashed" : "border-dashed";
 
   return (
-    <Card className={rootClass} data-testid={testId}>
+    <Card className={cn(rootClass, className)} data-testid={testId}>
       <CardContent className={`flex flex-col items-center gap-3 ${contentPadding} text-center`}>
         <div className={`rounded-full p-3 ${iconBg}`}>
           {icon}
