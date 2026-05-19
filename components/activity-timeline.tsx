@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ACTIVITY_TYPE_LABELS, type ActivityType } from "@/lib/crm-constants";
 import { formatDate } from "@/lib/formatters";
 import { isActivityType } from "@/lib/validation";
@@ -35,9 +36,11 @@ export type TimelineActivity = {
 export function ActivityTimeline({ activities }: { activities: TimelineActivity[] }) {
   if (activities.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">
-        No activity yet. Add a note to start the timeline.
-      </div>
+      <EmptyState
+        title="No activity yet"
+        description="Add a note to start the timeline."
+        data-testid="activity-timeline-empty"
+      />
     );
   }
 

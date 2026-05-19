@@ -46,7 +46,8 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort((a, b) => {
       const modifier = sort.direction === "asc" ? 1 : -1;
-      return compareAccount(a, b, sort.key) * modifier;
+      const cmp = compareAccount(a, b, sort.key);
+      return (cmp !== 0 ? cmp : a.id.localeCompare(b.id)) * modifier;
     });
   }, [accounts, sort]);
 

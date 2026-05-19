@@ -12,6 +12,7 @@ import type {
 } from "@/components/deal-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/crm-constants";
@@ -187,9 +188,12 @@ export function DealBoard({
                     </Card>
                   ))
                 ) : (
-                  <div className="rounded-md border border-dashed bg-background p-4 text-center text-xs text-muted-foreground">
-                    No deals in this stage.
-                  </div>
+                  <EmptyState
+                    title="No deals"
+                    description="No deals in this stage."
+                    compact
+                    data-testid={`deal-board-empty-${stage}`}
+                  />
                 )}
               </div>
             </section>
