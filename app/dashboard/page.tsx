@@ -365,23 +365,29 @@ export default async function DashboardPage() {
 
           <div>
             <h3 className="text-sm font-semibold">Do Today</h3>
-            <div className="mt-3 grid gap-3 lg:grid-cols-5">
-              {analystPanel.actions.map((action) => (
-                <Link
-                  key={action.id}
-                  href={action.href}
-                  className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
-                >
-                  <p className="line-clamp-2 text-sm font-semibold">{action.title}</p>
-                  <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                    {action.reason}
-                  </p>
-                  <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground">
-                    {action.suggestedNextAction}
-                  </p>
-                </Link>
-              ))}
-            </div>
+            {analystPanel.actions.length > 0 ? (
+              <div className="mt-3 grid gap-3 lg:grid-cols-5">
+                {analystPanel.actions.map((action) => (
+                  <Link
+                    key={action.id}
+                    href={action.href}
+                    className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
+                  >
+                    <p className="line-clamp-2 text-sm font-semibold">{action.title}</p>
+                    <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                      {action.reason}
+                    </p>
+                    <p className="mt-3 rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground">
+                      {action.suggestedNextAction}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">
+                No analyst-suggested actions for today.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
