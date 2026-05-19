@@ -1,9 +1,9 @@
 # AGENTS.md
 
 This repo is prepared for autonomous CLI-agent work. `PLAN.md` and
-`CRM-CONTRACT.md` are the primary coordination files; `PROJECT-CONTROL.md` and
-`LOCAL-GATE.md` are root entrypoints for current state and validation. This file
-is the short handoff.
+`CRM-CONTRACT.md` are the primary coordination files. `docs/PROJECT-CONTROL.md`
+and `docs/LOCAL-GATE.md` are the current state and validation references. This
+file is the short handoff.
 
 ## Operating Policy
 
@@ -51,7 +51,7 @@ complete the current prompt. Record the reason in SUMMARY/BLOCKERS.
 
 ## Standard Gate
 
-Run from the repo root. The same sequence is documented in `LOCAL-GATE.md` and
+Run from the repo root. The same sequence is documented in
 `docs/LOCAL-GATE.md`:
 
 ```powershell

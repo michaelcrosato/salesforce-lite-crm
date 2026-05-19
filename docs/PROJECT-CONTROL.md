@@ -93,8 +93,6 @@ or repairing worktrees.
   ownership, and reports.
 - `CRM-CONTRACT.md`: entity names, statuses, routes, search surfaces, report
   query services, and adapter signatures.
-- `PROJECT-CONTROL.md`: root entrypoint for current state.
-- `LOCAL-GATE.md`: root entrypoint for local validation.
 - `README.md`: product overview, local run instructions, implemented
   workflows, database notes, tests, limitations, and roadmap.
 - `DEMO.md`: current seeded demo path and audited anchor values.

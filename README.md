@@ -32,12 +32,10 @@ Start with these files before changing code or documentation:
   exports, and server-side adapter signatures.
 - `AGENTS.md` - short handoff for CLI agents, worktree paths, branch
   conventions, and max-YOLO operating policy.
-- `PROJECT-CONTROL.md` - root entrypoint for current project state and
-  coordination notes; detailed state lives in `docs/PROJECT-CONTROL.md`.
+- `docs/PROJECT-CONTROL.md` - current readiness status and coordination notes.
 - `docs/MERGE-PLAYBOOK.md` - merge checks, rollback/archive procedure, and
   final-gate expectations.
-- `LOCAL-GATE.md` - root entrypoint for local setup and validation commands;
-  detailed gate notes live in `docs/LOCAL-GATE.md`.
+- `docs/LOCAL-GATE.md` - authoritative local setup and validation commands.
 - `prompts/README.md` - policy for versioned prompt artifacts.
 
 Agents should work from repo-local evidence, keep changes scoped, record
