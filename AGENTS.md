@@ -1,8 +1,9 @@
 # AGENTS.md
 
 This repo is prepared for autonomous CLI-agent work. `PLAN.md` and
-`CRM-CONTRACT.md` are the primary coordination files; this file is the short
-handoff.
+`CRM-CONTRACT.md` are the primary coordination files; `PROJECT-CONTROL.md` and
+`LOCAL-GATE.md` are root entrypoints for current state and validation. This file
+is the short handoff.
 
 ## Operating Policy
 
@@ -17,18 +18,14 @@ handoff.
 
 | Agent | Expected worktree | Branch ownership | Report files | Current local status |
 |---|---|---|---|---|
-| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | present |
-| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | present in `git worktree list` |
-| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | present in `git worktree list` |
-| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | present in `git worktree list` |
+| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | `main` observed 2026-05-19 |
+| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | `claude/autonomy` observed 2026-05-19 |
+| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | `grok/autonomy` observed 2026-05-19 |
+| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | `gemini/autonomy` observed 2026-05-19 |
 
 Branch naming convention from `PLAN.md`: `<prefix>sprint-<id>-<feature-slug>`.
-Current handoff branches also exist for this phase:
-
-- Codex: `feat/codex-crm-contract-api`
-- Claude: `feat/claude-crm-ui-e2e`
-- Grok: `feat/grok-crm-data-reports`
-- Gemini: `gemini/sprint-4-demo-smoke-gate-hardening`
+Older Sprint 4B handoff branches may still exist in local history, but current
+dispatch should come from a fresh prompt plus `PLAN.md` and `CRM-CONTRACT.md`.
 
 ## Ownership Zones
 
@@ -54,7 +51,8 @@ complete the current prompt. Record the reason in SUMMARY/BLOCKERS.
 
 ## Standard Gate
 
-Run from the repo root:
+Run from the repo root. The same sequence is documented in `LOCAL-GATE.md` and
+`docs/LOCAL-GATE.md`:
 
 ```powershell
 npm install
@@ -92,5 +90,7 @@ action, and scope confirmation.
   B2B lead-conversion flow.
 - Deterministic AI-style summarization remains default. Do not add external AI
   provider integration during cleanup or readiness work.
-- Do not add auth, deployment, Salesforce integration, global search expansion,
-  dealer order CRUD, area CRUD, or new product routes during readiness work.
+- Do not add auth, deployment, Salesforce integration, a dedicated `/search`
+  page, dealer order CRUD, area CRUD, or new product routes during readiness
+  work. The Ctrl/Cmd+K command palette is already the implemented cross-entity
+  search surface.

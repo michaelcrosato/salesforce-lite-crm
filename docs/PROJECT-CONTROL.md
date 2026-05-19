@@ -2,56 +2,80 @@
 
 ## Current Status
 
-- Branch observed this pass: `gemini/autonomy`
-- Current pass: autonomy repo readiness pass.
-- Product feature work: not changed during this pass.
-- README status: `README.md` now reflects the updated product vision for a
-  full-fledged, AI-adaptive Salesforce-style CRM that autonomous AI coding
-  agents can customize for small business requirements.
-- Contract: `CRM-CONTRACT.md` exists on this branch and remains the source of
-  truth for entity names, statuses, routes, and adapter signatures.
-- Max-YOLO policy: the current prompt can authorize one-run exceptions. Use
-  repo-local evidence, SUMMARY/BLOCKERS, and the local gate instead of manual
-  approval gates.
+- Branch observed this pass: `main`
+- Commit observed this pass: `b7e0633 chore: add shared IFT v22 prompt (#2)`
+- Current pass: documentation audit against repo-local evidence.
+- Product feature work: not changed during this pass. Non-product code edits
+  were limited to app metadata copy, a command-palette test id, and the
+  matching Playwright assertion for the existing command-palette behavior.
+- Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
+  statuses, routes, search surfaces, report services, and adapter signatures.
+- Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
+  authoritative setup and validation references.
 
-## Completed Readiness Scope
+## Current Product Surface
 
-This readiness/documentation pass updated durable project documentation only:
+The current `main` tree includes:
 
-- `README.md` product positioning and local operating instructions.
-- `docs/PROJECT-CONTROL.md` readiness status.
-- `docs/NEXT-PROMPTS.md` Sprint 4 prompt preparation.
+- Dashboard, account, contact, opportunity, activity, lead, dealer order, area,
+  forecast, task, case, campaign, and report routes.
+- Drawer detail flows for opportunities, tasks, cases, and campaigns.
+- Detail pages for accounts, contacts, leads, and dealer orders.
+- Excluded placeholders for `/deals/[id]`, `/search`, `/command-palette`,
+  dealer-order create/edit routes, and area create/edit routes.
+- Global Ctrl/Cmd+K command palette search across accounts, contacts, deals,
+  leads, tasks, cases, and campaigns.
+- Header search routed to contacts only.
+- SQLite as the default runtime database with a Postgres schema-switch helper.
 
-No product routes, data models, business logic, UI behavior, tests, package
-scripts, or dependencies were added by this documentation pass.
+## Documentation Status
 
-## Sprint Status From PLAN.md
+This documentation pass updates durable project documentation:
 
-`PLAN.md` marks the readiness pass active by current prompt and Sprint 4 queued:
+- `README.md`
+- `DEMO.md`
+- `CRM-CONTRACT.md`
+- `PLAN.md`
+- `AGENTS.md`
+- `docs/*.md`
+- `prompts/README.md`
+- `REVIEW.CODEX.md`
 
-| Feature | Owner | Status |
+It also aligns supporting non-product files with those docs:
+
+- `app/layout.tsx`
+- `components/command-palette.tsx`
+- `e2e/excluded-routes.spec.ts`
+
+Historical prompt files under `prompts/<agent>/`, plus agent `SUMMARY.*`,
+`BLOCKERS.*`, and `*-NOTES.md` files, are branch handoff records. They may
+describe older sprint state and should not be used as current product truth
+without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
+
+## Sprint 4B Status
+
+`main` now contains the Sprint 4B demo-hardening surface:
+
+| Feature | Owner | Current state |
 |---|---|---|
-| S4-F1 Demo seed tuning | Codex | queued |
-| S4-F2 Route visual QA | Claude | queued |
-| S4-F3 Component polish | Grok | queued |
-| S4-F4 Demo smoke and gate hardening | Gemini | queued |
+| S4-F1 Demo seed tuning | Codex | Present in `main` |
+| S4-F2 Route visual QA | Claude | Present in `main` |
+| S4-F3 Component polish | Grok | Present in `main` |
+| S4-F4 Demo smoke and gate hardening | Gemini | Present in `main` |
 
-## Prepared Next Feature List
-
-`docs/NEXT-PROMPTS.md` is prepared for Sprint 4 and notes that `README.md` was
-updated during this pass. The prompts remain aligned with `PLAN.md` and
-`CRM-CONTRACT.md` and do not authorize new product scope beyond the queued
-Sprint 4 work.
+No next feature sprint is selected by this file. Use a fresh prompt plus
+`PLAN.md`, `CRM-CONTRACT.md`, and `docs/FEATURE-BACKLOG.md` before starting new
+feature work.
 
 ## Branch And Worktree Topology
 
-Observed with `git worktree list` during the readiness pass:
+Observed with `git worktree list` on 2026-05-19:
 
 ```text
-C:/dev/salesforce-lite-crm        5b4e0a7 [chore/claude-hooks-r23]
-C:/dev/salesforce-lite-crm-claude 54965da [feat/claude-crm-ui-e2e]
-C:/dev/salesforce-lite-crm-grok   b5c7cd9 [feat/grok-crm-data-reports]
-C:/dev/salesforce-lite-crm-gemini 8c44685 [gemini/autonomy]
+C:/dev/salesforce-lite-crm        b7e0633 [main]
+C:/dev/salesforce-lite-crm-claude a0f5372 [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini 2437f87 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   e7ea824 [grok/autonomy]
 ```
 
 Expected but missing locally:
@@ -63,23 +87,21 @@ none
 Use `docs/WORKTREE-SETUP.md` and `scripts/check-worktrees.ps1` before creating
 or repairing worktrees.
 
+## Source-Of-Truth Order
+
+- `PLAN.md`: execution protocol, sprint scope, source-of-truth hierarchy, gate,
+  ownership, and reports.
+- `CRM-CONTRACT.md`: entity names, statuses, routes, search surfaces, report
+  query services, and adapter signatures.
+- `PROJECT-CONTROL.md`: root entrypoint for current state.
+- `LOCAL-GATE.md`: root entrypoint for local validation.
+- `README.md`: product overview, local run instructions, implemented
+  workflows, database notes, tests, limitations, and roadmap.
+- `DEMO.md`: current seeded demo path and audited anchor values.
+- `AGENTS.md`: short operational handoff for CLI agents.
+
 ## Chat Versus Repo
 
 Chat is for current prompts, one-run exceptions, and short coordination context.
 Repo docs are for durable rules, contracts, checklists, scripts, and prompts.
 Do not paste raw chat history into repo files.
-
-## PLAN.md Versus README.md Versus CRM-CONTRACT.md
-
-- `PLAN.md`: execution protocol, sprint scope, source-of-truth hierarchy, gate,
-  ownership, reports.
-- `README.md`: product overview, AI-agent read-first list, local run
-  instructions, implemented routes/workflows, database notes, tests,
-  limitations, and roadmap.
-- `CRM-CONTRACT.md`: entity names, statuses, routes, adapter signatures.
-- `AGENTS.md`: short operational handoff for CLI agents.
-
-## Exact Next Step
-
-Start Sprint 4 using `docs/NEXT-PROMPTS.md`, then verify each branch with the
-appropriate local gate from `docs/LOCAL-GATE.md` before merge.

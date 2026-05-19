@@ -1,5 +1,13 @@
 # Codex Bug Audit and Fix Pass
 
+## Current Status Note - 2026-05-19
+
+This file is a historical audit report. The "Remaining Issues" section below is
+no longer current for `/tasks`, `/cases`, and `/campaigns`: those app-router
+pages now exist, are listed in `README.md` and `CRM-CONTRACT.md`, and have
+Playwright coverage. Use `docs/PROJECT-CONTROL.md` and `docs/QA-AUTOMATION.md`
+for current readiness status.
+
 ## Executive Summary
 - Overall risk level: Low to medium after fixes. Baseline unit tests, build, and e2e were already passing, but the audit found data-integrity bugs in form validation, nullable field clearing, and opportunity stage-history recording.
 - Main issues found: blank numeric form fields were coerced to `0`; account/contact edit forms could not clear nullable values; deal stage edits through the drawer/form and `crmClient.updateOpportunity` skipped `OpportunityStageHistory`.
@@ -51,11 +59,13 @@
 
 ## Remaining Issues
 
-### Contract routes not implemented in the app router
+### Contract routes not implemented in the app router (historical, resolved)
 - Severity: Medium
 - File(s): `CRM-CONTRACT.md`, `lib/crm/registry.ts`, `lib/services/search.ts`, `lib/services/reports.ts`, `app/`
-- Reason not fixed: `/tasks`, `/cases`, and `/campaigns` are contract routes and are returned by search/report helpers, but no app-router pages exist yet. The handoff explicitly assigns those UI pages and e2e coverage to Claude after the unblock commit, so adding pages here would be feature work rather than a safe bug fix.
-- Recommended next step: Implement `/tasks`, `/cases`, and `/campaigns` pages against the existing service contracts and add e2e navigation coverage.
+- Current status: `/tasks`, `/cases`, and `/campaigns` app-router pages now
+  exist, including new-page creation and query-string drawer flows.
+- Recommended next step: Treat this item as closed unless a future regression
+  removes those routes.
 
 ### Adapter null-clearing semantics are not defined
 - Severity: Low to medium
@@ -64,7 +74,8 @@
 - Recommended next step: Add null-clearing semantics to `CRM-CONTRACT.md`, then update adapter schemas and tests consistently.
 
 ## Missing Tests
-- E2E coverage for `/tasks`, `/cases`, and `/campaigns` once the UI routes exist.
+- E2E coverage for `/tasks`, `/cases`, and `/campaigns` now exists in
+  `e2e/tasks.spec.ts`, `e2e/cases.spec.ts`, and `e2e/campaigns.spec.ts`.
 - Browser-level regression for clearing account/contact nullable fields through the visible forms.
 - Contract-adapter tests for explicit null clearing after the API semantics are defined.
 - E2E or integration coverage for search/report links that target task, case, and campaign routes.

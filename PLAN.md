@@ -12,9 +12,9 @@
 
 | Version | 2.9D |
 
-| Last updated | 2026-05-17 |
+| Last updated | 2026-05-19 |
 
-| Active sprint | Repo readiness pass active by current prompt; Sprint 4 queued |
+| Active sprint | Documentation audit active by current prompt; Sprint 4B demo-hardening work is present in `main`; next feature sprint not selected. |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -90,9 +90,12 @@ Roster rules:
 
 
 
-\*\*Current prompt scope — Repo Readiness\*\*
+\*\*Current prompt scope — Documentation Audit\*\*
 
-Status: active for this run. Scope is repo hygiene, PLAN/README alignment, agent coordination docs, prompt folders, helper scripts, report files, safe local artifact cleanup, drift scans, and the local gate. This pass does not build product features or expand product scope.
+Status: active for this run. Scope is durable documentation alignment against
+repo-local evidence: implemented routes, package scripts, Prisma schema,
+seed anchors, QA docs, and coordination docs. This pass does not build product
+features or expand product scope.
 
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
@@ -106,13 +109,13 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 |---|---|---|---|
 
-| S4-F1 — Demo seed tuning | Codex | queued | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
+| S4-F1 — Demo seed tuning | Codex | present in `main` | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. |
 
-| S4-F2 — Route visual QA | Claude | queued | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic. |
+| S4-F2 — Route visual QA | Claude | present in `main` | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, `/deals`, `/tasks`, `/cases`, `/campaigns`, and `/reports`. |
 
-| S4-F3 — Component polish | Grok | queued | Shared components used in the demo have stable spacing, readable empty states, deterministic ordering, and no broken links or orphaned actions. |
+| S4-F3 — Component polish | Grok | present in `main` | Shared components used in the demo have stable spacing, readable empty states, deterministic ordering, and no broken links or orphaned actions. |
 
-| S4-F4 — Demo smoke and gate hardening | Gemini | queued | Tests/e2e support the README demo path. Local gate commands are documented accurately and failures are captured in `BLOCKERS.gemini.md`. Subject to §3 worktree availability. |
+| S4-F4 — Demo smoke and gate hardening | Gemini | present in `main` | Tests/e2e support the implemented CRM routes and local gate commands are documented in `docs/LOCAL-GATE.md`. |
 
 
 
@@ -136,7 +139,9 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 \- No new `/deals/\[id]` route. The current drawer flow stays.
 
-\- No global search expansion. Top search continues to route to contacts only.
+\- No dedicated `/search` page. Header search continues to route to contacts
+only; cross-entity search is available through the global Ctrl/Cmd+K command
+palette.
 
 
 

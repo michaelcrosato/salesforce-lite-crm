@@ -30,13 +30,18 @@ test.describe("excluded-route guard rails", () => {
     });
   }
 
-  test("command palette / global search is not implemented", async ({ page }) => {
+  test("command palette opens from the global shortcut", async ({ page }) => {
     await page.goto("/dashboard");
-    // Pressing Cmd+K or Ctrl+K should not open a search modal
-    await page.keyboard.press("Control+k");
-    await expect(page.getByRole("dialog")).not.toBeVisible();
-    
-    await page.keyboard.press("Meta+k");
-    await expect(page.getByRole("dialog")).not.toBeVisible();
+    await page.locator("body").click();
+    await page.keyboard.down("Control");
+    await page.keyboard.press("KeyK");
+    await page.keyboard.up("Control");
+
+    const searchInput = page.getByLabel("Search CRM");
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill("Northstar");
+    await expect(
+      page.getByTestId("command-palette").getByRole("link", { name: /Northstar Freight/ })
+    ).toBeVisible();
   });
 });

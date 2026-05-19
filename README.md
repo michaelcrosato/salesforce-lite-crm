@@ -4,8 +4,9 @@
 
 Salesforce Lite CRM is a full-fledged, AI-adaptive Salesforce-style CRM for
 small business revenue operations. It combines account, contact, opportunity,
-activity, lead-routing, dealer-order, forecasting, and analyst workflows in a
-local-first Next.js and Prisma application.
+activity, task, case, campaign, lead-routing, dealer-order, forecasting,
+reporting, command-palette search, and analyst workflows in a local-first
+Next.js and Prisma application.
 
 This repository is no longer framed as a demo or proof-of-concept. It is a CRM
 application foundation designed for autonomous AI coding agents to customize for
@@ -26,15 +27,17 @@ npm run seed
 Start with these files before changing code or documentation:
 
 - `PLAN.md` - execution rules, source-of-truth hierarchy, ownership zones,
-  Sprint 4 scope, local gate, report schema, and anti-drift rules.
+  current prompt/sprint scope, local gate, report schema, and anti-drift rules.
 - `CRM-CONTRACT.md` - entity names, route contract, status values, registry
   exports, and server-side adapter signatures.
 - `AGENTS.md` - short handoff for CLI agents, worktree paths, branch
   conventions, and max-YOLO operating policy.
-- `docs/PROJECT-CONTROL.md` - current readiness status and coordination notes.
+- `PROJECT-CONTROL.md` - root entrypoint for current project state and
+  coordination notes; detailed state lives in `docs/PROJECT-CONTROL.md`.
 - `docs/MERGE-PLAYBOOK.md` - merge checks, rollback/archive procedure, and
   final-gate expectations.
-- `docs/LOCAL-GATE.md` - authoritative local setup and validation commands.
+- `LOCAL-GATE.md` - root entrypoint for local setup and validation commands;
+  detailed gate notes live in `docs/LOCAL-GATE.md`.
 - `prompts/README.md` - policy for versioned prompt artifacts.
 
 Agents should work from repo-local evidence, keep changes scoped, record
@@ -48,13 +51,17 @@ The application supports the core operating loop for a small business revenue
 team:
 
 - Manage accounts, contacts, opportunities, and activity history.
+- Plan tasks, track cases, and coordinate campaigns tied to CRM records.
 - Create opportunities, move stages, and preserve stage-change history.
 - Capture notes and generate deterministic AI-style summaries and next steps.
+- Search across primary CRM objects from the global Ctrl/Cmd+K command palette.
 - Route consumer leads to dealer orders using postal-prefix coverage and quota
   pacing.
 - Monitor dealer order delivery, behind-pace accounts, and operational focus
   items.
 - Simulate forecast outcomes from pipeline value and lead-delivery assumptions.
+- Review built-in reports for pipeline, leads, activity volume, top accounts,
+  stale opportunities, and overdue tasks.
 - Expose deterministic analyst recommendations without relying on an external
   AI provider.
 
@@ -118,6 +125,7 @@ local workflow until that cutover is explicitly promoted.
 
 | Route | Workflow |
 |---|---|
+| `/` | Redirects to `/dashboard`. |
 | `/dashboard` | CRM KPIs, pipeline charts, focus lists, Dealer Ops cards, and deterministic analyst actions. |
 | `/accounts` | Account list and account health overview. |
 | `/accounts/new` | Account creation. |
@@ -141,7 +149,7 @@ local workflow until that cutover is explicitly promoted.
 | `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
 | `/campaigns/new` | Campaign creation. |
 | `/reports` | Report index with KPI cards. |
-| `/reports/<slug>` | Report detail for a named report slug. |
+| `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
 
 Primary workflows:
 
@@ -152,6 +160,11 @@ Primary workflows:
 - Add a contact note and review the generated summary and next step.
 - Move an opportunity through the board/drawer flow and update forecast values.
 - Adjust forecast assumptions to see month-end delivery and pipeline outcomes.
+- Use Ctrl/Cmd+K to search accounts, contacts, deals, leads, tasks, cases, and
+  campaigns.
+- Create or update tasks, cases, and campaigns through their list, new-page,
+  and drawer flows.
+- Open reports from `/reports` and drill into the supported report slugs.
 
 Task, Case, and Campaign entities are now wired into the app-router pages
 listed above. Detail flows for those entities use the drawer pattern
@@ -246,6 +259,7 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - dealer order pacing/detail verification
 - forecast simulator input changes
 - toast/result feedback
+- excluded-route placeholders and command-palette shortcut search
 - task, case, and campaign creation and status updates via drawer flow
 - report index and detail rendering
 - screenshot smoke coverage for stable dashboard and area views
@@ -263,28 +277,28 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
   implemented.
 - Dealer orders and areas are seeded and browsable, but create/edit flows for
   them are deferred.
-- Top search routes to contacts only.
+- The header search form routes to contacts only. Cross-entity search is
+  available through the global Ctrl/Cmd+K command palette; there is no dedicated
+  `/search` page.
 - SQLite is the local default; Postgres is available only through the helper
   path described above and is not the runtime default.
 - Postal-prefix matching is intentionally simple and does not use geocoding or
   territory polygons.
 - Forecast scenarios are transparent and deterministic, but they do not persist.
-- No CSV import/export.
+- CSV import/export helpers exist in `lib/business`, but there is no shipped
+  CSV UI workflow.
 - No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
   leads route to dealer orders instead.
 
 ## Roadmap
 
-Sprint 4 is queued for focused hardening of the existing product surface:
-
-- S4-F1 - Codex: tune seed data for the reference CRM workflow.
-- S4-F2 - Claude: route-level visual QA for implemented CRM pages.
-- S4-F3 - Grok: shared component polish for stable spacing, empty states, and
-  deterministic ordering.
-- S4-F4 - Gemini: smoke and gate hardening for Vitest, Playwright, and local
-  validation.
+The current tree includes the Sprint 4B demo-hardening surface: seeded demo
+anchors, route-level QA hooks, shared component polish, task/case/campaign
+workflows, reports, and local gate documentation. New feature work should be
+selected from `PLAN.md`, `CRM-CONTRACT.md`, and `docs/FEATURE-BACKLOG.md`
+rather than inferred from old agent handoff files.
 
 Deferred backlog items include Postgres runtime cutover readiness, auth and
-permissions, deployment configuration, broader global search, persistent
+permissions, deployment configuration, a dedicated `/search` page, persistent
 forecast scenarios, dealer order and area CRUD, optional external AI provider
-integration, and any future `/deals/[id]` route.
+integration, CSV UI workflows, and any future `/deals/[id]` route.

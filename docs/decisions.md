@@ -8,7 +8,7 @@
 ## Data Modeling
 
 - Used Prisma string fields for statuses and stages, then enforced allowed values with Zod schemas and helper functions.
-- Used SQLite with `cuid()` string primary keys for a simple local proof-of-concept database.
+- Used SQLite with `cuid()` string primary keys for a simple local development database.
 - Treated `won` and `lost` as closed stages, so stale deal detection and open pipeline metrics apply only to `new`, `qualified`, `proposal`, and `negotiation`.
 
 ## UI and Navigation
@@ -18,7 +18,7 @@
 - Used links to `/deals?deal=:id` instead of adding a deal detail page because a deal detail page was not in the requested scope.
 - Account creation uses `/accounts/new`; account editing is exposed inline on the account detail page to avoid adding extra navigation.
 - Toasts are hand-rolled with React context so mutation feedback stays dependency-free.
-- Contact and account sorting is client-side because the lists are unpaged in this proof of concept.
+- Contact and account sorting is client-side because the original lists were unpaged.
 - Loading states are route-level skeletons to keep async page rendering simple.
 
 ## AI-Style Summarization
@@ -68,3 +68,19 @@
 - Retained drawer-based deal detail at `/deals?deal=:id`; no `/deals/[id]` route was added.
 - Left dealer order and area CRUD out of scope; orders and areas remain seeded and demo-managed.
 - Deferred auth, deployment, Postgres migration, and external AI until after the Tuesday demo hardening pass.
+
+## Sprint 4B CRM Surface Hardening
+
+- Added Task, Case, and Campaign Prisma models and kept their detail flows on
+  list-page drawers using query parameters.
+- Added `/tasks`, `/cases`, `/campaigns`, and `/reports` app-router pages
+  without changing the existing `/deals?deal=:id` opportunity drawer contract.
+- Added report query services for pipeline by stage, leads by source, activity
+  volume, top accounts, stale opportunities, and overdue tasks.
+- Added a global Ctrl/Cmd+K command palette for cross-entity search while
+  keeping the header search form contact-only and leaving `/search` as an
+  excluded route.
+- Preserved seeded/browsable-only dealer orders and routing areas; create/edit
+  routes for those objects still render excluded placeholders.
+- Kept deterministic local behavior for routing, summarization, analyst
+  ranking, and forecast simulation.

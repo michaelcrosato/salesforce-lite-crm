@@ -18,12 +18,10 @@ rg -n "lint passed|typecheck passed|npm run lint|npm run typecheck|npm run forma
 
 Use the order defined by the current project prompt or `PLAN.md`. When no order is defined, merge the least cross-cutting branch first and the branch with broadest tests last.
 
-For the current handoff, the intended phase order is:
-
-1. Codex contract/API readiness branch.
-2. Claude UI/e2e branch.
-3. Grok data/report helpers branch.
-4. Gemini gate/e2e hardening branch when created.
+The previous Sprint 4B branches are already represented in current `main`.
+For future handoffs, use the merge order defined by the fresh prompt or the
+active `PLAN.md` sprint section instead of reusing archived Sprint 4B branch
+names.
 
 ## Conflict Ownership
 

@@ -37,6 +37,42 @@ Use this checklist for visual and workflow QA. It does not expand product scope.
 - Lead-volume multiplier changes update projected order outcomes.
 - Hit, miss, and over-deliver states remain readable.
 
+## Tasks
+
+- `/tasks` loads.
+- Filters for status, owner, and due date apply without errors.
+- `/tasks/new` creates a task linked to an available CRM record.
+- `/tasks?task=<id>` opens the task drawer and status updates persist.
+
+## Cases
+
+- `/cases` loads.
+- Filters for status, account, and owner apply without errors.
+- `/cases/new` creates a case.
+- `/cases?case=<id>` opens the case drawer and status updates persist.
+
+## Campaigns
+
+- `/campaigns` loads.
+- Filters for status and start date apply without errors.
+- `/campaigns/new` creates a campaign.
+- `/campaigns?campaign=<id>` opens the campaign drawer and updates persist.
+
+## Reports
+
+- `/reports` loads and lists all report cards.
+- Each report slug renders: `pipeline-by-stage`, `leads-by-source`,
+  `activity-volume`, `top-accounts`, `stale-opportunities`, and
+  `overdue-tasks`.
+
+## Search
+
+- Header search submits to `/contacts` and remains contact-focused.
+- Ctrl/Cmd+K opens the global command palette.
+- Command palette results can route to accounts, contacts, deals, leads, tasks,
+  cases, and campaigns.
+- `/search` and `/command-palette` remain excluded placeholder routes.
+
 ## Accounts
 
 - `/accounts` loads when present in the app router.

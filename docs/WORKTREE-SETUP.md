@@ -11,13 +11,13 @@ C:\dev\salesforce-lite-crm-grok
 C:\dev\salesforce-lite-crm-gemini
 ```
 
-Observed during this readiness pass after Gemini bootstrap:
+Observed during the 2026-05-19 documentation audit:
 
 ```text
-C:/dev/salesforce-lite-crm        [chore/claude-hooks-r23]
-C:/dev/salesforce-lite-crm-claude [feat/claude-crm-ui-e2e]
-C:/dev/salesforce-lite-crm-gemini [gemini/sprint-4-demo-smoke-gate-hardening]
-C:/dev/salesforce-lite-crm-grok   [feat/grok-crm-data-reports]
+C:/dev/salesforce-lite-crm        b7e0633 [main]
+C:/dev/salesforce-lite-crm-claude a0f5372 [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini 2437f87 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   e7ea824 [grok/autonomy]
 ```
 
 Use `git worktree list` for the current commit SHA at each path.

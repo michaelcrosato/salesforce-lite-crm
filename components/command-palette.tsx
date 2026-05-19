@@ -133,7 +133,10 @@ export function CommandPalette() {
         className="absolute inset-0 bg-slate-950/40"
         onClick={close}
       />
-      <div className="relative mx-auto mt-24 w-[min(640px,calc(100vw-2rem))] rounded-lg border bg-background shadow-2xl">
+      <div
+        className="relative mx-auto mt-24 w-[min(640px,calc(100vw-2rem))] rounded-lg border bg-background shadow-2xl"
+        data-testid="command-palette"
+      >
         <div className="flex items-center gap-3 border-b p-3">
           <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <Input

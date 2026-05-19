@@ -1,7 +1,7 @@
 # CRM Contract
 
-Version: v2.0
-Last audited: 2026-05-18
+Version: v2.1
+Last audited: 2026-05-19
 
 This file is the source of truth for CRM entity names, routes, status values, and server-side data access.
 
@@ -53,21 +53,21 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - No lifecycle status enum.
 
 ### Task
-- New Prisma model: `Task`.
+- Prisma model: `Task`.
 - Route: `/tasks`; detail route: `/tasks?task=<id>`.
 - Status values: `open`, `in_progress`, `done`, `cancelled`.
 - Priority values: `low`, `normal`, `high`, `urgent`.
 - Optional relations: `Account`, `Contact`, `Opportunity`, `Lead`, owner `User`.
 
 ### Case
-- New Prisma model: `Case`.
+- Prisma model: `Case`.
 - Route: `/cases`; detail route: `/cases?case=<id>`.
 - Status values: `new`, `in_progress`, `waiting`, `resolved`, `closed`.
 - Priority values: `low`, `normal`, `high`, `urgent`.
 - Optional relations: `Account`, `Contact`, owner `User`.
 
 ### Campaign
-- New Prisma model: `Campaign`.
+- Prisma model: `Campaign`.
 - Route: `/campaigns`; detail route: `/campaigns?campaign=<id>`.
 - Status values: `planned`, `active`, `completed`, `cancelled`.
 - Optional relations: owner `User`, related `Lead` rows, related `Contact` rows.
@@ -77,7 +77,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are live Sprint 4B demo routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
+- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
 
 ## Status Constants
 
@@ -96,15 +96,15 @@ Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/
 ## Feature Flags And Excluded Routes
 
 `lib/featureFlags.ts` exports `FEATURE_FLAGS`, `EXCLUDED_ROUTES`, and `isEnabled(flag)`.
-Remaining excluded-route flags default to `false` during Sprint 4B demo polish.
+Remaining excluded-route flags default to `false`.
 
 | Flag | Purpose | Excluded route(s) | Authority |
 |---|---|---|---|
-| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md section 4 line 137. |
-| `globalSearchUi` | Top search remains contacts-only; no expanded search route ships. | `/search` | PLAN.md section 4 line 139. |
-| `commandPalette` | No command palette route ships in Sprint 4B. | `/command-palette` | PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
-| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md section 4 line 135. |
-| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md section 4 line 135. |
+| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md Sprint 4 non-goals. |
+| `globalSearchUi` | The header search form remains contacts-only; no dedicated search page ships. | `/search` | The global Ctrl/Cmd+K command palette is the implemented cross-entity search surface. |
+| `commandPalette` | The command palette mounts globally and has no dedicated app-router page. | `/command-palette` | The route is intentionally a placeholder even though the shortcut UI exists. |
+| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md Sprint 4 non-goals. |
+| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md Sprint 4 non-goals. |
 
 `EXCLUDED_ROUTES` is the source of truth for routes without live demo pages that should either 404 or render the demo placeholder.
 
@@ -121,14 +121,33 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 
 ## Report Query Services
 
-`lib/services/reports.ts` exports these Sprint 4B report shapes:
+`lib/services/reports.ts` exports these report query shapes:
 
+- `pipelineByStage(): Promise<Array<{ stage: string; count: number; value: number; weightedValue: number }>>`
+  - Includes all `DEAL_STAGES`, even when a stage has zero deals.
+  - `weightedValue` is `value * probability`.
 - `leadsBySource(): Promise<Array<{ source: string; count: number; rate: number }>>`
   - `rate` is routed leads divided by total leads for that source.
   - A routed lead means `assignmentReason = "routed"` and at least one persisted `routing_event` Activity.
+- `activityVolumeByDay(now?: Date, days = 30): Promise<Array<{ day: string; count: number }>>`
+  - Returns one row per UTC day in the requested window.
+- `topAccountsByOpportunityValue(limit = 5): Promise<Array<{ accountId: string; accountName: string; opportunityCount: number; totalValue: number; route: string }>>`
+  - `totalValue` sums all opportunities for the account.
+  - `route` points to the account detail route.
 - `topAccountsByDealValue(limit = 10): Promise<Array<{ accountId: string; accountName: string; totalValue: number; openDealCount: number }>>`
   - `totalValue` sums open deal values only.
   - `openDealCount` counts deals in open pipeline stages.
+- `staleOpportunities(now?: Date): Promise<Array<{ id: string; name: string; stage: string; value: number; lastActivityAt: Date | null; route: string }>>`
+  - Uses the same stale/open-stage rules as dashboard focus logic.
+- `overdueTasks(now?: Date): Promise<Array<{ id: string; title: string; status: string; priority: string; dueDate: Date; route: string }>>`
+  - Excludes `done` and `cancelled` tasks.
+
+## Search Surfaces
+
+- Header search in `components/app-shell.tsx` submits to `/contacts` and is contacts-only.
+- The global command palette in `components/command-palette.tsx` opens with Ctrl/Cmd+K and calls `globalSearch()` through `components/command-palette-action.ts`.
+- `globalSearch()` returns accounts, contacts, opportunities, leads, tasks, cases, and campaigns with routes from `ROUTE_REGISTRY`.
+- `/search` and `/command-palette` remain excluded route placeholders; they are not product pages.
 
 ## crmClient Adapter Signatures
 
