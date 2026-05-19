@@ -8,13 +8,13 @@ Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise; 2f136ab - [codex] S4-F1: refresh coordination audit notes; 2215efb - [codex] S4-F1: harden forecast scenario inputs; f31396c - [codex] S4-F1: parse multiline csv fields; c1d7f29 - [codex] S4-F1: harden list query pagination; 7a9a9a2 - [codex] S4-F1: harden list query sorting; 1b45f62 - [codex] S4-F1: wire eslint into local gate
+Commits this prompt: 4e089e6 - [codex] S4-F1: protect claude hooks in cleanup; b4977d8 - [codex] autonomy: clear stale stop marker; bd43c97 - [codex] S4-F1: refresh worktree coordination docs; eda1f4f - [codex] S4-F1: remove duplicate helper casts; 4759d5a - [codex] S4-F1: ignore tsbuildinfo artifacts; f701bbc - [codex] S4-F1: update dev audit dependencies; 66653dc - [codex] S4-F1: avoid screenshot hydration noise; 2f136ab - [codex] S4-F1: refresh coordination audit notes; 2215efb - [codex] S4-F1: harden forecast scenario inputs; f31396c - [codex] S4-F1: parse multiline csv fields; c1d7f29 - [codex] S4-F1: harden list query pagination; 7a9a9a2 - [codex] S4-F1: harden list query sorting; 1b45f62 - [codex] S4-F1: wire eslint into local gate; 6268af5 - [codex] S4-F1: refresh lint review notes
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T07:18:25-07:00
+Timestamp: 2026-05-19T07:20:03-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -35,6 +35,7 @@ Approximate model tokens/spend this prompt: unknown
 - Extended the CSV import helper to parse valid quoted fields spanning physical lines, matching the CSV export helper's newline support; added regression coverage in `tests/helpers/csv-import.test.ts`.
 - Hardened the shared list-query helper so non-finite direct-call pagination and invalid runtime sort input fall back to configured defaults instead of producing `NaN` skip/take clauses or throwing; added regression coverage in `tests/api/listQuery.test.ts`.
 - Added `eslint.config.mjs`, exposed `npm run lint`, wired lint into both local-gate scripts and core gate docs, and removed the small dead-code/type-shape issues surfaced by the new lint gate.
+- Refreshed `REVIEW.CODEX.md` and `docs/PROJECT-CONTROL.md` so they no longer claim lint is absent or list stale test counts.
 
 ### Next action
 

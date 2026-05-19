@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:18:25-07:00
+Timestamp: 2026-05-19T07:20:03-07:00
 
 Escalation required: NO
 
@@ -31,3 +31,4 @@ Escalation required: NO
 - List-query hardening documented: `lib/services/listQuery.ts` and `tests/api/listQuery.test.ts` changed under Codex repo-hygiene scope; final full local gate passed with 143 Vitest tests and 19 e2e tests.
 - List-query sort hardening documented: `lib/services/listQuery.ts` and `tests/api/listQuery.test.ts` changed under Codex repo-hygiene scope; final full local gate passed with 144 Vitest tests and 19 e2e tests.
 - Lint gate documented: `eslint.config.mjs`, `package.json`, local-gate scripts, gate docs, and lint-surfaced cleanup edits changed under repo-hygiene scope; final full local gate passed with lint, 144 Vitest tests, and 19 e2e tests.
+- Lint review-note refresh documented: `REVIEW.CODEX.md` and `docs/PROJECT-CONTROL.md` were updated under repo-hygiene scope after lint became part of the local gate.
