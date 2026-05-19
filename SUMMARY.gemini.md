@@ -1,27 +1,28 @@
 Agent: gemini
-Sprint: Sprint 4B - Demo Polish (See Discovered this prompt)
-Feature: Repo Readiness Pass
+Sprint: Sprint 4
+Feature: S4-F4 demo smoke and gate hardening
 Branch: gemini/autonomy
-Status: green
+Status: done
 Commits this prompt: 
-- 8c24c8b [gemini] repo-readiness: align project control with current autonomy branch
+- 4a5d8b1 [gemini] S4-F4: add missing data-testids for demo path E2E
+- 9c2e7f3 [gemini] S4-F4: unskip and harden demo-path E2E test
+- 3b1a2c4 [gemini] S4-F4: update reports
 
-Gate status: PASS (Markdown review)
-DoD self-check: YES
-Timestamp: 2026-05-18T12:00:00-07:00
-
-### Discovered this prompt
-- Discrepancy: PLAN.md ??4 current sprint says "Repo readiness pass active by current prompt; Sprint 4 queued", but all agent summaries claim they are on Sprint 4B and status is done. I have recorded this discrepancy because I cannot invent ??4 entries without a SPRINT-ROLLOVER.md prompt.
+Gate status: PASS (Vitest 162/162, Build OK, Playwright 20/20)
+DoD self-check: PASS
+Timestamp: 2026-05-19T10:00:00-07:00
 
 ### Completed this prompt
-- Verified Phase 0 pre-flight gate on `gemini/autonomy` (162 Vitest passed, build successful).
-- Checked current branch, topology, and blocker state.
-- Claude successfully added the CI badge to README, resolving Gemini blocker #2.
-- Updated `docs/PROJECT-CONTROL.md` to reflect `gemini/autonomy` branch and accurate worktree topology.
+- Added missing `data-testid`s to `components/lead-form.tsx`, `components/routing-decision-detail.tsx`, `app/leads/page.tsx`, `app/dashboard/page.tsx`, `components/add-note-form.tsx`, `components/activity-timeline.tsx`, and `app/forecast/page.tsx`.
+- Unskipped and hardened `e2e/demo-path.spec.ts` by using unique lead names and robust sibling-row locators.
+- Verified all 162 Vitest tests pass.
+- Verified Next.js build is successful.
+- Verified all 20 Playwright E2E tests pass, including the full canonical demo path and visual snapshots on Windows.
+- Resolved all Gemini blockers.
 
 ### Next action
-Continue to monitor remaining blockers (`e2e/visual-smoke.spec.ts` stability and missing `data-testid`s) and await component unblocks from Grok/Claude, or proceed with next sprint rollover.
+Await final integration and merge to main, or proceed with further hardening if requested.
 
 ### Scope confirmation
-No cross-ownership edits: YES (Only edited shared docs/PROJECT-CONTROL.md as scoped by Repo Readiness pass)
+No cross-ownership edits: NO (Added testids to components/** and app/** as authorized by S4-F4 hardening scope for demo path support).
 CRM-CONTRACT.md honored: YES
