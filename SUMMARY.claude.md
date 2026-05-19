@@ -1,61 +1,57 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — list page CardTitle casing alignment
+Feature: S4-F2 route visual QA — root metadata refresh + report empty-state specificity
 Branch: claude/autonomy
 Status: active
-Commits this prompt: d51d817 — [claude] S4-F2: align CardTitle casing on list pages
+Commits this prompt: e0f138c — [claude] S4-F2: refresh root metadata description to match README framing; 468fb4a — [claude] S4-F2: specify report empty-state titles per report
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T06:35:00-08:00
+Timestamp: 2026-05-19T06:45:00-08:00
 
 ### Completed this prompt
 
-- Continued the S4-F2 visual QA sweep into the non-demo-critical list
-  routes flagged in the prior iteration's "Next action".
-- Identified one page-level coherence drift across the three drawer-flow
-  list pages: the list-section CardTitle strings used sentence case
-  ("Task list", "Case list", "Campaign list") while every other
-  CardTitle in `app/**` uses Title Case ("Account List", "Contact
-  Directory", "Activity Feed", "Pacing Dashboard", "Analyst Panel",
-  "Order Summary", etc.).
-- Fixed in one atomic commit:
-  - `app/tasks/page.tsx` — `Task list` → `Task List`
-  - `app/cases/page.tsx` — `Case list` → `Case List`
-  - `app/campaigns/page.tsx` — `Campaign list` → `Campaign List`
-- All changes are text-only inside `CardTitle` children. No business
-  logic, no component primitives, no schema, no route contract
-  changes. No new dependencies, no test changes. No cross-zone edits.
+- Refreshed the root `<meta name="description">` in `app/layout.tsx`. The
+  prior value ("AI-native CRM proof of concept for daily sales
+  workflows.") directly contradicted README L10 ("This repository is no
+  longer framed as a demo or proof-of-concept. It is a CRM application
+  foundation..."). New description mirrors the README product framing:
+  "Salesforce-style CRM application foundation for small business
+  revenue operations." Title and `Metadata` typing unchanged; no other
+  layout edits.
+- Polished the six report empty-state titles in
+  `app/reports/[slug]/page.tsx`. Four of the six previously used a
+  generic "No data" title; the `stale-opportunities` empty state used
+  "No stale deals" which contradicted both the registry title ("Stale
+  Opportunities") and its own description ("All open opportunities have
+  recent activity.").
+  - `pipeline-by-stage` → `title="No pipeline data"`
+  - `leads-by-source`   → `title="No leads"`
+  - `activity-volume`   → `title="No recent activity"`
+  - `top-accounts`      → `title="No accounts"`
+  - `stale-opportunities` → `title="No stale opportunities"` (was "No stale deals")
+  - `overdue-tasks`     → unchanged (already specific)
+- Both edits are pure text content inside JSX — no business logic,
+  routing, schema, component primitive, or contract changes. No new
+  dependencies, no test changes. No cross-zone edits.
 
-### Pattern audit (no further fix needed)
+### Verification
 
-| Route | CardTitle inventory (post-fix) |
-|---|---|
-| `/dashboard` | Analyst Panel, Dealer Ops Focus, Today's Focus — Title Case. |
-| `/leads` | Leads — single word. |
-| `/leads/[id]` | Lead Summary, Activity Timeline, Assignment — Title Case. |
-| `/orders` | Pacing Dashboard — Title Case. |
-| `/orders/[id]` | Assigned Leads This Month, Recent Routing Events, Order Summary — Title Case. |
-| `/areas` | Routing Areas — Title Case. |
-| `/forecast` | Scenario Inputs, Order Projection, How This Works — Title Case. |
-| `/accounts` | Account List — Title Case. |
-| `/accounts/[id]` | Account Summary, Related Contacts, Related Deals, Recent Activities — Title Case. |
-| `/contacts` | Contact Directory — Title Case. |
-| `/contacts/[id]` | Contact Summary, Related Deals, Activity Timeline — Title Case. |
-| `/activities` | Activity Feed — Title Case. |
-| `/tasks` | Filters, Task List — Title Case (post-fix). |
-| `/cases` | Filters, Case List — Title Case (post-fix). |
-| `/campaigns` | Filters, Campaign List — Title Case (post-fix). |
-| `/reports`, `/reports/[slug]` | Dynamic from `REPORT_DEFINITIONS` — handled by Grok-owned registry. |
+- `npm run build` → SUCCESS (32 routes generated, TypeScript clean).
+- `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
+- `git status --short` clean before each implementation commit (only
+  the carry-forward `tsconfig.tsbuildinfo` artifact left untracked).
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued` while SUMMARY entries
-across prior prompts have treated it as in-flight. Per PLAN.md §2 the
-local gate is authoritative; recent commits (`81f438f`, `9b98e72`, and
-now `d51d817`) demonstrate Claude-zone S4-F2 work is incremental and
-green. No PLAN.md §4 edit attempted from this prompt — the planning
-zone is shared and any sprint status promotion belongs in the
-SPRINT-ROLLOVER prompt.
+PLAN.md §4 still lists S4-F2 with `Status: queued` while Claude has now
+landed six S4-F2 commits across recent iterations (`81f438f`, `9b98e72`,
+`d51d817`, `e0f138c`, `468fb4a`, plus the prior side-by-side header
+work). Per PLAN.md §2 the local gate is authoritative; the visual QA
+sweep is materially complete on demo-critical routes and is now
+incrementally extending to non-demo-critical surfaces (root layout
+metadata and the report detail empty states). No PLAN.md §4 edit
+attempted from this prompt — the planning zone is shared and any
+sprint status promotion belongs in the SPRINT-ROLLOVER prompt.
 
 ### Outstanding cross-agent dependency
 
@@ -68,18 +64,19 @@ Claude this prompt.
 
 ### Next action
 
-If next iteration's prompt continues S4-F2, scan the remaining
-non-demo-critical routes — `/reports`, `/reports/[slug]`, `/search`,
-`/command-palette`, `/areas/[id]`, `/areas/[id]/edit`, `/areas/new`,
-`/orders/[id]/edit`, `/deals/new`, `/accounts/new`, `/contacts/new` —
-for similar text-level coherence issues (heading casing, button labels,
-empty-state copy). Otherwise S4-F2's demo-critical scope (§4
-acceptance) is verified complete and Claude can stand by until
-SPRINT-ROLLOVER queues a new claude-owned feature.
+Continue the visual QA sweep into remaining non-demo-critical routes:
+audit the form `PageHeader` copy on `/accounts/new`, `/contacts/new`,
+`/deals/new`, `/tasks/new`, `/cases/new`, `/campaigns/new` for term
+consistency (e.g. "Create a pipeline opportunity" vs "Create Deal" on
+`/deals/new`), then sweep the `/_not-found` and root error boundary
+copy for the same drift class fixed this iteration. Stop S4-F2 when
+all `app/**` user-visible copy is internally consistent with
+`CRM-CONTRACT.md` and README v2 framing.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (all three edited files live in `app/**`).
-CRM-CONTRACT.md honored: YES (no contract edits; no schema, route, or
-status value changes — pure text content updates inside CardTitle
-children).
+No cross-ownership edits: YES (both edited files live in `app/**`).
+CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
+signature changes — pure copy alignment that brings the
+`stale-opportunities` empty state into closer agreement with the
+contract's canonical `Opportunity` term).
