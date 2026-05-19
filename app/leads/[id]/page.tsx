@@ -85,7 +85,7 @@ export default async function LeadDetailPage({
     <div className="crm-page">
       <PageHeader
         title={`${lead.firstName} ${lead.lastName}`}
-        description="Lead routing details, assignment reason, and routing event timeline."
+        description="Lead contact details, status, dealer assignment, and activity timeline."
       />
 
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
