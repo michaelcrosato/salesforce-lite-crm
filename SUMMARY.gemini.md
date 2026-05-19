@@ -3,10 +3,7 @@ Sprint: Sprint 4
 Feature: S4-F4 demo smoke and gate hardening
 Branch: gemini/autonomy
 Status: done
-Commits this prompt: 
-- 4a5d8b1 [gemini] S4-F4: add missing data-testids for demo path E2E
-- 9c2e7f3 [gemini] S4-F4: unskip and harden demo-path E2E test
-- 3b1a2c4 [gemini] S4-F4: update reports
+Commits this prompt: e3be7bb — [gemini] S4-F4: add data-testids and harden demo-path E2E tests
 
 Gate status: PASS (Vitest 162/162, Build OK, Playwright 20/20)
 DoD self-check: PASS
