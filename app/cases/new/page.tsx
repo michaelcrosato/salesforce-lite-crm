@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CaseForm, type CaseOptionItem } from "@/components/cases/case-form";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { listAccounts, listContacts } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
 
@@ -38,7 +40,11 @@ export default async function NewCasePage() {
       <PageHeader
         title="New Case"
         description="Capture a customer issue and assign it to an owner."
-      />
+      >
+        <Button asChild variant="outline">
+          <Link href="/cases">Back to cases</Link>
+        </Button>
+      </PageHeader>
       <CaseForm
         title="Create Case"
         submitLabel="Create case"

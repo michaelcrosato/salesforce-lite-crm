@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   CampaignForm,
   type CampaignOptionItem
 } from "@/components/campaigns/campaign-form";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +30,11 @@ export default async function NewCampaignPage() {
       <PageHeader
         title="New Campaign"
         description="Plan an outreach program with a budget and target window."
-      />
+      >
+        <Button asChild variant="outline">
+          <Link href="/campaigns">Back to campaigns</Link>
+        </Button>
+      </PageHeader>
       <CampaignForm
         title="Create Campaign"
         submitLabel="Create campaign"
