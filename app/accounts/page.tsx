@@ -14,6 +14,24 @@ import { isOpenDealStage } from "@/lib/business/deals";
 
 export const dynamic = "force-dynamic";
 
+type AccountListItem = {
+  id: string;
+  name: string;
+  industry: string | null;
+  city: string | null;
+  region: string | null;
+  status: string;
+  healthScore: number;
+  owner: {
+    name: string;
+  } | null;
+  contacts: Array<{ id: string }>;
+  deals: Array<{
+    stage: string;
+    value: number;
+  }>;
+};
+
 export default async function AccountsPage({
   searchParams
 }: {
@@ -103,7 +121,7 @@ export default async function AccountsPage({
         <CardContent>
           {accounts.length > 0 ? (
             <AccountsTable
-              accounts={accounts.map((account) => ({
+              accounts={accounts.map((account: AccountListItem) => ({
                 id: account.id,
                 name: account.name,
                 industry: account.industry,

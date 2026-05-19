@@ -20,6 +20,28 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type AccountContactListItem = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  title: string | null;
+  email: string | null;
+  status: string;
+};
+
+type AccountDealListItem = {
+  id: string;
+  name: string;
+  stage: string;
+  value: number;
+  probability: number;
+  contact: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
+};
+
 export default async function AccountDetailPage({
   params
 }: {
@@ -178,7 +200,7 @@ export default async function AccountDetailPage({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {account.contacts.map((contact) => (
+                  {account.contacts.map((contact: AccountContactListItem) => (
                     <TableRow key={contact.id}>
                       <TableCell>
                         <Link
@@ -222,7 +244,7 @@ export default async function AccountDetailPage({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {account.deals.map((deal) => (
+                  {account.deals.map((deal: AccountDealListItem) => (
                     <TableRow key={deal.id}>
                       <TableCell>
                         <Link
