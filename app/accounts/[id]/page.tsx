@@ -16,7 +16,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { CONTACT_STATUS_LABELS, STAGE_LABELS, type ContactStatus } from "@/lib/crm-constants";
-import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
+import { formatCurrency, formatDate, formatNumber, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -146,8 +146,8 @@ export default async function AccountDetailPage({
           <SummaryItem label="Owner" value={account.owner?.name ?? "Unassigned"} />
           <SummaryItem label="Created" value={formatDate(account.createdAt)} />
           <SummaryItem label="Updated" value={formatDate(account.updatedAt)} />
-          <SummaryItem label="Contacts" value={account.contacts.length.toString()} />
-          <SummaryItem label="Deals" value={account.deals.length.toString()} />
+          <SummaryItem label="Contacts" value={formatNumber(account.contacts.length)} />
+          <SummaryItem label="Deals" value={formatNumber(account.deals.length)} />
         </CardContent>
       </Card>
 
