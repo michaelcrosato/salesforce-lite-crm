@@ -242,22 +242,32 @@ export default async function DashboardPage() {
           <div className="grid gap-4 xl:grid-cols-4">
             <AnalystList title="Behind-Pace Orders">
               {analystPanel.behindOrders.length > 0 ? (
-                analystPanel.behindOrders.slice(0, 3).map((order) => (
-                  <Link
-                    key={order.id}
-                    href={order.href}
-                    data-testid="analyst-item-behind-pace-order"
-                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">{order.name}</p>
-                      <Badge variant="danger">{order.paceStatus}</Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {order.explanation}
-                    </p>
-                  </Link>
-                ))
+                <>
+                  {analystPanel.behindOrders.slice(0, 3).map((order) => (
+                    <Link
+                      key={order.id}
+                      href={order.href}
+                      data-testid="analyst-item-behind-pace-order"
+                      className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold">{order.name}</p>
+                        <Badge variant="danger">{order.paceStatus}</Badge>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {order.explanation}
+                      </p>
+                    </Link>
+                  ))}
+                  {analystPanel.behindOrders.length > 3 ? (
+                    <Link
+                      href="/orders"
+                      className="block text-xs font-medium text-primary hover:underline"
+                    >
+                      See all {analystPanel.behindOrders.length} orders &rarr;
+                    </Link>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">No behind-pace orders.</p>
               )}
@@ -265,18 +275,28 @@ export default async function DashboardPage() {
 
             <AnalystList title="Unrouted Leads">
               {analystPanel.unroutedLeads.length > 0 ? (
-                analystPanel.unroutedLeads.slice(0, 3).map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={lead.href}
-                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
-                  >
-                    <p className="text-sm font-semibold">{lead.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {lead.assignmentReason}
-                    </p>
-                  </Link>
-                ))
+                <>
+                  {analystPanel.unroutedLeads.slice(0, 3).map((lead) => (
+                    <Link
+                      key={lead.id}
+                      href={lead.href}
+                      className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    >
+                      <p className="text-sm font-semibold">{lead.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {lead.assignmentReason}
+                      </p>
+                    </Link>
+                  ))}
+                  {analystPanel.unroutedLeads.length > 3 ? (
+                    <Link
+                      href="/leads"
+                      className="block text-xs font-medium text-primary hover:underline"
+                    >
+                      See all {analystPanel.unroutedLeads.length} leads &rarr;
+                    </Link>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">All recent leads routed.</p>
               )}
@@ -284,18 +304,28 @@ export default async function DashboardPage() {
 
             <AnalystList title="Stale High-Value Deals">
               {analystPanel.staleHighValueDeals.length > 0 ? (
-                analystPanel.staleHighValueDeals.slice(0, 3).map((deal) => (
-                  <Link
-                    key={deal.id}
-                    href={deal.href}
-                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
-                  >
-                    <p className="text-sm font-semibold">{deal.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {deal.accountName} · {formatCurrency(deal.value)}
-                    </p>
-                  </Link>
-                ))
+                <>
+                  {analystPanel.staleHighValueDeals.slice(0, 3).map((deal) => (
+                    <Link
+                      key={deal.id}
+                      href={deal.href}
+                      className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    >
+                      <p className="text-sm font-semibold">{deal.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {deal.accountName} &middot; {formatCurrency(deal.value)}
+                      </p>
+                    </Link>
+                  ))}
+                  {analystPanel.staleHighValueDeals.length > 3 ? (
+                    <Link
+                      href="/reports/stale-opportunities"
+                      className="block text-xs font-medium text-primary hover:underline"
+                    >
+                      See all {analystPanel.staleHighValueDeals.length} stale deals &rarr;
+                    </Link>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">No stale high-value deals.</p>
               )}
@@ -303,18 +333,28 @@ export default async function DashboardPage() {
 
             <AnalystList title="Low-Health Dealer Accounts">
               {analystPanel.lowHealthAccounts.length > 0 ? (
-                analystPanel.lowHealthAccounts.slice(0, 3).map((account) => (
-                  <Link
-                    key={`${account.id}-${account.orderName}`}
-                    href={account.href}
-                    className="block rounded-md border bg-background p-3 hover:bg-muted/50"
-                  >
-                    <p className="text-sm font-semibold">{account.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Health {account.healthScore} · {account.orderName}
-                    </p>
-                  </Link>
-                ))
+                <>
+                  {analystPanel.lowHealthAccounts.slice(0, 3).map((account) => (
+                    <Link
+                      key={`${account.id}-${account.orderName}`}
+                      href={account.href}
+                      className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    >
+                      <p className="text-sm font-semibold">{account.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Health {account.healthScore} &middot; {account.orderName}
+                      </p>
+                    </Link>
+                  ))}
+                  {analystPanel.lowHealthAccounts.length > 3 ? (
+                    <Link
+                      href="/accounts"
+                      className="block text-xs font-medium text-primary hover:underline"
+                    >
+                      See all {analystPanel.lowHealthAccounts.length} accounts &rarr;
+                    </Link>
+                  ) : null}
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   No low-health behind-pace dealer accounts.
