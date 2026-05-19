@@ -265,6 +265,7 @@ export default async function DashboardPage() {
                     key={lead.id}
                     href={lead.href}
                     className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    data-testid="analyst-item-unrouted-lead"
                   >
                     <p className="text-sm font-semibold">{lead.name}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -284,6 +285,7 @@ export default async function DashboardPage() {
                     key={deal.id}
                     href={deal.href}
                     className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    data-testid="analyst-item-stale-high-value-deal"
                   >
                     <p className="text-sm font-semibold">{deal.name}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -303,6 +305,7 @@ export default async function DashboardPage() {
                     key={`${account.id}-${account.orderName}`}
                     href={account.href}
                     className="block rounded-md border bg-background p-3 hover:bg-muted/50"
+                    data-testid="analyst-item-low-health-account"
                   >
                     <p className="text-sm font-semibold">{account.name}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -326,6 +329,7 @@ export default async function DashboardPage() {
                   key={action.id}
                   href={action.href}
                   className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
+                  data-testid="analyst-item-action"
                 >
                   <p className="line-clamp-2 text-sm font-semibold">{action.title}</p>
                   <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
