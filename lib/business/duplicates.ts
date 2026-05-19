@@ -19,27 +19,35 @@ export type DuplicateGroup<T> = {
   records: T[];
 };
 
+type DuplicateRecord = {
+  id: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+};
+
 function norm(str: string | null | undefined): string {
   return (str ?? "").toLowerCase().trim();
 }
 
-export function findDuplicateContacts(contacts: readonly DuplicateContact[]): DuplicateGroup<DuplicateContact>[] {
-  const byEmail = new Map<string, DuplicateContact[]>();
-  const byNamePhone = new Map<string, DuplicateContact[]>();
+function findDuplicates<T extends DuplicateRecord>(records: readonly T[]): DuplicateGroup<T>[] {
+  const byEmail = new Map<string, T[]>();
+  const byNamePhone = new Map<string, T[]>();
 
-  for (const c of contacts) {
-    const email = norm(c.email);
+  for (const record of records) {
+    const email = norm(record.email);
     if (email) {
       if (!byEmail.has(email)) byEmail.set(email, []);
-      byEmail.get(email)!.push(c);
+      byEmail.get(email)!.push(record);
     }
 
-    const key = `${norm(c.firstName)}|${norm(c.lastName)}|${norm(c.phone)}`;
+    const key = `${norm(record.firstName)}|${norm(record.lastName)}|${norm(record.phone)}`;
     if (!byNamePhone.has(key)) byNamePhone.set(key, []);
-    byNamePhone.get(key)!.push(c);
+    byNamePhone.get(key)!.push(record);
   }
 
-  const groups: DuplicateGroup<DuplicateContact>[] = [];
+  const groups: DuplicateGroup<T>[] = [];
 
   for (const [email, list] of byEmail) {
     if (list.length > 1) {
@@ -60,12 +68,10 @@ export function findDuplicateContacts(contacts: readonly DuplicateContact[]): Du
   return groups;
 }
 
+export function findDuplicateContacts(contacts: readonly DuplicateContact[]): DuplicateGroup<DuplicateContact>[] {
+  return findDuplicates(contacts);
+}
+
 export function findDuplicateLeads(leads: readonly DuplicateLead[]): DuplicateGroup<DuplicateLead>[] {
-  // same logic, reuse by casting shape
-  const contactsLike = leads as unknown as DuplicateContact[];
-  const contactGroups = findDuplicateContacts(contactsLike);
-  return contactGroups.map((g) => ({
-    reason: g.reason,
-    records: g.records as unknown as DuplicateLead[]
-  }));
+  return findDuplicates(leads);
 }
