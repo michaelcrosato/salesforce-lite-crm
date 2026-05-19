@@ -119,20 +119,35 @@ export default async function AccountDetailPage({
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <SummaryItem label="Domain" value={account.domain ?? "No domain"} />
-          <SummaryItem label="Industry" value={account.industry ?? "No industry"} />
+          <SummaryItem
+            label="Industry"
+            value={account.industry ?? "No industry"}
+          />
           <SummaryItem
             label="Location"
-            value={[account.city, account.region].filter(Boolean).join(", ") || "No location"}
+            value={
+              [account.city, account.region].filter(Boolean).join(", ") ||
+              "No location"
+            }
           />
           <SummaryItem
             label="Status"
             value={<AccountStatusBadge status={account.status} />}
           />
-          <SummaryItem label="Health" value={<HealthBadge value={account.healthScore} />} />
-          <SummaryItem label="Owner" value={account.owner?.name ?? "Unassigned"} />
+          <SummaryItem
+            label="Health"
+            value={<HealthBadge value={account.healthScore} />}
+          />
+          <SummaryItem
+            label="Owner"
+            value={account.owner?.name ?? "Unassigned"}
+          />
           <SummaryItem label="Created" value={formatDate(account.createdAt)} />
           <SummaryItem label="Updated" value={formatDate(account.updatedAt)} />
-          <SummaryItem label="Contacts" value={account.contacts.length.toString()} />
+          <SummaryItem
+            label="Contacts"
+            value={account.contacts.length.toString()}
+          />
           <SummaryItem label="Deals" value={account.deals.length.toString()} />
         </CardContent>
       </Card>
@@ -191,7 +206,11 @@ export default async function AccountDetailPage({
                       <TableCell>{contact.title ?? "No title"}</TableCell>
                       <TableCell>{contact.email ?? "No email"}</TableCell>
                       <TableCell>
-                        <Badge variant={contact.status === "active" ? "success" : "outline"}>
+                        <Badge
+                          variant={
+                            contact.status === "active" ? "success" : "outline"
+                          }
+                        >
                           {contact.status}
                         </Badge>
                       </TableCell>
@@ -200,7 +219,9 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No contacts are linked.</p>
+              <p className="text-sm text-muted-foreground">
+                No contacts are linked.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -234,7 +255,11 @@ export default async function AccountDetailPage({
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">
-                          {STAGE_LABELS[deal.stage as keyof typeof STAGE_LABELS]}
+                          {
+                            STAGE_LABELS[
+                              deal.stage as keyof typeof STAGE_LABELS
+                            ]
+                          }
                         </Badge>
                       </TableCell>
                       <TableCell>{formatCurrency(deal.value)}</TableCell>
@@ -256,7 +281,9 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No deals are linked.</p>
+              <p className="text-sm text-muted-foreground">
+                No deals are linked.
+              </p>
             )}
           </CardContent>
         </Card>

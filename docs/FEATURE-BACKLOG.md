@@ -5,11 +5,11 @@ roadmap and does not authorize feature work.
 
 ## Active Items From PLAN.md
 
-| ID | Scope | Owner | Status |
-|---|---|---|---|
-| S4-F1 | Demo seed tuning | Codex | queued |
-| S4-F2 | Route visual QA | Claude | queued |
-| S4-F3 | Component polish | Grok | queued |
+| ID    | Scope                         | Owner  | Status |
+| ----- | ----------------------------- | ------ | ------ |
+| S4-F1 | Demo seed tuning              | Codex  | queued |
+| S4-F2 | Route visual QA               | Claude | queued |
+| S4-F3 | Component polish              | Grok   | queued |
 | S4-F4 | Demo smoke and gate hardening | Gemini | queued |
 
 ## Deferred README-Known Limitations

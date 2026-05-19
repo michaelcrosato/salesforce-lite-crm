@@ -50,42 +50,42 @@ describe("crmClient list functions", () => {
     const results = await listOpportunities({
       filters: { stage: "proposal" }
     });
-    expect(results.some(o => o.name === "ListMatch Opportunity")).toBe(true);
+    expect(results.some((o) => o.name === "ListMatch Opportunity")).toBe(true);
   });
 
   it("lists leads with source filter", async () => {
     const results = await listLeads({
       filters: { search: "list-test" }
     });
-    expect(results.some(l => l.firstName === "ListMatch")).toBe(true);
+    expect(results.some((l) => l.firstName === "ListMatch")).toBe(true);
   });
 
   it("lists activities with type filter", async () => {
     const results = await listActivities({
       filters: { type: "call" }
     });
-    expect(results.some(a => a.title === "ListMatch Activity")).toBe(true);
+    expect(results.some((a) => a.title === "ListMatch Activity")).toBe(true);
   });
 
   it("lists tasks with status filter", async () => {
     const results = await listTasks({
       filters: { status: "open" }
     });
-    expect(results.some(t => t.title === "ListMatch Task")).toBe(true);
+    expect(results.some((t) => t.title === "ListMatch Task")).toBe(true);
   });
 
   it("lists cases with status filter", async () => {
     const results = await listCases({
       filters: { status: "new" }
     });
-    expect(results.some(c => c.subject === "ListMatch Case")).toBe(true);
+    expect(results.some((c) => c.subject === "ListMatch Case")).toBe(true);
   });
 
   it("lists campaigns with status filter", async () => {
     const results = await listCampaigns({
       filters: { status: "planned" }
     });
-    expect(results.some(c => c.name === "ListMatch Campaign")).toBe(true);
+    expect(results.some((c) => c.name === "ListMatch Campaign")).toBe(true);
   });
 });
 
@@ -136,11 +136,13 @@ async function cleanupListFixtures() {
     where: { deal: { name: "ListMatch Opportunity" } }
   });
   await prisma.activity.deleteMany({
-    where: { OR: [
-      { title: "ListMatch Activity" },
-      { deal: { name: "ListMatch Opportunity" } },
-      { title: { startsWith: "Task completed: ListMatch" } }
-    ]}
+    where: {
+      OR: [
+        { title: "ListMatch Activity" },
+        { deal: { name: "ListMatch Opportunity" } },
+        { title: { startsWith: "Task completed: ListMatch" } }
+      ]
+    }
   });
   await prisma.campaign.deleteMany({
     where: { name: "ListMatch Campaign" }

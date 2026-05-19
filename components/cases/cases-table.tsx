@@ -19,7 +19,13 @@ import {
 } from "@/lib/crm/registry";
 import { formatRelativeDays } from "@/lib/formatters";
 
-type BadgeVariant = "default" | "secondary" | "outline" | "success" | "warning" | "danger";
+type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "outline"
+  | "success"
+  | "warning"
+  | "danger";
 
 export type CaseLinkedRecord =
   | { kind: "account"; id: string; label: string }
@@ -106,7 +112,10 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
             <TableCell>{formatRelativeDays(crmCase.updatedAt)}</TableCell>
             <TableCell>
               <Button asChild variant="ghost" size="icon">
-                <Link href={ROUTE_REGISTRY.caseDetail(crmCase.id)} aria-label="Open case">
+                <Link
+                  href={ROUTE_REGISTRY.caseDetail(crmCase.id)}
+                  aria-label="Open case"
+                >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>

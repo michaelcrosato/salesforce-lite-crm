@@ -12,13 +12,16 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import {
-  ROUTE_REGISTRY,
-  type CampaignStatus
-} from "@/lib/crm/registry";
+import { ROUTE_REGISTRY, type CampaignStatus } from "@/lib/crm/registry";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 
-type BadgeVariant = "default" | "secondary" | "outline" | "success" | "warning" | "danger";
+type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "outline"
+  | "success"
+  | "warning"
+  | "danger";
 
 export type CampaignRow = {
   id: string;
@@ -77,7 +80,9 @@ export function CampaignsTable({ campaigns }: { campaigns: CampaignRow[] }) {
             <TableCell>{formatDate(campaign.startDate)}</TableCell>
             <TableCell>{formatDate(campaign.endDate)}</TableCell>
             <TableCell>
-              {typeof campaign.budget === "number" ? formatCurrency(campaign.budget) : "—"}
+              {typeof campaign.budget === "number"
+                ? formatCurrency(campaign.budget)
+                : "—"}
             </TableCell>
             <TableCell>{campaign.owner?.name ?? "Unassigned"}</TableCell>
             <TableCell>

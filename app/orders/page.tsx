@@ -8,7 +8,10 @@ import {
   DEALER_ORDER_STATUS_LABELS,
   type DealerOrderStatus
 } from "@/lib/crm-constants";
-import { expectedDeliveredByToday, getPacingStatus } from "@/lib/business/dealerOps";
+import {
+  expectedDeliveredByToday,
+  getPacingStatus
+} from "@/lib/business/dealerOps";
 import { formatDate, formatNumber } from "@/lib/formatters";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { prisma } from "@/lib/prisma";
@@ -97,14 +100,23 @@ export default async function OrdersPage() {
                     const status = getPacingStatus(orderForPacing, now);
 
                     return (
-                      <tr key={order.id} className="border-b align-top last:border-0">
+                      <tr
+                        key={order.id}
+                        className="border-b align-top last:border-0"
+                      >
                         <td className="py-3 pr-4 font-medium">
-                          <Link href={`/orders/${order.id}`} className="text-primary hover:underline">
+                          <Link
+                            href={`/orders/${order.id}`}
+                            className="text-primary hover:underline"
+                          >
                             {order.name}
                           </Link>
                         </td>
                         <td className="py-3 pr-4">
-                          <Link href={`/accounts/${order.account.id}`} className="text-primary hover:underline">
+                          <Link
+                            href={`/accounts/${order.account.id}`}
+                            className="text-primary hover:underline"
+                          >
                             {order.account.name}
                           </Link>
                         </td>
@@ -112,24 +124,42 @@ export default async function OrdersPage() {
                           {order.areas.map((link) => link.area.name).join(", ")}
                         </td>
                         <td className="py-3 pr-4">
-                          <Badge variant={order.status === "active" ? "success" : "secondary"}>
-                            {DEALER_ORDER_STATUS_LABELS[order.status as DealerOrderStatus] ??
-                              order.status}
+                          <Badge
+                            variant={
+                              order.status === "active"
+                                ? "success"
+                                : "secondary"
+                            }
+                          >
+                            {DEALER_ORDER_STATUS_LABELS[
+                              order.status as DealerOrderStatus
+                            ] ?? order.status}
                           </Badge>
                         </td>
-                        <td className="py-3 pr-4">{formatNumber(order.monthlyQuota)}</td>
-                        <td className="py-3 pr-4">{formatNumber(deliveredThisMonth)}</td>
                         <td className="py-3 pr-4">
-                          {formatNumber(Math.max(0, order.monthlyQuota - deliveredThisMonth))}
+                          {formatNumber(order.monthlyQuota)}
                         </td>
                         <td className="py-3 pr-4">
-                          {expectedDeliveredByToday(orderForPacing, now).toFixed(1)}
+                          {formatNumber(deliveredThisMonth)}
+                        </td>
+                        <td className="py-3 pr-4">
+                          {formatNumber(
+                            Math.max(0, order.monthlyQuota - deliveredThisMonth)
+                          )}
+                        </td>
+                        <td className="py-3 pr-4">
+                          {expectedDeliveredByToday(
+                            orderForPacing,
+                            now
+                          ).toFixed(1)}
                         </td>
                         <td className="w-48 py-3 pr-4">
                           <PacingBar order={orderForPacing} now={now} />
                           <span className="sr-only">{status}</span>
                         </td>
-                        <td className="py-3 pr-4">{formatDate(order.startDate)}</td>
+                        <td className="py-3 pr-4">
+                          {formatDate(order.startDate)}
+                        </td>
                       </tr>
                     );
                   })}

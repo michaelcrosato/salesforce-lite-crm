@@ -20,23 +20,24 @@ type TestOrderBy = {
   createdAt?: "asc" | "desc";
 };
 
-const config: ListQueryConfig<TestSortBy, TestFilters, TestWhere, TestOrderBy> = {
-  defaultSortBy: "name",
-  defaultSortOrder: "asc",
-  defaultPageSize: 20,
-  maxPageSize: 50,
-  emptyWhere: {},
-  andWhere: (clauses) => ({ AND: clauses }),
-  sortMap: {
-    name: (order) => ({ name: order }),
-    createdAt: (order) => ({ createdAt: order })
-  },
-  filterMap: {
-    status: (status) => ({ status }),
-    ownerId: (ownerId) => ({ ownerId }),
-    search: (search) => ({ name: { contains: search } })
-  }
-};
+const config: ListQueryConfig<TestSortBy, TestFilters, TestWhere, TestOrderBy> =
+  {
+    defaultSortBy: "name",
+    defaultSortOrder: "asc",
+    defaultPageSize: 20,
+    maxPageSize: 50,
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      name: (order) => ({ name: order }),
+      createdAt: (order) => ({ createdAt: order })
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      ownerId: (ownerId) => ({ ownerId }),
+      search: (search) => ({ name: { contains: search } })
+    }
+  };
 
 describe("list query helper", () => {
   it("returns default where, order, skip, and take clauses", () => {

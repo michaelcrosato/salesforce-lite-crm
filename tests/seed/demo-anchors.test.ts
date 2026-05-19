@@ -20,15 +20,19 @@ describe("Demo Anchor Seed Integrity", () => {
           where: {
             createdAt: {
               gte: new Date(now.getFullYear(), now.getMonth(), 1),
-              lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-            },
-          },
-        },
-      },
+              lt: new Date(now.getFullYear(), now.getMonth() + 1, 1)
+            }
+          }
+        }
+      }
     });
 
     const isBehind = dealerOrders.some((order) => {
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysInMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+      ).getDate();
       const expected = (order.monthlyQuota * now.getDate()) / daysInMonth;
       return order.leads.length - expected < -1;
     });
@@ -44,7 +48,7 @@ describe("Demo Anchor Seed Integrity", () => {
     const kpis = calculateDashboardKpis({
       contactsCount,
       accounts,
-      deals: deals.map((d) => ({ ...d, accountName: "dummy" })),
+      deals: deals.map((d) => ({ ...d, accountName: "dummy" }))
     });
 
     expect(kpis.totalContacts).toBeGreaterThan(0);
@@ -64,25 +68,25 @@ describe("Demo Anchor Seed Integrity", () => {
             where: {
               createdAt: {
                 gte: new Date(now.getFullYear(), now.getMonth(), 1),
-                lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-              },
-            },
-          },
-        },
+                lt: new Date(now.getFullYear(), now.getMonth() + 1, 1)
+              }
+            }
+          }
+        }
       }),
       prisma.lead.findMany(),
-      prisma.deal.findMany(),
+      prisma.deal.findMany()
     ]);
 
     const analystPanel = buildAnalystPanel({
       orders: orders.map((o) => ({
         ...o,
         deliveredThisMonth: o.leads.length,
-        account: { ...o.account, healthScore: o.account.healthScore ?? 100 },
+        account: { ...o.account, healthScore: o.account.healthScore ?? 100 }
       })),
       leads: leads.map((l) => ({ ...l })),
       deals: deals.map((d) => ({ ...d })),
-      now,
+      now
     });
 
     expect(analystPanel.actions.length).toBeGreaterThanOrEqual(1);
@@ -96,7 +100,7 @@ describe("Demo Anchor Seed Integrity", () => {
     const kpis = calculateDashboardKpis({
       contactsCount,
       accounts,
-      deals: deals.map((d) => ({ ...d, accountName: "dummy" })),
+      deals: deals.map((d) => ({ ...d, accountName: "dummy" }))
     });
 
     // Baseline values recorded from seed analysis
@@ -104,7 +108,9 @@ describe("Demo Anchor Seed Integrity", () => {
     const margin = expectedForecast * 0.05;
 
     // We will verify the actual value first if it differs significantly
-    expect(kpis.weightedForecastValue).toBeGreaterThan(expectedForecast - margin);
+    expect(kpis.weightedForecastValue).toBeGreaterThan(
+      expectedForecast - margin
+    );
     expect(kpis.weightedForecastValue).toBeLessThan(expectedForecast + margin);
   });
 });

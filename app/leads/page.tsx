@@ -25,10 +25,16 @@ export const dynamic = "force-dynamic";
 export default async function LeadsPage({
   searchParams
 }: {
-  searchParams: Promise<{ status?: string; area?: string; order?: string; source?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    area?: string;
+    order?: string;
+    source?: string;
+  }>;
 }) {
   const params = await searchParams;
-  const status = params.status && isLeadStatus(params.status) ? params.status : "all";
+  const status =
+    params.status && isLeadStatus(params.status) ? params.status : "all";
   const areaId = params.area ?? "all";
   const orderId = params.order ?? "all";
   const source = params.source ?? "all";
@@ -149,7 +155,10 @@ export default async function LeadsPage({
                 <option value="all">All sources</option>
                 {sources.map((sourceOption) =>
                   sourceOption.source ? (
-                    <option key={sourceOption.source} value={sourceOption.source}>
+                    <option
+                      key={sourceOption.source}
+                      value={sourceOption.source}
+                    >
                       {sourceOption.source}
                     </option>
                   ) : null
@@ -181,12 +190,19 @@ export default async function LeadsPage({
                     <Fragment key={lead.id}>
                       <tr className="border-b last:border-0">
                         <td className="py-3 pr-4 font-medium">
-                          <Link href={`/leads/${lead.id}`} className="text-primary hover:underline">
+                          <Link
+                            href={`/leads/${lead.id}`}
+                            className="text-primary hover:underline"
+                          >
                             {lead.firstName} {lead.lastName}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4">{lead.postalCode ?? "No postal"}</td>
-                        <td className="py-3 pr-4">{lead.area?.name ?? "Unresolved"}</td>
+                        <td className="py-3 pr-4">
+                          {lead.postalCode ?? "No postal"}
+                        </td>
+                        <td className="py-3 pr-4">
+                          {lead.area?.name ?? "Unresolved"}
+                        </td>
                         <td className="py-3 pr-4">
                           {lead.assignedOrder ? (
                             <Link
@@ -197,11 +213,20 @@ export default async function LeadsPage({
                               {lead.assignedOrder.account.name}
                             </Link>
                           ) : (
-                            <span className="text-muted-foreground">Unassigned</span>
+                            <span className="text-muted-foreground">
+                              Unassigned
+                            </span>
                           )}
                         </td>
                         <td className="py-3 pr-4">
-                          <Badge variant={lead.status === "assigned" ? "success" : "secondary"} data-testid="lead-status-badge">
+                          <Badge
+                            variant={
+                              lead.status === "assigned"
+                                ? "success"
+                                : "secondary"
+                            }
+                            data-testid="lead-status-badge"
+                          >
                             {isLeadStatus(lead.status)
                               ? LEAD_STATUS_LABELS[lead.status as LeadStatus]
                               : lead.status}
@@ -210,7 +235,9 @@ export default async function LeadsPage({
                         <td className="py-3 pr-4">
                           {reasonBadge(lead.assignmentReason)}
                         </td>
-                        <td className="py-3 pr-4">{formatDate(lead.createdAt)}</td>
+                        <td className="py-3 pr-4">
+                          {formatDate(lead.createdAt)}
+                        </td>
                       </tr>
                       <tr className="border-b last:border-0">
                         <td colSpan={7} className="pb-3 pr-4">
@@ -241,14 +268,21 @@ export default async function LeadsPage({
 
 function reasonBadge(reason: string | null) {
   if (!reason) {
-    return <Badge variant="outline" data-testid="lead-assignment-reason-badge">No decision</Badge>;
+    return (
+      <Badge variant="outline" data-testid="lead-assignment-reason-badge">
+        No decision
+      </Badge>
+    );
   }
 
   const knownReason = reason as AssignmentReason;
   const label = ASSIGNMENT_REASON_LABELS[knownReason] ?? reason;
 
   return (
-    <Badge variant={reason === "routed" ? "success" : "warning"} data-testid="lead-assignment-reason-badge">
+    <Badge
+      variant={reason === "routed" ? "success" : "warning"}
+      data-testid="lead-assignment-reason-badge"
+    >
       {label}
     </Badge>
   );

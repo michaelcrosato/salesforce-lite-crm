@@ -31,7 +31,13 @@ export const ACTIVITY_TYPES = [
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
-export const LEAD_STATUSES = ["new", "assigned", "contacted", "closed", "dead"] as const;
+export const LEAD_STATUSES = [
+  "new",
+  "assigned",
+  "contacted",
+  "closed",
+  "dead"
+] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
 export const DEALER_ORDER_STATUSES = ["active", "paused", "complete"] as const;

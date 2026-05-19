@@ -7,6 +7,7 @@
 ---
 
 ## Pre-Flight & Rebase (Completed)
+
 - Verified: clean tree (removed temp `grok-cli-prompt.txt` artifact), branch `feat/grok-crm-data-reports`, `Get-Location` in `C:\dev\salesforce-lite-crm-grok`, `[UNBLOCK]` commit visible on `feat/codex-crm-contract-api` (28bc34c).
 - Rebase: `git rebase feat/codex-crm-contract-api` → clean fast-forward, no conflicts in non-owned files.
 - Post-rebase setup for green baseline:
@@ -19,6 +20,7 @@
 ---
 
 ## Domain Rules (Strict — Do NOT Violate)
+
 - **Lead**: CONSUMER lead routed to DealerOrder via dealer-area matching (postal prefix). NOT generic B2B sales lead. No lead-conversion logic. Preserve routing story: routed leads → assignedOrderId + assignmentReason="routed"; unrouted → areaId + reason ("no_area_match", "no_matching_active_order", "all_orders_at_quota").
 - **Deal**: Opportunity-equivalent. Model is `Deal` (aliased `Opportunity`). Detail route **must stay** `/deals?deal=<id>` (drawer). Never assume `/deals/[id]`.
 - **Dealer Revenue Command Center**: Vertical differentiator. Demo data MUST preserve dealer-routing-and-pacing story (areas, dealerOrders with quotas, current/prior targets, lead routing events in Activity).
@@ -27,6 +29,7 @@
 ---
 
 ## Owned Paths (Edit Only These)
+
 - `prisma/seed.ts`: Add **NEW** Task/Case/Campaign seed sections + deleteMany at top of `main()`. **NEVER** modify existing Account/Contact/Deal/Lead/Area/DealerOrder/Activity/User seed data/arrays/functions.
 - `lib/business/tasks.ts` (new file): Pure Task helpers (`isOverdue`, `isDueToday`, `isUpcoming`, `tasksByOwner`, `taskCompletionStats`).
 - `lib/business/csv-export.ts` (new): `toCsv<T>()` RFC 4180 compliant.
@@ -44,6 +47,7 @@
 ---
 
 ## Not-Owned Paths (Do NOT Edit)
+
 - `prisma/schema.prisma` (Codex)
 - `lib/prisma.ts`, `lib/crm/**`, `lib/services/**`, `lib/validation.ts` (Codex)
 - Existing `lib/business/*.ts` (dashboard.ts, deals.ts, dealerOps.ts, analyst.ts, forecast.ts) — extend only via new files.
@@ -58,6 +62,7 @@
 ---
 
 ## Seed Conventions (from prisma/seed.ts)
+
 - Deterministic IDs (e.g., `task-001`, `case-acct-northstar-1`).
 - Use existing IDs from `accounts`, `contacts`, `deals`, `leads`, `users` arrays for relations (accountId, contactId, dealId, leadId, ownerId).
 - Mix of statuses/priorities/dates to exercise UI and reports (overdue/due-today/upcoming/completed for Tasks; varied for Cases/Campaigns).
@@ -73,7 +78,8 @@
 
 ---
 
-## Pure Helper Patterns (from lib/business/*.ts)
+## Pure Helper Patterns (from lib/business/\*.ts)
+
 - **Pure functions only**: No prisma, no side effects, deterministic given inputs + optional `now = new Date()`.
 - Types exported (e.g., `StaleDealCandidate`).
 - Use const arrays from registry or hardcode validated strings for enums.
@@ -87,7 +93,9 @@
 ---
 
 ## Codex Reports Service Surface (lib/services/reports.ts) — Augment, Do Not Duplicate
+
 Pure query functions (async, hit Prisma):
+
 - `pipelineByStage(): Promise<PipelineByStageRow[]>` — aggregates Deal by DEAL_STAGES.
 - `leadsBySource(): Promise<LeadsBySourceRow[]>`
 - `activityVolumeByDay(now?, days?): Promise<ActivityVolumeByDayRow[]>`
@@ -101,6 +109,7 @@ Use these to post-process results from above service calls (e.g., in future UI p
 ---
 
 ## Test Patterns (Vitest)
+
 - From `tests/business.test.ts`: `describe("...")`, `it("...")`, `expect(...)`, `beforeEach` for prisma cleanup in integration tests.
 - Pure helper tests: simple, no DB (e.g., `isStaleDeal` with fixed dates).
 - For my work: `tests/helpers/tasks.test.ts` etc. (5+ cases, edge dates, empty, etc.).
@@ -109,6 +118,7 @@ Use these to post-process results from above service calls (e.g., in future UI p
 ---
 
 ## CSV / Duplicates / Reports-Extra Requirements (from spec)
+
 - **csv-export.ts**: `toCsv<T>(rows, columns: {key: keyof T, label: string}[])` — RFC 4180 (quote on comma/quote/newline, \" escape), null/undef → "", Date → ISO 8601.
 - **csv-import.ts**: `parseCsv(input: string): {headers: string[], rows: string[][], errors: string[]}` (never throw), `previewRows(input, limit)` tolerant trailing ws.
 - **duplicates.ts**: `findDuplicateContacts(contacts): Array<{reason: string, records: Contact[]}>` — group by (email lower) OR (first+last+phone lower). Same for Leads. Non-mutating.
@@ -117,6 +127,7 @@ Use these to post-process results from above service calls (e.g., in future UI p
 ---
 
 ## TypeScript Discipline (Strict)
+
 - No `any`, no `@ts-ignore`, no `@ts-expect-error`.
 - After each commit touching `lib/business/*.ts` or `tests/seed-integrity.test.ts` or `tests/helpers/*`:
   ```powershell
@@ -128,6 +139,7 @@ Use these to post-process results from above service calls (e.g., in future UI p
 ---
 
 ## Stopping Conditions Handled
+
 - Pre-flight: resolved dirty tree by removing prompt artifact (not code).
 - Rebase: clean.
 - Baseline: green after prisma setup.
@@ -137,6 +149,7 @@ Use these to post-process results from above service calls (e.g., in future UI p
 ---
 
 ## Next Steps (Slice 1)
+
 G1: Task seed (~40) in seed.ts + db push/seed verify + commit `feat(data): task seed dataset`  
 ... (see user query for full 9 features, one commit each)
 
@@ -144,14 +157,16 @@ G1: Task seed (~40) in seed.ts + db push/seed verify + commit `feat(data): task 
 
 ---
 
-*Grok agent started: $(date) — following execution discipline strictly.*
+_Grok agent started: $(date) — following execution discipline strictly._
 
 ---
 
 ## YOLO MODE (Activated by user ":yolo")
+
 After completing the ultra-strict mission, user replied "1".
 
 **YOLO #1 — Dealer Trophies & Mascots Easter Egg**
+
 - New file: `lib/business/dealerTrophies.ts` (pure, glorious, zero `any`)
 - Mascots: Turbo Llama 🦙, Pacing Panther 🐆, Golden Shovel 🏆, Quota Crusher 💥, Disco Dealer 🪩, Lead Eagle 🦅, Maple Moose 🫎, Rage Router 😤
 - Trophies: Most Improved Pacing, Turbo Llama, Pacing Panther, Quota Crusher
@@ -159,7 +174,7 @@ After completing the ultra-strict mission, user replied "1".
 - Tests: 5/5 passing in `tests/helpers/dealer-trophies.test.ts`
 - This feature alone justifies the entire existence of the CRM.
 
-The dealer-routing-and-pacing story is now *dramatically* more fun.
+The dealer-routing-and-pacing story is now _dramatically_ more fun.
 
 YOLO status: **We are so back.**
 
@@ -175,4 +190,3 @@ Activated after initial YOLO #1. Delivered two additional major pure modules + p
 - All gates passed. The mascots have taken over the building.
 
 The vertical is now complete in spirit. Claude can build UI on top of this glorious nonsense.
-

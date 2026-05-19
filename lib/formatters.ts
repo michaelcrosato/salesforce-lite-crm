@@ -37,7 +37,10 @@ export function formatShortDate(value: Date | string | null | undefined) {
   }).format(new Date(value));
 }
 
-export function daysSince(value: Date | string | null | undefined, now = new Date()) {
+export function daysSince(
+  value: Date | string | null | undefined,
+  now = new Date()
+) {
   if (!value) {
     return null;
   }
@@ -47,7 +50,10 @@ export function daysSince(value: Date | string | null | undefined, now = new Dat
   return Math.max(0, Math.floor(diff / 86_400_000));
 }
 
-export function formatRelativeDays(value: Date | string | null | undefined, now = new Date()) {
+export function formatRelativeDays(
+  value: Date | string | null | undefined,
+  now = new Date()
+) {
   const days = daysSince(value, now);
 
   if (days === null) {

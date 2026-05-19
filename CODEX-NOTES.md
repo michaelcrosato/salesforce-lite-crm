@@ -1,12 +1,14 @@
 # Codex Notes
 
 ## Stack
+
 - Next.js 16 App Router with React 19 and TypeScript.
 - Prisma 7 using SQLite through `@prisma/adapter-better-sqlite3`.
 - Vitest for unit tests and Playwright for e2e smoke coverage.
 - Zod is available for input validation.
 
 ## Scripts
+
 - `npm run test` runs `vitest run`.
 - `npm run build` runs `next build`.
 - `npm run test:e2e` runs `npm run seed && playwright test`.
@@ -14,6 +16,7 @@
 - `npm run prisma:postgres` runs `node scripts/prisma-postgres.mjs`.
 
 ## Key Paths
+
 - Prisma schema: `prisma/schema.prisma`.
 - Prisma seed: `prisma/seed.ts`.
 - App routes and server actions: `app/`.
@@ -22,6 +25,7 @@
 - E2E smoke spec: `e2e/smoke.spec.ts`.
 
 ## Existing Schema
+
 - `User`
 - `Account`
 - `Contact`
@@ -33,12 +37,14 @@
 - `Lead`
 
 ## Routing Convention
+
 - App Router pages are server components by default.
 - Dynamic data routes export `dynamic = "force-dynamic"`.
 - Mutations are implemented as server actions in route-local `actions.ts` files.
 - Existing deal detail behavior uses the `/deals?deal=<id>` drawer pattern, not `/deals/[id]`.
 
 ## Owned Files For This Run
+
 - `package.json`, `package-lock.json` only for baseline restoration.
 - `prisma/schema.prisma`, `prisma/schema.postgres.prisma`, `prisma/migrations/*`.
 - `lib/prisma.ts`.
@@ -53,6 +59,7 @@
 - `e2e/playwright.config.ts` only for baseline restoration.
 
 ## Not Owned
+
 - `app/**/page.tsx`, `app/**/loading.tsx`, `app/**/error.tsx`, `app/layout.tsx`.
 - `components/**`.
 - `prisma/seed.ts` except minimal additions if needed for API tests.
@@ -60,6 +67,7 @@
 - `e2e/smoke.spec.ts` and other e2e specs.
 
 ## Sprint 4B Slice 0 - 2026-05-18
+
 - Branch: `feat/codex-services-routing-and-validation`.
 - Baseline HEAD after Gemini fixes: `e57e879`.
 - `sprint-4b-start` tag exists and rollback archive was created at `..\salesforce-lite-crm-sprint-4b-start.zip`.

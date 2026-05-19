@@ -42,11 +42,17 @@ type SortKey =
   | "lastActivity"
   | "openDeals";
 
-export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] }) {
-  const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>({
-    key: "name",
-    direction: "asc"
-  });
+export function ContactsTable({
+  contacts
+}: {
+  contacts: ContactTableRowData[];
+}) {
+  const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>(
+    {
+      key: "name",
+      direction: "asc"
+    }
+  );
 
   const sortedContacts = useMemo(() => {
     return [...contacts].sort((a, b) => {
@@ -58,7 +64,8 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
   function toggleSort(key: SortKey) {
     setSort((current) => ({
       key,
-      direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc"
     }));
   }
 
@@ -77,7 +84,11 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
             sortKey="lastActivity"
             onSort={toggleSort}
           />
-          <SortableHead label="Open Deals" sortKey="openDeals" onSort={toggleSort} />
+          <SortableHead
+            label="Open Deals"
+            sortKey="openDeals"
+            onSort={toggleSort}
+          />
           <TableHead className="w-16">Action</TableHead>
         </TableRow>
       </TableHeader>
@@ -85,7 +96,10 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
         {sortedContacts.map((contact) => (
           <TableRow key={contact.id}>
             <TableCell className="font-medium">
-              <Link href={`/contacts/${contact.id}`} className="text-primary hover:underline">
+              <Link
+                href={`/contacts/${contact.id}`}
+                className="text-primary hover:underline"
+              >
                 {contact.firstName} {contact.lastName}
               </Link>
             </TableCell>
@@ -105,7 +119,9 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
             <TableCell>{contact.email ?? "No email"}</TableCell>
             <TableCell>{contact.phone ?? "No phone"}</TableCell>
             <TableCell>
-              <Badge variant={contact.status === "active" ? "success" : "outline"}>
+              <Badge
+                variant={contact.status === "active" ? "success" : "outline"}
+              >
                 {contact.status === "active"
                   ? CONTACT_STATUS_LABELS.active
                   : CONTACT_STATUS_LABELS.inactive}
@@ -115,7 +131,10 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
             <TableCell>{contact.openDeals}</TableCell>
             <TableCell>
               <Button asChild variant="ghost" size="icon">
-                <Link href={`/contacts/${contact.id}`} aria-label="Open contact">
+                <Link
+                  href={`/contacts/${contact.id}`}
+                  aria-label="Open contact"
+                >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -138,7 +157,11 @@ function SortableHead({
 }) {
   return (
     <TableHead>
-      <button type="button" className="inline-flex items-center gap-1" onClick={() => onSort(sortKey)}>
+      <button
+        type="button"
+        className="inline-flex items-center gap-1"
+        onClick={() => onSort(sortKey)}
+      >
         {label}
         <ArrowUpDown className="h-3 w-3" aria-hidden="true" />
       </button>
@@ -146,7 +169,11 @@ function SortableHead({
   );
 }
 
-function compareContact(a: ContactTableRowData, b: ContactTableRowData, key: SortKey) {
+function compareContact(
+  a: ContactTableRowData,
+  b: ContactTableRowData,
+  key: SortKey
+) {
   if (key === "openDeals") {
     return a.openDeals - b.openDeals;
   }
@@ -158,8 +185,14 @@ function compareContact(a: ContactTableRowData, b: ContactTableRowData, key: Sor
   return textValue(a, key).localeCompare(textValue(b, key));
 }
 
-function textValue(contact: ContactTableRowData, key: Exclude<SortKey, "openDeals" | "lastActivity">) {
-  const values: Record<Exclude<SortKey, "openDeals" | "lastActivity">, string> = {
+function textValue(
+  contact: ContactTableRowData,
+  key: Exclude<SortKey, "openDeals" | "lastActivity">
+) {
+  const values: Record<
+    Exclude<SortKey, "openDeals" | "lastActivity">,
+    string
+  > = {
     name: `${contact.lastName} ${contact.firstName}`,
     account: contact.account?.name ?? "",
     title: contact.title ?? "",

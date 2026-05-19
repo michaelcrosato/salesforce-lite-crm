@@ -13,7 +13,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-sm font-semibold uppercase tracking-normal text-primary">
                 Salesforce Lite
               </span>
-              <span className="text-xs text-muted-foreground">Executive CRM</span>
+              <span className="text-xs text-muted-foreground">
+                Executive CRM
+              </span>
             </Link>
           </div>
           <SidebarNav />
@@ -22,7 +24,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
             <div className="flex h-16 items-center gap-4 px-4 sm:px-6 lg:px-8">
               <div className="lg:hidden">
-                <Link href="/dashboard" className="text-sm font-semibold text-primary">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-semibold text-primary"
+                >
                   Salesforce Lite
                 </Link>
               </div>

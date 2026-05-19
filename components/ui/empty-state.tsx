@@ -35,12 +35,12 @@ export function EmptyState({
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-        <div className={`rounded-full p-3 ${iconBg}`}>
-          {icon}
-        </div>
+        <div className={`rounded-full p-3 ${iconBg}`}>{icon}</div>
         <div>
           <p className="font-medium">{title}</p>
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            {description}
+          </p>
         </div>
         {actionHref && actionLabel && variant !== "loading" ? (
           <Button asChild>

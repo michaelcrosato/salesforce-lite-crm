@@ -66,12 +66,12 @@ Timestamp: 2026-05-18T11:10:00-08:00
   `<PostalCodeInput>` into `components/lead-form.tsx` is the remaining piece
   (Grok zone; BLOCKERS #9 filed against Grok).
 - Feature 2.4 (README — carried from prior turn): `docs(claude): readme demo
-  callout and routes refresh` (commit `796f776`) added the Demo callout and
+callout and routes refresh` (commit `796f776`) added the Demo callout and
   refreshed the routes table. CI badge still deferred — `.github/workflows/`
   does not exist on this branch (no Gemini CI workflow file to point at);
   BLOCKERS #7 remains active.
 - Feature 2.5 (page polish — carried from prior turn): `feat(claude):
-  page-level error boundary` (commit `2fb5944`) added the catch-all
+page-level error boundary` (commit `2fb5944`) added the catch-all
   `app/error.tsx`. The `dynamic = "force-dynamic"` audit confirmed all 23
   data-reading pages already have it. Page-wrapper `data-testid` additions
   happened opportunistically this prompt on `/leads` (`page-leads`) and
@@ -148,6 +148,7 @@ Placeholder (new this sprint): `/deals/[id]`, `/search`, `/command-palette`,
 ### Final action
 
 Sprint 4B Claude scope is complete. Remaining surfaces are not on Claude:
+
 - Codex (and IFT): resolve EXCLUDED_ROUTES content (BLOCKERS #5) — the only
   coordination decision left.
 - Gemini: ship `.github/workflows/<file>.yml` so the README CI badge can land,

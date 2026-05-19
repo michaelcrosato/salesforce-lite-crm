@@ -3,7 +3,11 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
 const schemaPath = join(process.cwd(), "prisma", "schema.prisma");
-const postgresSchemaPath = join(process.cwd(), "prisma", "schema.postgres.prisma");
+const postgresSchemaPath = join(
+  process.cwd(),
+  "prisma",
+  "schema.postgres.prisma"
+);
 const originalSchema = readFileSync(schemaPath, "utf8");
 const postgresSchema = readFileSync(postgresSchemaPath, "utf8");
 

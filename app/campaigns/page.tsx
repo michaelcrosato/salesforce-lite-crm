@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { CampaignsView } from "@/components/campaigns/campaigns-view";
-import {
-  type CampaignRow
-} from "@/components/campaigns/campaigns-table";
-import {
-  type DrawerCampaign
-} from "@/components/campaigns/campaign-detail-drawer";
+import { type CampaignRow } from "@/components/campaigns/campaigns-table";
+import { type DrawerCampaign } from "@/components/campaigns/campaign-detail-drawer";
 import { type CampaignOptionItem } from "@/components/campaigns/campaign-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,16 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/page-header";
 import { Select } from "@/components/ui/select";
-import {
-  getCampaign,
-  listCampaigns
-} from "@/lib/crm/crmClient";
+import { getCampaign, listCampaigns } from "@/lib/crm/crmClient";
 import type { CampaignListOptions } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
-import {
-  CAMPAIGN_STATUSES,
-  type CampaignStatus
-} from "@/lib/crm/registry";
+import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +43,9 @@ export default async function CampaignsPage({
   searchParams: Promise<CampaignsSearchParams>;
 }) {
   const params = await searchParams;
-  const statusFilter = isCampaignStatus(params.status) ? params.status : undefined;
+  const statusFilter = isCampaignStatus(params.status)
+    ? params.status
+    : undefined;
   const startDateFrom = params.startFrom?.trim() ? params.startFrom : undefined;
   const startDateTo = params.startTo?.trim() ? params.startTo : undefined;
 
@@ -110,7 +102,7 @@ export default async function CampaignsPage({
         budget: found.budget,
         ownerId: found.ownerId,
         ownerName: found.ownerId
-          ? ownerById.get(found.ownerId)?.name ?? null
+          ? (ownerById.get(found.ownerId)?.name ?? null)
           : null,
         createdAt: found.createdAt.toISOString(),
         updatedAt: found.updatedAt.toISOString()
@@ -137,7 +129,11 @@ export default async function CampaignsPage({
           <form action="/campaigns" className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select
+                id="status"
+                name="status"
+                defaultValue={params.status ?? ""}
+              >
                 <option value="">All</option>
                 {CAMPAIGN_STATUSES.map((status) => (
                   <option key={status} value={status}>

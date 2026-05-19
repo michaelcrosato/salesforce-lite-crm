@@ -17,7 +17,10 @@ export type PostalValidationResult =
 const canadianPostalPattern = /^[A-Z]\d[A-Z]\d[A-Z]\d$/;
 const usZipPattern = /^\d{5}(-\d{4})?$/;
 
-export function normalizePostalCode(input: string, country: PostalCountry): string | null {
+export function normalizePostalCode(
+  input: string,
+  country: PostalCountry
+): string | null {
   if (country === "CA") {
     const compact = input.replace(/\s+/g, "").toUpperCase();
 
@@ -62,17 +65,20 @@ export function validatePostalCode(
   };
 }
 
-export const postalCodeSchema = z.string().trim().transform((value, ctx) => {
-  const result = validatePostalCode(value, "CA");
+export const postalCodeSchema = z
+  .string()
+  .trim()
+  .transform((value, ctx) => {
+    const result = validatePostalCode(value, "CA");
 
-  if (!result.ok) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: result.reason
-    });
+    if (!result.ok) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: result.reason
+      });
 
-    return z.NEVER;
-  }
+      return z.NEVER;
+    }
 
-  return result.normalized;
-});
+    return result.normalized;
+  });

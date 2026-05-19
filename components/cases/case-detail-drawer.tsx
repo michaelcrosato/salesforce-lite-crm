@@ -3,10 +3,7 @@
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import {
-  deleteCaseAction,
-  updateCaseStatusAction
-} from "@/app/cases/actions";
+import { deleteCaseAction, updateCaseStatusAction } from "@/app/cases/actions";
 import {
   CaseForm,
   type CaseFormInitialValues,
@@ -24,7 +21,13 @@ import {
 } from "@/lib/crm/registry";
 import { formatDate } from "@/lib/formatters";
 
-type BadgeVariant = "default" | "secondary" | "outline" | "success" | "warning" | "danger";
+type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "outline"
+  | "success"
+  | "warning"
+  | "danger";
 
 export type DrawerCase = CaseFormInitialValues & {
   id: string;
@@ -143,22 +146,41 @@ export function CaseDetailDrawer({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Fields</CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit
                 </Button>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
-                <FieldView label="Status" value={STATUS_LABELS[crmCase.status]} />
+                <FieldView
+                  label="Status"
+                  value={STATUS_LABELS[crmCase.status]}
+                />
                 <FieldView label="Priority" value={crmCase.priority} />
-                <FieldView label="Owner" value={crmCase.ownerName ?? "Unassigned"} />
-                <FieldView label="Created" value={formatDate(crmCase.createdAt)} />
-                <FieldView label="Updated" value={formatDate(crmCase.updatedAt)} />
+                <FieldView
+                  label="Owner"
+                  value={crmCase.ownerName ?? "Unassigned"}
+                />
+                <FieldView
+                  label="Created"
+                  value={formatDate(crmCase.createdAt)}
+                />
+                <FieldView
+                  label="Updated"
+                  value={formatDate(crmCase.updatedAt)}
+                />
                 {crmCase.description ? (
                   <div className="sm:col-span-2">
                     <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
                       Description
                     </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">{crmCase.description}</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">
+                      {crmCase.description}
+                    </p>
                   </div>
                 ) : null}
               </CardContent>

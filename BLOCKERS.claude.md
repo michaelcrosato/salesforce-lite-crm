@@ -7,8 +7,8 @@ Escalation required: NO
 
 ### Active blockers
 
-| # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
-|---|--------------|------|-------------|----------|---------|-----------------|
+| #   | File / module | Type | Description | Evidence | Awaiting | Safe next action |
+| --- | ------------- | ---- | ----------- | -------- | -------- | ---------------- |
 
 (no active blockers)
 
@@ -20,7 +20,7 @@ Escalation required: NO
   `https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml`.
 - **Blocker #5 (Codex `EXCLUDED_ROUTES` content):** resolved transitively —
   Gemini's merge (`6804fb9 merge(gemini): consume codex excluded-route
-  reconciliation`) brought in Codex's reconciliation that removed `/tasks`,
+reconciliation`) brought in Codex's reconciliation that removed `/tasks`,
   `/cases`, `/campaigns` from `EXCLUDED_ROUTES`. The list now contains only
   truly-absent routes: `/deals/[id]`, `/search`, `/command-palette`,
   `/orders/new`, `/orders/[id]/edit`, `/areas/new`, `/areas/[id]/edit` — i.e.,

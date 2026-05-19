@@ -12,7 +12,9 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     page.getByRole("heading", { name: "Pipeline by Stage" }).first()
   ).toBeVisible();
   await expect(page.getByRole("columnheader", { name: "Stage" })).toBeVisible();
-  await expect(page.getByRole("columnheader", { name: "Weighted value" })).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "Weighted value" })
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "All reports" }).click();
   await expect(page.getByRole("heading", { name: "Reports" })).toBeVisible();

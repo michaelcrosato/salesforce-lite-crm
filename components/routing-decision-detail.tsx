@@ -9,12 +9,18 @@ interface RoutingDecisionDetailProps {
   testid?: string;
 }
 
-export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetailProps) {
+export function RoutingDecisionDetail({
+  decision,
+  testid
+}: RoutingDecisionDetailProps) {
   const [expanded, setExpanded] = useState(false);
 
   if (!decision) {
     return (
-      <div data-testid={testid ? `${testid}-empty` : "routing-detail-empty"} className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+      <div
+        data-testid={testid ? `${testid}-empty` : "routing-detail-empty"}
+        className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground"
+      >
         No routing record found for this lead.
       </div>
     );
@@ -42,7 +48,11 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
             )}
           </span>
         </div>
-        {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        {expanded ? (
+          <ChevronDown className="h-4 w-4" />
+        ) : (
+          <ChevronRight className="h-4 w-4" />
+        )}
       </button>
 
       {expanded && (
@@ -74,10 +84,13 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
 
 function formatStep(step: string, result: unknown): string {
   if (typeof result === "string") return result;
-  if (typeof result === "number" || typeof result === "boolean") return String(result);
+  if (typeof result === "number" || typeof result === "boolean")
+    return String(result);
 
   if (Array.isArray(result)) {
-    return result.map((r) => (typeof r === "object" ? JSON.stringify(r) : String(r))).join(", ");
+    return result
+      .map((r) => (typeof r === "object" ? JSON.stringify(r) : String(r)))
+      .join(", ");
   }
 
   if (result && typeof result === "object") {
@@ -108,7 +121,9 @@ function formatStep(step: string, result: unknown): string {
       }
     }
     if (step.includes("select")) {
-      return r.selectedOrderId ? `Selected ${r.selectedOrderId}` : "No selection";
+      return r.selectedOrderId
+        ? `Selected ${r.selectedOrderId}`
+        : "No selection";
     }
 
     return Object.entries(r)
@@ -118,4 +133,3 @@ function formatStep(step: string, result: unknown): string {
 
   return JSON.stringify(result);
 }
-

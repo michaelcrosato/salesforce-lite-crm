@@ -9,7 +9,10 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
 
-  if (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")) {
+  if (
+    databaseUrl.startsWith("postgres://") ||
+    databaseUrl.startsWith("postgresql://")
+  ) {
     return new PrismaClient({
       // @ts-expect-error - generated client for sqlite types datasources as never
       datasources: {
@@ -17,7 +20,8 @@ function createPrismaClient() {
           url: databaseUrl
         }
       },
-      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
+      log:
+        process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
     });
   }
 
@@ -31,8 +35,7 @@ function createPrismaClient() {
   });
 }
 
-export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

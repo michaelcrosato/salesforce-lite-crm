@@ -7,8 +7,8 @@ Escalation required: NO
 
 ### Active blockers
 
-| # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
-|---|--------------|------|-------------|----------|---------|-----------------|
+| #   | File / module | Type | Description | Evidence | Awaiting | Safe next action |
+| --- | ------------- | ---- | ----------- | -------- | -------- | ---------------- |
 
 ### Resolved this prompt
 

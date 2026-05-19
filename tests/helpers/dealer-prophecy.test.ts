@@ -3,7 +3,7 @@ import {
   findMostDramaticProphecy,
   foretellDealerFate,
   generateRealmReport,
-  summonCouncilOfProphets,
+  summonCouncilOfProphets
 } from "@/lib/business/dealerProphecy";
 
 describe("Full YOLO — Dealer Prophecy Oracle", () => {
@@ -12,7 +12,13 @@ describe("Full YOLO — Dealer Prophecy Oracle", () => {
     expect(p.dealerName).toBe("Northstar");
     expect(p.text.length).toBeGreaterThan(20);
     expect(p.mascot.emoji).toBeTruthy();
-    expect(["ASCENSION", "LLAMA_BLESSED", "MIRACLE_RUN", "SLOW_BURN", "RECKONING"]).toContain(p.fate);
+    expect([
+      "ASCENSION",
+      "LLAMA_BLESSED",
+      "MIRACLE_RUN",
+      "SLOW_BURN",
+      "RECKONING"
+    ]).toContain(p.fate);
   });
 
   it("is deterministic for the same inputs", () => {
@@ -32,8 +38,13 @@ describe("Full YOLO — Dealer Prophecy Oracle", () => {
 
   it("summonCouncilOfProphets returns one prophecy per dealer", () => {
     const dealers = [
-      { name: "A", accountName: "AA", deliveredThisMonth: 30, monthlyQuota: 20 },
-      { name: "B", accountName: "BB", deliveredThisMonth: 10, monthlyQuota: 25 },
+      {
+        name: "A",
+        accountName: "AA",
+        deliveredThisMonth: 30,
+        monthlyQuota: 20
+      },
+      { name: "B", accountName: "BB", deliveredThisMonth: 10, monthlyQuota: 25 }
     ];
     const council = summonCouncilOfProphets(dealers);
     expect(council).toHaveLength(2);
@@ -43,7 +54,7 @@ describe("Full YOLO — Dealer Prophecy Oracle", () => {
   it("findMostDramaticProphecy prefers doom and high confidence", () => {
     const prophecies = [
       foretellDealerFate("Safe", "Safe Co", 22, 20, 1),
-      foretellDealerFate("Doomed", "Doom Ltd", 4, 25, 99),
+      foretellDealerFate("Doomed", "Doom Ltd", 4, 25, 99)
     ];
     const dramatic = findMostDramaticProphecy(prophecies);
     expect(dramatic).not.toBeNull();
@@ -52,8 +63,18 @@ describe("Full YOLO — Dealer Prophecy Oracle", () => {
 
   it("realm report produces sane counts and a verdict", () => {
     const dealers = [
-      { name: "Crusher", accountName: "C", deliveredThisMonth: 40, monthlyQuota: 25 },
-      { name: "Struggler", accountName: "S", deliveredThisMonth: 6, monthlyQuota: 20 },
+      {
+        name: "Crusher",
+        accountName: "C",
+        deliveredThisMonth: 40,
+        monthlyQuota: 25
+      },
+      {
+        name: "Struggler",
+        accountName: "S",
+        deliveredThisMonth: 6,
+        monthlyQuota: 20
+      }
     ];
     const report = generateRealmReport(summonCouncilOfProphets(dealers));
     expect(report.total).toBe(2);

@@ -11,11 +11,14 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await expect(page.getByRole("heading", { name: "Contacts" })).toBeVisible();
 
   await page.getByRole("link", { name: "Maya Singh" }).first().click();
-  await expect(page.getByRole("heading", { name: "Maya Singh", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Maya Singh", exact: true })
+  ).toBeVisible();
 
   const noteText =
     "Smoke summary first sentence. Smoke summary second sentence. Hidden raw third sentence asks to follow up next week with pricing.";
-  const expectedSummary = "Smoke summary first sentence. Smoke summary second sentence.";
+  const expectedSummary =
+    "Smoke summary first sentence. Smoke summary second sentence.";
   await page.getByLabel("Raw note").fill(noteText);
   await page.getByRole("button", { name: "Save note" }).click();
   await expect(page.getByText(expectedSummary).first()).toBeVisible();
@@ -33,7 +36,9 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await targetColumn.dispatchEvent("dragover", { dataTransfer });
   await targetColumn.dispatchEvent("drop", { dataTransfer });
   await sourceCard.dispatchEvent("dragend", { dataTransfer });
-  await expect(targetColumn.locator(`[data-deal-id="${dealId}"]`)).toBeVisible();
+  await expect(
+    targetColumn.locator(`[data-deal-id="${dealId}"]`)
+  ).toBeVisible();
   await expect(page.getByText("Deal moved").first()).toBeVisible();
 
   await page.getByRole("link", { name: "Leads" }).first().click();
@@ -44,7 +49,9 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await page.getByLabel("First name").fill("E2E");
   await page.getByLabel("Last name").fill(leadLastName);
   await page.getByLabel("Phone").fill("604-555-9191");
-  await page.getByLabel("Email").fill(`e2e.route.${leadSuffix}@dealerlead.example`);
+  await page
+    .getByLabel("Email")
+    .fill(`e2e.route.${leadSuffix}@dealerlead.example`);
   await page.getByLabel("Postal code").fill("V5K 0A1");
   await page.getByLabel("Province").fill("BC");
   await page.getByLabel("Source").fill("e2e");
@@ -52,24 +59,39 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
 
   const leadRow = page.getByRole("row").filter({ hasText: leadName }).first();
   await expect(leadRow).toContainText("Routed");
-  const assignedOrderHref = await leadRow.locator('a[href^="/orders/"]').first().getAttribute("href");
+  const assignedOrderHref = await leadRow
+    .locator('a[href^="/orders/"]')
+    .first()
+    .getAttribute("href");
   expect(assignedOrderHref).toBe("/orders/dealer-order-vancouver-northstar");
 
   await page.getByRole("link", { name: "Orders" }).first().click();
-  await expect(page.getByRole("heading", { name: "Dealer Orders" })).toBeVisible();
-  const orderRow = page.getByRole("row").filter({
-    has: page.locator(`a[href="${assignedOrderHref}"]`)
-  }).first();
-  await expect(orderRow.locator('td:nth-child(6)')).not.toBeEmpty();
+  await expect(
+    page.getByRole("heading", { name: "Dealer Orders" })
+  ).toBeVisible();
+  const orderRow = page
+    .getByRole("row")
+    .filter({
+      has: page.locator(`a[href="${assignedOrderHref}"]`)
+    })
+    .first();
+  await expect(orderRow.locator("td:nth-child(6)")).not.toBeEmpty();
 
   await page.goto(assignedOrderHref ?? "/orders");
   await expect(
-    page.getByRole("heading", { name: "Vancouver fleet lead package", exact: true })
+    page.getByRole("heading", {
+      name: "Vancouver fleet lead package",
+      exact: true
+    })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: leadName, exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: leadName, exact: true })
+  ).toBeVisible();
 
   await page.goto("/forecast");
-  await expect(page.getByRole("heading", { name: "Forecast Simulator" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Forecast Simulator" })
+  ).toBeVisible();
   const firstProjection = page.locator("[data-forecast-projected]").first();
   const beforeProjection = await firstProjection.textContent();
   await page.getByLabel("Lead volume multiplier").fill("2");

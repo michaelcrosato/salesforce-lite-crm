@@ -14,10 +14,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
-import {
-  CAMPAIGN_STATUSES,
-  type CampaignStatus
-} from "@/lib/crm/registry";
+import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 
 export type CampaignOptionItem = {
   id: string;
@@ -96,7 +93,11 @@ export function CampaignForm({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-4 md:grid-cols-2"
+        >
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -133,7 +134,11 @@ export function CampaignForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="ownerId">Owner</Label>
-            <Select id="ownerId" name="ownerId" defaultValue={initialValues?.ownerId ?? ""}>
+            <Select
+              id="ownerId"
+              name="ownerId"
+              defaultValue={initialValues?.ownerId ?? ""}
+            >
               <option value="">Unassigned</option>
               {owners.map((option) => (
                 <option key={option.id} value={option.id}>

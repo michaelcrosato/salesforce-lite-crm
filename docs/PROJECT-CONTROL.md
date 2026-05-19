@@ -29,11 +29,11 @@ scripts, or dependencies were added by this documentation pass.
 
 `PLAN.md` marks the readiness pass active by current prompt and Sprint 4 queued:
 
-| Feature | Owner | Status |
-|---|---|---|
-| S4-F1 Demo seed tuning | Codex | queued |
-| S4-F2 Route visual QA | Claude | queued |
-| S4-F3 Component polish | Grok | queued |
+| Feature                             | Owner  | Status |
+| ----------------------------------- | ------ | ------ |
+| S4-F1 Demo seed tuning              | Codex  | queued |
+| S4-F2 Route visual QA               | Claude | queued |
+| S4-F3 Component polish              | Grok   | queued |
 | S4-F4 Demo smoke and gate hardening | Gemini | queued |
 
 ## Prepared Next Feature List

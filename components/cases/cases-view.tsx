@@ -6,10 +6,7 @@ import {
   CaseDetailDrawer,
   type DrawerCase
 } from "@/components/cases/case-detail-drawer";
-import {
-  CasesTable,
-  type CaseRow
-} from "@/components/cases/cases-table";
+import { CasesTable, type CaseRow } from "@/components/cases/cases-table";
 import { type CaseOptionItem } from "@/components/cases/case-form";
 import { EmptyState } from "@/components/ui/empty-state";
 

@@ -6,7 +6,9 @@ export interface LeadsBySourceChartData {
   rates: number[];
 }
 
-export function leadsBySourceChart(rows: LeadsBySourceRow[]): LeadsBySourceChartData {
+export function leadsBySourceChart(
+  rows: LeadsBySourceRow[]
+): LeadsBySourceChartData {
   const sorted = [...rows].sort((a, b) => b.count - a.count);
 
   return {

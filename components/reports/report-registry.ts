@@ -16,12 +16,14 @@ export const REPORT_DEFINITIONS: readonly ReportDefinition[] = [
   {
     slug: "pipeline-by-stage",
     title: "Pipeline by Stage",
-    description: "Count, value, and weighted value of opportunities grouped by stage."
+    description:
+      "Count, value, and weighted value of opportunities grouped by stage."
   },
   {
     slug: "leads-by-source",
     title: "Leads by Source",
-    description: "Where consumer leads come from across the dealer routing model."
+    description:
+      "Where consumer leads come from across the dealer routing model."
   },
   {
     slug: "activity-volume",

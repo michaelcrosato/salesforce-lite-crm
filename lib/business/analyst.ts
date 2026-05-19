@@ -1,6 +1,9 @@
 import { isStaleDeal } from "@/lib/business/deals";
 import { getPacingStatus, type PacingStatus } from "@/lib/business/dealerOps";
-import { calculatePaceGap, daysRemainingInMonth } from "@/lib/routing/leadRouter";
+import {
+  calculatePaceGap,
+  daysRemainingInMonth
+} from "@/lib/routing/leadRouter";
 
 export type AnalystOrder = {
   id: string;
@@ -102,7 +105,10 @@ export function buildAnalystPanel(input: {
     .filter((order) => order.status === "active")
     .map((order) => {
       const paceStatus = getPacingStatus(order, now);
-      const remaining = Math.max(0, order.monthlyQuota - order.deliveredThisMonth);
+      const remaining = Math.max(
+        0,
+        order.monthlyQuota - order.deliveredThisMonth
+      );
       const score =
         paceStatus === "behind"
           ? 100 + calculatePaceGap(order, order.deliveredThisMonth, now)
@@ -126,7 +132,9 @@ export function buildAnalystPanel(input: {
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 
   const unroutedLeads = input.leads
-    .filter((lead) => lead.assignmentReason && lead.assignmentReason !== "routed")
+    .filter(
+      (lead) => lead.assignmentReason && lead.assignmentReason !== "routed"
+    )
     .map((lead) => ({
       id: lead.id,
       name: `${lead.firstName} ${lead.lastName}`,
@@ -147,7 +155,9 @@ export function buildAnalystPanel(input: {
 
   const lowHealthAccounts = behindOrders
     .map((behindOrder) => {
-      const sourceOrder = input.orders.find((order) => order.id === behindOrder.id);
+      const sourceOrder = input.orders.find(
+        (order) => order.id === behindOrder.id
+      );
 
       if (!sourceOrder || sourceOrder.account.healthScore >= 60) {
         return null;
@@ -217,7 +227,8 @@ function rankAnalystActions(input: {
       title: account.name,
       reason: `Health score ${account.healthScore} with behind order ${account.orderName}.`,
       href: account.href,
-      suggestedNextAction: "Call the account owner and confirm dealer delivery expectations.",
+      suggestedNextAction:
+        "Call the account owner and confirm dealer delivery expectations.",
       score: 80 + (60 - account.healthScore)
     });
   }
@@ -228,7 +239,8 @@ function rankAnalystActions(input: {
       title: deal.name,
       reason: `${deal.accountName} has a stale high-value deal.`,
       href: deal.href,
-      suggestedNextAction: "Open the deal drawer and log the next sales activity.",
+      suggestedNextAction:
+        "Open the deal drawer and log the next sales activity.",
       score: 70 + deal.value / 10_000
     });
   }

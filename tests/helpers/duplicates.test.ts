@@ -8,11 +8,41 @@ import {
 
 describe("duplicate detector", () => {
   const baseContacts: DuplicateContact[] = [
-    { id: "c1", email: "a@example.com", firstName: "Ana", lastName: "Lee", phone: "111-1111" },
-    { id: "c2", email: "A@EXAMPLE.COM", firstName: "Ana", lastName: "Lee", phone: "111-1111" },
-    { id: "c3", email: "b@example.com", firstName: "Bob", lastName: "Kim", phone: "222-2222" },
-    { id: "c4", email: null, firstName: "Bob", lastName: "Kim", phone: "222-2222" },
-    { id: "c5", email: "c@example.com", firstName: "Cara", lastName: "Fox", phone: null }
+    {
+      id: "c1",
+      email: "a@example.com",
+      firstName: "Ana",
+      lastName: "Lee",
+      phone: "111-1111"
+    },
+    {
+      id: "c2",
+      email: "A@EXAMPLE.COM",
+      firstName: "Ana",
+      lastName: "Lee",
+      phone: "111-1111"
+    },
+    {
+      id: "c3",
+      email: "b@example.com",
+      firstName: "Bob",
+      lastName: "Kim",
+      phone: "222-2222"
+    },
+    {
+      id: "c4",
+      email: null,
+      firstName: "Bob",
+      lastName: "Kim",
+      phone: "222-2222"
+    },
+    {
+      id: "c5",
+      email: "c@example.com",
+      firstName: "Cara",
+      lastName: "Fox",
+      phone: null
+    }
   ];
 
   it("groups by lowercase email match", () => {
@@ -41,7 +71,10 @@ describe("duplicate detector", () => {
   });
 
   it("findDuplicateLeads works on Lead shape (same fields)", () => {
-    const leads: DuplicateLead[] = baseContacts.map((c) => ({ ...c, id: "l" + c.id }));
+    const leads: DuplicateLead[] = baseContacts.map((c) => ({
+      ...c,
+      id: "l" + c.id
+    }));
     const groups = findDuplicateLeads(leads);
     expect(groups.length).toBeGreaterThan(0);
     expect(groups[0].records[0].id.startsWith("l")).toBe(true);

@@ -7,7 +7,10 @@ interface ActivityVolumeCardProps {
   isLoading?: boolean;
 }
 
-export function ActivityVolumeCard({ data, isLoading }: ActivityVolumeCardProps) {
+export function ActivityVolumeCard({
+  data,
+  isLoading
+}: ActivityVolumeCardProps) {
   if (isLoading) {
     return (
       <Card>
@@ -15,7 +18,11 @@ export function ActivityVolumeCard({ data, isLoading }: ActivityVolumeCardProps)
           <CardTitle>Activity Volume (Last 30 Days)</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmptyState variant="loading" title="Loading activity" description="Aggregating daily activity volume..." />
+          <EmptyState
+            variant="loading"
+            title="Loading activity"
+            description="Aggregating daily activity volume..."
+          />
         </CardContent>
       </Card>
     );
@@ -28,7 +35,10 @@ export function ActivityVolumeCard({ data, isLoading }: ActivityVolumeCardProps)
           <CardTitle>Activity Volume (Last 30 Days)</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmptyState title="No activity data" description="No activities recorded in the selected period." />
+          <EmptyState
+            title="No activity data"
+            description="No activities recorded in the selected period."
+          />
         </CardContent>
       </Card>
     );
@@ -47,7 +57,10 @@ export function ActivityVolumeCard({ data, isLoading }: ActivityVolumeCardProps)
             const height = max > 0 ? Math.round((row.count / max) * 100) : 0;
             return (
               <div key={idx} className="flex-1 flex flex-col items-center">
-                <div className="w-full bg-primary rounded-t" style={{ height: `${height}%` }} />
+                <div
+                  className="w-full bg-primary rounded-t"
+                  style={{ height: `${height}%` }}
+                />
                 <div className="text-[10px] text-muted-foreground mt-1 truncate w-full text-center">
                   {row.day.slice(5)}
                 </div>

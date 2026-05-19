@@ -13,26 +13,45 @@ describe("task date helpers", () => {
   const now = new Date("2026-05-15T12:00:00Z");
 
   it("isOverdue returns true for past due open tasks", () => {
-    const task: TaskForDate = { dueDate: "2026-05-10T10:00:00Z", status: "open" };
+    const task: TaskForDate = {
+      dueDate: "2026-05-10T10:00:00Z",
+      status: "open"
+    };
     expect(isOverdue(task, now)).toBe(true);
   });
 
   it("isOverdue returns false for done or cancelled even if past due", () => {
-    expect(isOverdue({ dueDate: "2026-05-10", status: "done" }, now)).toBe(false);
-    expect(isOverdue({ dueDate: "2026-05-10", status: "cancelled" }, now)).toBe(false);
+    expect(isOverdue({ dueDate: "2026-05-10", status: "done" }, now)).toBe(
+      false
+    );
+    expect(isOverdue({ dueDate: "2026-05-10", status: "cancelled" }, now)).toBe(
+      false
+    );
   });
 
   it("isDueToday matches same calendar day and non-done status", () => {
-    const dueToday: TaskForDate = { dueDate: "2026-05-15T23:59:00Z", status: "in_progress" };
+    const dueToday: TaskForDate = {
+      dueDate: "2026-05-15T23:59:00Z",
+      status: "in_progress"
+    };
     expect(isDueToday(dueToday, now)).toBe(true);
-    const doneToday: TaskForDate = { dueDate: "2026-05-15T09:00:00Z", status: "done" };
+    const doneToday: TaskForDate = {
+      dueDate: "2026-05-15T09:00:00Z",
+      status: "done"
+    };
     expect(isDueToday(doneToday, now)).toBe(false);
   });
 
   it("isUpcoming detects future within window and excludes past", () => {
-    const soon: TaskForDate = { dueDate: "2026-05-18T09:00:00Z", status: "open" };
+    const soon: TaskForDate = {
+      dueDate: "2026-05-18T09:00:00Z",
+      status: "open"
+    };
     expect(isUpcoming(soon, now, 7)).toBe(true);
-    const far: TaskForDate = { dueDate: "2026-06-20T09:00:00Z", status: "open" };
+    const far: TaskForDate = {
+      dueDate: "2026-06-20T09:00:00Z",
+      status: "open"
+    };
     expect(isUpcoming(far, now, 7)).toBe(false);
     const past: TaskForDate = { dueDate: "2026-05-10", status: "open" };
     expect(isUpcoming(past, now, 7)).toBe(false);
@@ -50,7 +69,12 @@ describe("task stats and grouping", () => {
   const now = new Date("2026-05-15T12:00:00Z");
   const sample: TaskWithOwner[] = [
     { id: "t1", dueDate: "2026-05-10", status: "open", ownerId: "user-ava" },
-    { id: "t2", dueDate: "2026-05-15T17:00:00Z", status: "in_progress", ownerId: "user-ava" },
+    {
+      id: "t2",
+      dueDate: "2026-05-15T17:00:00Z",
+      status: "in_progress",
+      ownerId: "user-ava"
+    },
     { id: "t3", dueDate: "2026-05-20", status: "open", ownerId: "user-marcus" },
     { id: "t4", dueDate: "2026-05-15", status: "done", ownerId: "user-elena" },
     { id: "t5", dueDate: null, status: "open", ownerId: null },

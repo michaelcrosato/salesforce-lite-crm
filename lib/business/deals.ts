@@ -1,4 +1,8 @@
-import { DEAL_STAGES, OPEN_DEAL_STAGES, type DealStage } from "@/lib/crm-constants";
+import {
+  DEAL_STAGES,
+  OPEN_DEAL_STAGES,
+  type DealStage
+} from "@/lib/crm-constants";
 import { dealStageSchema } from "@/lib/validation";
 
 export type ForecastDeal = {

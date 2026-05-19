@@ -32,7 +32,10 @@ export type Prophecy = {
 };
 
 /** The ancient texts. Do not question them. */
-const FATE_TEMPLATES: Record<Fate, (name: string, mascot: Mascot, pct: number, over: number) => string> = {
+const FATE_TEMPLATES: Record<
+  Fate,
+  (name: string, mascot: Mascot, pct: number, over: number) => string
+> = {
   ASCENSION: (n, m, p) =>
     `${n} walks the golden path. The ${m.name} has chosen them. ${p}% is merely the beginning of the saga.`,
   RECKONING: (n, m) =>
@@ -46,7 +49,7 @@ const FATE_TEMPLATES: Record<Fate, (name: string, mascot: Mascot, pct: number, o
   THE_LONG_SLOG: (n, m, p) =>
     `${n} fights the good fight at ${p}%. The ${m.name} respects the grind, even if the numbers do not yet sing.`,
   LLAMA_BLESSED: (n, m) =>
-    `The Turbo Llama has smiled upon ${n}. This is not luck. This is divine, chaotic selection.`,
+    `The Turbo Llama has smiled upon ${n}. This is not luck. This is divine, chaotic selection.`
 };
 
 /** Derives a deterministic but unhinged fate from performance numbers. */
@@ -96,7 +99,10 @@ export function foretellDealerFate(
   }
 
   const text = FATE_TEMPLATES[fate](dealerName, mascot, pct, over);
-  const confidence = Math.min(98, Math.max(47, 65 + Math.floor((pct - 70) / 3) + (seed % 7)));
+  const confidence = Math.min(
+    98,
+    Math.max(47, 65 + Math.floor((pct - 70) / 3) + (seed % 7))
+  );
 
   return {
     dealerName,
@@ -105,7 +111,7 @@ export function foretellDealerFate(
     fate,
     text,
     severity,
-    confidence,
+    confidence
   };
 }
 
@@ -119,17 +125,29 @@ export function summonCouncilOfProphets(
   }>
 ): Prophecy[] {
   return dealers.map((d, idx) =>
-    foretellDealerFate(d.name, d.accountName, d.deliveredThisMonth, d.monthlyQuota, idx * 13 + d.name.charCodeAt(0))
+    foretellDealerFate(
+      d.name,
+      d.accountName,
+      d.deliveredThisMonth,
+      d.monthlyQuota,
+      idx * 13 + d.name.charCodeAt(0)
+    )
   );
 }
 
 /** Returns the single most dramatic prophecy of the month (for dashboard hero banner). */
-export function findMostDramaticProphecy(prophecies: readonly Prophecy[]): Prophecy | null {
+export function findMostDramaticProphecy(
+  prophecies: readonly Prophecy[]
+): Prophecy | null {
   if (prophecies.length === 0) return null;
 
   return [...prophecies].sort((a, b) => {
-    const scoreA = (a.severity === "doom" ? 100 : a.severity === "chaos" ? 80 : 40) + a.confidence;
-    const scoreB = (b.severity === "doom" ? 100 : b.severity === "chaos" ? 80 : 40) + b.confidence;
+    const scoreA =
+      (a.severity === "doom" ? 100 : a.severity === "chaos" ? 80 : 40) +
+      a.confidence;
+    const scoreB =
+      (b.severity === "doom" ? 100 : b.severity === "chaos" ? 80 : 40) +
+      b.confidence;
     return scoreB - scoreA;
   })[0];
 }
@@ -138,17 +156,22 @@ export function findMostDramaticProphecy(prophecies: readonly Prophecy[]): Proph
 export function generateRealmReport(prophecies: readonly Prophecy[]) {
   const blessings = prophecies.filter((p) => p.severity === "blessing").length;
   const warnings = prophecies.filter((p) => p.severity === "warning").length;
-  const dooms = prophecies.filter((p) => p.severity === "doom" || p.severity === "chaos").length;
+  const dooms = prophecies.filter(
+    (p) => p.severity === "doom" || p.severity === "chaos"
+  ).length;
 
   const dramatic = findMostDramaticProphecy(prophecies);
 
   let verdict: string;
   if (blessings > warnings + dooms) {
-    verdict = "The realm is strong. The llamas are pleased. Keep the pressure high.";
+    verdict =
+      "The realm is strong. The llamas are pleased. Keep the pressure high.";
   } else if (warnings > dooms) {
-    verdict = "The wind shifts. Some dealers walk the edge. The council watches closely.";
+    verdict =
+      "The wind shifts. Some dealers walk the edge. The council watches closely.";
   } else {
-    verdict = "The mascots have begun sharpening their shovels. The reckoning approaches.";
+    verdict =
+      "The mascots have begun sharpening their shovels. The reckoning approaches.";
   }
 
   return {
@@ -158,6 +181,6 @@ export function generateRealmReport(prophecies: readonly Prophecy[]) {
     dooms,
     dramatic,
     verdict,
-    mascotOfTheMonth: prophecies.length > 0 ? prophecies[0].mascot : null,
+    mascotOfTheMonth: prophecies.length > 0 ? prophecies[0].mascot : null
   };
 }

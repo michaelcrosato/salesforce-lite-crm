@@ -2,13 +2,22 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardCharts, type StageChartDatum } from "@/components/dashboard-charts";
+import {
+  DashboardCharts,
+  type StageChartDatum
+} from "@/components/dashboard-charts";
 import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
 import { DEAL_STAGES, STAGE_LABELS } from "@/lib/crm-constants";
 import { buildAnalystPanel } from "@/lib/business/analyst";
-import { calculateDashboardKpis, rankTodaysFocus } from "@/lib/business/dashboard";
-import { calculateDealerOpsKpis, rankDealerOpsFocus } from "@/lib/business/dealerOps";
+import {
+  calculateDashboardKpis,
+  rankTodaysFocus
+} from "@/lib/business/dashboard";
+import {
+  calculateDealerOpsKpis,
+  rankDealerOpsFocus
+} from "@/lib/business/dealerOps";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
@@ -211,8 +220,14 @@ export default async function DashboardPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <KpiCard label="Total Contacts" value={formatNumber(kpis.totalContacts)} />
-        <KpiCard label="Active Accounts" value={formatNumber(kpis.activeAccounts)} />
+        <KpiCard
+          label="Total Contacts"
+          value={formatNumber(kpis.totalContacts)}
+        />
+        <KpiCard
+          label="Active Accounts"
+          value={formatNumber(kpis.activeAccounts)}
+        />
         <KpiCard label="Open Deals" value={formatNumber(kpis.openDeals)} />
         <KpiCard
           label="Open Pipeline"
@@ -254,7 +269,9 @@ export default async function DashboardPage() {
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">No behind-pace orders.</p>
+                <p className="text-sm text-muted-foreground">
+                  No behind-pace orders.
+                </p>
               )}
             </AnalystList>
 
@@ -274,7 +291,9 @@ export default async function DashboardPage() {
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">All recent leads routed.</p>
+                <p className="text-sm text-muted-foreground">
+                  All recent leads routed.
+                </p>
               )}
             </AnalystList>
 
@@ -294,7 +313,9 @@ export default async function DashboardPage() {
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">No stale high-value deals.</p>
+                <p className="text-sm text-muted-foreground">
+                  No stale high-value deals.
+                </p>
               )}
             </AnalystList>
 
@@ -331,7 +352,9 @@ export default async function DashboardPage() {
                   className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
                   data-testid="analyst-item-action"
                 >
-                  <p className="line-clamp-2 text-sm font-semibold">{action.title}</p>
+                  <p className="line-clamp-2 text-sm font-semibold">
+                    {action.title}
+                  </p>
                   <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
                     {action.reason}
                   </p>
@@ -353,8 +376,14 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-          <KpiCard label="Leads This Month" value={formatNumber(dealerOpsKpis.leadsThisMonth)} />
-          <KpiCard label="Unrouted Leads" value={formatNumber(dealerOpsKpis.unroutedLeads)} />
+          <KpiCard
+            label="Leads This Month"
+            value={formatNumber(dealerOpsKpis.leadsThisMonth)}
+          />
+          <KpiCard
+            label="Unrouted Leads"
+            value={formatNumber(dealerOpsKpis.unroutedLeads)}
+          />
           <KpiCard
             label="Active Dealer Orders"
             value={formatNumber(dealerOpsKpis.activeDealerOrders)}
@@ -363,7 +392,10 @@ export default async function DashboardPage() {
             label="Behind-Pace Orders"
             value={formatNumber(dealerOpsKpis.behindPaceOrders)}
           />
-          <KpiCard label="Orders At Quota" value={formatNumber(dealerOpsKpis.ordersAtQuota)} />
+          <KpiCard
+            label="Orders At Quota"
+            value={formatNumber(dealerOpsKpis.ordersAtQuota)}
+          />
           <KpiCard
             label="Recent Routed Leads"
             value={formatNumber(dealerOpsKpis.recentRoutedLeads)}
@@ -382,10 +414,14 @@ export default async function DashboardPage() {
                     href={item.href}
                     className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
                   >
-                    <Badge variant={item.kind === "order" ? "danger" : "secondary"}>
+                    <Badge
+                      variant={item.kind === "order" ? "danger" : "secondary"}
+                    >
                       {item.kind}
                     </Badge>
-                    <p className="mt-3 line-clamp-2 text-sm font-semibold">{item.title}</p>
+                    <p className="mt-3 line-clamp-2 text-sm font-semibold">
+                      {item.title}
+                    </p>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                       {item.subtitle}
                     </p>
@@ -414,10 +450,14 @@ export default async function DashboardPage() {
                   href={item.href}
                   className="rounded-md border bg-background p-4 transition-colors hover:bg-muted/50"
                 >
-                  <Badge variant={item.kind === "deal" ? "warning" : "secondary"}>
+                  <Badge
+                    variant={item.kind === "deal" ? "warning" : "secondary"}
+                  >
                     {item.kind}
                   </Badge>
-                  <p className="mt-3 line-clamp-2 text-sm font-semibold">{item.title}</p>
+                  <p className="mt-3 line-clamp-2 text-sm font-semibold">
+                    {item.title}
+                  </p>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {item.subtitle}
                   </p>
@@ -426,7 +466,8 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              No urgent focus items. Add activity notes or move deals to keep the loop current.
+              No urgent focus items. Add activity notes or move deals to keep
+              the loop current.
             </p>
           )}
         </CardContent>

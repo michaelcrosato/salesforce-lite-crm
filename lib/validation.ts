@@ -42,21 +42,24 @@ const optionalDate = z.preprocess((value) => {
 }, z.date().optional());
 
 const requiredDate = (message: string) =>
-  z.preprocess((value) => {
-    if (value instanceof Date) {
-      return value;
-    }
+  z.preprocess(
+    (value) => {
+      if (value instanceof Date) {
+        return value;
+      }
 
-    if (typeof value !== "string" && typeof value !== "number") {
-      return undefined;
-    }
+      if (typeof value !== "string" && typeof value !== "number") {
+        return undefined;
+      }
 
-    if (typeof value === "string" && value.trim().length === 0) {
-      return undefined;
-    }
+      if (typeof value === "string" && value.trim().length === 0) {
+        return undefined;
+      }
 
-    return new Date(value);
-  }, z.date({ required_error: message, invalid_type_error: message }));
+      return new Date(value);
+    },
+    z.date({ required_error: message, invalid_type_error: message })
+  );
 
 export const accountStatusSchema = z.enum(ACCOUNT_STATUSES);
 export const contactStatusSchema = z.enum(CONTACT_STATUSES);
@@ -113,10 +116,12 @@ export const accountFormSchema = z.object({
   region: optionalText,
   status: accountStatusSchema,
   ownerId: optionalText,
-  healthScore: requiredInteger("Health score must be a whole number.", (schema) =>
-    schema
-      .min(0, "Health score must be at least 0.")
-      .max(100, "Health score cannot exceed 100.")
+  healthScore: requiredInteger(
+    "Health score must be a whole number.",
+    (schema) =>
+      schema
+        .min(0, "Health score must be at least 0.")
+        .max(100, "Health score cannot exceed 100.")
   )
 });
 
@@ -139,10 +144,12 @@ export const dealFormSchema = z.object({
   value: requiredInteger("Value must be a whole number.", (schema) =>
     schema.min(0, "Value must be 0 or greater.")
   ),
-  probability: requiredInteger("Probability must be a whole number.", (schema) =>
-    schema
-      .min(0, "Probability must be at least 0.")
-      .max(100, "Probability cannot exceed 100.")
+  probability: requiredInteger(
+    "Probability must be a whole number.",
+    (schema) =>
+      schema
+        .min(0, "Probability must be at least 0.")
+        .max(100, "Probability cannot exceed 100.")
   ),
   expectedCloseDate: optionalText
 });
@@ -229,16 +236,19 @@ export const activityCreateSchema = z.object({
 });
 export const activityUpdateSchema = activityCreateSchema.partial();
 
-export const noteCreateSchema = activityCreateSchema.omit({ type: true }).extend({
-  type: z.literal("note").optional()
-});
+export const noteCreateSchema = activityCreateSchema
+  .omit({ type: true })
+  .extend({
+    type: z.literal("note").optional()
+  });
 export const noteUpdateSchema = noteCreateSchema.partial();
 
 export const dealerOrderCreateSchema = z.object({
   accountId: idSchema,
   name: z.string().trim().min(1, "Dealer order name is required."),
-  monthlyQuota: requiredInteger("Monthly quota must be a whole number.", (schema) =>
-    schema.min(0, "Monthly quota must be 0 or greater.")
+  monthlyQuota: requiredInteger(
+    "Monthly quota must be a whole number.",
+    (schema) => schema.min(0, "Monthly quota must be 0 or greater.")
   ),
   status: dealerOrderStatusSchema,
   startDate: requiredDate("Start date is required."),
@@ -285,21 +295,29 @@ export const campaignCreateSchema = z.object({
   status: campaignStatusSchema.default("planned"),
   startDate: optionalDate,
   endDate: optionalDate,
-  budget: optionalNonNegativeInteger("Budget must be a whole number and 0 or greater."),
+  budget: optionalNonNegativeInteger(
+    "Budget must be a whole number and 0 or greater."
+  ),
   ownerId: optionalText,
   leadIds: z.array(idSchema).optional(),
   contactIds: z.array(idSchema).optional()
 });
 export const campaignUpdateSchema = campaignCreateSchema.partial();
 
-export function isDealStage(value: string): value is z.infer<typeof dealStageSchema> {
+export function isDealStage(
+  value: string
+): value is z.infer<typeof dealStageSchema> {
   return dealStageSchema.safeParse(value).success;
 }
 
-export function isActivityType(value: string): value is z.infer<typeof activityTypeSchema> {
+export function isActivityType(
+  value: string
+): value is z.infer<typeof activityTypeSchema> {
   return activityTypeSchema.safeParse(value).success;
 }
 
-export function isLeadStatus(value: string): value is z.infer<typeof leadStatusSchema> {
+export function isLeadStatus(
+  value: string
+): value is z.infer<typeof leadStatusSchema> {
   return leadStatusSchema.safeParse(value).success;
 }

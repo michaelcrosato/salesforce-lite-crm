@@ -1,6 +1,9 @@
 export type SortOrder = "asc" | "desc";
 
-export type ListQueryInput<SortBy extends string, Filters extends Record<string, unknown>> = {
+export type ListQueryInput<
+  SortBy extends string,
+  Filters extends Record<string, unknown>
+> = {
   page?: number;
   pageSize?: number;
   sortBy?: SortBy;
@@ -29,7 +32,9 @@ export type ListQueryConfig<
   andWhere: (clauses: Where[]) => Where;
   sortMap: Record<SortBy, (order: SortOrder) => OrderBy>;
   filterMap: {
-    [Key in keyof Filters]?: (value: NonNullable<Filters[Key]>) => Where | undefined;
+    [Key in keyof Filters]?: (
+      value: NonNullable<Filters[Key]>
+    ) => Where | undefined;
   };
 };
 
@@ -68,7 +73,10 @@ export function buildListQuery<
   }
 
   return {
-    where: whereClauses.length > 0 ? config.andWhere(whereClauses) : config.emptyWhere,
+    where:
+      whereClauses.length > 0
+        ? config.andWhere(whereClauses)
+        : config.emptyWhere,
     orderBy: config.sortMap[sortBy](sortOrder),
     skip: (page - 1) * take,
     take

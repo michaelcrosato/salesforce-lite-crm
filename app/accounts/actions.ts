@@ -16,7 +16,9 @@ function fieldErrors(error: {
   return error.flatten().fieldErrors;
 }
 
-export async function createAccountAction(formData: FormData): Promise<ActionResult> {
+export async function createAccountAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = accountFormSchema.safeParse({
     name: formValue(formData, "name"),
     domain: formValue(formData, "domain"),

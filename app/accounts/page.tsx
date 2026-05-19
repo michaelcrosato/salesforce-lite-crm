@@ -21,7 +21,9 @@ export default async function AccountsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams.q?.trim() ?? "";
-  const status = ACCOUNT_STATUSES.includes(resolvedSearchParams.status as AccountStatus)
+  const status = ACCOUNT_STATUSES.includes(
+    resolvedSearchParams.status as AccountStatus
+  )
     ? (resolvedSearchParams.status as AccountStatus)
     : "all";
   const accounts = await prisma.account.findMany({
@@ -88,8 +90,15 @@ export default async function AccountsPage({
       <Card>
         <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Account List</CardTitle>
-          <form action="/accounts" className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-[1fr_160px]">
-            <Input name="q" defaultValue={query} placeholder="Search accounts" />
+          <form
+            action="/accounts"
+            className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-[1fr_160px]"
+          >
+            <Input
+              name="q"
+              defaultValue={query}
+              placeholder="Search accounts"
+            />
             <Select name="status" defaultValue={status}>
               <option value="all">All statuses</option>
               {ACCOUNT_STATUSES.map((accountStatus) => (

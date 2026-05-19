@@ -16,7 +16,10 @@ const STAGE_LABELS: Record<string, string> = {
   lost: "Lost"
 };
 
-export function PipelineByStageCard({ data, isLoading }: PipelineByStageCardProps) {
+export function PipelineByStageCard({
+  data,
+  isLoading
+}: PipelineByStageCardProps) {
   if (isLoading) {
     return (
       <Card>
@@ -24,7 +27,11 @@ export function PipelineByStageCard({ data, isLoading }: PipelineByStageCardProp
           <CardTitle>Pipeline by Stage</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmptyState variant="loading" title="Loading pipeline" description="Aggregating deal values by stage..." />
+          <EmptyState
+            variant="loading"
+            title="Loading pipeline"
+            description="Aggregating deal values by stage..."
+          />
         </CardContent>
       </Card>
     );
@@ -37,7 +44,10 @@ export function PipelineByStageCard({ data, isLoading }: PipelineByStageCardProp
           <CardTitle>Pipeline by Stage</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmptyState title="No pipeline data" description="No open deals in the current period." />
+          <EmptyState
+            title="No pipeline data"
+            description="No open deals in the current period."
+          />
         </CardContent>
       </Card>
     );
@@ -52,15 +62,25 @@ export function PipelineByStageCard({ data, isLoading }: PipelineByStageCardProp
       </CardHeader>
       <CardContent className="space-y-2">
         {data
-          .sort((a, b) => (STAGE_LABELS[a.stage] || a.stage).localeCompare(STAGE_LABELS[b.stage] || b.stage))
+          .sort((a, b) =>
+            (STAGE_LABELS[a.stage] || a.stage).localeCompare(
+              STAGE_LABELS[b.stage] || b.stage
+            )
+          )
           .map((row) => {
-            const width = maxValue > 0 ? Math.round((row.value / maxValue) * 100) : 0;
+            const width =
+              maxValue > 0 ? Math.round((row.value / maxValue) * 100) : 0;
             return (
               <div key={row.stage} className="flex items-center gap-3 text-sm">
-                <div className="w-24 font-medium">{STAGE_LABELS[row.stage] || row.stage}</div>
+                <div className="w-24 font-medium">
+                  {STAGE_LABELS[row.stage] || row.stage}
+                </div>
                 <div className="flex-1">
                   <div className="h-2 rounded bg-muted">
-                    <div className="h-2 rounded bg-primary" style={{ width: `${width}%` }} />
+                    <div
+                      className="h-2 rounded bg-primary"
+                      style={{ width: `${width}%` }}
+                    />
                   </div>
                 </div>
                 <div className="w-28 text-right tabular-nums">

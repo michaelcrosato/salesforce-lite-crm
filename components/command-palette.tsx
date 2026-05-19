@@ -135,7 +135,10 @@ export function CommandPalette() {
       />
       <div className="relative mx-auto mt-24 w-[min(640px,calc(100vw-2rem))] rounded-lg border bg-background shadow-2xl">
         <div className="flex items-center gap-3 border-b p-3">
-          <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Search
+            className="h-4 w-4 text-muted-foreground"
+            aria-hidden="true"
+          />
           <Input
             ref={inputRef}
             value={query}
@@ -151,12 +154,17 @@ export function CommandPalette() {
         <div className="max-h-[60vh] overflow-y-auto p-2">
           {query.trim().length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Type to search across accounts, contacts, deals, leads, tasks, cases, and campaigns.
+              Type to search across accounts, contacts, deals, leads, tasks,
+              cases, and campaigns.
             </p>
           ) : isPending && totalResults === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">Searching…</p>
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              Searching…
+            </p>
           ) : totalResults === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">No matches.</p>
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">
+              No matches.
+            </p>
           ) : (
             GROUPS.map((group) => {
               const items = results[group.key];
@@ -180,7 +188,9 @@ export function CommandPalette() {
                           className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted"
                         >
                           <span>{item.label}</span>
-                          <span className="text-xs text-muted-foreground">{group.label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {group.label}
+                          </span>
                         </Link>
                       </li>
                     ))}

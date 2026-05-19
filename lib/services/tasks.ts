@@ -21,7 +21,13 @@ const optionalFilterDate = z.preprocess((value) => {
   return new Date(value);
 }, z.date().optional());
 
-const taskSortByValues = ["dueDate", "createdAt", "updatedAt", "status", "priority"] as const;
+const taskSortByValues = [
+  "dueDate",
+  "createdAt",
+  "updatedAt",
+  "status",
+  "priority"
+] as const;
 const sortOrderSchema = z.enum(["asc", "desc"]);
 const taskFilterSchema = z
   .object({
@@ -88,7 +94,10 @@ function parseTaskListInput(input: unknown): ParsedTaskListInput {
   const { skip, take, ...filters } = legacy;
 
   return {
-    page: skip !== undefined && take !== undefined ? Math.floor(skip / take) + 1 : undefined,
+    page:
+      skip !== undefined && take !== undefined
+        ? Math.floor(skip / take) + 1
+        : undefined,
     pageSize: take,
     filters
   };

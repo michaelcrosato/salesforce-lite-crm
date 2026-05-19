@@ -65,7 +65,11 @@ export function AddNoteForm({
           <input type="hidden" name="contactId" value={contactId} />
           <div className="space-y-2">
             <Label htmlFor="dealId">Linked deal</Label>
-            <Select id="dealId" name="dealId" defaultValue={defaultDealId ?? ""}>
+            <Select
+              id="dealId"
+              name="dealId"
+              defaultValue={defaultDealId ?? ""}
+            >
               <option value="">No linked deal</option>
               {deals.map((deal) => (
                 <option key={deal.id} value={deal.id}>
@@ -88,7 +92,11 @@ export function AddNoteForm({
             ) : null}
           </div>
           <div className="flex items-center justify-end gap-3">
-            <Button type="submit" disabled={isPending} data-testid="contact-note-submit">
+            <Button
+              type="submit"
+              disabled={isPending}
+              data-testid="contact-note-submit"
+            >
               {isPending ? "Summarizing..." : "Save note"}
             </Button>
           </div>

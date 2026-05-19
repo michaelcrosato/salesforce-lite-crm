@@ -82,7 +82,9 @@ export class DeterministicActivitySummarizer implements ActivitySummarizer {
     const cleaned = input.rawText.trim().replace(/\s+/g, " ");
     const sentences = meaningfulSentences(cleaned);
     const summary = sentences.slice(0, 2).join(" ") || cleaned.slice(0, 180);
-    const matchedRules = nextStepRules.filter((rule) => rule.pattern.test(cleaned));
+    const matchedRules = nextStepRules.filter((rule) =>
+      rule.pattern.test(cleaned)
+    );
     const primaryRule = matchedRules[0];
 
     return {
@@ -93,4 +95,5 @@ export class DeterministicActivitySummarizer implements ActivitySummarizer {
   }
 }
 
-export const deterministicActivitySummarizer = new DeterministicActivitySummarizer();
+export const deterministicActivitySummarizer =
+  new DeterministicActivitySummarizer();

@@ -39,10 +39,14 @@ export function PipelineByStageTable({ rows }: { rows: PipelineByStageRow[] }) {
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.stage}>
-            <TableCell className="font-medium">{dealStageLabel(row.stage)}</TableCell>
+            <TableCell className="font-medium">
+              {dealStageLabel(row.stage)}
+            </TableCell>
             <TableCell>{formatNumber(row.count)}</TableCell>
             <TableCell>{formatCurrency(row.value)}</TableCell>
-            <TableCell>{formatCurrency(Math.round(row.weightedValue))}</TableCell>
+            <TableCell>
+              {formatCurrency(Math.round(row.weightedValue))}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -71,7 +75,11 @@ export function LeadsBySourceTable({ rows }: { rows: LeadsBySourceRow[] }) {
   );
 }
 
-export function ActivityVolumeTable({ rows }: { rows: ActivityVolumeByDayRow[] }) {
+export function ActivityVolumeTable({
+  rows
+}: {
+  rows: ActivityVolumeByDayRow[];
+}) {
   return (
     <Table>
       <TableHeader>
@@ -92,7 +100,11 @@ export function ActivityVolumeTable({ rows }: { rows: ActivityVolumeByDayRow[] }
   );
 }
 
-export function TopAccountsTable({ rows }: { rows: TopAccountByOpportunityValueRow[] }) {
+export function TopAccountsTable({
+  rows
+}: {
+  rows: TopAccountByOpportunityValueRow[];
+}) {
   return (
     <Table>
       <TableHeader>
@@ -119,7 +131,11 @@ export function TopAccountsTable({ rows }: { rows: TopAccountByOpportunityValueR
   );
 }
 
-export function StaleOpportunitiesTable({ rows }: { rows: StaleOpportunityRow[] }) {
+export function StaleOpportunitiesTable({
+  rows
+}: {
+  rows: StaleOpportunityRow[];
+}) {
   return (
     <Table>
       <TableHeader>

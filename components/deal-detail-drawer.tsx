@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { moveDealAction } from "@/app/deals/actions";
-import { ActivityTimeline, type TimelineActivity } from "@/components/activity-timeline";
+import {
+  ActivityTimeline,
+  type TimelineActivity
+} from "@/components/activity-timeline";
 import { AddNoteForm } from "@/components/add-note-form";
 import {
   DealForm,
@@ -19,7 +22,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/crm-constants";
-import { formatCurrency, formatDate, formatPercent, formatRelativeDays } from "@/lib/formatters";
+import {
+  formatCurrency,
+  formatDate,
+  formatPercent,
+  formatRelativeDays
+} from "@/lib/formatters";
 
 export type DrawerDeal = {
   id: string;
@@ -138,7 +146,11 @@ export function DealDetailDrawer({
                 <CardTitle>Fields</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
-                <EditableField label="Name" value={activeDeal.name} onEdit={() => setIsEditing(true)} />
+                <EditableField
+                  label="Name"
+                  value={activeDeal.name}
+                  onEdit={() => setIsEditing(true)}
+                />
                 <EditableField
                   label="Stage"
                   value={STAGE_LABELS[activeDeal.stage]}
@@ -161,7 +173,9 @@ export function DealDetailDrawer({
                 />
                 <EditableField
                   label="Last Activity"
-                  value={formatRelativeDays(activeDeal.lastActivityAt ?? activeDeal.createdAt)}
+                  value={formatRelativeDays(
+                    activeDeal.lastActivityAt ?? activeDeal.createdAt
+                  )}
                   onEdit={() => setIsEditing(true)}
                 />
                 <EditableField
@@ -187,7 +201,9 @@ export function DealDetailDrawer({
                 aria-label={`Move ${activeDeal.name} stage from drawer`}
                 defaultValue={activeDeal.stage}
                 disabled={isPending}
-                onChange={(event) => moveStage(event.currentTarget.value as DealStage)}
+                onChange={(event) =>
+                  moveStage(event.currentTarget.value as DealStage)
+                }
               >
                 {DEAL_STAGES.map((stage) => (
                   <option key={stage} value={stage}>
@@ -196,7 +212,9 @@ export function DealDetailDrawer({
                 ))}
               </Select>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">{formatCurrency(activeDeal.value)}</Badge>
+                <Badge variant="secondary">
+                  {formatCurrency(activeDeal.value)}
+                </Badge>
                 <Badge variant={activeDeal.stale ? "danger" : "outline"}>
                   {activeDeal.stale ? "Stale" : "Current"}
                 </Badge>
@@ -210,14 +228,20 @@ export function DealDetailDrawer({
             </CardHeader>
             <CardContent className="flex flex-wrap gap-4 text-sm">
               {activeDeal.account ? (
-                <Link href={`/accounts/${activeDeal.account.id}`} className="text-primary hover:underline">
+                <Link
+                  href={`/accounts/${activeDeal.account.id}`}
+                  className="text-primary hover:underline"
+                >
                   {activeDeal.account.name}
                 </Link>
               ) : (
                 <span className="text-muted-foreground">No account</span>
               )}
               {activeDeal.contact ? (
-                <Link href={`/contacts/${activeDeal.contact.id}`} className="text-primary hover:underline">
+                <Link
+                  href={`/contacts/${activeDeal.contact.id}`}
+                  className="text-primary hover:underline"
+                >
                   {activeDeal.contact.firstName} {activeDeal.contact.lastName}
                 </Link>
               ) : (

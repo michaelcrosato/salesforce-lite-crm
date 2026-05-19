@@ -97,8 +97,14 @@ export default async function LeadDetailPage({
             <CardContent className="grid gap-4 md:grid-cols-2">
               <Summary label="Phone" value={lead.phone ?? "No phone"} />
               <Summary label="Email" value={lead.email ?? "No email"} />
-              <Summary label="Postal Code" value={lead.postalCode ?? "No postal code"} />
-              <Summary label="Province" value={lead.province ?? "No province"} />
+              <Summary
+                label="Postal Code"
+                value={lead.postalCode ?? "No postal code"}
+              />
+              <Summary
+                label="Province"
+                value={lead.province ?? "No province"}
+              />
               <Summary label="Source" value={lead.source ?? "No source"} />
               <Summary label="Created" value={formatDate(lead.createdAt)} />
             </CardContent>
@@ -121,21 +127,34 @@ export default async function LeadDetailPage({
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Status</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Status
+                </p>
                 <div className="mt-2">
-                  <LeadStatusControl leadId={lead.id} status={status as LeadStatus} />
+                  <LeadStatusControl
+                    leadId={lead.id}
+                    status={status as LeadStatus}
+                  />
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Reason</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Reason
+                </p>
                 <div className="mt-2">{reasonBadge(lead.assignmentReason)}</div>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Area</p>
-                <p className="mt-1 font-medium">{lead.area?.name ?? "Unresolved"}</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Area
+                </p>
+                <p className="mt-1 font-medium">
+                  {lead.area?.name ?? "Unresolved"}
+                </p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Dealer</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Dealer
+                </p>
                 {lead.assignedOrder ? (
                   <div className="mt-1 space-y-1">
                     <Link
@@ -152,7 +171,9 @@ export default async function LeadDetailPage({
                     </Link>
                   </div>
                 ) : (
-                  <p className="mt-1 text-muted-foreground">No dealer order assigned</p>
+                  <p className="mt-1 text-muted-foreground">
+                    No dealer order assigned
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -166,7 +187,9 @@ export default async function LeadDetailPage({
 function Summary({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border bg-background p-3">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
+      <p className="text-xs font-medium uppercase text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 text-sm font-medium">{value}</p>
     </div>
   );
@@ -179,5 +202,7 @@ function reasonBadge(reason: string | null) {
 
   const label = ASSIGNMENT_REASON_LABELS[reason as AssignmentReason] ?? reason;
 
-  return <Badge variant={reason === "routed" ? "success" : "warning"}>{label}</Badge>;
+  return (
+    <Badge variant={reason === "routed" ? "success" : "warning"}>{label}</Badge>
+  );
 }

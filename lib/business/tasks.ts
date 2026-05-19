@@ -49,7 +49,11 @@ export function isDueToday(task: TaskForDate, now = new Date()): boolean {
   return dueDay === nowDay;
 }
 
-export function isUpcoming(task: TaskForDate, now = new Date(), windowDays = 7): boolean {
+export function isUpcoming(
+  task: TaskForDate,
+  now = new Date(),
+  windowDays = 7
+): boolean {
   if (!task.dueDate) return false;
   if (isDoneStatus(task.status)) return false;
   const due = toDate(task.dueDate);
@@ -60,7 +64,9 @@ export function isUpcoming(task: TaskForDate, now = new Date(), windowDays = 7):
   return diffDays <= windowDays;
 }
 
-export function tasksByOwner<T extends TaskWithOwner>(tasks: readonly T[]): Record<string, T[]> {
+export function tasksByOwner<T extends TaskWithOwner>(
+  tasks: readonly T[]
+): Record<string, T[]> {
   const groups: Record<string, T[]> = {};
   for (const task of tasks) {
     const key = task.ownerId ?? "unassigned";
@@ -70,7 +76,10 @@ export function tasksByOwner<T extends TaskWithOwner>(tasks: readonly T[]): Reco
   return groups;
 }
 
-export function taskCompletionStats(tasks: readonly TaskForDate[], now = new Date()): TaskCompletionStats {
+export function taskCompletionStats(
+  tasks: readonly TaskForDate[],
+  now = new Date()
+): TaskCompletionStats {
   const total = tasks.length;
   let completed = 0;
   let overdueCount = 0;
@@ -87,7 +96,8 @@ export function taskCompletionStats(tasks: readonly TaskForDate[], now = new Dat
     if (isUpcoming(task, now, 30)) upcomingCount += 1;
   }
 
-  const completionRate = total > 0 ? Math.round((completed / total) * 100) / 100 : 0;
+  const completionRate =
+    total > 0 ? Math.round((completed / total) * 100) / 100 : 0;
   return {
     total,
     completed,

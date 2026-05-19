@@ -1,8 +1,5 @@
 import { PageHeader } from "@/components/page-header";
-import {
-  TaskForm,
-  type TaskOptionItem
-} from "@/components/tasks/task-form";
+import { TaskForm, type TaskOptionItem } from "@/components/tasks/task-form";
 import {
   listAccounts,
   listContacts,

@@ -116,32 +116,32 @@ local workflow until that cutover is explicitly promoted.
 
 ## Core Routes And Workflows
 
-| Route | Workflow |
-|---|---|
-| `/dashboard` | CRM KPIs, pipeline charts, focus lists, Dealer Ops cards, and deterministic analyst actions. |
-| `/accounts` | Account list and account health overview. |
-| `/accounts/new` | Account creation. |
-| `/accounts/<id>` | Account detail with contacts, opportunities, dealer orders, and activity context. |
-| `/contacts` | Contact list and CRM relationship context. |
-| `/contacts/<id>` | Contact detail, activity history, note capture, and deterministic summary/next-step output. |
-| `/deals` | Opportunity board and list using the existing `Deal` model. |
-| `/deals/new` | Opportunity creation. |
-| `/deals?deal=<id>` | Opportunity detail drawer. There is no `/deals/[id]` route in the current contract. |
-| `/activities` | Activity timeline for notes, calls, emails, meetings, status changes, and routing events. |
-| `/leads` | Consumer lead creation and dealer-order routing. |
-| `/leads/<id>` | Lead detail and status updates. |
-| `/orders` | Dealer order pacing and quota overview. |
-| `/orders/<id>` | Dealer order detail with delivered leads and routing events. |
-| `/areas` | Postal-prefix routing coverage. |
-| `/forecast` | Pipeline and dealer delivery forecast simulator. |
-| `/tasks` | Task list with filters; detail via `/tasks?task=<id>` drawer. |
-| `/tasks/new` | Task creation. |
-| `/cases` | Case list with filters; detail via `/cases?case=<id>` drawer. |
-| `/cases/new` | Case creation. |
-| `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
-| `/campaigns/new` | Campaign creation. |
-| `/reports` | Report index with KPI cards. |
-| `/reports/<slug>` | Report detail for a named report slug. |
+| Route              | Workflow                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| `/dashboard`       | CRM KPIs, pipeline charts, focus lists, Dealer Ops cards, and deterministic analyst actions. |
+| `/accounts`        | Account list and account health overview.                                                    |
+| `/accounts/new`    | Account creation.                                                                            |
+| `/accounts/<id>`   | Account detail with contacts, opportunities, dealer orders, and activity context.            |
+| `/contacts`        | Contact list and CRM relationship context.                                                   |
+| `/contacts/<id>`   | Contact detail, activity history, note capture, and deterministic summary/next-step output.  |
+| `/deals`           | Opportunity board and list using the existing `Deal` model.                                  |
+| `/deals/new`       | Opportunity creation.                                                                        |
+| `/deals?deal=<id>` | Opportunity detail drawer. There is no `/deals/[id]` route in the current contract.          |
+| `/activities`      | Activity timeline for notes, calls, emails, meetings, status changes, and routing events.    |
+| `/leads`           | Consumer lead creation and dealer-order routing.                                             |
+| `/leads/<id>`      | Lead detail and status updates.                                                              |
+| `/orders`          | Dealer order pacing and quota overview.                                                      |
+| `/orders/<id>`     | Dealer order detail with delivered leads and routing events.                                 |
+| `/areas`           | Postal-prefix routing coverage.                                                              |
+| `/forecast`        | Pipeline and dealer delivery forecast simulator.                                             |
+| `/tasks`           | Task list with filters; detail via `/tasks?task=<id>` drawer.                                |
+| `/tasks/new`       | Task creation.                                                                               |
+| `/cases`           | Case list with filters; detail via `/cases?case=<id>` drawer.                                |
+| `/cases/new`       | Case creation.                                                                               |
+| `/campaigns`       | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer.                    |
+| `/campaigns/new`   | Campaign creation.                                                                           |
+| `/reports`         | Report index with KPI cards.                                                                 |
+| `/reports/<slug>`  | Report detail for a named report slug.                                                       |
 
 Primary workflows:
 

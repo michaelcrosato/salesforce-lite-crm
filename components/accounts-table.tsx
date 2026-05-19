@@ -38,11 +38,17 @@ type SortKey =
   | "contacts"
   | "pipeline";
 
-export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] }) {
-  const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>({
-    key: "name",
-    direction: "asc"
-  });
+export function AccountsTable({
+  accounts
+}: {
+  accounts: AccountTableRowData[];
+}) {
+  const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>(
+    {
+      key: "name",
+      direction: "asc"
+    }
+  );
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort((a, b) => {
       const modifier = sort.direction === "asc" ? 1 : -1;
@@ -53,7 +59,8 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
   function toggleSort(key: SortKey) {
     setSort((current) => ({
       key,
-      direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc"
     }));
   }
 
@@ -62,13 +69,29 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
       <TableHeader>
         <TableRow>
           <SortableHead label="Name" sortKey="name" onSort={toggleSort} />
-          <SortableHead label="Industry" sortKey="industry" onSort={toggleSort} />
-          <SortableHead label="Location" sortKey="location" onSort={toggleSort} />
+          <SortableHead
+            label="Industry"
+            sortKey="industry"
+            onSort={toggleSort}
+          />
+          <SortableHead
+            label="Location"
+            sortKey="location"
+            onSort={toggleSort}
+          />
           <SortableHead label="Status" sortKey="status" onSort={toggleSort} />
           <SortableHead label="Health" sortKey="health" onSort={toggleSort} />
           <SortableHead label="Owner" sortKey="owner" onSort={toggleSort} />
-          <SortableHead label="Contacts" sortKey="contacts" onSort={toggleSort} />
-          <SortableHead label="Open Pipeline" sortKey="pipeline" onSort={toggleSort} />
+          <SortableHead
+            label="Contacts"
+            sortKey="contacts"
+            onSort={toggleSort}
+          />
+          <SortableHead
+            label="Open Pipeline"
+            sortKey="pipeline"
+            onSort={toggleSort}
+          />
           <TableHead className="w-16">Action</TableHead>
         </TableRow>
       </TableHeader>
@@ -89,7 +112,10 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
             <TableCell>{formatCurrency(account.openPipeline)}</TableCell>
             <TableCell>
               <Button asChild variant="ghost" size="icon">
-                <Link href={`/accounts/${account.id}`} aria-label="Open account">
+                <Link
+                  href={`/accounts/${account.id}`}
+                  aria-label="Open account"
+                >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -112,7 +138,11 @@ function SortableHead({
 }) {
   return (
     <TableHead>
-      <button type="button" className="inline-flex items-center gap-1" onClick={() => onSort(sortKey)}>
+      <button
+        type="button"
+        className="inline-flex items-center gap-1"
+        onClick={() => onSort(sortKey)}
+      >
         {label}
         <ArrowUpDown className="h-3 w-3" aria-hidden="true" />
       </button>
@@ -120,7 +150,11 @@ function SortableHead({
   );
 }
 
-function compareAccount(a: AccountTableRowData, b: AccountTableRowData, key: SortKey) {
+function compareAccount(
+  a: AccountTableRowData,
+  b: AccountTableRowData,
+  key: SortKey
+) {
   if (key === "health") {
     return a.healthScore - b.healthScore;
   }
@@ -136,8 +170,14 @@ function compareAccount(a: AccountTableRowData, b: AccountTableRowData, key: Sor
   return accountTextValue(a, key).localeCompare(accountTextValue(b, key));
 }
 
-function accountTextValue(account: AccountTableRowData, key: Exclude<SortKey, "health" | "contacts" | "pipeline">) {
-  const values: Record<Exclude<SortKey, "health" | "contacts" | "pipeline">, string> = {
+function accountTextValue(
+  account: AccountTableRowData,
+  key: Exclude<SortKey, "health" | "contacts" | "pipeline">
+) {
+  const values: Record<
+    Exclude<SortKey, "health" | "contacts" | "pipeline">,
+    string
+  > = {
     name: account.name,
     industry: account.industry ?? "",
     location: locationText(account),
@@ -149,5 +189,7 @@ function accountTextValue(account: AccountTableRowData, key: Exclude<SortKey, "h
 }
 
 function locationText(account: Pick<AccountTableRowData, "city" | "region">) {
-  return [account.city, account.region].filter(Boolean).join(", ") || "No location";
+  return (
+    [account.city, account.region].filter(Boolean).join(", ") || "No location"
+  );
 }

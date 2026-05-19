@@ -66,7 +66,9 @@ export function calculateDashboardKpis(input: {
 
   return {
     totalContacts: input.contactsCount,
-    activeAccounts: input.accounts.filter((account) => account.status === "active").length,
+    activeAccounts: input.accounts.filter(
+      (account) => account.status === "active"
+    ).length,
     openDeals: openDeals.length,
     openPipelineValue: openDeals.reduce((total, deal) => total + deal.value, 0),
     weightedForecastValue: calculateWeightedForecast(openDeals),
@@ -130,7 +132,9 @@ export function rankTodaysFocus(input: {
     if (activity.nextStep) {
       const ageInDays = Math.max(
         0,
-        Math.floor((now.getTime() - new Date(activity.createdAt).getTime()) / 86_400_000)
+        Math.floor(
+          (now.getTime() - new Date(activity.createdAt).getTime()) / 86_400_000
+        )
       );
 
       items.push({

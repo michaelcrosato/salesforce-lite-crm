@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   description: "AI-native CRM proof of concept for daily sales workflows."
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>

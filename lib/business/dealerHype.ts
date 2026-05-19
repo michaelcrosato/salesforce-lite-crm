@@ -28,35 +28,105 @@ export type WarCry = {
 
 /** The sacred war cries. Add more. Never delete. */
 const WAR_CRIES: WarCry[] = [
-  { mascot: "Turbo Llama", emoji: "🦙", text: "ZOOM ZOOM QUOTA BOOM — THE LLAMA DOES NOT BRAKE FOR MEDIOCRITY", intensity: "unhinged" },
-  { mascot: "Pacing Panther", emoji: "🐆", text: "I do not run. I arrive. On time. Every time. Fear the silence.", intensity: "normal" },
-  { mascot: "Golden Shovel", emoji: "🏆", text: "I was in the hole. Now the hole is in me. I AM THE SHOVEL.", intensity: "unhinged" },
-  { mascot: "Quota Crusher", emoji: "💥", text: "CRUSH. DELIVER. REPEAT. THERE IS NO OTHER PATH.", intensity: "apocalyptic" },
-  { mascot: "Disco Dealer", emoji: "🪩", text: "The only thing that stays alive is my pipeline. AND THE BEAT.", intensity: "normal" },
-  { mascot: "Lead Eagle", emoji: "🦅", text: "I saw the lead before it was born. I claimed it in the egg.", intensity: "unhinged" },
-  { mascot: "Maple Moose", emoji: "🫎", text: "Sorry for delivering so hard, eh? It won't happen again (it will).", intensity: "mild" },
-  { mascot: "Rage Router", emoji: "😤", text: "YOUR LEAD IS MY LEAD. YOUR TERRITORY IS MY TERRITORY. I AM THE MAP.", intensity: "apocalyptic" },
-  { mascot: "Neon Narwhal", emoji: "🐋", text: "I swim in the deep quota. You are still on the surface, sparkling.", intensity: "unhinged" },
-  { mascot: "Savage Sloth", emoji: "🦥", text: "Slow is smooth. Smooth is quota. I arrive exactly when I mean to.", intensity: "normal" },
-  { mascot: "Crypto Coyote", emoji: "🦴", text: "I bought territory at the bottom. You are still FOMOing leads.", intensity: "unhinged" },
-  { mascot: "Viking Volvo", emoji: "🛡️", text: "I do not chase. I conquer. Your region is now my shield wall.", intensity: "apocalyptic" },
+  {
+    mascot: "Turbo Llama",
+    emoji: "🦙",
+    text: "ZOOM ZOOM QUOTA BOOM — THE LLAMA DOES NOT BRAKE FOR MEDIOCRITY",
+    intensity: "unhinged"
+  },
+  {
+    mascot: "Pacing Panther",
+    emoji: "🐆",
+    text: "I do not run. I arrive. On time. Every time. Fear the silence.",
+    intensity: "normal"
+  },
+  {
+    mascot: "Golden Shovel",
+    emoji: "🏆",
+    text: "I was in the hole. Now the hole is in me. I AM THE SHOVEL.",
+    intensity: "unhinged"
+  },
+  {
+    mascot: "Quota Crusher",
+    emoji: "💥",
+    text: "CRUSH. DELIVER. REPEAT. THERE IS NO OTHER PATH.",
+    intensity: "apocalyptic"
+  },
+  {
+    mascot: "Disco Dealer",
+    emoji: "🪩",
+    text: "The only thing that stays alive is my pipeline. AND THE BEAT.",
+    intensity: "normal"
+  },
+  {
+    mascot: "Lead Eagle",
+    emoji: "🦅",
+    text: "I saw the lead before it was born. I claimed it in the egg.",
+    intensity: "unhinged"
+  },
+  {
+    mascot: "Maple Moose",
+    emoji: "🫎",
+    text: "Sorry for delivering so hard, eh? It won't happen again (it will).",
+    intensity: "mild"
+  },
+  {
+    mascot: "Rage Router",
+    emoji: "😤",
+    text: "YOUR LEAD IS MY LEAD. YOUR TERRITORY IS MY TERRITORY. I AM THE MAP.",
+    intensity: "apocalyptic"
+  },
+  {
+    mascot: "Neon Narwhal",
+    emoji: "🐋",
+    text: "I swim in the deep quota. You are still on the surface, sparkling.",
+    intensity: "unhinged"
+  },
+  {
+    mascot: "Savage Sloth",
+    emoji: "🦥",
+    text: "Slow is smooth. Smooth is quota. I arrive exactly when I mean to.",
+    intensity: "normal"
+  },
+  {
+    mascot: "Crypto Coyote",
+    emoji: "🦴",
+    text: "I bought territory at the bottom. You are still FOMOing leads.",
+    intensity: "unhinged"
+  },
+  {
+    mascot: "Viking Volvo",
+    emoji: "🛡️",
+    text: "I do not chase. I conquer. Your region is now my shield wall.",
+    intensity: "apocalyptic"
+  }
 ];
 
 /** Friendly but soul-damaging roasts for dealers who need a wake-up call. */
 const ROAST_TEMPLATES = [
-  (name: string, pct: number) => `${name} is at ${pct}%. The only thing slower is their email response time.`,
-  (name: string, pct: number) => `I've seen glaciers move faster than ${name}'s pipeline. At least glaciers are consistent.`,
-  (name: string, pct: number) => `${name} hit ${pct}%. In their defense, they also hit every red light on the way to work.`,
-  (name: string, pct: number) => `Rumor has it ${name} thinks "quota" is a suggestion. Bold strategy.`,
-  (name: string, pct: number) => `${name} is ${100 - pct}% away from greatness. That's also how far their leads are from closed.`,
+  (name: string, pct: number) =>
+    `${name} is at ${pct}%. The only thing slower is their email response time.`,
+  (name: string, pct: number) =>
+    `I've seen glaciers move faster than ${name}'s pipeline. At least glaciers are consistent.`,
+  (name: string, pct: number) =>
+    `${name} hit ${pct}%. In their defense, they also hit every red light on the way to work.`,
+  (name: string, pct: number) =>
+    `Rumor has it ${name} thinks "quota" is a suggestion. Bold strategy.`,
+  (name: string, pct: number) =>
+    `${name} is ${100 - pct}% away from greatness. That's also how far their leads are from closed.`
 ];
 
 /**
  * Returns a war cry for the given mascot at the requested intensity.
  * If the mascot has no exact match, falls back to the closest energy vibe.
  */
-export function getDealerWarCry(mascot: Mascot, intensity: HypeIntensity = "normal"): WarCry {
-  const exact = WAR_CRIES.find((c) => c.mascot === mascot.name && c.intensity === intensity);
+export function getDealerWarCry(
+  mascot: Mascot,
+  intensity: HypeIntensity = "normal"
+): WarCry {
+  const exact = WAR_CRIES.find(
+    (c) => c.mascot === mascot.name && c.intensity === intensity
+  );
   if (exact) return exact;
 
   // Fallback: same mascot any intensity, or random chaos
@@ -76,13 +146,14 @@ export function roastDealer(
   mascot: Mascot
 ): Roast {
   const template = ROAST_TEMPLATES[performancePct % ROAST_TEMPLATES.length];
-  const severity = performancePct < 40 ? "nuclear" : performancePct < 70 ? "savage" : "gentle";
+  const severity =
+    performancePct < 40 ? "nuclear" : performancePct < 70 ? "savage" : "gentle";
 
   return {
     target: dealerName,
     text: template(dealerName, performancePct),
     severity,
-    mascot: mascot.name,
+    mascot: mascot.name
   };
 }
 
@@ -98,7 +169,7 @@ export function buildVictorySpeech(
     `🏆 ${dealerName} has been anointed ${trophyName}!`,
     `${mascot.emoji} ${mascot.catchphrase}`,
     cry.text,
-    `Score: ${score}. The council of mascots has spoken. The rest of you... are on notice.`,
+    `Score: ${score}. The council of mascots has spoken. The rest of you... are on notice.`
   ].join(" ");
 }
 
@@ -116,19 +187,25 @@ export function buildHypeReport(
       headline: "The arena is empty. The llamas are disappointed.",
       chants: [],
       roasts: [],
-      legends: [],
+      legends: []
     };
   }
 
   const withPct = orders.map((o) => ({
     ...o,
-    pct: o.monthlyQuota > 0 ? Math.round((o.deliveredThisMonth / o.monthlyQuota) * 100) : 0,
+    pct:
+      o.monthlyQuota > 0
+        ? Math.round((o.deliveredThisMonth / o.monthlyQuota) * 100)
+        : 0
   }));
 
   const chants = withPct
     .filter((o) => o.pct >= 100)
     .slice(0, 3)
-    .map((o) => getDealerWarCry(o.mascot, o.pct > 130 ? "apocalyptic" : "unhinged").text);
+    .map(
+      (o) =>
+        getDealerWarCry(o.mascot, o.pct > 130 ? "apocalyptic" : "unhinged").text
+    );
 
   const roasts = withPct
     .filter((o) => o.pct < 75)
@@ -144,8 +221,8 @@ export function buildHypeReport(
     chants.length > 0
       ? "THE PACK IS HOWLING. THE LLAMAS ARE ZOOMING. QUOTA WILL BE OURS."
       : roasts.length > 0
-      ? "The council has reviewed the numbers. Some of you have explaining to do."
-      : "Everyone is exactly average. The mascots are... concerned.";
+        ? "The council has reviewed the numbers. Some of you have explaining to do."
+        : "Everyone is exactly average. The mascots are... concerned.";
 
   return { headline, chants, roasts, legends };
 }
@@ -159,7 +236,7 @@ export function getDailyDealerAffirmation(seed: number): string {
     "Every 'no' is just a 'not yet' wearing a cheap disguise.",
     "You are the reason the CRM still has hope.",
     "The Rage Router believes in you. That's terrifying and motivating.",
-    "Today you close. Tomorrow you ascend.",
+    "Today you close. Tomorrow you ascend."
   ];
   return affirmations[seed % affirmations.length];
 }

@@ -14,6 +14,7 @@
 Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependent feature implementation.
 
 ### First-Output Required Data (pwsh-verified)
+
 - **Current branch:** `feat/grok-crm-data-reports`
 - **HEAD:** `e45e46e` — chore(grok): report-only — YOLO mode re-entry + PowerShell gate verification (148/148 test, build SUCCESS, type clean, clean tree)
 - **git status:** clean (empty)
@@ -27,6 +28,7 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - **Gate baseline (prior pwsh run this session):** 148/148 vitest PASS + build SUCCESS + type-strict clean on Grok zones
 
 ### Grok Tasks SAFE to do NOW (PREP ONLY, independent of Codex [UNBLOCK LIB])
+
 1. **PRE-FLIGHT checks** (no commit per prompt): git status/HEAD/tag/archive (archive optional), pwsh gate runs, rg scans.
 2. **SLICE 0 — Repo discovery + component/seed inventory** (doc commit allowed):
    - Read PLAN.md §4/§5 + CRM-CONTRACT.md (noted: RoutingDecision / postal / featureFlags not present yet — confirms blocked).
@@ -42,7 +44,8 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 **Branch note (status):** Current tree is prior sprint YOLO data branch. The official 4B Grok branch per coordination is `feat/grok-components-and-seed-tuning`. Actual feature work should occur after proper branch switch/create per pre-flight in GROK-SPRINT-4B.md (once [UNBLOCK LIB] lands or per operator instruction). Prep inventory is valid on any clean tree.
 
 ### Grok Tasks BLOCKED until Codex [UNBLOCK LIB] exists on branch
-- **SLICE 1 Track A (components for items 54/55/56):** 
+
+- **SLICE 1 Track A (components for items 54/55/56):**
   - `components/excluded-route-placeholder.tsx` (needs EXCLUDED_ROUTES / isEnabled from lib/featureFlags.ts)
   - `components/routing-decision-detail.tsx` (needs `RoutingDecision` type + `getRoutingDecisionForLead` shape from Codex lib/services)
   - `components/postal-code-input.tsx` (needs `normalizePostalCode` / `validatePostalCode` / schema from lib/postal.ts + validation)
@@ -57,6 +60,7 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 **Current Sprint 4B Completion Status (as of this run):**
 
 **Completed by Grok:**
+
 - Slice 0 inventory/prep (full component + lib/business + seed inspection)
 - Seed anchor manifest (current values documented for Gemini)
 - Component / lib-business inventory with client/server classification and importers
@@ -66,6 +70,7 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - All via pwsh commands + doc-only commits on current branch
 
 **Not completed by Grok:**
+
 - `components/excluded-route-placeholder.tsx`
 - `components/routing-decision-detail.tsx`
 - `components/postal-code-input.tsx`
@@ -76,6 +81,7 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 **Conclusion (Final Handoff):** Grok has completed the requested priority items for Sprint 4B:
 
 **Shipped:**
+
 - Slice 0 inventory + seed manifest
 - Slice 1: 4 components + seed stabilization + [UNBLOCK] (3f7ed00)
 - Feature 2.1: Component empty/loading/error state pass (6d66f22)
@@ -83,14 +89,17 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 - Feature 2.3: Complete report cards (3294732)
 
 **Deferred:**
+
 - Feature 2.4 CSV — documented as low-risk deferral (CANDIDATE-S5)
 
 **Blockers:**
+
 - Codex [UNBLOCK LIB] (336aa6d) → **CONSUMED**
 - Grok [UNBLOCK] handoff → **SHIPPED**
 
 **Final Audit (this run):**
-- rg any/@ts-* : Clean (prose only in legacy YOLO files)
+
+- rg any/@ts-\* : Clean (prose only in legacy YOLO files)
 - rg console.log : Clean
 - npm run seed : Success
 - pwsh scripts/local-gate.ps1 : **PASSED** (149 tests, 7/7 e2e)
@@ -99,12 +108,14 @@ Mode: **PREP ONLY** — inventory, status, doc-only commits allowed. No dependen
 **Seed Anchor Manifest:** Stable (V5K 0A1, multiple negative-pace DealerOrders, deterministic lead sources and top accounts).
 
 **Final Grok Deliverables:**
+
 - Components: ExcludedRoutePlaceholder, RoutingDecisionDetail, PostalCodeInput, PageSkeleton, 4 Report Cards
 - Helpers: leadsBySourceChart, topAccountsCard
 - EmptyState: Enhanced with loading/error variants
 - **Claude blocker #9 resolved** (this task): Wired `<PostalCodeInput>` into `components/lead-form.tsx` on `feat/grok-components-and-seed-tuning`. Used existing component + Codex postal path. Preserved all prior form behavior (FormData submit, reset, errors, toasts). Added `name`/`id` support to PostalCodeInput for form compatibility. Full gate + type scan passed. testid="lead-form-postal-input".
 
 **Excluded-route guard rails & Codex/contract decision:**
+
 - The tension on EXCLUDED_ROUTES (/tasks, /cases, /campaigns listed as excluded but have live demo UI C1-C3 with e2e coverage) is noted.
 - Decision: EXCLUDED_ROUTES list should be cleaned to only include routes without live demo pages (remove /tasks, /cases, /campaigns and any other live ones). The Grok guard rail components (ExcludedRoutePlaceholder, routing detail, postal input, page skeleton) are fully delivered and ready for the truly excluded routes. This resolves the contract mismatch before final merge. The placeholder and wiring are in place; Codex or coordination decision on the list content is the remaining step.
 - All type-strict, data-testid compliant, server/client correct.
@@ -121,6 +132,7 @@ The previous "only Slice 0" status is now historical. Ready for Claude to consum
 ---
 
 **Coordination context (from SPRINT-4B-COORDINATION.md):**
+
 - Gemini currently blocking Codex → no [UNBLOCK LIB] yet.
 - Grok Slice 0 + Slice 1 Track B (seed) were intended as early independent work.
 - Grok + Claude are paired on Items 54 (excluded routes), 55 (routing decision detail), 56 (postal validation).
@@ -129,10 +141,11 @@ The previous "only Slice 0" status is now historical. Ready for Claude to consum
 ---
 
 ## Seed Anchor Manifest (current state — HEAD e45e46e, for Gemini Item 53)
+
 Documented from `prisma/seed.ts` inspection (prep-only; values not modified):
 
 - **Demo postal (V5K 0A1 routing story):** `postalSamples["area-vancouver"] = "V5K 0A1"` (used for lead generation into Vancouver area; expected to route successfully to active DealerOrder).
-- **Behind-pace DealerOrders (analyst actionable / "at risk"):** 
+- **Behind-pace DealerOrders (analyst actionable / "at risk"):**
   - `dealer-order-vancouver-northstar` (acct-northstar, monthlyQuota=28, pace gap=-42) — largest negative, primary demo example.
   - `dealer-order-vancouver-cascade` (-30)
   - `dealer-order-burnaby-orbit` (-26)
@@ -151,16 +164,20 @@ Documented from `prisma/seed.ts` inspection (prep-only; values not modified):
 ---
 
 ## Component Inventory (Grok-owned — current tree, prep for S4-F3 + 4B Items 54-56)
+
 (Full list via pwsh + rg; 25 .tsx files under components/)
 
 **Client components** (`"use client"` — interactivity required):
+
 - add-note-form.tsx, contact-form.tsx, deal-board.tsx, deal-detail-drawer.tsx, deal-form.tsx, lead-form.tsx, lead-status-control.tsx, dashboard-charts.tsx, sidebar-nav.tsx, ui/toast.tsx
 
 **Server components** (default — most tables, cards, primitives):
-- account-badges.tsx, account-form.tsx, accounts-table.tsx, activity-timeline.tsx, app-shell.tsx, contacts-table.tsx, kpi-card.tsx, pacing-bar.tsx, page-header.tsx, deal-form.tsx (some overlap), 
-- ui/*: badge, button, card, empty-state, input, label, select, skeleton, table, textarea  (most are pure; some may be used in client contexts)
+
+- account-badges.tsx, account-form.tsx, accounts-table.tsx, activity-timeline.tsx, app-shell.tsx, contacts-table.tsx, kpi-card.tsx, pacing-bar.tsx, page-header.tsx, deal-form.tsx (some overlap),
+- ui/\*: badge, button, card, empty-state, input, label, select, skeleton, table, textarea (most are pure; some may be used in client contexts)
 
 **Key demo-used (Claude pages import these):**
+
 - EmptyState (used in accounts, contacts, deals, leads, orders, areas, activities lists)
 - Tables (AccountsTable, ContactsTable, etc.)
 - DealBoard, DealDetailDrawer, LeadForm, LeadStatusControl, PacingBar, KPI cards, DashboardCharts
@@ -175,7 +192,9 @@ No `components/reports/` subdir yet (will be created in Slice 2 2.3 when unblock
 ---
 
 ## lib/business/ Inventory (Grok pure helpers — current)
+
 13 files (all pure, no Prisma, deterministic):
+
 - analyst.ts, dashboard.ts, deals.ts, dealerOps.ts, forecast.ts (existing core)
 - tasks.ts, csv-export.ts, csv-import.ts, duplicates.ts, reports-extra.ts (Sprint 4A Grok data work)
 - dealerTrophies.ts, dealerHype.ts, dealerProphecy.ts (Full YOLO easter eggs — still present, tested, delightful)
@@ -188,6 +207,7 @@ All pass current type-strict + test gates.
 ---
 
 ## Active Sprint Context & Queue (from GROK-SPRINT-4B.md + COORDINATION)
+
 - **PREP ONLY** (this prompt) → complete Slice 0 inventory + doc, record unblock status.
 - When [UNBLOCK LIB] lands + we are on correct 4B branch: proceed to Slice 1 (Track B seed pin independent; Track A components after types exist) → ship with [UNBLOCK] for Claude.
 - Slice 2 polish + report helpers/cards (parallel with Claude wiring).
@@ -195,11 +215,12 @@ All pass current type-strict + test gates.
 
 **Ownership per 4B prompt (overrides prior):** components/** (all), prisma/seed.ts (anchors + new sections), lib/business/** (pure helpers), globals.css + tailwind.config.ts.
 
-**Strict rules followed:** No any/@ts-*, server components default, data-testid on interactive, existing tokens only, seed high-risk (manifest first).
+**Strict rules followed:** No any/@ts-\*, server components default, data-testid on interactive, existing tokens only, seed high-risk (manifest first).
 
 ---
 
 ## Prior YOLO / Data Work (historical, preserved)
+
 (See previous "Current Run — YOLO..." and "YOLO PHASE" sections below for the 148-test green state, dealer mascots, hype, prophecy, trophies. All still in tree and passing.)
 
 **Gate this session remains green** (pwsh verified).
@@ -209,6 +230,7 @@ All pass current type-strict + test gates.
 ---
 
 ## Next Action (PREP ONLY complete)
+
 - Once operator confirms or [UNBLOCK LIB] appears on a rebased/ switched `feat/grok-components-and-seed-tuning` branch: begin safe independent Track B seed stabilization + full Slice 1 after types available.
 - Continue only doc/status updates or pure inventory until then.
 - Will re-run pwsh gate + rg before any future edit.
@@ -218,10 +240,12 @@ All pass current type-strict + test gates.
 ---
 
 ## Full GROK-SPRINT-4B.md — INGESTED (2026-05-18 PREP run)
+
 **Status:** Entire prompt file (364 lines) read to completion via read_file (full content from line 1 through the final "GO" / priority instructions and stopping conditions).
 
 **Key late instructions internalized (beyond earlier partial reads):**
-- Stopping conditions: Slice 0 baseline gate red, 3 consecutive failure-loop limits, Codex [UNBLOCK] absent within first 6h *and* seed work done → fall back to Feature 2.1 (component polish on *existing* components only), seed anchor test breakage >2 times, working tree unrecoverable, out of features.
+
+- Stopping conditions: Slice 0 baseline gate red, 3 consecutive failure-loop limits, Codex [UNBLOCK] absent within first 6h _and_ seed work done → fall back to Feature 2.1 (component polish on _existing_ components only), seed anchor test breakage >2 times, working tree unrecoverable, out of features.
 - Explicit GO guidance at end of file:
   - "Track B (seed anchor stabilization) is INDEPENDENT of Codex's unblock — start it immediately in parallel with Slice 0."
   - "For Item 54's placeholder, you can ship without unblock — it doesn't import from Codex's new modules."
@@ -250,8 +274,8 @@ This action directly fulfills the directive "You can finish your entire prompts\
 
 3. **components/ Inventory** (25 .tsx files):
    - **Client** (`"use client"`): add-note-form, contact-form, deal-board, deal-detail-drawer, deal-form, lead-form, lead-status-control, dashboard-charts, sidebar-nav, ui/toast (and a few more interactive).
-   - **Server** (default): account-badges, accounts-table, activity-timeline, app-shell, contacts-table, kpi-card, pacing-bar, page-header, empty-state, most ui/* primitives (badge, button, card, input, select, skeleton, table, etc.).
-   - **Key importers** (demo-critical pages via grep in app/): 
+   - **Server** (default): account-badges, accounts-table, activity-timeline, app-shell, contacts-table, kpi-card, pacing-bar, page-header, empty-state, most ui/\* primitives (badge, button, card, input, select, skeleton, table, etc.).
+   - **Key importers** (demo-critical pages via grep in app/):
      - orders/page + [id]: PacingBar, PageHeader, ActivityTimeline, EmptyState, Badge, Card
      - leads/page + [id]: LeadForm, LeadStatusControl, PageHeader, EmptyState, Select
      - deals: DealBoard/DetailDrawer/DealForm (inferred from structure)
@@ -294,6 +318,7 @@ Slice 0 work product is complete. Awaiting operator signal or [UNBLOCK LIB] to p
 ## (Historical content from prior YOLO readiness run preserved below for continuity)
 
 ## Current Run — YOLO MODE ACTIVATED (this prompt) [prior]
+
 ... (previous content retained for git history; see commit e45e46e for full prior YOLO verification details)
 
-*Grok Sprint 4B PREP ONLY complete for this prompt. Awaiting [UNBLOCK LIB] + branch alignment for dependent work. Turbo Llama stands by.*
+_Grok Sprint 4B PREP ONLY complete for this prompt. Awaiting [UNBLOCK LIB] + branch alignment for dependent work. Turbo Llama stands by._

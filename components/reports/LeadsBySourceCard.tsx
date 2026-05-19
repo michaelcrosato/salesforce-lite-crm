@@ -62,7 +62,10 @@ export function LeadsBySourceCard({ data, isLoading }: LeadsBySourceCardProps) {
               <div className="w-28 truncate font-medium">{label}</div>
               <div className="flex-1">
                 <div className="h-2.5 rounded bg-muted">
-                  <div className="h-2.5 rounded bg-primary" style={{ width: `${width}%` }} />
+                  <div
+                    className="h-2.5 rounded bg-primary"
+                    style={{ width: `${width}%` }}
+                  />
                 </div>
               </div>
               <div className="w-20 text-right tabular-nums">

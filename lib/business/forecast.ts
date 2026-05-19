@@ -69,12 +69,20 @@ export function calculateDefaultAssignmentRate(input: {
 
 export function buildForecast(input: ForecastInput): ForecastResult {
   const now = input.now ?? new Date();
-  const leadVolumeMultiplier = clampLeadVolumeMultiplier(input.leadVolumeMultiplier);
+  const leadVolumeMultiplier = clampLeadVolumeMultiplier(
+    input.leadVolumeMultiplier
+  );
   const assignmentRate = clampAssignmentRate(input.assignmentRate);
   const elapsedDays = Math.max(1, now.getDate());
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysInMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0
+  ).getDate();
   const orders = input.areaId
-    ? input.orders.filter((order) => order.areas.some((area) => area.id === input.areaId))
+    ? input.orders.filter((order) =>
+        order.areas.some((area) => area.id === input.areaId)
+      )
     : input.orders;
 
   const rows = orders.map((order) => {
@@ -94,22 +102,32 @@ export function buildForecast(input: ForecastInput): ForecastResult {
       monthlyQuota: order.monthlyQuota,
       projectedDelivered,
       risk,
-      additionalLeadsNeeded: Math.max(0, order.monthlyQuota - projectedDelivered)
+      additionalLeadsNeeded: Math.max(
+        0,
+        order.monthlyQuota - projectedDelivered
+      )
     };
   });
 
   return {
     summary: {
-      projectedLeads: rows.reduce((total, row) => total + row.projectedDelivered, 0),
+      projectedLeads: rows.reduce(
+        (total, row) => total + row.projectedDelivered,
+        0
+      ),
       ordersLikelyToHitQuota: rows.filter((row) => row.risk === "hit").length,
       ordersLikelyToMissQuota: rows.filter((row) => row.risk === "miss").length,
-      ordersLikelyToOverDeliver: rows.filter((row) => row.risk === "over").length
+      ordersLikelyToOverDeliver: rows.filter((row) => row.risk === "over")
+        .length
     },
     rows
   };
 }
 
-function forecastRisk(projectedDelivered: number, monthlyQuota: number): ForecastRisk {
+function forecastRisk(
+  projectedDelivered: number,
+  monthlyQuota: number
+): ForecastRisk {
   if (projectedDelivered < monthlyQuota) {
     return "miss";
   }

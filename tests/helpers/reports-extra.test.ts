@@ -31,8 +31,16 @@ describe("reports-extra pure helpers", () => {
 
   it("bucketByDateRange assigns to correct buckets", () => {
     const buckets: Bucket[] = [
-      { start: new Date("2026-04-01"), end: new Date("2026-04-30"), label: "apr" },
-      { start: new Date("2026-05-01"), end: new Date("2026-05-31"), label: "may" }
+      {
+        start: new Date("2026-04-01"),
+        end: new Date("2026-04-30"),
+        label: "apr"
+      },
+      {
+        start: new Date("2026-05-01"),
+        end: new Date("2026-05-31"),
+        label: "may"
+      }
     ];
     const b = bucketByDateRange(records, "createdAt", buckets);
     expect(b.apr.map((r) => r.id)).toEqual(["r3", "r4"]);
@@ -40,7 +48,11 @@ describe("reports-extra pure helpers", () => {
   });
 
   it("handles empty and missing dates gracefully", () => {
-    const emptyCmp = monthlyComparison<Record<string, unknown>>([], "createdAt", now);
+    const emptyCmp = monthlyComparison<Record<string, unknown>>(
+      [],
+      "createdAt",
+      now
+    );
     expect(emptyCmp.thisMonth).toBe(0);
     const top = topNByField<Record<string, unknown>>([], "value", 5);
     expect(top).toHaveLength(0);

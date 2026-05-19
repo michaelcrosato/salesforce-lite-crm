@@ -50,7 +50,11 @@ export function LeadForm() {
         <CardTitle>Create Lead</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-4 md:grid-cols-2"
+        >
           <div className="space-y-2">
             <Label htmlFor="firstName">First name</Label>
             <Input id="firstName" name="firstName" required />
@@ -97,7 +101,11 @@ export function LeadForm() {
             <FieldError errors={errors?.source} />
           </div>
           <div className="flex justify-end md:col-span-2">
-            <Button type="submit" disabled={isPending} data-testid="lead-form-submit">
+            <Button
+              type="submit"
+              disabled={isPending}
+              data-testid="lead-form-submit"
+            >
               {isPending ? "Routing..." : "Create lead"}
             </Button>
           </div>

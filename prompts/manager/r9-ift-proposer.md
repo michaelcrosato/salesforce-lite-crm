@@ -8,6 +8,7 @@ Output three sections only:
 --- NEXT-SPRINT-QUEUE.proposed.json ---
 
 Rules:
+
 1. Every proposed task must cite an existing CRM-CONTRACT.md acceptance criterion, current PLAN.md item, or unresolved blocker.
 2. Do not propose CRM-CONTRACT.md changes as safe; flag them.
 3. Do not change ownership zones.

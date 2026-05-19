@@ -9,7 +9,7 @@ const testOrderId = "test-order-routing-1";
 describe("leads service - getRoutingDecisionForLead", () => {
   beforeEach(async () => {
     await cleanup();
-    
+
     // Create necessary area and dealer order
     await prisma.area.create({
       data: {
@@ -52,8 +52,13 @@ describe("leads service - getRoutingDecisionForLead", () => {
   });
 
   it("returns routing decision from fallback summary", async () => {
-    await createTestLead({ id: testLeadId, areaId: testAreaId, assignedOrderId: testOrderId, postalCode: "V5K 1A1" });
-    
+    await createTestLead({
+      id: testLeadId,
+      areaId: testAreaId,
+      assignedOrderId: testOrderId,
+      postalCode: "V5K 1A1"
+    });
+
     await prisma.activity.create({
       data: {
         id: "routing-activity-1",
@@ -78,8 +83,12 @@ describe("leads service - getRoutingDecisionForLead", () => {
   });
 
   it("parses valid JSON routing payload steps", async () => {
-    await createTestLead({ id: testLeadId, areaId: testAreaId, postalCode: "90210" });
-    
+    await createTestLead({
+      id: testLeadId,
+      areaId: testAreaId,
+      postalCode: "90210"
+    });
+
     const payload = {
       summary: "Routed via explicit JSON",
       steps: [
@@ -117,10 +126,10 @@ describe("leads service - getRoutingDecisionForLead", () => {
     expect(decision?.candidateOrders[0].dealerName).toBe("Test JSON Order");
     expect(decision?.candidateOrders[0].paceGap).toBe(5);
   });
-  
+
   it("resolves US zip codes correctly", async () => {
     await createTestLead({ id: testLeadId, postalCode: "10001-1234" });
-    
+
     await prisma.activity.create({
       data: {
         id: "routing-activity-3",

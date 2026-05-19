@@ -112,7 +112,10 @@ export default async function OrderDetailPage({
     order.leads.map((lead) => getRoutingDecisionForLead(lead.id))
   );
   const decisionsByLeadId = new Map(
-    order.leads.map((lead, index) => [lead.id, leadRoutingDecisions[index] ?? null])
+    order.leads.map((lead, index) => [
+      lead.id,
+      leadRoutingDecisions[index] ?? null
+    ])
   );
 
   return (
@@ -141,7 +144,8 @@ export default async function OrderDetailPage({
                           {lead.firstName} {lead.lastName}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {lead.postalCode ?? "No postal"} · {formatDate(lead.createdAt)}
+                          {lead.postalCode ?? "No postal"} ·{" "}
+                          {formatDate(lead.createdAt)}
                         </span>
                       </Link>
                       <RoutingDecisionDetail
@@ -176,20 +180,38 @@ export default async function OrderDetailPage({
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Dealer</p>
-                <Link href={`/accounts/${order.account.id}`} className="mt-1 block text-primary hover:underline">
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Dealer
+                </p>
+                <Link
+                  href={`/accounts/${order.account.id}`}
+                  className="mt-1 block text-primary hover:underline"
+                >
                   {order.account.name}
                 </Link>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Status</p>
-                <Badge className="mt-1" variant={order.status === "active" ? "success" : "secondary"}>
-                  {DEALER_ORDER_STATUS_LABELS[order.status as DealerOrderStatus] ?? order.status}
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Status
+                </p>
+                <Badge
+                  className="mt-1"
+                  variant={order.status === "active" ? "success" : "secondary"}
+                >
+                  {DEALER_ORDER_STATUS_LABELS[
+                    order.status as DealerOrderStatus
+                  ] ?? order.status}
                 </Badge>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <Summary label="Quota" value={formatNumber(order.monthlyQuota)} />
-                <Summary label="Delivered" value={formatNumber(deliveredThisMonth)} />
+                <Summary
+                  label="Quota"
+                  value={formatNumber(order.monthlyQuota)}
+                />
+                <Summary
+                  label="Delivered"
+                  value={formatNumber(deliveredThisMonth)}
+                />
                 <Summary
                   label="Expected"
                   value={expectedDeliveredByToday(pacingOrder, now).toFixed(1)}
@@ -197,13 +219,17 @@ export default async function OrderDetailPage({
               </div>
               <PacingBar order={pacingOrder} now={now} />
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Areas</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Areas
+                </p>
                 <p className="mt-1">
                   {order.areas.map((link) => link.area.name).join(", ")}
                 </p>
               </div>
               <div>
-                <p className="text-xs font-medium uppercase text-muted-foreground">Dates</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">
+                  Dates
+                </p>
                 <p className="mt-1">
                   {formatDate(order.startDate)} to {formatDate(order.endDate)}
                 </p>
@@ -219,7 +245,9 @@ export default async function OrderDetailPage({
 function Summary({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border bg-background p-3">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
+      <p className="text-xs font-medium uppercase text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 font-semibold">{value}</p>
     </div>
   );

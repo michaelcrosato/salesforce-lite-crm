@@ -4,7 +4,11 @@ import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { calculateWeightedForecast, isOpenDealStage, isStaleDeal } from "@/lib/business/deals";
+import {
+  calculateWeightedForecast,
+  isOpenDealStage,
+  isStaleDeal
+} from "@/lib/business/deals";
 import { DEAL_STAGES, type DealStage } from "@/lib/crm-constants";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
@@ -152,7 +156,9 @@ export default async function DealsPage({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="Open Pipeline"
-          value={formatCurrency(openDeals.reduce((total, deal) => total + deal.value, 0))}
+          value={formatCurrency(
+            openDeals.reduce((total, deal) => total + deal.value, 0)
+          )}
         />
         <KpiCard
           label="Weighted Forecast"

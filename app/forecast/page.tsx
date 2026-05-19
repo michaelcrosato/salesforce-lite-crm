@@ -24,78 +24,83 @@ export const dynamic = "force-dynamic";
 export default async function ForecastPage({
   searchParams
 }: {
-  searchParams: Promise<{ multiplier?: string; assignmentRate?: string; area?: string }>;
+  searchParams: Promise<{
+    multiplier?: string;
+    assignmentRate?: string;
+    area?: string;
+  }>;
 }) {
   const now = new Date();
   const { start, end } = currentMonthRange(now);
   const params = await searchParams;
   const parsedParams = forecastQuerySchema.safeParse(params);
   const query = parsedParams.success ? parsedParams.data : {};
-  const [orders, areas, totalLeadsThisMonth, routedLeadsThisMonth] = await Promise.all([
-    prisma.dealerOrder.findMany({
-      where: {
-        status: "active"
-      },
-      orderBy: {
-        name: "asc"
-      },
-      include: {
-        account: {
-          select: {
-            id: true,
-            name: true
-          }
+  const [orders, areas, totalLeadsThisMonth, routedLeadsThisMonth] =
+    await Promise.all([
+      prisma.dealerOrder.findMany({
+        where: {
+          status: "active"
         },
-        areas: {
-          include: {
-            area: {
-              select: {
-                id: true,
-                name: true
-              }
-            }
-          }
+        orderBy: {
+          name: "asc"
         },
-        leads: {
-          where: {
-            createdAt: {
-              gte: start,
-              lt: end
+        include: {
+          account: {
+            select: {
+              id: true,
+              name: true
             }
           },
-          select: {
-            id: true
+          areas: {
+            include: {
+              area: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          },
+          leads: {
+            where: {
+              createdAt: {
+                gte: start,
+                lt: end
+              }
+            },
+            select: {
+              id: true
+            }
           }
         }
-      }
-    }),
-    prisma.area.findMany({
-      orderBy: {
-        name: "asc"
-      },
-      select: {
-        id: true,
-        name: true
-      }
-    }),
-    prisma.lead.count({
-      where: {
-        createdAt: {
-          gte: start,
-          lt: end
+      }),
+      prisma.area.findMany({
+        orderBy: {
+          name: "asc"
+        },
+        select: {
+          id: true,
+          name: true
         }
-      }
-    }),
-    prisma.lead.count({
-      where: {
-        assignmentReason: "routed",
-        createdAt: {
-          gte: start,
-          lt: end
+      }),
+      prisma.lead.count({
+        where: {
+          createdAt: {
+            gte: start,
+            lt: end
+          }
         }
-      }
-    })
-  ]);
+      }),
+      prisma.lead.count({
+        where: {
+          assignmentReason: "routed",
+          createdAt: {
+            gte: start,
+            lt: end
+          }
+        }
+      })
+    ]);
 
   const defaultAssignmentRate = calculateDefaultAssignmentRate({
     totalLeads: totalLeadsThisMonth,
@@ -103,7 +108,9 @@ export default async function ForecastPage({
   });
   const leadVolumeMultiplier = clampLeadVolumeMultiplier(query.multiplier ?? 1);
   const assignmentRate = clampAssignmentRate(
-    query.assignmentRate === undefined ? defaultAssignmentRate : query.assignmentRate / 100
+    query.assignmentRate === undefined
+      ? defaultAssignmentRate
+      : query.assignmentRate / 100
   );
   const selectedAreaId = query.area;
   const forecast = buildForecast({
@@ -133,7 +140,10 @@ export default async function ForecastPage({
           <CardTitle>Scenario Inputs</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action="/forecast" className="grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto]">
+          <form
+            action="/forecast"
+            className="grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto]"
+          >
             <div className="space-y-2">
               <Label htmlFor="multiplier">Lead volume multiplier</Label>
               <Input
@@ -171,7 +181,11 @@ export default async function ForecastPage({
               </Select>
             </div>
             <div className="flex items-end">
-              <Button type="submit" className="w-full" data-testid="forecast-apply-button">
+              <Button
+                type="submit"
+                className="w-full"
+                data-testid="forecast-apply-button"
+              >
                 Apply
               </Button>
             </div>
@@ -222,22 +236,38 @@ export default async function ForecastPage({
                 {forecast.rows.map((row) => (
                   <tr key={row.orderId} className="border-b last:border-0">
                     <td className="py-3 pr-4">
-                      <Link href={`/accounts/${row.accountId}`} className="text-primary hover:underline">
+                      <Link
+                        href={`/accounts/${row.accountId}`}
+                        className="text-primary hover:underline"
+                      >
                         {row.accountName}
                       </Link>
                     </td>
                     <td className="py-3 pr-4 font-medium">
-                      <Link href={`/orders/${row.orderId}`} className="text-primary hover:underline">
+                      <Link
+                        href={`/orders/${row.orderId}`}
+                        className="text-primary hover:underline"
+                      >
                         {row.orderName}
                       </Link>
                     </td>
                     <td className="py-3 pr-4">{row.areas.join(", ")}</td>
-                    <td className="py-3 pr-4">{formatNumber(row.currentDelivered)}</td>
-                    <td className="py-3 pr-4">{formatNumber(row.monthlyQuota)}</td>
-                    <td className="py-3 pr-4" data-forecast-projected={row.orderId} data-testid="forecast-projection-value">
+                    <td className="py-3 pr-4">
+                      {formatNumber(row.currentDelivered)}
+                    </td>
+                    <td className="py-3 pr-4">
+                      {formatNumber(row.monthlyQuota)}
+                    </td>
+                    <td
+                      className="py-3 pr-4"
+                      data-forecast-projected={row.orderId}
+                      data-testid="forecast-projection-value"
+                    >
                       {formatNumber(row.projectedDelivered)}
                     </td>
-                    <td className="py-3 pr-4">{formatNumber(row.additionalLeadsNeeded)}</td>
+                    <td className="py-3 pr-4">
+                      {formatNumber(row.additionalLeadsNeeded)}
+                    </td>
                     <td className="py-3 pr-4">
                       <RiskBadge risk={row.risk} />
                     </td>
@@ -254,9 +284,10 @@ export default async function ForecastPage({
           <CardTitle>How This Works</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Projected delivered leads = current delivered leads / elapsed days in this month * days in
-          month * lead volume multiplier * assignment rate. Area filtering limits the table to
-          active orders linked to that routing area.
+          Projected delivered leads = current delivered leads / elapsed days in
+          this month * days in month * lead volume multiplier * assignment rate.
+          Area filtering limits the table to active orders linked to that
+          routing area.
         </CardContent>
       </Card>
     </div>
@@ -271,7 +302,11 @@ function RiskBadge({ risk }: { risk: ForecastRisk }) {
   };
 
   return (
-    <Badge variant={risk === "miss" ? "danger" : risk === "hit" ? "success" : "warning"}>
+    <Badge
+      variant={
+        risk === "miss" ? "danger" : risk === "hit" ? "success" : "warning"
+      }
+    >
       {labels[risk]}
     </Badge>
   );

@@ -2,7 +2,10 @@ import Link from "next/link";
 import { TasksView } from "@/components/tasks/tasks-view";
 import { type TaskOptionItem } from "@/components/tasks/task-form";
 import { type DrawerTask } from "@/components/tasks/task-detail-drawer";
-import { type TaskLinkedRecord, type TaskRow } from "@/components/tasks/tasks-table";
+import {
+  type TaskLinkedRecord,
+  type TaskRow
+} from "@/components/tasks/tasks-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -49,7 +52,9 @@ function isTaskStatus(value: string | undefined): value is TaskStatus {
   return (TASK_STATUSES as readonly string[]).includes(value);
 }
 
-function toTaskOption(items: Array<{ id: string; label: string }>): TaskOptionItem[] {
+function toTaskOption(
+  items: Array<{ id: string; label: string }>
+): TaskOptionItem[] {
   return items;
 }
 
@@ -88,7 +93,9 @@ export default async function TasksPage({
     ]);
 
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
-  const accountById = new Map(accountsList.map((account) => [account.id, account]));
+  const accountById = new Map(
+    accountsList.map((account) => [account.id, account])
+  );
   const contactById = new Map(
     contactsList.map((contact) => [contact.id, contact])
   );
@@ -181,7 +188,7 @@ export default async function TasksPage({
         priority: found.priority as TaskPriority,
         ownerId: found.ownerId,
         ownerName: found.ownerId
-          ? ownerById.get(found.ownerId)?.name ?? null
+          ? (ownerById.get(found.ownerId)?.name ?? null)
           : null,
         accountId: found.accountId,
         contactId: found.contactId,
@@ -212,7 +219,11 @@ export default async function TasksPage({
           <form action="/tasks" className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select
+                id="status"
+                name="status"
+                defaultValue={params.status ?? ""}
+              >
                 <option value="">All</option>
                 {TASK_STATUSES.map((status) => (
                   <option key={status} value={status}>
@@ -223,7 +234,11 @@ export default async function TasksPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ownerId">Owner</Label>
-              <Select id="ownerId" name="ownerId" defaultValue={params.ownerId ?? ""}>
+              <Select
+                id="ownerId"
+                name="ownerId"
+                defaultValue={params.ownerId ?? ""}
+              >
                 <option value="">Any owner</option>
                 {owners.map((owner) => (
                   <option key={owner.id} value={owner.id}>
@@ -234,11 +249,21 @@ export default async function TasksPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueFrom">Due from</Label>
-              <Input id="dueFrom" name="dueFrom" type="date" defaultValue={params.dueFrom ?? ""} />
+              <Input
+                id="dueFrom"
+                name="dueFrom"
+                type="date"
+                defaultValue={params.dueFrom ?? ""}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueTo">Due to</Label>
-              <Input id="dueTo" name="dueTo" type="date" defaultValue={params.dueTo ?? ""} />
+              <Input
+                id="dueTo"
+                name="dueTo"
+                type="date"
+                defaultValue={params.dueTo ?? ""}
+              />
             </div>
             <div className="flex items-end gap-3 md:col-span-4">
               <Button type="submit">Apply filters</Button>

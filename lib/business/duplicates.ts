@@ -23,7 +23,9 @@ function norm(str: string | null | undefined): string {
   return (str ?? "").toLowerCase().trim();
 }
 
-export function findDuplicateContacts(contacts: readonly DuplicateContact[]): DuplicateGroup<DuplicateContact>[] {
+export function findDuplicateContacts(
+  contacts: readonly DuplicateContact[]
+): DuplicateGroup<DuplicateContact>[] {
   const byEmail = new Map<string, DuplicateContact[]>();
   const byNamePhone = new Map<string, DuplicateContact[]>();
 
@@ -50,7 +52,9 @@ export function findDuplicateContacts(contacts: readonly DuplicateContact[]): Du
   for (const [key, list] of byNamePhone) {
     if (list.length > 1) {
       // avoid duplicating pure email groups if they also match name+phone (rare)
-      const already = groups.some((g) => g.records.some((r) => list.some((l) => l.id === r.id)));
+      const already = groups.some((g) =>
+        g.records.some((r) => list.some((l) => l.id === r.id))
+      );
       if (!already) {
         groups.push({ reason: `name+phone:${key}`, records: [...list] });
       }
@@ -60,7 +64,9 @@ export function findDuplicateContacts(contacts: readonly DuplicateContact[]): Du
   return groups;
 }
 
-export function findDuplicateLeads(leads: readonly DuplicateLead[]): DuplicateGroup<DuplicateLead>[] {
+export function findDuplicateLeads(
+  leads: readonly DuplicateLead[]
+): DuplicateGroup<DuplicateLead>[] {
   // same logic, reuse by casting shape
   const contactsLike = leads as unknown as DuplicateContact[];
   const contactGroups = findDuplicateContacts(contactsLike);

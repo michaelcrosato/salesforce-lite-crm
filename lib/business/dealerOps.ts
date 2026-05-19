@@ -1,4 +1,7 @@
-import { calculatePaceGap, daysRemainingInMonth } from "@/lib/routing/leadRouter";
+import {
+  calculatePaceGap,
+  daysRemainingInMonth
+} from "@/lib/routing/leadRouter";
 
 export type PacingStatus = "behind" | "on_pace" | "ahead" | "over";
 
@@ -52,7 +55,11 @@ export function expectedDeliveredByToday(
   order: Pick<DealerOpsOrder, "monthlyQuota">,
   now: Date = new Date()
 ) {
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysInMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0
+  ).getDate();
   return (order.monthlyQuota * now.getDate()) / daysInMonth;
 }
 
@@ -85,7 +92,10 @@ export function pacingPercent(
     return 0;
   }
 
-  return Math.min(100, Math.round((order.deliveredThisMonth / order.monthlyQuota) * 100));
+  return Math.min(
+    100,
+    Math.round((order.deliveredThisMonth / order.monthlyQuota) * 100)
+  );
 }
 
 export function calculateDealerOpsKpis(input: {
@@ -95,18 +105,25 @@ export function calculateDealerOpsKpis(input: {
   now?: Date;
 }): DealerOpsKpis {
   const now = input.now ?? new Date();
-  const activeOrders = input.orders.filter((order) => order.status === "active");
+  const activeOrders = input.orders.filter(
+    (order) => order.status === "active"
+  );
 
   return {
     leadsThisMonth: input.leadsThisMonth,
-    unroutedLeads: input.leads.filter((lead) => lead.assignmentReason !== "routed").length,
+    unroutedLeads: input.leads.filter(
+      (lead) => lead.assignmentReason !== "routed"
+    ).length,
     activeDealerOrders: activeOrders.length,
-    behindPaceOrders: activeOrders.filter((order) => getPacingStatus(order, now) === "behind")
-      .length,
+    behindPaceOrders: activeOrders.filter(
+      (order) => getPacingStatus(order, now) === "behind"
+    ).length,
     ordersAtQuota: activeOrders.filter(
       (order) => order.deliveredThisMonth >= order.monthlyQuota
     ).length,
-    recentRoutedLeads: input.leads.filter((lead) => lead.assignmentReason === "routed").length
+    recentRoutedLeads: input.leads.filter(
+      (lead) => lead.assignmentReason === "routed"
+    ).length
   };
 }
 

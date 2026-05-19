@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/lib/action-result";
-import { ASSIGNMENT_REASON_LABELS, type AssignmentReason } from "@/lib/crm-constants";
+import {
+  ASSIGNMENT_REASON_LABELS,
+  type AssignmentReason
+} from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
 import { routeLead } from "@/lib/routing/leadRouter";
 import { leadFormSchema, leadStatusUpdateSchema } from "@/lib/validation";
@@ -18,7 +21,9 @@ function fieldErrors(error: {
   return error.flatten().fieldErrors;
 }
 
-export async function createLeadAction(formData: FormData): Promise<ActionResult> {
+export async function createLeadAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = leadFormSchema.safeParse({
     firstName: formValue(formData, "firstName"),
     lastName: formValue(formData, "lastName"),
@@ -33,7 +38,8 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
     const errors = fieldErrors(parsed.error);
     const postalIssue = errors.postalCode?.[0];
     const onlyPostal =
-      postalIssue && Object.values(errors).filter((entry) => entry?.length).length === 1;
+      postalIssue &&
+      Object.values(errors).filter((entry) => entry?.length).length === 1;
 
     return {
       ok: false,

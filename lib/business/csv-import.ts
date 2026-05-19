@@ -10,7 +10,10 @@ export type PreviewResult = {
   totalRows: number;
 };
 
-function parseCsvLine(line: string, lineNumber: number): { fields: string[]; error?: string } {
+function parseCsvLine(
+  line: string,
+  lineNumber: number
+): { fields: string[]; error?: string } {
   const fields: string[] = [];
   let current = "";
   let inQuote = false;

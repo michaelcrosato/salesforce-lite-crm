@@ -23,7 +23,9 @@ function closeDateFromForm(value: string | undefined) {
   return value ? new Date(`${value}T12:00:00`) : null;
 }
 
-export async function createDealAction(formData: FormData): Promise<ActionResult> {
+export async function createDealAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = dealFormSchema.safeParse({
     accountId: formValue(formData, "accountId"),
     contactId: formValue(formData, "contactId"),
@@ -70,7 +72,7 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
           createdAt: now
         }
       }
-    },
+    }
   });
 
   revalidatePath("/deals");
@@ -134,7 +136,8 @@ export async function updateDealAction(
         value: parsed.data.value,
         probability: parsed.data.probability,
         expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
-        lastActivityAt: existing.stage === parsed.data.stage ? existing.lastActivityAt : now
+        lastActivityAt:
+          existing.stage === parsed.data.stage ? existing.lastActivityAt : now
       }
     });
 

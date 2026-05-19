@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
-import { ACTIVITY_TYPES, ACTIVITY_TYPE_LABELS, type ActivityType } from "@/lib/crm-constants";
+import {
+  ACTIVITY_TYPES,
+  ACTIVITY_TYPE_LABELS,
+  type ActivityType
+} from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +21,9 @@ export default async function ActivitiesPage({
   searchParams: Promise<{ type?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const filter = ACTIVITY_TYPES.includes(resolvedSearchParams.type as ActivityType)
+  const filter = ACTIVITY_TYPES.includes(
+    resolvedSearchParams.type as ActivityType
+  )
     ? (resolvedSearchParams.type as ActivityType)
     : "all";
   const activities = await prisma.activity.findMany({
@@ -74,7 +80,9 @@ export default async function ActivitiesPage({
             <CardTitle>Activity Feed</CardTitle>
             <div className="mt-2 flex flex-wrap gap-2">
               <Link href="/activities">
-                <Badge variant={filter === "all" ? "default" : "outline"}>All</Badge>
+                <Badge variant={filter === "all" ? "default" : "outline"}>
+                  All
+                </Badge>
               </Link>
               {ACTIVITY_TYPES.map((type) => (
                 <Link key={type} href={`/activities?type=${type}`}>
@@ -85,7 +93,10 @@ export default async function ActivitiesPage({
               ))}
             </div>
           </div>
-          <form action="/activities" className="grid w-full gap-2 sm:max-w-sm sm:grid-cols-[1fr_auto]">
+          <form
+            action="/activities"
+            className="grid w-full gap-2 sm:max-w-sm sm:grid-cols-[1fr_auto]"
+          >
             <Select name="type" defaultValue={filter}>
               <option value="all">All activity</option>
               {ACTIVITY_TYPES.map((type) => (

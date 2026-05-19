@@ -1,10 +1,16 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export function Table({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) {
+export function Table({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLTableElement>) {
   return (
     <div className="w-full overflow-auto">
-      <table className={cn("w-full caption-bottom text-sm", className)} {...props} />
+      <table
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
     </div>
   );
 }
@@ -20,7 +26,9 @@ export function TableBody({
   className,
   ...props
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />;
+  return (
+    <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />
+  );
 }
 
 export function TableRow({

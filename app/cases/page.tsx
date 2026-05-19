@@ -4,9 +4,7 @@ import {
   type CaseLinkedRecord,
   type CaseRow
 } from "@/components/cases/cases-table";
-import {
-  type DrawerCase
-} from "@/components/cases/case-detail-drawer";
+import { type DrawerCase } from "@/components/cases/case-detail-drawer";
 import { type CaseOptionItem } from "@/components/cases/case-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +79,9 @@ export default async function CasesPage({
   ]);
 
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
-  const accountById = new Map(accountsList.map((account) => [account.id, account]));
+  const accountById = new Map(
+    accountsList.map((account) => [account.id, account])
+  );
   const contactById = new Map(
     contactsList.map((contact) => [contact.id, contact])
   );
@@ -146,7 +146,7 @@ export default async function CasesPage({
         priority: found.priority as CasePriority,
         ownerId: found.ownerId,
         ownerName: found.ownerId
-          ? ownerById.get(found.ownerId)?.name ?? null
+          ? (ownerById.get(found.ownerId)?.name ?? null)
           : null,
         accountId: found.accountId,
         contactId: found.contactId,
@@ -175,7 +175,11 @@ export default async function CasesPage({
           <form action="/cases" className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select id="status" name="status" defaultValue={params.status ?? ""}>
+              <Select
+                id="status"
+                name="status"
+                defaultValue={params.status ?? ""}
+              >
                 <option value="">All</option>
                 {CASE_STATUSES.map((status) => (
                   <option key={status} value={status}>
@@ -186,7 +190,11 @@ export default async function CasesPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="accountId">Account</Label>
-              <Select id="accountId" name="accountId" defaultValue={params.accountId ?? ""}>
+              <Select
+                id="accountId"
+                name="accountId"
+                defaultValue={params.accountId ?? ""}
+              >
                 <option value="">Any account</option>
                 {accountsList.map((account) => (
                   <option key={account.id} value={account.id}>
@@ -197,7 +205,11 @@ export default async function CasesPage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ownerId">Owner</Label>
-              <Select id="ownerId" name="ownerId" defaultValue={params.ownerId ?? ""}>
+              <Select
+                id="ownerId"
+                name="ownerId"
+                defaultValue={params.ownerId ?? ""}
+              >
                 <option value="">Any owner</option>
                 {owners.map((owner) => (
                   <option key={owner.id} value={owner.id}>

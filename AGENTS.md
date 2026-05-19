@@ -15,12 +15,12 @@ handoff.
 
 ## Agent Roster
 
-| Agent | Expected worktree | Branch ownership | Report files | Current local status |
-|---|---|---|---|---|
-| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | present |
-| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | present in `git worktree list` |
-| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | present in `git worktree list` |
-| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | present in `git worktree list` |
+| Agent  | Expected worktree                   | Branch ownership                             | Report files                              | Current local status           |
+| ------ | ----------------------------------- | -------------------------------------------- | ----------------------------------------- | ------------------------------ |
+| Codex  | `C:\dev\salesforce-lite-crm`        | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md`   | present                        |
+| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches                           | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | present in `git worktree list` |
+| Grok   | `C:\dev\salesforce-lite-crm-grok`   | `grok/` branches                             | `SUMMARY.grok.md`, `BLOCKERS.grok.md`     | present in `git worktree list` |
+| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches                           | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | present in `git worktree list` |
 
 Branch naming convention from `PLAN.md`: `<prefix>sprint-<id>-<feature-slug>`.
 Current handoff branches also exist for this phase:

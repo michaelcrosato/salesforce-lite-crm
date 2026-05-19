@@ -11,12 +11,13 @@ where stated.
 
 This is Sprint 4B — the 36-hour demo-polish window. You are one
 of four agents:
-- Codex: backend, schema, contract, registry, services, lib (lib/**)
+
+- Codex: backend, schema, contract, registry, services, lib (lib/\*\*)
 - Claude Code: app routes (app/**/page.tsx, app/**/actions.ts),
   DEMO.md, README.md
 - Grok CLI: components/**, prisma/seed.ts, lib/business/**,
   Tailwind/CSS
-- You (Gemini CLI): tests/**, e2e/**, scripts/**, Playwright/Vitest
+- You (Gemini CLI): tests/**, e2e/**, scripts/\*\*, Playwright/Vitest
   config, CI workflows, the gate itself
 
 You are the 4th execution agent. You are NOT an external AI provider
@@ -29,12 +30,12 @@ BLOCKERS.gemini.md.
 OWNED FILES (whitelist — you are the ONLY agent who may edit these)
 ============================================================
 
-- tests/** (Vitest unit/integration tests)
-- e2e/** (Playwright specs)
-- scripts/** (gate scripts, helper scripts)
+- tests/\*\* (Vitest unit/integration tests)
+- e2e/\*\* (Playwright specs)
+- scripts/\*\* (gate scripts, helper scripts)
 - playwright.config.ts, e2e/playwright.config.ts
 - vitest.config.ts (if present)
-- .github/workflows/** (CI)
+- .github/workflows/\*\* (CI)
 - SUMMARY.gemini.md, BLOCKERS.gemini.md (you create)
 - AGENTS.md additions (read existing file; append your section only,
   do not rewrite other agents' sections)
@@ -43,14 +44,14 @@ OWNED FILES (whitelist — you are the ONLY agent who may edit these)
 NOT-OWNED FILES (do NOT edit, even to fix a test)
 ============================================================
 
-- prisma/schema.prisma, prisma/migrations/** (Codex)
+- prisma/schema.prisma, prisma/migrations/\*\* (Codex)
 - prisma/seed.ts (Grok — if a test needs a new seed shape, file a
   blocker, do not edit the seed yourself)
-- app/** including page.tsx, layout.tsx, actions.ts (Claude)
-- components/** (Grok)
+- app/\*\* including page.tsx, layout.tsx, actions.ts (Claude)
+- components/\*\* (Grok)
 - lib/crm/**, lib/services/**, lib/validation.ts, lib/featureFlags.ts
   (Codex)
-- lib/business/** (Grok)
+- lib/business/\*\* (Grok)
 - CRM-CONTRACT.md, README.md, DEMO.md (Codex / Claude)
 - package.json scripts section — you may PROPOSE additions via
   BLOCKERS.gemini.md but do not edit; Codex applies them
@@ -64,6 +65,7 @@ EXECUTION DISCIPLINE — STRICT
 ============================================================
 
 Failure-loop rule, non-negotiable:
+
 - After any failed command: diagnose, make the smallest fix, rerun
   ONCE. That is one fix attempt.
 - If still red: one more focused fix attempt and rerun ONCE.
@@ -74,6 +76,7 @@ Failure-loop rule, non-negotiable:
   independent feature. Do NOT loop a third time.
 
 After each feature:
+
 - Run the full gate: `npm run test && npm run build && npm run test:e2e`
 - If Playwright browsers missing: `npx playwright install chromium`
   then rerun.
@@ -81,6 +84,7 @@ After each feature:
 - Append a one-line shipped/blocked note to SUMMARY.gemini.md.
 
 TypeScript discipline:
+
 - No `any`, no `@ts-ignore`, no `@ts-expect-error`, no
   `as unknown as` bypasses in test files.
 - After every commit run:
@@ -88,6 +92,7 @@ TypeScript discipline:
   — must return no matches in YOUR files.
 
 Flakiness discipline:
+
 - Every new Playwright test runs 3 times locally before commit
   (`npx playwright test <file> --repeat-each=3`). If any of the 3
   fail, fix or skip — do not commit flaky tests.
@@ -145,42 +150,33 @@ This is your unblocking commit. The gate script is what every other
 agent will call repeatedly. Make it solid.
 
 1a. (Item 49) Create SUMMARY.gemini.md and BLOCKERS.gemini.md at
-    repo root, mirroring the format of SUMMARY.codex.md /
-    BLOCKERS.codex.md. SUMMARY.gemini.md starts with:
-    - Agent identity: Gemini CLI, execution agent (tests / e2e /
-      scripts / gate / CI)
-    - Owned zones list (paste from this prompt's OWNED FILES)
-    - Slice 0 baseline numbers
-    - Sprint 4B feature queue (paste from Slice 2 below)
+repo root, mirroring the format of SUMMARY.codex.md /
+BLOCKERS.codex.md. SUMMARY.gemini.md starts with: - Agent identity: Gemini CLI, execution agent (tests / e2e /
+scripts / gate / CI) - Owned zones list (paste from this prompt's OWNED FILES) - Slice 0 baseline numbers - Sprint 4B feature queue (paste from Slice 2 below)
 
 1b. (Item 49) Append a "Gemini CLI" section to AGENTS.md if that
-    file exists. If it does not exist, create it and include
-    sections for all four agents (Codex, Claude Code, Grok CLI,
-    Gemini CLI), each pointing at CRM-CONTRACT.md as the SSOT and
-    naming the owned zones. Do not rewrite other agents' content
-    if AGENTS.md already exists — append only.
+file exists. If it does not exist, create it and include
+sections for all four agents (Codex, Claude Code, Grok CLI,
+Gemini CLI), each pointing at CRM-CONTRACT.md as the SSOT and
+naming the owned zones. Do not rewrite other agents' content
+if AGENTS.md already exists — append only.
 
 1c. (Item 50) Create `scripts/local-gate.ps1` and
-    `scripts/local-gate.sh`. Both MUST:
-    - Mirror PLAN.md §9 verbatim (build → test → test:e2e order, or
-      whatever §9 specifies — read it, do not assume).
-    - Exit non-zero on any step failure.
-    - Print a clear `[GATE PASS]` or `[GATE FAIL: <step>]` final line.
-    - Accept an optional `--skip-e2e` flag for quick iteration; e2e
-      is required for "real" gate, but agents iterating on unit tests
-      benefit from a fast path.
-    - Be idempotent — running them twice in a row should not
-      corrupt anything (no stray temp files, no port conflicts).
+`scripts/local-gate.sh`. Both MUST: - Mirror PLAN.md §9 verbatim (build → test → test:e2e order, or
+whatever §9 specifies — read it, do not assume). - Exit non-zero on any step failure. - Print a clear `[GATE PASS]` or `[GATE FAIL: <step>]` final line. - Accept an optional `--skip-e2e` flag for quick iteration; e2e
+is required for "real" gate, but agents iterating on unit tests
+benefit from a fast path. - Be idempotent — running them twice in a row should not
+corrupt anything (no stray temp files, no port conflicts).
 
     PowerShell version uses native `if ($LASTEXITCODE -ne 0)` checks
     between steps. Bash version uses `set -e` plus explicit step
     echo. Do NOT use `|| true` in either.
 
 1d. Run BOTH scripts (`pwsh scripts/local-gate.ps1` and, if WSL/git
-    bash is available, `bash scripts/local-gate.sh`). Both must
-    return `[GATE PASS]`. If only PowerShell is testable on the
-    Windows host, document that in SUMMARY.gemini.md and leave the
-    bash version in place for CI (Slice 2 will exercise it).
+bash is available, `bash scripts/local-gate.sh`). Both must
+return `[GATE PASS]`. If only PowerShell is testable on the
+Windows host, document that in SUMMARY.gemini.md and leave the
+bash version in place for CI (Slice 2 will exercise it).
 
 1e. Commit: `feat(gemini): slice 1 bootstrap files and local gate scripts [UNBLOCK]`
 
@@ -195,28 +191,28 @@ SLICE 2 — Gemini feature queue (sequential, commit per feature)
 Work through this queue in order. Each feature is one commit. Run
 gate after each. Apply failure-loop rule strictly.
 
-----------------------------------------------------------------
-Feature 2.1 — (Item 53) Demo anchor seed integrity tests
-----------------------------------------------------------------
+---
+
+## Feature 2.1 — (Item 53) Demo anchor seed integrity tests
 
 Create `tests/seed/demo-anchors.test.ts`. Use the anchor values you
 recorded in Slice 0. Assertions:
 
 a) Demo postal code resolves to expected area: query the routing
-   service via `lib/crm/crmClient.ts` with the demo postal code from
-   seed, assert the area name matches the expected anchor.
+service via `lib/crm/crmClient.ts` with the demo postal code from
+seed, assert the area name matches the expected anchor.
 b) At least one behind-pace DealerOrder exists in seed
-   (`DealerOrder` where `expectedPace > actualPace` or whatever the
-   schema field is — read the model, do not guess).
+(`DealerOrder` where `expectedPace > actualPace` or whatever the
+schema field is — read the model, do not guess).
 c) Dashboard KPIs non-empty: query the report service for pipeline
-   totals, weighted forecast, activity volume — each must return a
-   non-zero value at default filter.
+totals, weighted forecast, activity volume — each must return a
+non-zero value at default filter.
 d) Analyst panel has at least one actionable item: query whatever
-   service feeds the analyst panel (likely `lib/services/reports.ts`
-   stale-opportunities or overdue-tasks), assert length ≥ 1.
+service feeds the analyst panel (likely `lib/services/reports.ts`
+stale-opportunities or overdue-tasks), assert length ≥ 1.
 e) Forecast baseline stable: query weighted forecast helper, assert
-   the return is within ±5% of the value you recorded in Slice 0.
-   This is a regression guard against seed drift.
+the return is within ±5% of the value you recorded in Slice 0.
+This is a regression guard against seed drift.
 
 If any anchor doesn't exist in the current seed, do NOT make it
 pass by editing seed (Grok owns that). File a blocker entry naming
@@ -227,13 +223,14 @@ Test count target: +5 to +8 Vitest tests.
 
 Commit: `test(gemini): demo anchor seed integrity`
 
-----------------------------------------------------------------
-Feature 2.2 — (Item 51) CI mirror of local gate
-----------------------------------------------------------------
+---
+
+## Feature 2.2 — (Item 51) CI mirror of local gate
 
 Depends on 2.1 being green (so CI doesn't go red on first push).
 
 Create `.github/workflows/ci.yml`:
+
 - Triggers: `push` to any branch, `pull_request` to `main`.
 - Single job `gate`, runs on `ubuntu-latest`.
 - Steps:
@@ -261,15 +258,16 @@ under failure-loop rule.
 
 Commit: `feat(gemini): ci mirror of local gate`
 
-----------------------------------------------------------------
-Feature 2.3 — (Item 26 + Item 20) Test gap audit + fills
-----------------------------------------------------------------
+---
+
+## Feature 2.3 — (Item 26 + Item 20) Test gap audit + fills
 
 Read every file under `lib/services/**` and `lib/crm/**`. For each
 exported function, check if `tests/api/**` or `tests/services/**`
 covers it. Build a gap matrix in SUMMARY.gemini.md.
 
 Fill the highest-value gaps first:
+
 - Any service function with no test at all (P0)
 - Any service function with happy-path test but no validation/
   error-path test (P1)
@@ -282,9 +280,9 @@ and move on.
 
 Commit: `test(gemini): service and api validation gap fills`
 
-----------------------------------------------------------------
-Feature 2.4 — (Item 48 + S4-F4) E2E demo-path hardening
-----------------------------------------------------------------
+---
+
+## Feature 2.4 — (Item 48 + S4-F4) E2E demo-path hardening
 
 Read existing `e2e/**` specs. The demo path per the recommended
 execution order is: postal-code lead intake → routing decision →
@@ -306,9 +304,9 @@ commit.
 
 Commit: `test(gemini): e2e demo path hardening`
 
-----------------------------------------------------------------
-Feature 2.5 — (S4-F4) Broken-route feature flags
-----------------------------------------------------------------
+---
+
+## Feature 2.5 — (S4-F4) Broken-route feature flags
 
 Per PLAN.md §4, these routes are explicit non-goals: `/tasks`,
 `/cases`, `/campaigns`, `/deals/[id]`, and command palette /
@@ -330,26 +328,27 @@ exclusion list in CRM-CONTRACT.md.
 
 Commit: `test(gemini): excluded-route guard rails`
 
-----------------------------------------------------------------
-Feature 2.6 — Final gate run + handoff
-----------------------------------------------------------------
+---
+
+## Feature 2.6 — Final gate run + handoff
 
 a) Run `pwsh scripts/local-gate.ps1` one final time. Must be
-   `[GATE PASS]`.
+`[GATE PASS]`.
 b) Run type-safety scan:
-   `rg '\bany\b|@ts-ignore|@ts-expect-error' tests e2e scripts`
-   — must return no matches.
+`rg '\bany\b|@ts-ignore|@ts-expect-error' tests e2e scripts`
+— must return no matches.
 c) Run flakiness scan: pick the 3 most expensive Playwright specs,
-   run each with `--repeat-each=5`. Any flakes → fix or skip, do
-   not commit flaky.
+run each with `--repeat-each=5`. Any flakes → fix or skip, do
+not commit flaky.
 d) Update SUMMARY.gemini.md with final state:
-   - Shipped features (list with commit hashes)
-   - Skipped tests with TODO references
-   - Blockers filed for other agents (count)
-   - Final Vitest count
-   - Final Playwright spec count + pass rate
-   - Gate status (local + CI)
-e) Commit: `docs(gemini): final sprint 4b gate report and handoff`
+
+- Shipped features (list with commit hashes)
+- Skipped tests with TODO references
+- Blockers filed for other agents (count)
+- Final Vitest count
+- Final Playwright spec count + pass rate
+- Gate status (local + CI)
+  e) Commit: `docs(gemini): final sprint 4b gate report and handoff`
 
 ============================================================
 FINAL VERIFICATION — read-only, no commit
@@ -364,6 +363,7 @@ Run these even if Feature 2.6 reverted; they reflect end-state truth.
 5. `git archive --format=zip --output ..\salesforce-lite-crm-sprint-4b-gemini.zip HEAD`
 
 Print a single final report:
+
 - Sections completed
 - Sections skipped or blocked
 - Commit hashes
@@ -380,6 +380,7 @@ STOPPING CONDITIONS
 ============================================================
 
 Stop and report if:
+
 - Slice 0 baseline gate is red (do not proceed; file blocker on
   Codex's Sprint 4A merge)
 - More than 3 features in a row hit the failure-loop limit

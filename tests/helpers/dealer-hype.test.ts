@@ -4,7 +4,7 @@ import {
   buildVictorySpeech,
   getDailyDealerAffirmation,
   getDealerWarCry,
-  roastDealer,
+  roastDealer
 } from "@/lib/business/dealerHype";
 import { getDealerMascot } from "@/lib/business/dealerTrophies";
 
@@ -12,7 +12,7 @@ const mockDealer = (name: string, delivered: number, quota: number) => ({
   name,
   deliveredThisMonth: delivered,
   monthlyQuota: quota,
-  mascot: getDealerMascot({ name }),
+  mascot: getDealerMascot({ name })
 });
 
 describe("Full YOLO — Dealer Hype Engine", () => {
@@ -32,7 +32,12 @@ describe("Full YOLO — Dealer Hype Engine", () => {
 
   it("builds victory speeches that mention the trophy and mascot", () => {
     const mascot = getDealerMascot({ name: "Vancouver Northstar" });
-    const speech = buildVictorySpeech("Vancouver Northstar", "Turbo Llama of the Month", mascot, 142);
+    const speech = buildVictorySpeech(
+      "Vancouver Northstar",
+      "Turbo Llama of the Month",
+      mascot,
+      142
+    );
     expect(speech).toContain("Vancouver Northstar");
     expect(speech).toContain("Turbo Llama");
     expect(speech).toContain(mascot.emoji);
@@ -42,7 +47,7 @@ describe("Full YOLO — Dealer Hype Engine", () => {
     const orders = [
       mockDealer("Northstar", 31, 24),
       mockDealer("Luma", 8, 16),
-      mockDealer("Orbit", 29, 25),
+      mockDealer("Orbit", 29, 25)
     ];
     const report = buildHypeReport(orders);
     expect(report.headline.length).toBeGreaterThan(10);
@@ -66,7 +71,7 @@ describe("Full YOLO — Dealer Hype Engine", () => {
   it("hype report headline adapts to the emotional state of the cohort", () => {
     const allFailing = [
       mockDealer("Failing A", 2, 20),
-      mockDealer("Failing B", 3, 15),
+      mockDealer("Failing B", 3, 15)
     ];
     const report = buildHypeReport(allFailing);
     expect(report.headline).toContain("council has reviewed");

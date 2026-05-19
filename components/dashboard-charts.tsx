@@ -20,7 +20,14 @@ export type StageChartDatum = {
   count: number;
 };
 
-const colors = ["#1d4ed8", "#0f766e", "#a16207", "#be123c", "#15803d", "#475569"];
+const colors = [
+  "#1d4ed8",
+  "#0f766e",
+  "#a16207",
+  "#be123c",
+  "#15803d",
+  "#475569"
+];
 
 export function DashboardCharts({ data }: { data: StageChartDatum[] }) {
   return (
@@ -39,14 +46,18 @@ export function DashboardCharts({ data }: { data: StageChartDatum[] }) {
             >
               <XAxis dataKey="label" tickLine={false} axisLine={false} />
               <YAxis
-                tickFormatter={(value: number) => `$${Math.round(value / 1000)}k`}
+                tickFormatter={(value: number) =>
+                  `$${Math.round(value / 1000)}k`
+                }
                 tickLine={false}
                 axisLine={false}
                 width={56}
               />
               <Tooltip
                 formatter={(value) =>
-                  typeof value === "number" ? formatCurrency(value) : String(value ?? "")
+                  typeof value === "number"
+                    ? formatCurrency(value)
+                    : String(value ?? "")
                 }
               />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} fill="#1d4ed8" />
@@ -70,7 +81,10 @@ export function DashboardCharts({ data }: { data: StageChartDatum[] }) {
                 paddingAngle={2}
               >
                 {data.map((entry, index) => (
-                  <Cell key={entry.stage} fill={colors[index % colors.length]} />
+                  <Cell
+                    key={entry.stage}
+                    fill={colors[index % colors.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip
@@ -83,7 +97,10 @@ export function DashboardCharts({ data }: { data: StageChartDatum[] }) {
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted-foreground sm:grid-cols-3">
             {data.map((stage, index) => (
-              <div key={stage.stage} className="flex min-w-0 items-center gap-2">
+              <div
+                key={stage.stage}
+                className="flex min-w-0 items-center gap-2"
+              >
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: colors[index % colors.length] }}

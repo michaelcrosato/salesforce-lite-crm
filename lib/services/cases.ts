@@ -5,7 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { caseCreateSchema, caseUpdateSchema, idSchema } from "@/lib/validation";
 
-const caseSortByValues = ["updatedAt", "createdAt", "status", "priority", "subject"] as const;
+const caseSortByValues = [
+  "updatedAt",
+  "createdAt",
+  "status",
+  "priority",
+  "subject"
+] as const;
 const sortOrderSchema = z.enum(["asc", "desc"]);
 const caseFilterSchema = z
   .object({
@@ -66,7 +72,10 @@ function parseCaseListInput(input: unknown): ParsedCaseListInput {
   const { skip, take, ...filters } = legacy;
 
   return {
-    page: skip !== undefined && take !== undefined ? Math.floor(skip / take) + 1 : undefined,
+    page:
+      skip !== undefined && take !== undefined
+        ? Math.floor(skip / take) + 1
+        : undefined,
     pageSize: take,
     filters
   };

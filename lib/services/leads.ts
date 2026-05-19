@@ -72,7 +72,9 @@ export async function getRoutingDecisionForLead(
   }
 
   const postal = resolvePostal(lead.postalCode);
-  const parsedPayload = parseRoutingPayload(routingEvent.rawText ?? routingEvent.summary);
+  const parsedPayload = parseRoutingPayload(
+    routingEvent.rawText ?? routingEvent.summary
+  );
   const candidateOrders =
     buildCandidateOrdersFromSteps(parsedPayload.steps) ??
     buildLegacyCandidateOrders(lead, parsedPayload.summary);
@@ -182,7 +184,8 @@ function parseRoutingPayload(summary: string | null) {
       : [];
 
     return {
-      summary: typeof summaryValue === "string" ? summaryValue : fallbackSummary,
+      summary:
+        typeof summaryValue === "string" ? summaryValue : fallbackSummary,
       steps
     };
   } catch {
