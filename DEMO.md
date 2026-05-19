@@ -1,104 +1,87 @@
-# Five-Minute Demo Walkthrough — Salesforce Lite CRM
+# Five-Minute Demo Walkthrough - Salesforce Lite CRM
 
-This walkthrough is the canonical demo path for Sprint 4B. It assumes a
-deterministic local seed, no auth, and no external AI provider. Step times
-are cumulative from the moment the operator opens the app.
+This walkthrough is the reviewer demo path for the current CRM foundation. It
+assumes a freshly seeded local SQLite database, no authentication, and no
+external AI provider.
 
-## Before you start
+## Before You Start
 
-- Reset state: `npm run seed`
-- Verify gate green (skip e2e for speed):
-  `pwsh scripts/local-gate.ps1 --skip-e2e`
-  (fallback while Gemini's gate script is in flight: `npm run test && npm run build`)
-- Start the dev server: `npm run dev`
-- Open at <http://localhost:3000>
+Run from the repository root:
 
-If the dev server was already running before `npm run seed`, restart it.
-A stale Prisma connection can mask the new seed state and cause the
-`smoke.spec.ts` "Note for Maya Singh" strict-mode violation noted in
-prior SUMMARY.claude.md handoff notes.
+```powershell
+npm install
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+npx prisma generate
+npx prisma db push
+npm run seed
+npm run dev
+```
 
-## Step 0:30 — Dashboard (open at /)
+Open <http://localhost:3000/dashboard>.
 
-- Show pipeline total, weighted forecast, and activity volume.
-- Expected numbers: `<TBD from SEED-ANCHORS — pending Grok S4-F1>`
-  - Pipeline total: `<TBD>`
-  - Weighted forecast: `<TBD>`
-  - Activity volume (last 7d): `<TBD>`
+For merge readiness, run the full gate in `docs/LOCAL-GATE.md` instead of only
+starting the app.
 
-Blocker filed on Grok to publish a SEED-ANCHORS section in
-`SUMMARY.grok.md` with the canonical demo numbers.
+## Step 0:30 - Dashboard
 
-## Step 1:00 — Drop a lead
+- Open `/dashboard`.
+- Show CRM KPI cards, pipeline charts, Dealer Ops cards, focus lists, and
+  deterministic analyst actions.
+- Point out that recommendations are local deterministic code, not an external
+  AI call.
 
-- Navigate to `/leads`, click "New lead".
-- Enter the demo postal code `V5K 0A1` (Vancouver-area FSA used by the
-  deterministic routing path; preserved verbatim per CLAUDE.md rule #7).
-- Fill in name + email; submit.
-- Expected: lead lands in the list, routing decision visible inline on
-  the new row (Sprint 4B Item 55 — routing detail panel; wired once
-  `[UNBLOCK LIB]` and `[UNBLOCK COMPONENTS]` ship).
+## Step 1:00 - Drop A Lead
 
-## Step 1:30 — Inspect the routing decision
+- Navigate to `/leads`.
+- Create a lead with postal code `V5K 0A1`.
+- Expected: the lead normalizes to the Vancouver prefix, routes when an active
+  eligible dealer order has capacity, and records routing context.
 
-- Click the "Why this routing?" toggle (`data-testid="routing-detail-toggle-{leadId}"`)
-  on the new lead row.
-- Expected sequence in the detail panel:
-  1. **normalize** — postal normalized to `V5K 0A1`
-  2. **extract_prefix** — FSA `V5K`
-  3. **match_area** — matched area name `<TBD from SEED-ANCHORS>`
-  4. **filter_orders** — candidate dealer orders for that area
-  5. **rank_pace_gap** — orders ranked by behind-pace gap (largest first)
-  6. **select** — winning order id
+## Step 1:45 - Inspect Routing And Orders
 
-## Step 2:30 — Deal board
+- Open the new or seeded lead detail at `/leads/<id>`.
+- Navigate to `/orders` and open a listed order at `/orders/<id>`.
+- Confirm pacing, delivered leads, and routing event context are visible.
+
+## Step 2:45 - Deal Board
 
 - Navigate to `/deals`.
-- Drag one card from the "Negotiation" column to the "Won" column.
-  (Drawer detail at `/deals?deal=<id>` remains the canonical detail
-  surface — no `/deals/[id]` route per CRM-CONTRACT.md.)
-- Expected: card moves, stage history records a row in
-  `OpportunityStageHistory` (Item 17, shipped Sprint 4A).
+- Open an opportunity through the drawer query flow at `/deals?deal=<id>`.
+- Move a deal stage and confirm the visible board or drawer state updates.
+- Do not use `/deals/[id]`; there is no live bracketed deal detail route.
 
-## Step 3:30 — Analyst view
+## Step 3:30 - Accounts, Contacts, And Activities
 
-- Navigate to `/dashboard` (analyst recommendations live on the
-  dashboard, not a separate `/analyst` route — see "Known limitations").
-- Expected: at least one stale opportunity flagged, one overdue task
-  surfaced, deterministic ordering (no external AI provider).
+- Open `/accounts` and a listed account detail page.
+- Open `/contacts` and a listed contact detail page.
+- Add a contact note and confirm the deterministic summary and next step appear.
+- Open `/activities` to review the activity timeline.
 
-## Step 4:30 — Forecast
+## Step 4:30 - Forecast And Reports
 
-- Navigate to `/forecast`.
-- Expected: weighted forecast value reflects the just-moved deal.
-- The forecast simulator is transparent and non-persistent per
-  PLAN.md §4.
+- Navigate to `/forecast` and adjust the simulator assumptions.
+- Open `/reports` and a representative report detail page.
+- If useful for the review, open `/tasks`, `/cases`, and `/campaigns` to show
+  the current supporting CRM work queues.
 
-## Known limitations (reviewer expectation-setting)
-
-Sourced from `PLAN.md` §4 (Sprint 4 non-goals) and `README.md` — single
-source of truth for the limitations list.
+## Known Limitations
 
 - No authentication, permissions, or multi-tenancy.
 - No deployment pipeline or hosting configuration.
-- No external AI provider integration. Summarizer, routing, analyst, and
-  forecast are deterministic local code.
-- No geocoding or territory polygons. Postal prefix matching only.
-- No persistent forecast scenarios. Simulator is in-memory.
-- No dealer-order or routing-area create/edit flows. Browse-only.
-- No `/deals/[id]` detail route. Deal detail uses drawer at
-  `/deals?deal=<id>`.
-- No global search expansion. Top search routes to contacts only.
-- CSV import/export: deferred (backlog B-NN).
-- Lead → Account + Contact + Opportunity conversion: out of scope for
-  this vertical (dealer-order routing replaces it; see CRM-CONTRACT.md
-  Lead entity note).
+- No external AI provider integration.
+- No Salesforce integration.
+- No geocoding or territory polygons; postal prefix matching is the local
+  default.
+- No persistent forecast scenarios.
+- No dealer-order or routing-area create/edit flows.
+- No live `/deals/[id]` detail route; deal detail uses `/deals?deal=<id>`.
+- No global search expansion; the top search routes to contacts only.
+- No CSV import/export UI.
+- No Lead to Account, Contact, and Opportunity conversion flow; this vertical
+  routes consumer leads to dealer orders.
 
-## Reset for the next demo
+## Reset
 
-```
+```powershell
 npm run seed
 ```
-
-The seed is deterministic; the same numbers will appear on each run
-once Grok's S4-F1 anchor manifest lands.

@@ -1,5 +1,10 @@
 # GROK-NOTES.md — Grok Agent (Seed Data, Pure Helpers, CSV, Duplicates)
 
+> 2026-05-18 Codex readiness note: older entries in this file are retained as
+> history. Current repo state is governed by `PLAN.md`, `CRM-CONTRACT.md`, and
+> the latest Codex readiness reports. Prior non-contract dealer
+> trophy/hype/prophecy artifacts were removed during the readiness pass.
+
 **Branch:** feat/grok-crm-data-reports  
 **Role:** Seed data (Task/Case/Campaign only), pure business helpers, CSV export/import, duplicate detection, supplementary report helpers, seed integrity tests.  
 **Owner of:** `prisma/seed.ts` (NEW sections only), `lib/business/tasks.ts` (new), `lib/business/csv-export.ts` (new), `lib/business/csv-import.ts` (new), `lib/business/duplicates.ts` (new), `lib/business/reports-extra.ts` (new), `tests/seed-integrity.test.ts` (new), `tests/helpers/*` (new).
@@ -175,4 +180,3 @@ Activated after initial YOLO #1. Delivered two additional major pure modules + p
 - All gates passed. The mascots have taken over the building.
 
 The vertical is now complete in spirit. Claude can build UI on top of this glorious nonsense.
-

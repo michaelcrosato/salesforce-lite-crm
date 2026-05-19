@@ -70,7 +70,9 @@ npm run test:e2e
 
 ## Route Scan For Deal Detail
 
-Docs may mention `/deals/[id]` only as deferred or not implemented. Live route links or app-router files must not introduce `/deals/[id]` unless that feature is explicitly promoted.
+Docs may mention `/deals/[id]` only as deferred, excluded, or not implemented
+as a live detail route. Live route links or non-placeholder app-router behavior
+must not introduce `/deals/[id]` unless that feature is explicitly promoted.
 
 ## Preserving Reports
 

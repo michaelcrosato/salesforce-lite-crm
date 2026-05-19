@@ -57,6 +57,22 @@ Use this checklist for visual and workflow QA. It does not expand product scope.
 - Moving a deal stage updates visible board/drawer state.
 - Stage movement feedback is visible.
 
+## Work Queues And Reports
+
+- `/tasks`, `/cases`, and `/campaigns` load and support their drawer detail
+  flows through query parameters.
+- `/reports` loads.
+- A representative `/reports/<slug>` page renders table content or an empty
+  state without server or client errors.
+
+## Excluded Routes
+
+- `/deals/[id]`, `/search`, `/command-palette`, `/orders/new`,
+  `/orders/[id]/edit`, `/areas/new`, and `/areas/[id]/edit` return 404 or
+  render the excluded-route placeholder.
+- Ctrl/Cmd+K does not open a command palette while `commandPalette` remains
+  excluded.
+
 ## Final Gate
 
 Run:

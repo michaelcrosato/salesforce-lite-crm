@@ -1,31 +1,24 @@
-Agent: Codex
-Sprint: R8/R9 managed autonomy bootstrap
-Feature: r8-r9-managed-autonomy-bootstrap
-Branch: codex/r8-r9-managed-autonomy-bootstrap
-Timestamp: 2026-05-18T15:57:03-07:00
-Escalation required: NO
+# BLOCKERS.codex.md
 
-### Active blockers
+agent: Codex
+branch: `codex/r8-r9-managed-autonomy-bootstrap`
+timestamp: `2026-05-18T16:34:21-07:00`
+escalation required: NO
 
-| # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
-|---|--------------|------|-------------|----------|---------|-----------------|
+## Active Blockers
 
-### Resolved this prompt
+No active blockers.
 
-- PLAN.md ownership note: planning/decision-zone edits were explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- .gitignore ownership note: shared/contract-zone ignore additions were explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- scripts/run-autonomous-loop.ps1 ownership note: Gemini-zone scripts/** creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/AUTONOMOUS-LOOP.md ownership note: operator documentation creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/shared/s4-f1-codex-demo-seed-tuning.md ownership note: shared prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/shared/s4-f2-claude-route-visual-qa.md ownership note: shared prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/shared/s4-f3-grok-component-polish.md ownership note: shared prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/shared/s4-f4-gemini-demo-smoke-gate.md ownership note: shared prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/autonomy/queue.schema.json ownership note: managed-autonomy schema creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/autonomy/queue.example.json ownership note: managed-autonomy queue example creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/autonomy/dispatch.schema.json ownership note: managed-autonomy schema creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/autonomy/handoff.schema.json ownership note: managed-autonomy schema creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/manager/r9-dispatch-manager.md ownership note: manager prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/manager/r9-ift-proposer.md ownership note: manager prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- prompts/manager/r9-reviewer.md ownership note: manager prompt creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- scripts/run-managed-autonomy.ps1 ownership note: Gemini-zone scripts/** creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
-- docs/MANAGED-AUTONOMY.md ownership note: operator documentation creation was explicitly granted by the current one-run R8/R9 managed-autonomy bootstrap scope.
+| # | File / module | Type | Description | Failing command | Exit code | Final meaningful output | Safe next action |
+|---|---|---|---|---|---|---|---|
+
+## Non-Blocking Notes
+
+| Item | Evidence | Handling |
+|---|---|---|
+| Requested path mismatch | `C:\dev\salesforce-lite-crm-codex` was not a Git repository and contained only ignored `.next` output. `C:\dev\salesforce-lite-crm` was the only registered project worktree in `git worktree list`. | Readiness pass ran against the actual Codex worktree listed in `PLAN.md` and `AGENTS.md`; docs record the mismatch. |
+| npm audit output | `npm install` completed with exit code 0 and reported 11 audit findings. | Not escalated because audit is not part of the documented local gate; dependency remediation should be a separate dependency-maintenance task if desired. |
+
+## Failed Commands
+
+None unresolved.

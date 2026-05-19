@@ -1,5 +1,9 @@
 # BLOCKERS.grok.md — Grok Agent Blockers & Requests
 
+> 2026-05-18 Codex readiness note: this is a historical Grok blocker snapshot
+> from a prior branch/session. Current blocker state for this readiness pass is
+> in `BLOCKERS.codex.md`.
+
 **Agent:** Grok
 **Branch (current session):** feat/grok-crm-data-reports (target 4B: feat/grok-components-and-seed-tuning per prompt)
 **Timestamp:** 2026-05-18 (Sprint 4B PREP ONLY run)

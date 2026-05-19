@@ -1,5 +1,11 @@
 # SUMMARY.grok.md — Grok Agent Execution Summary
 
+> 2026-05-18 Codex readiness note: this is a historical Grok report from a
+> prior branch/session. Current repo state is governed by `PLAN.md`,
+> `CRM-CONTRACT.md`, `SUMMARY.codex.md`, and `REVIEW.CODEX.md`. Codex removed
+> prior non-contract dealer trophy/hype/prophecy artifacts during the readiness
+> pass, so older references below no longer describe the current tree.
+
 **Project:** Salesforce Lite CRM POC (Dealer Revenue Command Center vertical)  
 **Agent:** Grok (components/**, prisma/seed.ts, lib/business/**, app/globals.css, tailwind.config.ts) — Sprint 4B ownership per GROK-SPRINT-4B.md  
 **Current Branch (this session):** feat/grok-crm-data-reports  

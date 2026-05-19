@@ -126,7 +126,7 @@ local workflow until that cutover is explicitly promoted.
 | `/contacts/<id>` | Contact detail, activity history, note capture, and deterministic summary/next-step output. |
 | `/deals` | Opportunity board and list using the existing `Deal` model. |
 | `/deals/new` | Opportunity creation. |
-| `/deals?deal=<id>` | Opportunity detail drawer. There is no `/deals/[id]` route in the current contract. |
+| `/deals?deal=<id>` | Opportunity detail drawer. There is no live `/deals/[id]` detail route in the current contract. |
 | `/activities` | Activity timeline for notes, calls, emails, meetings, status changes, and routing events. |
 | `/leads` | Consumer lead creation and dealer-order routing. |
 | `/leads/<id>` | Lead detail and status updates. |
@@ -260,7 +260,7 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - `Lead` means a consumer lead routed to a dealer order, not a generic B2B
   lead-conversion object.
 - Deal detail stays in the `/deals?deal=<id>` drawer flow; `/deals/[id]` is not
-  implemented.
+  implemented as a live detail route.
 - Dealer orders and areas are seeded and browsable, but create/edit flows for
   them are deferred.
 - Top search routes to contacts only.

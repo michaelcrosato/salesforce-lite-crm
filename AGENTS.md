@@ -17,18 +17,14 @@ handoff.
 
 | Agent | Expected worktree | Branch ownership | Report files | Current local status |
 |---|---|---|---|---|
-| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | present |
-| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | present in `git worktree list` |
-| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | present in `git worktree list` |
-| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | present in `git worktree list` |
+| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | registered Git worktree |
+| Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | expected path exists locally but is not currently registered by `git worktree list` |
+| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | expected path exists locally but is not currently registered by `git worktree list` |
+| Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | expected path exists locally but is not currently registered by `git worktree list` |
 
 Branch naming convention from `PLAN.md`: `<prefix>sprint-<id>-<feature-slug>`.
-Current handoff branches also exist for this phase:
-
-- Codex: `feat/codex-crm-contract-api`
-- Claude: `feat/claude-crm-ui-e2e`
-- Grok: `feat/grok-crm-data-reports`
-- Gemini: `gemini/sprint-4-demo-smoke-gate-hardening`
+Current Sprint 4 next-push prompts are in `docs/NEXT-PROMPTS.md` and
+`prompts/shared/s4-f*.md`.
 
 ## Ownership Zones
 

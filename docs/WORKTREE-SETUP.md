@@ -11,16 +11,16 @@ C:\dev\salesforce-lite-crm-grok
 C:\dev\salesforce-lite-crm-gemini
 ```
 
-Observed during this readiness pass after Gemini bootstrap:
+Observed during the 2026-05-18 Codex readiness pass:
 
 ```text
-C:/dev/salesforce-lite-crm        [chore/claude-hooks-r23]
-C:/dev/salesforce-lite-crm-claude [feat/claude-crm-ui-e2e]
-C:/dev/salesforce-lite-crm-gemini [gemini/sprint-4-demo-smoke-gate-hardening]
-C:/dev/salesforce-lite-crm-grok   [feat/grok-crm-data-reports]
+C:/dev/salesforce-lite-crm 2d2110d [codex/r8-r9-managed-autonomy-bootstrap]
 ```
 
-Use `git worktree list` for the current commit SHA at each path.
+The sibling expected paths existed on disk, but only the Codex path was
+registered by `git worktree list` at the time of this pass. Use
+`git worktree list` for the current commit SHA and branch at each registered
+path before creating, repairing, or deleting worktrees.
 
 ## Inspect Worktrees
 

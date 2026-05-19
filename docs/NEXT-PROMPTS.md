@@ -1,6 +1,7 @@
 # Next Prompts
 
-Status: prepared for Sprint 4.
+Status: prepared for the next Sprint 4 implementation push after the current
+readiness pass.
 
 `README.md` has been updated to reflect the current product vision: a
 full-fledged, AI-adaptive Salesforce-style CRM for small business requirements,
@@ -66,9 +67,14 @@ Scope:
 - Primary zone: `app/**`.
 - Verify implemented routes render coherently: `/dashboard`, `/leads`,
   `/leads/<id>`, `/orders`, `/orders/<id>`, `/areas`, `/forecast`,
-  `/accounts`, `/accounts/<id>`, `/contacts`, `/contacts/<id>`, and `/deals`.
+  `/accounts`, `/accounts/<id>`, `/contacts`, `/contacts/<id>`, `/deals`,
+  `/activities`, `/tasks`, `/cases`, `/campaigns`, `/reports`, and
+  representative report detail pages.
 - Visual fixes must not change business logic or introduce new routes.
 - Preserve the `/deals?deal=<id>` drawer flow. Do not add `/deals/[id]`.
+- Confirm excluded routes remain excluded or placeholder-only: `/deals/[id]`,
+  `/search`, `/command-palette`, `/orders/new`, `/orders/[id]/edit`,
+  `/areas/new`, and `/areas/[id]/edit`.
 
 Required checks:
 
@@ -129,8 +135,8 @@ Scope:
 
 - Primary zone: `tests/**`, `e2e/**`, `scripts/**`, `playwright.config.ts`,
   and `vitest.config.ts`.
-- Harden smoke coverage for the README reference workflow and the implemented
-  CRM routes.
+- Harden smoke coverage for the README reference workflow, implemented CRM
+  routes, and excluded-route guard rails.
 - Keep the local gate documented in `docs/LOCAL-GATE.md` accurate. Do not add
   package scripts unless the current prompt explicitly authorizes package
   changes.

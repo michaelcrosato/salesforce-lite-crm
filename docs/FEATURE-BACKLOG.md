@@ -25,11 +25,12 @@ roadmap and does not authorize feature work.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
 
-## Contract Routes Pending UI Phase
+## Implemented Contract Routes
 
-`CRM-CONTRACT.md` defines `/tasks`, `/cases`, and `/campaigns` as contract
-routes. App-router pages are not present in this worktree at readiness time.
-Do not claim those UI pages exist until files are added under `app/`.
+`CRM-CONTRACT.md` defines `/tasks`, `/cases`, `/campaigns`, and `/reports` as
+live routes. App-router pages are present in this worktree and are covered by
+Vitest or Playwright checks. Detail flows for tasks, cases, campaigns, and deals
+use query-parameter drawers rather than bracketed dynamic detail routes.
 
 ## Do Not Build During Readiness
 

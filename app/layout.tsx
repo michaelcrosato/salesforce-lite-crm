@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
-import { CommandPalette } from "@/components/command-palette";
 import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Salesforce Lite CRM",
-  description: "AI-native CRM proof of concept for daily sales workflows."
+  description: "Local-first CRM foundation for small business revenue workflows."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +14,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToastProvider>
           <AppShell>{children}</AppShell>
-          <CommandPalette />
         </ToastProvider>
       </body>
     </html>

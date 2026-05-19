@@ -77,7 +77,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are live Sprint 4B demo routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
+- Existing UI routes are preserved. `/tasks`, `/cases`, `/campaigns`, and `/reports` are live demo routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
 
 ## Status Constants
 
@@ -96,15 +96,15 @@ Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/
 ## Feature Flags And Excluded Routes
 
 `lib/featureFlags.ts` exports `FEATURE_FLAGS`, `EXCLUDED_ROUTES`, and `isEnabled(flag)`.
-Remaining excluded-route flags default to `false` during Sprint 4B demo polish.
+Remaining excluded-route flags default to `false` until a later prompt and contract update explicitly promote them.
 
 | Flag | Purpose | Excluded route(s) | Authority |
 |---|---|---|---|
-| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md section 4 line 137. |
-| `globalSearchUi` | Top search remains contacts-only; no expanded search route ships. | `/search` | PLAN.md section 4 line 139. |
-| `commandPalette` | No command palette route ships in Sprint 4B. | `/command-palette` | PLAN.md section 4 line 119 forbids bundling extra S4 UI work without an explicit prompt. |
-| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md section 4 line 135. |
-| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md section 4 line 135. |
+| `dealDetailRoute` | Deal detail stays in the drawer flow. | `/deals/[id]` | PLAN.md Sprint 4 non-goals and backlog. |
+| `globalSearchUi` | Top search remains contacts-only; no expanded search route ships. | `/search` | PLAN.md Sprint 4 non-goals and backlog. |
+| `commandPalette` | No command palette route or global shortcut ships in the current contract. | `/command-palette` | PLAN.md Sprint 4 non-goals. |
+| `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md Sprint 4 non-goals and backlog. |
+| `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md Sprint 4 non-goals and backlog. |
 
 `EXCLUDED_ROUTES` is the source of truth for routes without live demo pages that should either 404 or render the demo placeholder.
 
