@@ -20,6 +20,8 @@
 
 | Editor | Collaborative. Agents may edit this file when the current prompt or repo work calls for it. |
 
+| Continuous | ON |
+
 
 
 \## 2. Source of Truth Hierarchy
@@ -269,6 +271,32 @@ On the next prompt, the uncommitted implementation paths from a still-open `gate
 
 
 Edge cases that look novel resolve to a named section when possible. If no section covers it, make the smallest reversible call, document it, and continue.
+
+
+## 6A. Continuous / Unattended Mode
+Default:
+6 step 13 remains in force. Agents stop after assigned work unless the current prompt explicitly asks them to continue into the next feature.
+
+Continuous Mode:
+When `Continuous: ON` is present in 1 Document Control, or when the active manager prompt explicitly says `FULL AUTONOMY`, `UNATTENDED`, `OVERNIGHT`, or `CONTINUE-UNTIL-STOPPED`, 6 step 13 is replaced with:
+After the required gate/checks, report rewrites, report commit, and push, select the next ready task from 4 or the active manager queue, assign it to the correct owner/worktree, and repeat the Execution Loop without asking for human confirmation.
+
+Token usage is not a stopping condition. Do not set or respect artificial token, cost, turn, or iteration caps unless the user explicitly adds one in the current prompt.
+
+Stop only on:
+1. queue empty;
+2. user turns Continuous OFF or interrupts with a stop instruction;
+3. CLI/session/context/provider quota exhausted;
+4. required credential, login, payment, account approval, or external service unavailable;
+5. local gate remains red after documented repair attempts;
+6. no independent safe task remains after a blocker;
+7. next action would require destructive or irreversible work;
+8. force-push, hard reset, broad deletion, secret exposure, or main-branch rewrite would be required;
+9. next task would expand scope beyond PLAN.md, CRM-CONTRACT.md, or the active queue.
+
+When a stop condition is reached, write the reason to BLOCKERS/SUMMARY. If safe, set `Continuous: OFF`; otherwise create `AUTONOMY.STOP` with the reason.
+
+All ownership zones, CRM-CONTRACT.md invariants, report requirements, hook policies, and local-gate authority remain in force.
 
 
 

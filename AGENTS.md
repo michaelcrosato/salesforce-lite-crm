@@ -6,9 +6,13 @@ handoff.
 
 ## Operating Policy
 
-- Maximum YOLO mode: the current prompt can authorize a one-run exception.
-- Do not wait for human/manual approval as a hard blocker. Use repo-local
-  evidence, the current prompt, SUMMARY/BLOCKERS, and the local gate.
+- Maximum YOLO / Continuous Mode:
+  - Default: the current prompt can authorize a one-run exception.
+  - Continuous Mode: when PLAN.md `Continuous: ON` or the active manager prompt explicitly enables unattended operation, do not stop after one feature. Use repo-local evidence, SUMMARY/BLOCKERS, PLAN.md, CRM-CONTRACT.md, .claude hooks, .cursor rules, and the local gate as governors.
+  - Token usage is unconstrained by repo policy.
+  - Do not wait for human/manual approval unless a documented stop condition is hit.
+  - If blocked, repair within scope; if still blocked, write BLOCKERS with exact evidence and pivot to the next independent safe task.
+  - Do not pass `--max-turns`, `--max-budget-usd`, or equivalent budget/iteration caps in unattended launches unless the user explicitly requests a cap.
 - Keep changes scoped. Document cross-zone or prompt-authorized exceptions.
 - Do not paste raw chat history into repo docs.
 - Do not create product features during readiness or cleanup passes.

@@ -9,3 +9,6 @@ Follow `AGENTS.md`, `PLAN.md`, and `CRM-CONTRACT.md` as the active repo instruct
 This repo authorizes autonomous repo-local execution for the standard gate and git workflow. Do not stop for manual approval before running ordinary local commands such as `npm install`, `npm run *`, `npx prisma *`, `npx playwright *`, `git status`, `git log`, `git diff`, `git fetch`, `git pull`, `git checkout`, `git merge`, `git add`, `git commit`, or `git push`.
 
 Keep the product guardrails in `AGENTS.md` in force: do not force-push, rewrite history, delete worktrees, delete source files as cleanup, or use destructive commands unless the user explicitly requests that operation.
+
+Continuous / Unattended Mode:
+When PLAN.md `Continuous: ON` or the active manager prompt enables unattended operation, continue selecting and executing the next ready PLAN.md 4 task until a documented stop condition is reached. Do not pause merely because one feature completed. Do not treat token cost as a stop condition. Preserve all product guardrails, ownership zones, local-gate requirements, and destructive-command prohibitions.
