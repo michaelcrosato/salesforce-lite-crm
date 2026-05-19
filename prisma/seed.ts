@@ -75,19 +75,19 @@ const contacts = [
 ] as const;
 
 const deals = [
-  ["deal-1", "acct-northstar", "contact-1", "user-ava", "Northstar dispatch team rollout", "proposal", 118000, 9, 5],
+  ["deal-1", "acct-northstar", "contact-1", "user-ava", "Northstar dispatch team rollout", "proposal", 118000, 9, 21],
   ["deal-2", "acct-northstar", "contact-21", "user-ava", "Finance reporting workspace", "qualified", 42000, 16, 18],
   ["deal-3", "acct-luma", "contact-3", "user-marcus", "Luma patient intake CRM", "negotiation", 156000, 3, 2],
   ["deal-4", "acct-luma", "contact-4", "user-marcus", "Support handoff pilot", "new", 28000, 21, 30],
   ["deal-5", "acct-cascade", "contact-5", "user-ava", "Cascade enterprise expansion", "won", 210000, 1, 1],
   ["deal-6", "acct-cascade", "contact-6", "user-ava", "Sales operations analytics", "qualified", 64000, 7, 9],
-  ["deal-7", "acct-harbor", "contact-7", "user-elena", "Advisor desk modernization", "proposal", 98000, 22, 12],
+  ["deal-7", "acct-harbor", "contact-7", "user-elena", "Advisor desk modernization", "proposal", 98000, 22, 23],
   ["deal-8", "acct-harbor", "contact-8", "user-elena", "Compliance workflow pilot", "lost", 36000, 40, 35],
   ["deal-9", "acct-orbit", "contact-9", "user-marcus", "Retail territory planning", "negotiation", 132000, 15, 4],
   ["deal-10", "acct-orbit", "contact-10", "user-marcus", "Store manager mobile CRM", "new", 52000, 0, 20],
   ["deal-11", "acct-zenith", "contact-11", "user-elena", "Biotech commercial launch", "proposal", 175000, 6, 3],
   ["deal-12", "acct-zenith", "contact-12", "user-elena", "Finance approvals automation", "qualified", 73000, 11, 10],
-  ["deal-13", "acct-summit", "contact-13", "user-ava", "Energy partner portal", "negotiation", 225000, 31, 8],
+  ["deal-13", "acct-summit", "contact-13", "user-ava", "Energy partner portal", "negotiation", 225000, 31, 28],
   ["deal-14", "acct-summit", "contact-14", "user-ava", "Legal contract workspace", "proposal", 87000, 18, 6],
   ["deal-15", "acct-evergreen", "contact-15", "user-marcus", "Studio advertiser CRM", "lost", 59000, 60, 45],
   ["deal-16", "acct-apex", "contact-17", "user-elena", "Kitchen expansion pipeline", "won", 126000, 2, 1],
@@ -126,6 +126,8 @@ const dealerAreas = [
  * These values are the contract for Gemini's anchor tests and the live demo story.
  * - V5K 0A1 must always resolve to area-vancouver and route successfully.
  * - Multiple DealerOrders must have negative pace gaps (behind-pace) for the analyst panel.
+ * - Multiple high-value open deals must be stale for the analyst panel.
+ * - Low-health accounts must be attached to active behind-pace dealer orders.
  * - Lead sources must include routed + other sources.
  * - Top accounts must have multiple open deals.
  */
