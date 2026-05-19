@@ -38,6 +38,10 @@ function positiveIntegerOrDefault(value: number, fallback: number) {
   return Number.isFinite(truncated) ? Math.max(1, truncated) : fallback;
 }
 
+function isSortOrder(value: unknown): value is SortOrder {
+  return value === "asc" || value === "desc";
+}
+
 export function buildListQuery<
   SortBy extends string,
   Filters extends Record<string, unknown>,
@@ -55,8 +59,13 @@ export function buildListQuery<
     defaultPageSize
   );
   const take = Math.min(requestedPageSize, maxPageSize);
-  const sortBy = input.sortBy ?? config.defaultSortBy;
-  const sortOrder = input.sortOrder ?? config.defaultSortOrder;
+  const sortBy =
+    input.sortBy && Object.hasOwn(config.sortMap, input.sortBy)
+      ? input.sortBy
+      : config.defaultSortBy;
+  const sortOrder = isSortOrder(input.sortOrder)
+    ? input.sortOrder
+    : config.defaultSortOrder;
   const filters: Partial<Filters> = input.filters ?? {};
   const whereClauses: Where[] = [];
 
