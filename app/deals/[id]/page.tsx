@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { ExcludedRoutePlaceholder } from "@/components/excluded-route-placeholder";
+
+export const metadata: Metadata = {
+  title: "Deal Detail (Unavailable)"
+};
 
 export default function ExcludedDealDetailPage() {
   return (

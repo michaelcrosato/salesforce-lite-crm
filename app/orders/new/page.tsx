@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { ExcludedRoutePlaceholder } from "@/components/excluded-route-placeholder";
+
+export const metadata: Metadata = {
+  title: "New Order (Unavailable)"
+};
 
 export default function ExcludedOrdersNewPage() {
   return (

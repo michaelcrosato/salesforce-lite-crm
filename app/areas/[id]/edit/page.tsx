@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { ExcludedRoutePlaceholder } from "@/components/excluded-route-placeholder";
+
+export const metadata: Metadata = {
+  title: "Edit Area (Unavailable)"
+};
 
 export default function ExcludedAreaEditPage() {
   return (
