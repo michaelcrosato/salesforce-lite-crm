@@ -1,78 +1,75 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — forecast empty state for no active orders
+Feature: S4-F2 route visual QA — analyst panel see-all links + defensive metadata
 Branch: claude/autonomy
 Status: active
-Commits this prompt: af2ec63 — [claude] S4-F2: add EmptyState to forecast Order Projection when no active orders
+Commits this prompt: c16cc09 — [claude] S4-F2: add robots noindex to root metadata for internal CRM; e832278 — [claude] S4-F2: declare explicit viewport for mobile responsiveness; 0adb964 — [claude] S4-F2: add see-all links to analyst panel lists when over 3 items; 7a98cfc — [claude] S4-F2: add fallback for empty analyst Do Today section
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T07:27:00-08:00
+Timestamp: 2026-05-19T07:47:30-08:00
 
 ### Completed this prompt
 
-- `/forecast/page.tsx` Order Projection card previously always
-  rendered the `<table>` (column headers + tbody) regardless of
-  whether any active orders existed. When the seed produced zero
-  active orders (e.g. a fresh setup before seed runs, or an edge
-  state with all orders paused), the table rendered headers only
-  with an empty tbody — confusing UX that gave no signal about what
-  was missing or how to recover.
-- Wrapped the table render in `forecast.rows.length > 0` and added
-  an `<EmptyState>` fallback that titles "No active dealer orders",
-  describes the relationship to the orders surface, and ships an
-  action button linking to `/orders` so the user has an explicit
-  next step. Matches the established list-page empty-state pattern
-  used on `/accounts`, `/contacts`, `/orders`, `/areas`, and
-  `/activities`.
-- Imported `EmptyState` from `@/components/ui/empty-state`. No other
-  imports changed. No business logic change — `buildForecast` still
-  runs and its summary KPI cards still render with whatever
-  projected values fall out (typically zeros) so the page is
-  consistent across the empty / non-empty rows transition.
+- Added `robots: { index: false, follow: false }` to the root
+  `app/layout.tsx` metadata. README explicitly states "No deployment
+  configuration is included" and the app is single-tenant with no
+  auth; the noindex declaration is defensive against accidental
+  search-engine indexing if the app is ever reverse-proxied to a
+  public URL. Inherited by every page through Next.js metadata
+  merging, so no per-page declaration is needed.
+- Added an explicit `viewport: Viewport = { width: "device-width",
+  initialScale: 1 }` export to the root layout. Next.js 16
+  auto-injects a basic viewport meta if absent but the explicit
+  declaration pins `initialScale: 1` which prevents iOS Safari's
+  default form-input auto-zoom and is the modern Next.js
+  recommendation (the `viewport` export was extracted out of
+  `metadata` in Next.js 14.0).
+- Added "See all N <entity> &rarr;" links to all four `AnalystList`
+  groups on `/dashboard` when the list has more than 3 items. The
+  prior render hard-capped at `.slice(0, 3)` with no way for the
+  user to drill into the full list. Each link targets the most
+  semantically appropriate downstream page:
+  - Behind-Pace Orders &rarr; `/orders`
+  - Unrouted Leads &rarr; `/leads`
+  - Stale High-Value Deals &rarr; `/reports/stale-opportunities`
+  - Low-Health Dealer Accounts &rarr; `/accounts`
+  The link is only rendered when `array.length > 3` so short lists
+  stay compact. Item count in the link text gives the user a
+  preview of the actual size.
+- Added a fallback `<p>No analyst-suggested actions for today.</p>`
+  to the "Do Today" section of the Analyst Panel. The prior render
+  iterated `analystPanel.actions.map(...)` unconditionally inside
+  a 5-col grid, leaving an `<h3>` followed by an empty grid when
+  the actions array was empty. Now the header has explicit empty
+  context.
+- All edits are pure UI: no business logic, schema, route, or
+  contract changes. No new dependencies, no test changes.
 
 ### Verification
 
-- `npm run build` → SUCCESS (32 routes; new EmptyState branch
-  compiles cleanly).
+- `npm run build` → SUCCESS (32 routes; metadata/viewport exports
+  compile cleanly).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files). No
-  test exercises the empty-rows branch in /forecast specifically;
-  this change is defensive against an edge state.
-- `git status --short` clean before the implementation commit aside
-  from the carry-forward `tsconfig.tsbuildinfo` artifact.
+  test exercises the `analystPanel.actions === []` branch
+  specifically; this addition is defensive against an edge state.
+- `git status --short` clean before each implementation commit
+  aside from the carry-forward `tsconfig.tsbuildinfo` artifact.
 
 ### S4-F2 cumulative progress on `claude/autonomy`
 
-Implementation commits on this branch since `cc00d6c` (23 total):
+Latest implementation commits (last 4 added this iteration):
 
 | SHA | Subject |
 |---|---|
-| `e0f138c` | refresh root metadata description to match README framing |
-| `468fb4a` | specify report empty-state titles per report |
-| `ca0f472` | align /deals/new description with page Deal terminology |
-| `2b7f8da` | reframe orders/areas empty-state copy as deferred not demo |
-| `07a19cb` | add loading skeletons for account/contact/report detail pages |
-| `642ed78` | drop stakeholders term from /contacts description |
-| `0fba7d3` | add custom 404 page with dashboard and accounts links |
-| `0a33253` | add Apply button to /accounts filter form |
-| `bd6468a` | clarify forecast formula with grouping and unicode operators |
-| `a93f85a` | broaden /leads/[id] description to cover full page surface |
-| `2098a38` | add title template to root metadata |
-| `dba0fce` | add per-page metadata titles for distinct browser tabs |
-| `0632bfd` | dynamic generateMetadata titles for detail pages |
-| `63d9ff9` | add metadata titles for entity creation pages |
-| `c175bbe` | add metadata titles for excluded route placeholders |
-| `45a5398` | broaden dashboard description |
-| `aed2ea2` | Prisma error handling on account actions |
-| `b382f36` | Prisma error handling on deal actions |
-| `8be5bd7` | Prisma error handling on lead actions |
-| `6963f5f` | back-to-list nav button on entity creation pages |
-| `501c6be` | set tab title on global not-found page |
-| `af2ec63` | EmptyState on forecast when no active orders |
+| `c16cc09` | add robots noindex to root metadata |
+| `e832278` | declare explicit viewport for mobile responsiveness |
+| `0adb964` | add see-all links to analyst panel lists when over 3 items |
+| `7a98cfc` | add fallback for empty analyst Do Today section |
 
-Plus pre-session `81f438f`, `9b98e72`, `d51d817` make 26 Claude-zone
-S4-F2 implementation commits on this branch.
+Total Claude-zone S4-F2 implementation commits on this branch: 30
+across 13 LOOP iterations (including pre-session work).
 
-Ten categories of polish:
+Eleven categories of polish:
 1. metadata + product framing alignment
 2. copy precision (form/empty/header surfaces)
 3. perceived-perf parity (loading skeletons)
@@ -80,33 +77,25 @@ Ten categories of polish:
 5. interactive filter parity
 6. internal documentation clarity (forecast formula)
 7. complete browser tab title coverage
-8. server-action error-handling parity (all 7 entity actions)
+8. server-action error-handling parity
 9. explicit back-to-list nav on /new pages
-10. **NEW** defensive empty-state coverage on /forecast Order Projection
-
-### Audit observations (no fix this prompt)
-
-- Detail-page sub-list empty states (`/accounts/[id]` Related
-  Contacts/Deals; `/contacts/[id]` Related Deals; `/orders/[id]`
-  Assigned Leads This Month) all use a plain `<p
-  className="text-sm text-muted-foreground">` for the "no items"
-  fallback rather than `<EmptyState>`. This is intentionally
-  consistent across all detail pages — the EmptyState component is
-  reserved for top-level list pages where the empty state IS the
-  whole page. Not changing.
-- `prismaErrorMessage` is now duplicated in four entity action files
-  (contacts, accounts, deals, leads — tasks/cases/campaigns have
-  their own variants). Extracting to a shared helper would require
-  either `app/_lib/` (acceptable in Claude's zone) or `lib/` (Codex's
-  zone). The four-line duplication is mild; defer unless future
-  changes need a single source.
+10. defensive empty-state coverage on /forecast and dashboard
+11. **NEW** analyst-panel see-all drill-downs + root metadata
+    completeness (robots, viewport)
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued`. Gemini's branch
-(`gemini/autonomy`) has commit `9560bc6` that would promote Sprint 4
-features to `done` once merged. Per PLAN.md §2 the local gate is
-authoritative; gate has been green for every commit on this branch.
+`origin/main` is now 12 commits ahead of this branch's base and
+has received merges from `gemini/autonomy` and `grok/autonomy`
+plus shared prompt additions. A trial `git merge origin/main`
+produced one conflict on `app/layout.tsx` (competing description
+updates between this branch's "Salesforce-style CRM application
+foundation..." and main's "Local-first CRM for small business
+revenue operations.") — aborted per CLAUDE.md §14 ("block instead
+of guessing on destructive operations"). The merge is operator
+scope per `prompts/shared/MERGE.md` Phase 2. Reported here so the
+operator has the heads-up before pulling this branch into a
+release merge.
 
 ### Outstanding cross-agent dependency
 
@@ -116,16 +105,16 @@ zone; no action from Claude this prompt.
 
 ### Next action
 
-S4-F2 is comprehensively complete for the Claude-owned surface
-across visual coherence, copy accuracy, perceived performance,
-error resilience, navigation affordances, and defensive empty-state
-coverage. Best next move: stand by for SPRINT-ROLLOVER prompt, or
-the operator may merge this branch + Gemini's PLAN.md update.
+Iteration continues. The Claude-zone S4-F2 surface is now
+comprehensively polished; remaining incremental wins are smaller
+(e.g. one-off empty-state texts, micro-copy tweaks). If the
+operator wants to ship this branch, a merge into main + Gemini's
+PLAN.md status promotion would close out Sprint 4 visual QA.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single edited file lives in
-`app/**`).
+No cross-ownership edits: YES (both files edited live in `app/**`
+— `app/layout.tsx` and `app/dashboard/page.tsx`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — defensive empty-state wraps the existing render
-with no behavior change for the populated case).
+signature changes — metadata/viewport additions plus UI affordances
+inside existing render trees).
