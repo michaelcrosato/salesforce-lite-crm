@@ -128,7 +128,9 @@ export default async function LeadDetailPage({
               </div>
               <div>
                 <p className="text-xs font-medium uppercase text-muted-foreground">Reason</p>
-                <div className="mt-2">{reasonBadge(lead.assignmentReason)}</div>
+                <div className="mt-2" data-testid="lead-status-badge">
+                  {reasonBadge(lead.assignmentReason)}
+                </div>
               </div>
               <div>
                 <p className="text-xs font-medium uppercase text-muted-foreground">Area</p>

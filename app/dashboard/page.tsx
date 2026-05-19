@@ -229,7 +229,7 @@ export default async function DashboardPage() {
 
       <DashboardCharts data={chartData} />
 
-      <Card>
+      <Card data-testid="dashboard-analyst-panel">
         <CardHeader>
           <CardTitle>Analyst Panel</CardTitle>
         </CardHeader>
@@ -241,6 +241,7 @@ export default async function DashboardPage() {
                   <Link
                     key={order.id}
                     href={order.href}
+                    data-testid="analyst-item-behind-pace-order"
                     className="block rounded-md border bg-background p-3 hover:bg-muted/50"
                   >
                     <div className="flex items-center justify-between gap-3">

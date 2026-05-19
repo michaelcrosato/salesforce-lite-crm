@@ -144,6 +144,7 @@ export default async function ForecastPage({
                 max="3"
                 step="0.1"
                 defaultValue={leadVolumeMultiplier}
+                data-testid="forecast-multiplier-input"
               />
             </div>
             <div className="space-y-2">
@@ -170,7 +171,7 @@ export default async function ForecastPage({
               </Select>
             </div>
             <div className="flex items-end">
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" data-testid="forecast-apply-button">
                 Apply
               </Button>
             </div>
@@ -179,11 +180,13 @@ export default async function ForecastPage({
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Projected Leads"
-          value={formatNumber(forecast.summary.projectedLeads)}
-          detail={`${leadVolumeMultiplier}x volume at ${Math.round(assignmentRate * 100)}% assignment`}
-        />
+        <div data-testid="forecast-projection-value">
+          <KpiCard
+            label="Projected Leads"
+            value={formatNumber(forecast.summary.projectedLeads)}
+            detail={`${leadVolumeMultiplier}x volume at ${Math.round(assignmentRate * 100)}% assignment`}
+          />
+        </div>
         <KpiCard
           label="Likely Hit Quota"
           value={formatNumber(forecast.summary.ordersLikelyToHitQuota)}
