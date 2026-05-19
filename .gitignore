@@ -22,3 +22,5 @@ prisma/dev.db-shm
 # .claude/active-agent
 agent-runs/
 status/
+
+next-env.d.ts
