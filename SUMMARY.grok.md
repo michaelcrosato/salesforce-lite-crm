@@ -14,29 +14,23 @@ Sprint: 4 / continuous polish (noting PLAN §4 still lists S4-F3 queued; reality
 Feature: S4-F3 + Continuous YOLO Component & Visual Polish  
 Branch: grok/sprint-4-component-polish  
 Status: active (continuous improvement loop)  
-Commits this prompt (YOLO burst 1): 565f9f7, e18960e, 7e2e983, 01f59ca, 7384158 — KpiCard/PacingBar/DashboardCharts/CommandPalette + globals.css demo polish  
+Commits this prompt (YOLO Cycle 1): 565f9f7, e18960e, 7e2e983, 01f59ca, 7384158 — KpiCard/PacingBar/DashboardCharts/CommandPalette + globals.css  
+Commits this prompt (YOLO Cycle 2 so far): b729965, 903f895 — AccountsTable + ContactsTable now render EmptyState + data-testid support  
 Gate status: PASS (multiple verifications)  
 DoD self-check: PASS  
-Timestamp: 2026-05-19T14:10:00Z
+Timestamp: 2026-05-19T14:40:00Z
 
-### Completed this prompt (YOLO Cycle 1)
-- Activated full YOLO continuous improvement per explicit max-authority prompt. Created living todo backlog for scoped, high-ROI work strictly inside Grok ownership (components/** + globals.css + tailwind.config.ts).
-- Re-ran full local gate as baseline: 162/162 vitest PASS, build clean, 19/20 e2e PASS (demo-path still skipped in Gemini zone).
-- Next-env.d.ts verified untracked/not-staged before any changes (mandatory).
-- Backlog audit (parallel reads of 51 files): identified missing/ inconsistent testid support, raw empty messages instead of shared EmptyState, lack of loading/empty handling in analyst/dashboard components, opportunities in ui/ primitives and CSS for demo visual excellence.
-- Executed 5 atomic, coherent commits (one logical change each):
-  1. **KpiCard** (components/kpi-card.tsx): added `data-testid` forwarding + interface. Enables dashboard kpi targeting.
-  2. **PacingBar** (components/pacing-bar.tsx): added `data-testid` prop + applied to container. Directly supports "analyst-item-behind-pace-order" and Gemini BLOCKERS #3.
-  3. **DashboardCharts** (components/dashboard-charts.tsx): major robustness — `isLoading` + `data-testid` props, conditional EmptyState (loading + "no data"), hasData guard. Transforms empty chart areas into polished states. "dashboard-analyst-panel" ready.
-  4. **CommandPalette** (components/command-palette.tsx): replaced 3 raw <p> messages with unified `<EmptyState compact variant="loading" />`. Consistent UX + future test hooks.
-  5. **globals.css** (app/globals.css): YOLO demo visual polish — stronger `:focus-visible` rings, reinforced `shadow-soft`, new `.crm-card` / `.crm-table-row` utilities for consistent interactive feel across demo.
-- All changes 100% in Grok zone. No business logic, no schema, no app/** or lib/ edits, CRM-CONTRACT honored, guardrails (no /deals/[id] work) respected.
-- Every commit followed by build + targeted e2e verification (all green). No `any`/ts-ignore introduced.
-- Partial progress on Gemini BLOCKERS #3 (more demo-critical components now expose stable testids + states). The remaining items are primarily in Claude-owned app/ pages.
-- Documented everything in this SUMMARY + BLOCKERS for continuous handoff.
+### Completed this prompt (YOLO Cycle 1 + Cycle 2 start)
+- Activated full YOLO continuous improvement per explicit max-authority prompt. Living todo backlog active for scoped, high-ROI work strictly inside Grok ownership.
+- Re-ran full local gate multiple times — always green.
+- Cycle 1 (5 commits): KpiCard, PacingBar, DashboardCharts (loading+empty+testid), CommandPalette (EmptyState unification), globals.css visual polish.
+- Cycle 2 (so far): 
+  - **AccountsTable** + **ContactsTable**: Added proper EmptyState when list is empty + `data-testid` prop on container + empty variant. Makes list views in demo much more polished and e2e-friendly.
+- All work 100% in zone, atomic commits, gate verified after each batch.
+- Continued progress toward Gemini testid gaps and overall demo robustness.
 
 ### Next action
-Continue YOLO loop immediately (Cycle 2+): more components (remaining reports cards, deal-detail-drawer, tasks/cases/campaigns views in components/, ui/ primitives unification, additional testid catalog), deeper globals.css + possible minimal tailwind.config extensions for demo tokens, more empty/loading parity, a11y/keyboard polish, stable sort tie-breakers everywhere. Run gate after each burst, rewrite reports, push. Stop only on explicit user "stop" or token limit or hard boundary violation. Will surface total delta when paused.
+Continue YOLO loop immediately (Cycle 2 continuation + more): ui/ primitives, reports cards, deal-board/detail polish, lead-status-control, further CSS. Full gate + reports + push after each batch. Loop runs until user says stop.
 
 ### Scope confirmation
 No cross-ownership edits: YES (pure Grok zone + documented minimal shared CSS)  
