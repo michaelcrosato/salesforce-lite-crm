@@ -59,7 +59,7 @@ function parseCsvLine(line: string, lineNumber: number): { fields: string[]; err
   return { fields };
 }
 
-export function parseCsv(input: string): ParseResult {
+function parseCsvRecords(input: string) {
   const errors: string[] = [];
   const lines = input.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
 
@@ -68,29 +68,64 @@ export function parseCsv(input: string): ParseResult {
     lines.pop();
   }
 
-  if (lines.length === 0) {
+  const records: string[][] = [];
+  let lineIndex = 0;
+
+  while (lineIndex < lines.length) {
+    const lineNumber = lineIndex + 1;
+    const line = lines[lineIndex];
+    let parsed = parseCsvLine(line, lineNumber);
+
+    if (parsed.error) {
+      let combined = line;
+      let nextLineIndex = lineIndex + 1;
+      let recovered = false;
+
+      while (nextLineIndex < lines.length) {
+        combined += `\n${lines[nextLineIndex]}`;
+        parsed = parseCsvLine(combined, lineNumber);
+
+        if (!parsed.error) {
+          records.push(parsed.fields);
+          lineIndex = nextLineIndex + 1;
+          recovered = true;
+          break;
+        }
+
+        nextLineIndex += 1;
+      }
+
+      if (recovered) {
+        continue;
+      }
+
+      errors.push(parsed.error ?? `Unclosed quote on line ${lineNumber}`);
+      lineIndex += 1;
+      continue;
+    }
+
+    records.push(parsed.fields);
+    lineIndex += 1;
+  }
+
+  return { records, errors };
+}
+
+export function parseCsv(input: string): ParseResult {
+  const { records, errors } = parseCsvRecords(input);
+
+  const nonEmptyRecords = records.filter(
+    (record) => !(record.length === 1 && record[0].trim() === "")
+  );
+
+  if (nonEmptyRecords.length === 0) {
     return { headers: [], rows: [], errors: [] };
   }
 
-  const headerLine = lines[0].trimEnd();
-  const headerParse = parseCsvLine(headerLine, 1);
-  if (headerParse.error) errors.push(headerParse.error);
-  const headers = headerParse.fields.map((h) => h.trim());
+  const [headerRecord, ...rowRecords] = nonEmptyRecords;
+  const headers = headerRecord.map((h) => h.trim());
 
-  const rows: string[][] = [];
-  for (let li = 1; li < lines.length; li += 1) {
-    const raw = lines[li];
-    if (raw.trim() === "") continue;
-    const line = raw.trimEnd();
-    const parsed = parseCsvLine(line, li + 1);
-    if (parsed.error) {
-      errors.push(parsed.error);
-      continue;
-    }
-    // tolerant trailing ws already handled by trimEnd + field trim? keep as-is per spec tolerant ws
-    const trimmedFields = parsed.fields.map((f) => f.trim());
-    rows.push(trimmedFields);
-  }
+  const rows = rowRecords.map((record) => record.map((field) => field.trim()));
 
   return { headers, rows, errors };
 }
