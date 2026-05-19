@@ -14,7 +14,7 @@ C:\dev\salesforce-lite-crm-gemini
 Observed during the 2026-05-19 Codex repo-hygiene pass:
 
 ```text
-C:/dev/salesforce-lite-crm        1dee04e [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm        19c9477 [codex/sprint-4-demo-seed-tuning]
 C:/dev/salesforce-lite-crm-claude c84d34b [claude/autonomy]
 C:/dev/salesforce-lite-crm-gemini fc4f787 [gemini/autonomy]
 C:/dev/salesforce-lite-crm-grok   99c92ae [grok/sprint-4-component-polish]

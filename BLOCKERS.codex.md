@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:53:18-07:00
+Timestamp: 2026-05-19T07:57:09-07:00
 
 Escalation required: NO
 
@@ -39,3 +39,4 @@ Escalation required: NO
 - Query-param hardening documented: `lib/queryParams.ts`, focused helper tests, and task/case/campaign/lead list pages were updated under repo-hygiene scope; final full local gate passed with 147 Vitest tests and 19 e2e tests.
 - Forecast query hardening documented: `app/forecast/page.tsx`, `lib/queryParams.ts`, and focused helper tests now parse bounded numeric scenario params independently; final full local gate passed with 148 Vitest tests and 19 e2e tests.
 - Date formatter hardening documented: `lib/formatters.ts` and focused helper tests now handle invalid dates without throwing or rendering `NaN`; final full local gate passed with 150 Vitest tests and 19 e2e tests.
+- Dashboard date scoring hardening documented: `lib/business/deals.ts`, `lib/business/dashboard.ts`, and focused business tests now avoid implicit `NaN` stale/focus scores; final full local gate passed with 151 Vitest tests and 19 e2e tests.
