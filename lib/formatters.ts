@@ -15,7 +15,8 @@ export function formatPercent(value: number) {
 }
 
 export function formatDate(value: Date | string | null | undefined) {
-  if (!value) {
+  const date = toValidDate(value);
+  if (!date) {
     return "No date";
   }
 
@@ -23,27 +24,28 @@ export function formatDate(value: Date | string | null | undefined) {
     month: "short",
     day: "numeric",
     year: "numeric"
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export function formatShortDate(value: Date | string | null | undefined) {
-  if (!value) {
+  const date = toValidDate(value);
+  if (!date) {
     return "None";
   }
 
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric"
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export function daysSince(value: Date | string | null | undefined, now = new Date()) {
-  if (!value) {
+  const then = toValidDate(value);
+  if (!then) {
     return null;
   }
 
-  const then = new Date(value).getTime();
-  const diff = now.getTime() - then;
+  const diff = now.getTime() - then.getTime();
   return Math.max(0, Math.floor(diff / 86_400_000));
 }
 
@@ -63,4 +65,13 @@ export function formatRelativeDays(value: Date | string | null | undefined, now 
   }
 
   return `${days} days ago`;
+}
+
+function toValidDate(value: Date | string | null | undefined): Date | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
