@@ -44,6 +44,8 @@ subject to normal human diff review before commit/push.
   instead of throwing or producing `NaN` relative dates.
 - Hardened stale-deal and dashboard focus date scoring against malformed date
   inputs.
+- Sanitized forecast order quantities so malformed delivered/quota values do not
+  produce `NaN` projections.
 
 ## Remaining Risks
 
@@ -64,7 +66,7 @@ subject to normal human diff review before commit/push.
 | `npm run seed` | PASS |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm run test` | PASS, 151 tests |
+| `npm run test` | PASS, 152 tests |
 | `npm run build` | PASS |
 | `npx playwright install chromium` | PASS |
 | `npm run test:e2e` | PASS, 19 passed |

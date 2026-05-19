@@ -21,7 +21,7 @@ Git repository and contained only ignored `.next` output at the start of this
 pass. The active Codex worktree for this pass is:
 
 ```text
-C:/dev/salesforce-lite-crm 19c9477 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm 93a0fa7 [codex/sprint-4-demo-seed-tuning]
 ```
 
 The readiness pass therefore ran against `C:\dev\salesforce-lite-crm`, which is
@@ -31,7 +31,7 @@ As of `scripts/check-worktrees.ps1` on 2026-05-19, all four expected worktrees
 are registered:
 
 ```text
-C:/dev/salesforce-lite-crm        19c9477 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm        93a0fa7 [codex/sprint-4-demo-seed-tuning]
 C:/dev/salesforce-lite-crm-claude c84d34b [claude/autonomy]
 C:/dev/salesforce-lite-crm-gemini fc4f787 [gemini/autonomy]
 C:/dev/salesforce-lite-crm-grok   99c92ae [grok/sprint-4-component-polish]
@@ -75,6 +75,8 @@ cleanup changes:
   labels instead of throwing or rendering `NaN`.
 - Hardened stale-deal and dashboard focus scoring so malformed date values do
   not produce implicit `NaN` scores.
+- Sanitized forecast order quantities so malformed delivered/quota values do
+  not produce `NaN` projections.
 
 ## Sprint Status From PLAN.md
 
