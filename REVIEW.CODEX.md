@@ -32,9 +32,9 @@ subject to normal human diff review before commit/push.
 
 ## Remaining Risks
 
-- `npm install` reported 11 audit findings; audit remediation was not attempted
-  because it is outside the current local gate and may require dependency
-  upgrades.
+- `npm audit --audit-level=critical` now passes after exact dev dependency
+  updates. The remaining 10 audit findings are moderate and npm's suggested
+  fixes require breaking/downgrade paths for `prisma`, `next`, or `vitest`.
 - Historical non-Codex report files still contain prior-session details; Codex
   added supersession notes where current tree claims would otherwise be
   misleading.
@@ -52,6 +52,7 @@ subject to normal human diff review before commit/push.
 | `npx playwright install chromium` | PASS |
 | `npm run test:e2e` | PASS, 19 passed |
 | `scripts/local-gate.ps1` | PASS |
+| `npm audit --audit-level=critical` | PASS, 10 moderate findings remain |
 | `git diff --check` | PASS |
 
 ## Git Status Summary

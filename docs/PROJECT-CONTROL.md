@@ -6,8 +6,8 @@
 - Current pass: Codex repo hygiene continuation active under the current
   max-YOLO prompt; full local gate passed on 2026-05-19.
 - Product feature work: not expanded. This pass only corrected contract drift,
-  stale coordination docs, excluded-route behavior, and non-contract seed/helper
-  artifacts.
+  stale coordination docs, excluded-route behavior, non-contract seed/helper
+  artifacts, and local safety/tooling drift.
 - Contract: `CRM-CONTRACT.md` v2.0 remains the source of truth for entity names,
   statuses, routes, and adapter signatures.
 - Max-YOLO policy: the current prompt can authorize one-run exceptions. Use
@@ -21,7 +21,7 @@ Git repository and contained only ignored `.next` output at the start of this
 pass. The active Codex worktree for this pass is:
 
 ```text
-C:/dev/salesforce-lite-crm bac8264 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm 557fe07 [codex/sprint-4-demo-seed-tuning]
 ```
 
 The readiness pass therefore ran against `C:\dev\salesforce-lite-crm`, which is
@@ -31,15 +31,15 @@ As of `scripts/check-worktrees.ps1` on 2026-05-19, all four expected worktrees
 are registered:
 
 ```text
-C:/dev/salesforce-lite-crm        bac8264 [codex/sprint-4-demo-seed-tuning]
-C:/dev/salesforce-lite-crm-claude 75d6a28 [claude/autonomy]
-C:/dev/salesforce-lite-crm-gemini 32a7385 [gemini/autonomy]
-C:/dev/salesforce-lite-crm-grok   3c604a4 [grok/sprint-4-component-polish]
+C:/dev/salesforce-lite-crm        557fe07 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm-claude 2098a38 [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini 8bfa980 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   717b92d [grok/sprint-4-component-polish]
 ```
 
-Claude and Gemini have local dirty generated/debug files in their worktrees;
-do not dispatch unattended work there until those paths are cleaned or
-explicitly accounted for in that agent's reports.
+Claude and Gemini have local dirty modified and generated/debug files in their
+worktrees; do not dispatch unattended work there until those paths are cleaned
+or explicitly accounted for in that agent's reports.
 
 ## Completed Readiness Scope
 
@@ -54,6 +54,12 @@ cleanup changes:
   documentation.
 - Preserved `/deals?deal=<id>` as the only live opportunity detail behavior.
 - Confirmed `/tasks`, `/cases`, `/campaigns`, and `/reports` are live routes.
+- Protected tracked `.claude` hook/config files from cleanup script deletion.
+- Cleared the direct critical npm audit finding with exact dev dependency
+  updates; only moderate findings remain, and npm's suggested fixes require
+  breaking/downgrade paths.
+- Removed Playwright-induced screenshot hydration warning noise from the local
+  gate output.
 
 ## Sprint Status From PLAN.md
 
