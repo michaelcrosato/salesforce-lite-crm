@@ -1,57 +1,72 @@
 Agent: claude
 Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — root metadata refresh + report empty-state specificity
+Feature: S4-F2 route visual QA — /deals/new term consistency + orders/areas empty-state reframing
 Branch: claude/autonomy
 Status: active
-Commits this prompt: e0f138c — [claude] S4-F2: refresh root metadata description to match README framing; 468fb4a — [claude] S4-F2: specify report empty-state titles per report
+Commits this prompt: ca0f472 — [claude] S4-F2: align /deals/new description with page Deal terminology; 2b7f8da — [claude] S4-F2: reframe orders/areas empty-state copy as deferred not demo
 Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
 DoD self-check: PASS
-Timestamp: 2026-05-19T06:45:00-08:00
+Timestamp: 2026-05-19T06:47:00-08:00
 
 ### Completed this prompt
 
-- Refreshed the root `<meta name="description">` in `app/layout.tsx`. The
-  prior value ("AI-native CRM proof of concept for daily sales
-  workflows.") directly contradicted README L10 ("This repository is no
-  longer framed as a demo or proof-of-concept. It is a CRM application
-  foundation..."). New description mirrors the README product framing:
-  "Salesforce-style CRM application foundation for small business
-  revenue operations." Title and `Metadata` typing unchanged; no other
-  layout edits.
-- Polished the six report empty-state titles in
-  `app/reports/[slug]/page.tsx`. Four of the six previously used a
-  generic "No data" title; the `stale-opportunities` empty state used
-  "No stale deals" which contradicted both the registry title ("Stale
-  Opportunities") and its own description ("All open opportunities have
-  recent activity.").
-  - `pipeline-by-stage` → `title="No pipeline data"`
-  - `leads-by-source`   → `title="No leads"`
-  - `activity-volume`   → `title="No recent activity"`
-  - `top-accounts`      → `title="No accounts"`
-  - `stale-opportunities` → `title="No stale opportunities"` (was "No stale deals")
-  - `overdue-tasks`     → unchanged (already specific)
-- Both edits are pure text content inside JSX — no business logic,
-  routing, schema, component primitive, or contract changes. No new
-  dependencies, no test changes. No cross-zone edits.
+- `/deals/new` `PageHeader` description had internal term drift: title
+  was "New Deal" and the form submit was "Create deal", but the
+  description read "Create a pipeline opportunity and log the initial
+  stage." `CRM-CONTRACT.md` allows either canonical term, but within a
+  single card the surrounding copy should not switch terms mid-stream.
+  Fixed to "Create a deal and log the initial pipeline stage." — keeps
+  the page internally consistent, preserves the "pipeline" qualifier
+  that distinguishes the action from other Deal flows, and re-orders
+  the noun phrase so "pipeline stage" reads naturally rather than the
+  more abstract "pipeline opportunity".
+- `/orders` and `/areas` empty-state descriptions both read "...are
+  seeded and demo-managed for now." The README v2 framing
+  (lines 10–13: "no longer framed as a demo or proof-of-concept") makes
+  the "demo-managed" phrasing stale, and the relevant PLAN.md §4 entry
+  uses the precise word "deferred" for CRUD scope. Reframed to
+  "Seeded ... cover this surface; create and edit flows are deferred."
+  This matches the wording style used by the excluded-route placeholder
+  components (Grok-owned `components/excluded-route-placeholder.tsx`)
+  that already say "Area creation is deferred" and "Dealer order
+  creation is deferred." Result: empty-state copy and placeholder copy
+  now use the same operational vocabulary.
+- Both edits are pure text content inside JSX strings — no business
+  logic, routing, schema, component primitive, or contract changes.
+  No new dependencies, no test changes, no cross-zone edits.
 
 ### Verification
 
 - `npm run build` → SUCCESS (32 routes generated, TypeScript clean).
 - `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
-- `git status --short` clean before each implementation commit (only
-  the carry-forward `tsconfig.tsbuildinfo` artifact left untracked).
+- `git status --short` clean before each implementation commit aside
+  from the carry-forward `tsconfig.tsbuildinfo` artifact.
+
+### S4-F2 cumulative progress on `claude/autonomy`
+
+Implementation commits on this branch since `cc00d6c`:
+
+| SHA | Subject |
+|---|---|
+| `e0f138c` | refresh root metadata description to match README framing |
+| `468fb4a` | specify report empty-state titles per report |
+| `ca0f472` | align /deals/new description with page Deal terminology |
+| `2b7f8da` | reframe orders/areas empty-state copy as deferred not demo |
+
+All four extend the prior S4-F2 sweep on this branch (`81f438f`,
+`9b98e72`, `d51d817`) by tightening copy on non-demo-critical surfaces
+without touching business logic. Demo-critical routes were verified
+green at commit `d51d817`.
 
 ### Reconciliation note
 
-PLAN.md §4 still lists S4-F2 with `Status: queued` while Claude has now
-landed six S4-F2 commits across recent iterations (`81f438f`, `9b98e72`,
-`d51d817`, `e0f138c`, `468fb4a`, plus the prior side-by-side header
-work). Per PLAN.md §2 the local gate is authoritative; the visual QA
-sweep is materially complete on demo-critical routes and is now
-incrementally extending to non-demo-critical surfaces (root layout
-metadata and the report detail empty states). No PLAN.md §4 edit
-attempted from this prompt — the planning zone is shared and any
-sprint status promotion belongs in the SPRINT-ROLLOVER prompt.
+PLAN.md §4 still lists S4-F2 with `Status: queued` while Claude has
+landed eight S4-F2 implementation commits across recent iterations.
+Per PLAN.md §2 the local gate is authoritative; the visual QA sweep is
+materially complete on demo-critical routes and is extending into
+non-demo-critical copy alignment. No PLAN.md §4 edit attempted from
+this prompt — the planning zone is shared and any sprint status
+promotion belongs in the SPRINT-ROLLOVER prompt.
 
 ### Outstanding cross-agent dependency
 
@@ -64,19 +79,19 @@ Claude this prompt.
 
 ### Next action
 
-Continue the visual QA sweep into remaining non-demo-critical routes:
-audit the form `PageHeader` copy on `/accounts/new`, `/contacts/new`,
-`/deals/new`, `/tasks/new`, `/cases/new`, `/campaigns/new` for term
-consistency (e.g. "Create a pipeline opportunity" vs "Create Deal" on
-`/deals/new`), then sweep the `/_not-found` and root error boundary
-copy for the same drift class fixed this iteration. Stop S4-F2 when
-all `app/**` user-visible copy is internally consistent with
-`CRM-CONTRACT.md` and README v2 framing.
+Continue the S4-F2 visual QA sweep. Remaining candidate routes worth
+re-reading: `/contacts/page.tsx` ("Search contacts, create new
+stakeholders, and open detail timelines." — the noun "stakeholders"
+mixes term registers); `/leads/[id]/loading.tsx` (compare with
+`/orders/[id]/loading.tsx` for skeleton-shape parity); and the three
+detail pages that ship no `loading.tsx`: `/accounts/[id]`,
+`/contacts/[id]`, `/reports/[slug]`. Detail-page loading skeletons
+would meaningfully improve perceived performance on cold Prisma
+queries.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (both edited files live in `app/**`).
+No cross-ownership edits: YES (all three edited files live in `app/**`).
 CRM-CONTRACT.md honored: YES (no schema, route, status, or adapter
-signature changes — pure copy alignment that brings the
-`stale-opportunities` empty state into closer agreement with the
-contract's canonical `Opportunity` term).
+signature changes — pure copy alignment with the contract's permitted
+term ranges and the PLAN.md §4 wording for deferred CRUD).
