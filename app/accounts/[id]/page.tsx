@@ -214,7 +214,7 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No contacts are linked.</p>
+              <p className="text-sm text-muted-foreground">No contacts are linked yet.</p>
             )}
           </CardContent>
         </Card>
@@ -270,7 +270,7 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No deals are linked.</p>
+              <p className="text-sm text-muted-foreground">No deals are linked yet.</p>
             )}
           </CardContent>
         </Card>
