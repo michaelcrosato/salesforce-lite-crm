@@ -212,7 +212,7 @@ export default async function DashboardPage() {
     <div className="crm-page">
       <PageHeader
         title="Dashboard"
-        description="A live view of accounts, contacts, pipeline, and sales follow-up."
+        description="Pipeline health, dealer routing, deterministic analyst actions, and today's focus."
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
