@@ -1,6 +1,7 @@
 import { TASK_STATUSES } from "@/lib/crm/registry";
 
 export type TaskForDate = {
+  id?: string;
   dueDate: Date | string | null;
   status: string;
 };

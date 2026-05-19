@@ -381,6 +381,8 @@ seed             -> tsx prisma/seed.ts
 
 test             -> vitest run
 
+typecheck        -> tsc --noEmit
+
 test:e2e         -> npm run seed \&\& playwright test
 
 prisma:postgres  -> node scripts/prisma-postgres.mjs
@@ -389,7 +391,7 @@ prisma:postgres  -> node scripts/prisma-postgres.mjs
 
 
 
-There are no `lint` or `typecheck` scripts; agents must not invent them or claim they passed. If they are later added, this section is updated before agents run them.
+There are no `lint` scripts; agents must not invent them or claim they passed. If they are later added, this section is updated before agents run them.
 
 
 
@@ -410,6 +412,8 @@ npx prisma db push
 npm run seed
 
 npm run test
+
+npm run typecheck
 
 npm run build
 

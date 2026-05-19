@@ -55,7 +55,7 @@ describe("crmClient list functions", () => {
 
   it("lists leads with source filter", async () => {
     const results = await listLeads({
-      filters: { source: "list-test" }
+      filters: { search: "list-test" }
     });
     expect(results.some(l => l.firstName === "ListMatch")).toBe(true);
   });
@@ -69,21 +69,21 @@ describe("crmClient list functions", () => {
 
   it("lists tasks with status filter", async () => {
     const results = await listTasks({
-      status: "open"
+      filters: { status: "open" }
     });
     expect(results.some(t => t.title === "ListMatch Task")).toBe(true);
   });
 
   it("lists cases with status filter", async () => {
     const results = await listCases({
-      status: "new"
+      filters: { status: "new" }
     });
     expect(results.some(c => c.subject === "ListMatch Case")).toBe(true);
   });
 
   it("lists campaigns with status filter", async () => {
     const results = await listCampaigns({
-      status: "planned"
+      filters: { status: "planned" }
     });
     expect(results.some(c => c.name === "ListMatch Campaign")).toBe(true);
   });

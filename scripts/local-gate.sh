@@ -37,6 +37,10 @@ echo "==> npm run test"
 npm run test
 
 echo ""
+echo "==> npm run typecheck"
+npm run typecheck
+
+echo ""
 echo "==> npm run build"
 npm run build
 
