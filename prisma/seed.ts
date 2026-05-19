@@ -1,5 +1,9 @@
 import { deterministicActivitySummarizer } from "../lib/ai/activitySummarizer";
 import { probabilityForStage } from "../lib/business/deals";
+import {
+  extractPostalPrefix,
+  normalizePostalCode as normalizeDisplayPostalCode
+} from "../lib/postal";
 import { prisma } from "../lib/prisma";
 
 function daysFromNow(days: number) {
@@ -128,6 +132,7 @@ const dealerAreas = [
  * - Multiple DealerOrders must have negative pace gaps (behind-pace) for the analyst panel.
  * - Lead sources must include routed + other sources.
  * - Top accounts must have multiple open deals.
+ * - Seeded routing events must carry structured rawText for the decision detail panel.
  */
 const dealerOrders = [
   ["dealer-order-vancouver-northstar", "acct-northstar", "Vancouver fleet lead package", 28, "active", -42],
@@ -400,6 +405,142 @@ function buildDealerLeads() {
   return leadSeeds;
 }
 
+type DealerOrderSeed = (typeof dealerOrders)[number];
+type DealerAreaSeed = (typeof dealerAreas)[number];
+
+function seedRoutingPayloadString(input: {
+  lead: DealerLeadSeed;
+  area: DealerAreaSeed | undefined;
+  assignedOrder: DealerOrderSeed | undefined;
+  summary: string;
+}) {
+  const postal = seedPostalTrace(input.lead.postalCode);
+  const filteredOrders = input.area ? activeSeedOrdersForArea(input.area[0]) : [];
+  const rankedOrders = rankSeedOrdersForPayload(filteredOrders, input.assignedOrder);
+
+  return JSON.stringify({
+    version: 1,
+    input: {
+      postal: postal.compact,
+      leadId: input.lead.id
+    },
+    steps: [
+      {
+        step: "normalize",
+        result: postal.normalized
+      },
+      {
+        step: "extract_prefix",
+        result: postal.prefix
+      },
+      {
+        step: "match_area",
+        result: input.area ? { id: input.area[0], name: input.area[1] } : null
+      },
+      {
+        step: "filter_orders",
+        result: {
+          count: filteredOrders.length,
+          orderIds: filteredOrders.map((order) => order[0])
+        }
+      },
+      {
+        step: "rank_pace_gap",
+        result: rankedOrders
+      },
+      {
+        step: "select",
+        result: {
+          orderId: input.assignedOrder?.[0] ?? null
+        }
+      }
+    ],
+    summary: input.summary
+  });
+}
+
+function seedPostalTrace(postalCode: string | null) {
+  const input = postalCode ?? "";
+  const compact = input.replace(/[^a-z0-9]/gi, "").toUpperCase();
+  const normalized = normalizeDisplayPostalCode(input, "CA") ?? compact;
+  const prefix = normalized.includes(" ")
+    ? extractPostalPrefix(normalized, "CA")
+    : compact.slice(0, 3);
+
+  return {
+    compact,
+    normalized,
+    prefix
+  };
+}
+
+function activeSeedOrdersForArea(areaId: string) {
+  const orderIds = dealerOrderAreaLinks
+    .filter((link) => link[1] === areaId)
+    .map((link) => link[0]);
+
+  return orderIds
+    .map((orderId) => dealerOrders.find((order) => order[0] === orderId))
+    .filter((order): order is DealerOrderSeed => order !== undefined)
+    .filter((order) => order[4] === "active");
+}
+
+function rankSeedOrdersForPayload(
+  filteredOrders: DealerOrderSeed[],
+  assignedOrder: DealerOrderSeed | undefined
+) {
+  const eligibleOrders = filteredOrders
+    .filter((order) => currentSeedDeliveryCount(order[0]) < order[3])
+    .sort((left, right) => {
+      const gapDelta = seedPaceGap(right) - seedPaceGap(left);
+
+      if (gapDelta !== 0) {
+        return gapDelta;
+      }
+
+      const deliveredDelta =
+        currentSeedDeliveryCount(left[0]) - currentSeedDeliveryCount(right[0]);
+
+      if (deliveredDelta !== 0) {
+        return deliveredDelta;
+      }
+
+      return left[2].localeCompare(right[2]);
+    });
+  const assignedOrderInArea =
+    assignedOrder && filteredOrders.some((order) => order[0] === assignedOrder[0])
+      ? assignedOrder
+      : undefined;
+  const orderedSeed =
+    assignedOrderInArea === undefined
+      ? eligibleOrders
+      : [
+          assignedOrderInArea,
+          ...eligibleOrders.filter((order) => order[0] !== assignedOrderInArea[0])
+        ];
+
+  return orderedSeed.map((order, index) => ({
+    orderId: order[0],
+    dealerName: order[2],
+    paceGap: seedPaceGap(order),
+    rank: index + 1
+  }));
+}
+
+function currentSeedDeliveryCount(orderId: string) {
+  return currentDeliveryTargets.find((target) => target[0] === orderId)?.[1] ?? 0;
+}
+
+function seedPaceGap(order: DealerOrderSeed) {
+  const remainingQuota = Math.max(0, order[3] - currentSeedDeliveryCount(order[0]));
+  return Number((remainingQuota / seedDaysRemainingInMonth()).toFixed(2));
+}
+
+function seedDaysRemainingInMonth(now = new Date()) {
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  return Math.max(lastDay - now.getDate() + 1, 1);
+}
+
 async function main() {
   await prisma.task.deleteMany();
   await prisma.case.deleteMany();
@@ -553,6 +694,10 @@ async function main() {
       ? dealerOrderById.get(lead.assignedOrderId)
       : undefined;
     const area = lead.areaId ? areaById.get(lead.areaId) : undefined;
+    const summary =
+      lead.assignmentReason === "routed" && assignedOrder && area
+        ? `Resolved ${area[1]}; selected ${assignedOrder[2]} for dealer pacing.`
+        : routingFailureSummary(lead.assignmentReason);
 
     return {
       id: `routing-event-${lead.id}`,
@@ -563,10 +708,13 @@ async function main() {
         lead.assignmentReason === "routed" && assignedOrder
           ? `${lead.firstName} ${lead.lastName} routed to ${assignedOrder[2]}`
           : `${lead.firstName} ${lead.lastName} was not routed`,
-      summary:
-        lead.assignmentReason === "routed" && assignedOrder && area
-          ? `Resolved ${area[1]}; selected ${assignedOrder[2]} for dealer pacing.`
-          : routingFailureSummary(lead.assignmentReason),
+      rawText: seedRoutingPayloadString({
+        lead,
+        area,
+        assignedOrder,
+        summary
+      }),
+      summary,
       nextStep:
         lead.assignmentReason === "routed"
           ? "Dealer should contact the assigned lead."
