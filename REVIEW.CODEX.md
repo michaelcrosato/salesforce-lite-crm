@@ -14,8 +14,9 @@ subject to normal human diff review before commit/push.
   prompts in `docs/NEXT-PROMPTS.md` and `prompts/shared/s4-f*.md`.
 - Updated backlog/demo/checklist docs to reflect live `/tasks`, `/cases`,
   `/campaigns`, and `/reports` routes.
-- Confirmed package-script docs match `package.json`; `npm run lint` exists and
-  is part of the local gate, while typecheck and format scripts remain absent.
+- Confirmed package-script docs match `package.json`; `npm run lint` and
+  `npm run typecheck` both exist and are part of the local gate, while the
+  format script remains absent.
 
 ## Code And Test Issues
 
@@ -31,6 +32,8 @@ subject to normal human diff review before commit/push.
 - Restored generated `next-env.d.ts` noise after `next build`.
 - Added the Next ESLint flat config and wired `npm run lint` into the local
   gate.
+- Added an explicit `npm run typecheck` gate and fixed test-only type drift so
+  standalone `tsc --noEmit` remains green outside `next build`.
 
 ## Remaining Risks
 
@@ -50,6 +53,7 @@ subject to normal human diff review before commit/push.
 | `npx prisma db push` | PASS |
 | `npm run seed` | PASS |
 | `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
 | `npm run test` | PASS, 144 tests |
 | `npm run build` | PASS |
 | `npx playwright install chromium` | PASS |

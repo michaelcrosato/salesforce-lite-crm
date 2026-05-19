@@ -4,7 +4,7 @@
 
 - Branch observed this pass: `codex/sprint-4-demo-seed-tuning`.
 - Current pass: Codex repo hygiene continuation active under the current
-  max-YOLO prompt; full local gate passed on 2026-05-19.
+  max-YOLO prompt; full local gate, including typecheck, passed on 2026-05-19.
 - Product feature work: not expanded. This pass only corrected contract drift,
   stale coordination docs, excluded-route behavior, non-contract seed/helper
   artifacts, and local safety/tooling drift.
@@ -21,7 +21,7 @@ Git repository and contained only ignored `.next` output at the start of this
 pass. The active Codex worktree for this pass is:
 
 ```text
-C:/dev/salesforce-lite-crm 557fe07 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm d324bb9 [codex/sprint-4-demo-seed-tuning]
 ```
 
 The readiness pass therefore ran against `C:\dev\salesforce-lite-crm`, which is
@@ -31,15 +31,16 @@ As of `scripts/check-worktrees.ps1` on 2026-05-19, all four expected worktrees
 are registered:
 
 ```text
-C:/dev/salesforce-lite-crm        557fe07 [codex/sprint-4-demo-seed-tuning]
-C:/dev/salesforce-lite-crm-claude 2098a38 [claude/autonomy]
-C:/dev/salesforce-lite-crm-gemini 8bfa980 [gemini/autonomy]
-C:/dev/salesforce-lite-crm-grok   717b92d [grok/sprint-4-component-polish]
+C:/dev/salesforce-lite-crm        d324bb9 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm-claude c84d34b [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini fc4f787 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   99c92ae [grok/sprint-4-component-polish]
 ```
 
-Claude and Gemini have local dirty modified and generated/debug files in their
-worktrees; do not dispatch unattended work there until those paths are cleaned
-or explicitly accounted for in that agent's reports.
+Claude has a generated `tsconfig.tsbuildinfo` file, and Gemini has extensive
+local modified source, report, prompt, hook/config, test, and generated/debug
+files. Do not dispatch unattended work there until those paths are cleaned or
+explicitly accounted for in that agent's reports.
 
 ## Completed Readiness Scope
 
@@ -62,6 +63,8 @@ cleanup changes:
   gate output.
 - Added `npm run lint` to the local gate using the installed Next ESLint flat
   config.
+- Added `npm run typecheck` to the local gate and active gate docs/prompts after
+  fixing test-only TypeScript drift.
 
 ## Sprint Status From PLAN.md
 
@@ -100,5 +103,5 @@ Do not paste raw chat history into repo files.
 
 Continue Sprint 4 coordination from `docs/NEXT-PROMPTS.md`. Before launching
 non-Codex agents, inspect their current worktree status with
-`scripts/check-worktrees.ps1`; the full local gate passed in the Codex worktree
-on 2026-05-19.
+`scripts/check-worktrees.ps1`; the full local gate, including lint and
+typecheck, passed in the Codex worktree on 2026-05-19.

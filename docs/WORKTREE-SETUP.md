@@ -14,18 +14,19 @@ C:\dev\salesforce-lite-crm-gemini
 Observed during the 2026-05-19 Codex repo-hygiene pass:
 
 ```text
-C:/dev/salesforce-lite-crm        557fe07 [codex/sprint-4-demo-seed-tuning]
-C:/dev/salesforce-lite-crm-claude 2098a38 [claude/autonomy]
-C:/dev/salesforce-lite-crm-gemini 8bfa980 [gemini/autonomy]
-C:/dev/salesforce-lite-crm-grok   717b92d [grok/sprint-4-component-polish]
+C:/dev/salesforce-lite-crm        d324bb9 [codex/sprint-4-demo-seed-tuning]
+C:/dev/salesforce-lite-crm-claude c84d34b [claude/autonomy]
+C:/dev/salesforce-lite-crm-gemini fc4f787 [gemini/autonomy]
+C:/dev/salesforce-lite-crm-grok   99c92ae [grok/sprint-4-component-polish]
 ```
 
 All four expected paths are currently registered. Use `git worktree list` and
 `scripts/check-worktrees.ps1` for the current commit SHA, branch, and dirty
 state at each registered path before creating, repairing, or deleting
-worktrees. The 2026-05-19 check found Claude and Gemini worktrees with local
-modified and generated/debug files, so do not launch unattended work there
-until their owners clean or account for those paths.
+worktrees. The 2026-05-19 check found Claude with generated `tsconfig.tsbuildinfo`
+and Gemini with extensive local modified source, report, prompt, hook/config,
+test, and generated/debug files, so do not launch unattended work there until
+their owners clean or account for those paths.
 
 ## Inspect Worktrees
 

@@ -6,7 +6,7 @@ Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T07:25:56-07:00
+Timestamp: 2026-05-19T07:37:48-07:00
 
 Escalation required: NO
 
@@ -34,3 +34,4 @@ Escalation required: NO
 - Lint review-note refresh documented: `REVIEW.CODEX.md` and `docs/PROJECT-CONTROL.md` were updated under repo-hygiene scope after lint became part of the local gate.
 - Lint strictness documented: `package.json`, `README.md`, and `docs/LOCAL-GATE.md` now use/document `eslint . --max-warnings=0`; final full local gate passed.
 - Prompt gate alignment documented: active prompt, queue, merge, and Copilot instruction files were updated under repo-hygiene scope so future runs include `npm run lint`; `git diff --check` and `npm run lint` passed.
+- Typecheck gate documented: `package.json`, local-gate scripts, active gate docs/prompts, and type-drift tests were updated under repo-hygiene scope so future full gates include `npm run typecheck`; final full local gate passed with lint, typecheck, 144 Vitest tests, build, and 19 e2e tests.
