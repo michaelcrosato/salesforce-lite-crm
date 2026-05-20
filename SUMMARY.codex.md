@@ -2,35 +2,35 @@ Agent: Codex
 
 Sprint: automation
 
-Feature: Overnight autonomy false startup stop investigation
+Feature: Overnight watchdog continuous recovery
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: d8cfde5 - [codex] automation: avoid false stdin startup stops
+Commits this prompt: 6cfa374 - [codex] automation: keep watchdog recovering overnight
 
-Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed. Targeted Codex invocation smoke also passed.
+Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed. Watchdog dry run and Codex invocation smoke also passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T08:40:14-07:00
+Timestamp: 2026-05-20T08:50:48-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed the 2026-05-20 07:39 overnight attempt ran one inner autonomy iteration, not multiple feature loops.
-- Found the stop was a wrapper false positive: `codex exec` exited 0 and produced a GREEN final answer, but the runner scanned the echoed prompt/history and matched old text containing `stdin is not a terminal`.
-- Tightened startup-failure detection in `scripts/autonomy-loop.ps1` and `scripts/start-codex-overnight.ps1` so successful Codex runs are not failed by prompt/history text.
-- Preserved real startup failure handling for non-zero Codex exits and actual stdin write failures.
+- Changed `scripts/start-codex-overnight.ps1` so non-zero inner-loop exits no longer stop the overnight watchdog by default.
+- Added recovery behavior: log the failed loop, re-run Codex invocation smoke, wait briefly, then restart the inner loop.
+- Kept stop controls: `STOP` / `AUTONOMY.STOP` stop the watchdog, while `-StopOnLoopFailure` and `-StopOnCodexSmokeFailure` restore fail-fast debugging behavior.
+- Documented the continuous recovery behavior in `docs/AGENT-LOOPS.md`.
 
 ### Next action
 
-Rerun the overnight launcher normally. If the next Codex iteration exits cleanly, the watchdog should continue instead of stopping on the old false startup blocker.
+Start the overnight watchdog from an external PowerShell window. The default launcher now keeps recovering/restarting until a stop file is present or the host process is closed.
 
 ### Scope confirmation
 
-Cross-zone edits: YES. `scripts/**` is Gemini-owned, but the current prompt directly investigated and fixed the Codex overnight launcher/loop scripts.
+Cross-zone edits: YES. `scripts/**` is Gemini-owned, but the current prompt directly authorized watchdog automation hardening; docs update stayed in the agent-loop operations doc.
 
 CRM-CONTRACT.md honored: YES
