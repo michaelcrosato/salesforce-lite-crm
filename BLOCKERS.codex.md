@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: S4-F1 - Demo seed tuning / repo hygiene continuation
+Feature: Roadmap documentation finalization
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-19T08:00:04-07:00
+Timestamp: 2026-05-19T22:12:51-07:00
 
 Escalation required: NO
 
@@ -18,26 +18,10 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active blockers.
-- Cross-zone exception documented: `scripts/clean-local-artifacts.ps1` is Gemini-owned, but the current prompt granted repo-wide improvement authority and the dry run proved `-Apply` could remove the tracked `.claude` safety-hook directory. The fix was narrow and full local gate passed.
-- Resumed from prior autonomy stop state by committing the already-present `AUTONOMY.STOP` deletion; the removed marker instructed deletion once dispatch resumed.
-- Coordination-doc exception documented: `AGENTS.md`, `docs/PROJECT-CONTROL.md`, and `docs/WORKTREE-SETUP.md` were updated under the current repo-hygiene prompt to replace stale worktree registration claims with live `scripts/check-worktrees.ps1` evidence.
-- Type-safety exception documented: `lib/business/duplicates.ts` is outside the normal Codex zone, but the current prompt authorized repo-wide improvement and the edit removed unsafe casts without changing behavior; `npm run test` and `npm run build` passed.
-- Shared ignore-file exception documented: `.gitignore` was updated under repo-hygiene scope to ignore generated `*.tsbuildinfo` files observed in sibling worktrees.
-- Shared manifest exception documented: `package.json` and `package-lock.json` were updated under repo-hygiene scope to clear the direct critical npm audit finding while preserving exact pins; remaining moderate audit findings require npm's breaking/downgrade force-fix paths.
-- E2E tooling exception documented: `e2e/visual-smoke.spec.ts` was updated under repo-hygiene scope to remove Playwright-induced hydration noise from visual screenshots; full local gate passed.
-- Coordination-doc exception updated: `AGENTS.md`, `docs/PROJECT-CONTROL.md`, `docs/WORKTREE-SETUP.md`, and `REVIEW.CODEX.md` were refreshed from live worktree/audit evidence under repo-hygiene scope.
-- Forecast hardening documented: `lib/business/forecast.ts` and `tests/forecast-analyst.test.ts` changed under Codex repo-hygiene scope; full local gate passed with 141 Vitest tests and 19 e2e tests.
-- CSV helper hardening documented: `lib/business/csv-import.ts` and `tests/helpers/csv-import.test.ts` changed under repo-hygiene scope; final full local gate passed with 142 Vitest tests and 19 e2e tests.
-- List-query hardening documented: `lib/services/listQuery.ts` and `tests/api/listQuery.test.ts` changed under Codex repo-hygiene scope; final full local gate passed with 143 Vitest tests and 19 e2e tests.
-- List-query sort hardening documented: `lib/services/listQuery.ts` and `tests/api/listQuery.test.ts` changed under Codex repo-hygiene scope; final full local gate passed with 144 Vitest tests and 19 e2e tests.
-- Lint gate documented: `eslint.config.mjs`, `package.json`, local-gate scripts, gate docs, and lint-surfaced cleanup edits changed under repo-hygiene scope; final full local gate passed with lint, 144 Vitest tests, and 19 e2e tests.
-- Lint review-note refresh documented: `REVIEW.CODEX.md` and `docs/PROJECT-CONTROL.md` were updated under repo-hygiene scope after lint became part of the local gate.
-- Lint strictness documented: `package.json`, `README.md`, and `docs/LOCAL-GATE.md` now use/document `eslint . --max-warnings=0`; final full local gate passed.
-- Prompt gate alignment documented: active prompt, queue, merge, and Copilot instruction files were updated under repo-hygiene scope so future runs include `npm run lint`; `git diff --check` and `npm run lint` passed.
-- Typecheck gate documented: `package.json`, local-gate scripts, active gate docs/prompts, and type-drift tests were updated under repo-hygiene scope so future full gates include `npm run typecheck`; final full local gate passed with lint, typecheck, 144 Vitest tests, build, and 19 e2e tests.
-- Excluded-route e2e alignment documented: `e2e/excluded-routes.spec.ts` now derives smoke paths from `lib/featureFlags.ts`; targeted excluded-route e2e and the full local gate passed.
-- Query-param hardening documented: `lib/queryParams.ts`, focused helper tests, and task/case/campaign/lead list pages were updated under repo-hygiene scope; final full local gate passed with 147 Vitest tests and 19 e2e tests.
-- Forecast query hardening documented: `app/forecast/page.tsx`, `lib/queryParams.ts`, and focused helper tests now parse bounded numeric scenario params independently; final full local gate passed with 148 Vitest tests and 19 e2e tests.
-- Date formatter hardening documented: `lib/formatters.ts` and focused helper tests now handle invalid dates without throwing or rendering `NaN`; final full local gate passed with 150 Vitest tests and 19 e2e tests.
-- Dashboard date scoring hardening documented: `lib/business/deals.ts`, `lib/business/dashboard.ts`, and focused business tests now avoid implicit `NaN` stale/focus scores; final full local gate passed with 151 Vitest tests and 19 e2e tests.
-- Forecast order sanitization documented: `lib/business/forecast.ts` and forecast tests now keep malformed order quantities from producing `NaN` projections; final full local gate passed with 152 Vitest tests and 19 e2e tests.
+- Shared coordination exception documented: `PLAN.md`, `README.md`,
+  `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`, and
+  `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md` were edited under the current prompt's
+  explicit roadmap-documentation scope.
+- Runtime gate not run: the change was docs-only and made no runtime behavior
+  claims. Docs-safe checks passed: `git diff --check`,
+  `git diff --cached --check`, and local roadmap link-target verification.
