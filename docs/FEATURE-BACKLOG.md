@@ -1,7 +1,8 @@
 # Feature Backlog
 
 This file records verified repo facts and deferred items only. It is not a
-roadmap and does not authorize feature work.
+roadmap and does not authorize feature work. Proposed B-NN roadmap entries live
+in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 
 ## Recently Landed In Main
 
