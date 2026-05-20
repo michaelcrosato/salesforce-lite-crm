@@ -56,10 +56,36 @@ $watchRoot = Join-Path $script:RepoRoot "agent-runs"
 New-Item -ItemType Directory -Force -Path $watchRoot | Out-Null
 $watchLog = Join-Path $watchRoot ("codex-watchdog-{0}.log" -f $RollbackTag)
 
+function Get-Utf8NoBomEncoding {
+  return (New-Object System.Text.UTF8Encoding -ArgumentList $false)
+}
+
+function Write-TextFile {
+  param(
+    [Parameter(Mandatory = $true)][string] $Path,
+    [Parameter(Mandatory = $true)][string] $Text
+  )
+
+  $parent = Split-Path -Parent $Path
+  if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+  [System.IO.File]::WriteAllText($Path, $Text, (Get-Utf8NoBomEncoding))
+}
+
+function Add-TextFileLine {
+  param(
+    [Parameter(Mandatory = $true)][string] $Path,
+    [Parameter(Mandatory = $true)][string] $Text
+  )
+
+  $parent = Split-Path -Parent $Path
+  if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+  [System.IO.File]::AppendAllText($Path, ($Text + [Environment]::NewLine), (Get-Utf8NoBomEncoding))
+}
+
 function Write-WatchLog {
   param([Parameter(Mandatory = $true)][string] $Message)
   Write-Host $Message
-  Add-Content -LiteralPath $watchLog -Encoding UTF8 -Value $Message
+  Add-TextFileLine -Path $watchLog -Text $Message
 }
 
 function Require-Command {
@@ -139,9 +165,20 @@ function Test-StopSignal {
   return ((Test-Path -LiteralPath $stop) -or (Test-Path -LiteralPath $autonomyStop))
 }
 
+function Get-CodexInvocationStartupFailure {
+  param([AllowNull()][string] $Text)
+  if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
+  if ($Text -match "stdin is not a terminal") { return "stdin is not a terminal" }
+  if ($Text -match "input is not valid UTF-8") { return "input is not valid UTF-8" }
+  if ($Text -match "Failed to write UTF-8 prompt bytes to Codex stdin" -or $Text -match "pipe has been ended") {
+    return "stdin pipe closed before prompt write completed"
+  }
+  return ""
+}
+
 function Test-CodexStdinStartupFailure {
   param([AllowNull()][string] $Text)
-  return ($Text -match "stdin is not a terminal")
+  return (-not [string]::IsNullOrWhiteSpace((Get-CodexInvocationStartupFailure -Text $Text)))
 }
 
 function Set-LauncherStartupBlockerReport {
@@ -223,8 +260,8 @@ Cross-zone edits: NO
 CRM-CONTRACT.md honored:  YES
 "@
 
-  Set-Content -LiteralPath $blockersPath -Encoding UTF8 -Value $blockers
-  Set-Content -LiteralPath $summaryPath -Encoding UTF8 -Value $summary
+  Write-TextFile -Path $blockersPath -Text $blockers
+  Write-TextFile -Path $summaryPath -Text $summary
 }
 
 function Invoke-CodexSmoke {
@@ -248,12 +285,13 @@ function Invoke-CodexSmoke {
     $text = $text.TrimEnd()
     if ($text.Length -gt 0) {
       Write-Host $text
-      Add-Content -LiteralPath $watchLog -Encoding UTF8 -Value $text
+      Add-TextFileLine -Path $watchLog -Text $text
     }
   }
 
-  if (Test-CodexStdinStartupFailure -Text $combined) {
-    $evidence = "Codex invocation smoke returned 'stdin is not a terminal'."
+  $startupFailure = Get-CodexInvocationStartupFailure -Text $combined
+  if (-not [string]::IsNullOrWhiteSpace($startupFailure)) {
+    $evidence = "Codex invocation smoke startup/invocation failure: $startupFailure."
     Set-LauncherStartupBlockerReport -Evidence $evidence -LogPath $watchLog
     throw "$evidence Do not start overnight automation."
   }

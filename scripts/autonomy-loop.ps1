@@ -87,12 +87,22 @@ $script:MasterLog = Join-Path $script:RunDir "MASTER.log"
 $script:LastGreenHead = $null
 $script:LastCodexCombinedOutput = ""
 $script:LastCodexStartupFailure = $false
+$script:LoopExitCode = 0
 
 New-Item -ItemType Directory -Force -Path $script:RunDir | Out-Null
 
 function Write-MasterLog {
   param([Parameter(Mandatory = $true)][string] $Text)
   Add-Content -LiteralPath $script:MasterLog -Value ("{0} {1}" -f (Get-Date -Format o), $Text)
+}
+
+function Get-Utf8NoBomEncoding {
+  return (New-Object System.Text.UTF8Encoding -ArgumentList $false)
+}
+
+function Read-TextFile {
+  param([Parameter(Mandatory = $true)][string] $Path)
+  return [System.IO.File]::ReadAllText($Path, (Get-Utf8NoBomEncoding))
 }
 
 function Require-Command {
@@ -259,12 +269,29 @@ function Write-TextFile {
 
   $parent = Split-Path -Parent $Path
   if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
-  Set-Content -LiteralPath $Path -Encoding UTF8 -Value $Text
+  [System.IO.File]::WriteAllText($Path, $Text, (Get-Utf8NoBomEncoding))
+}
+
+function Get-CodexInvocationStartupFailure {
+  param([AllowNull()][string] $Text)
+  if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
+  if ($Text -match "stdin is not a terminal") { return "stdin is not a terminal" }
+  if ($Text -match "input is not valid UTF-8") { return "input is not valid UTF-8" }
+  if ($Text -match "Failed to write UTF-8 prompt bytes to Codex stdin" -or $Text -match "pipe has been ended") {
+    return "stdin pipe closed before prompt write completed"
+  }
+  return ""
 }
 
 function Test-CodexStdinStartupFailure {
   param([AllowNull()][string] $Text)
-  return ($Text -match "stdin is not a terminal")
+  return (-not [string]::IsNullOrWhiteSpace((Get-CodexInvocationStartupFailure -Text $Text)))
+}
+
+function Set-LoopFailureExit {
+  param([Parameter(Mandatory = $true)][string] $Reason)
+  $script:LoopExitCode = 1
+  Write-MasterLog ("failure exit requested: {0}" -f $Reason)
 }
 
 function Set-StartupBlockerReport {
@@ -361,7 +388,8 @@ function Invoke-CodexProcess {
   )
 
   $codex = Get-CodexExecutable
-  $promptText = Get-Content -Raw -LiteralPath $PromptPath
+  $promptText = Read-TextFile -Path $PromptPath
+  $promptBytes = [System.Text.Encoding]::UTF8.GetBytes($promptText)
 
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $codex
@@ -378,13 +406,31 @@ function Invoke-CodexProcess {
   [void] $process.Start()
   $stdoutTask = $process.StandardOutput.ReadToEndAsync()
   $stderrTask = $process.StandardError.ReadToEndAsync()
-  $process.StandardInput.Write($promptText)
-  $process.StandardInput.Close()
+  $stdinWriteFailure = $null
+  try {
+    $process.StandardInput.BaseStream.Write($promptBytes, 0, $promptBytes.Length)
+    $process.StandardInput.BaseStream.Flush()
+  }
+  catch {
+    $stdinWriteFailure = $_.Exception.Message
+  }
+  finally {
+    $process.StandardInput.Close()
+  }
   $process.WaitForExit()
 
   $stdout = $stdoutTask.Result
   $stderr = $stderrTask.Result
   $exitCode = $process.ExitCode
+
+  if (-not [string]::IsNullOrWhiteSpace($stdinWriteFailure)) {
+    $writeFailureText = "Failed to write UTF-8 prompt bytes to Codex stdin: $stdinWriteFailure"
+    if ([string]::IsNullOrWhiteSpace($stderr)) {
+      $stderr = $writeFailureText
+    } else {
+      $stderr = (($stderr.TrimEnd(), $writeFailureText) -join "`n")
+    }
+  }
 
   $script:LastCodexCombinedOutput = (($stdout, $stderr) -join "`n")
   $script:LastCodexStartupFailure = Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput
@@ -456,12 +502,14 @@ function Invoke-LocalGate {
 function Invoke-CommandInRepo {
   param(
     [Parameter(Mandatory = $true)][string] $Label,
-    [Parameter(Mandatory = $true)][string] $Command,
+    [Parameter(Mandatory = $true)]
+    [Alias("Command")]
+    [string] $CommandLine,
     [Parameter(Mandatory = $true)][string] $LogPath
   )
 
   return Invoke-LoggedNative -Label $Label -LogPath $LogPath -Command {
-    & cmd.exe /d /s /c $Command
+    & cmd.exe /d /s /c $CommandLine
   }
 }
 
@@ -630,7 +678,8 @@ function Invoke-CodexPrompt {
   Write-MasterLog ("codex prompt {0}: exit {1}" -f (Split-Path -Leaf $PromptPath), $exitCode)
 
   if ($script:LastCodexStartupFailure) {
-    $evidence = "Codex exec returned 'stdin is not a terminal' for prompt $(Split-Path -Leaf $PromptPath)."
+    $failure = Get-CodexInvocationStartupFailure -Text $script:LastCodexCombinedOutput
+    $evidence = "Codex exec startup/invocation failure for prompt $(Split-Path -Leaf $PromptPath): $failure."
     Set-StartupBlockerReport -Evidence $evidence -LogPath $OutputPath
     throw $evidence
   }
@@ -645,7 +694,7 @@ function New-LoopPromptText {
     throw "Missing loop prompt: $script:LoopPrompt"
   }
 
-  $template = Get-Content -Raw -LiteralPath $script:LoopPrompt
+  $template = Read-TextFile -Path $script:LoopPrompt
   $template = $template.Replace("{AGENT}", $script:Agent)
 
   $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD")
@@ -833,7 +882,7 @@ function New-RolloverPromptText {
     throw "Missing sprint rollover prompt: $script:RolloverPrompt"
   }
 
-  $template = Get-Content -Raw -LiteralPath $script:RolloverPrompt
+  $template = Read-TextFile -Path $script:RolloverPrompt
   $template = $template.Replace("{AGENT}", $script:Agent)
 
   $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD")
@@ -993,7 +1042,7 @@ function Push-GreenBranchIfRequested {
 function Read-SummaryText {
   param([string] $SummaryPath)
   if (Test-Path -LiteralPath $SummaryPath) {
-    return Get-Content -Raw -LiteralPath $SummaryPath
+    return Read-TextFile -Path $SummaryPath
   }
   return ""
 }
@@ -1021,7 +1070,12 @@ function Invoke-CodexInvocationSmoke {
   $summaryPath = Join-Path $smokeDir "final.md"
   $outputPath = Join-Path $smokeDir "agent-output.log"
 
-  Write-TextFile -Path $promptPath -Text "Return exactly OK."
+  $leftSmartQuote = [string][char]0x201C
+  $rightSmartQuote = [string][char]0x201D
+  $omega = [string][char]0x03A9
+  $sentinel = "{0}smart quotes{1} {2}" -f $leftSmartQuote, $rightSmartQuote, $omega
+  $smokePrompt = "Return exactly OK only if you can read this UTF-8 sentinel exactly: $sentinel. If the sentinel is corrupted or unreadable, return UTF8_FAIL."
+  Write-TextFile -Path $promptPath -Text $smokePrompt
 
   Write-Host ""
   Write-Host "Running Codex invocation smoke with the same codex exec path used by autonomy iterations."
@@ -1030,8 +1084,9 @@ function Invoke-CodexInvocationSmoke {
   $exitCode = Invoke-CodexPrompt -PromptPath $promptPath -SummaryPath $summaryPath -OutputPath $outputPath
   if ($exitCode -ne 0) {
     $evidence = "Codex invocation smoke failed with exit code $exitCode."
-    if (Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput) {
-      $evidence = "Codex invocation smoke returned 'stdin is not a terminal'."
+    $failure = Get-CodexInvocationStartupFailure -Text $script:LastCodexCombinedOutput
+    if (-not [string]::IsNullOrWhiteSpace($failure)) {
+      $evidence = "Codex invocation smoke startup/invocation failure: $failure."
     }
     Set-StartupBlockerReport -Evidence $evidence -LogPath $outputPath
     throw $evidence
@@ -1043,7 +1098,7 @@ function Invoke-CodexInvocationSmoke {
     throw $evidence
   }
 
-  $summaryText = (Get-Content -Raw -LiteralPath $summaryPath).Trim()
+  $summaryText = (Read-TextFile -Path $summaryPath).Trim()
   if ($summaryText -ne "OK") {
     $evidence = "Codex invocation smoke created --output-last-message but returned '$summaryText' instead of OK."
     Set-StartupBlockerReport -Evidence $evidence -LogPath $outputPath
@@ -1198,6 +1253,7 @@ try {
 
       if ($consecutiveFailures -ge $MaxConsecutiveFailedIterations) {
         Write-Host "Max consecutive failed iterations reached."
+        Set-LoopFailureExit -Reason "Max consecutive failed iterations reached after agent non-zero exits."
         break
       }
 
@@ -1217,6 +1273,7 @@ try {
 
         if ($consecutiveFailures -ge $MaxConsecutiveFailedIterations) {
           Write-Host "Max consecutive failed iterations reached."
+          Set-LoopFailureExit -Reason "Max consecutive failed iterations reached after repair loop failures."
           break
         }
 
@@ -1232,6 +1289,7 @@ try {
 
         if ($consecutiveFailures -ge $MaxConsecutiveFailedIterations) {
           Write-Host "Max consecutive failed iterations reached."
+          Set-LoopFailureExit -Reason "Max consecutive failed iterations reached after cleanup failures."
           break
         }
 
@@ -1298,10 +1356,17 @@ try {
   Write-Host "Current status:"
   Invoke-NativeCommand { & git -C $script:RunRoot status --short }
   Write-Host ("Logs: {0}" -f $script:RunDir)
+  if ($script:LoopExitCode -ne 0) {
+    Write-Host ("Loop failure exit code: {0}" -f $script:LoopExitCode)
+  }
   Write-Host "========================================"
 
   Write-MasterLog "finished"
 }
 finally {
   Stop-Transcript | Out-Null
+}
+
+if ($script:LoopExitCode -ne 0) {
+  exit $script:LoopExitCode
 }
