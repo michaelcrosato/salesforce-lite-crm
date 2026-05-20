@@ -1,36 +1,41 @@
 Agent: Codex
 
-Sprint: automation
+Sprint: 4
 
-Feature: Overnight watchdog continuous recovery
+Feature: S4-F1 - Demo seed tuning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 6cfa374 - [codex] automation: keep watchdog recovering overnight
+Commits this prompt: 6dd448e - [codex] S4-F1: add seed routing payloads
 
-Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed. Watchdog dry run and Codex invocation smoke also passed.
+Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T08:50:48-07:00
+Timestamp: 2026-05-20T09:03:46-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Changed `scripts/start-codex-overnight.ps1` so non-zero inner-loop exits no longer stop the overnight watchdog by default.
-- Added recovery behavior: log the failed loop, re-run Codex invocation smoke, wait briefly, then restart the inner loop.
-- Kept stop controls: `STOP` / `AUTONOMY.STOP` stop the watchdog, while `-StopOnLoopFailure` and `-StopOnCodexSmokeFailure` restore fail-fast debugging behavior.
-- Documented the continuous recovery behavior in `docs/AGENT-LOOPS.md`.
+- Added deterministic structured JSON payloads to seeded `routing_event` activities in `prisma/seed.ts`, preserving the existing human-readable summaries and next steps.
+- Verified a seeded Vancouver lead (`lead-1`, postal prefix `V5K`) reads back routing steps `normalize`, `extract_prefix`, `match_area`, `filter_orders`, `rank_pace_gap`, and `select`, with ranked Vancouver candidate orders.
+- Updated `docs/schema-changelog.md` with the required seed-change entry.
+- Ran the full local gate through `scripts/local-gate.ps1`; it completed successfully.
+
+### Discovered this prompt
+
+- `PLAN.md` §4 lists Sprint 4 queued, while historical Claude/Grok/Gemini summaries still reference Sprint 4B branches and statuses. Treated those summaries as historical because `docs/NEXT-PROMPTS.md` and `prompts/README.md` mark the Sprint 4B prompts as superseded.
+- `PLAN.md` §9 still contains stale prose saying `lint` and `typecheck` scripts do not exist, but the current prompt, `package.json`, `docs/LOCAL-GATE.md`, and `scripts/local-gate.ps1` include them. Used the current prompt and local gate output as the higher authority.
 
 ### Next action
 
-Start the overnight watchdog from an external PowerShell window. The default launcher now keeps recovering/restarting until a stop file is present or the host process is closed.
+Codex S4-F1 is merge-ready from this branch; no Codex-owned Sprint 4 blocker remains.
 
 ### Scope confirmation
 
-Cross-zone edits: YES. `scripts/**` is Gemini-owned, but the current prompt directly authorized watchdog automation hardening; docs update stayed in the agent-loop operations doc.
+No cross-ownership edits: NO - `docs/schema-changelog.md` was updated as the smallest required coordination line for a seed change.
 
 CRM-CONTRACT.md honored: YES
