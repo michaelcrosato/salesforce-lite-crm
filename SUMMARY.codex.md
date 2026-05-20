@@ -1,59 +1,42 @@
 Agent: Codex
 
-Sprint: automation
+Sprint: Sprint 4
 
-Feature: Overnight autonomy Codex startup hardening
+Feature: S4-F1 - Demo seed tuning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 4cc2a93 - [codex] automation: enforce UTF-8 codex stdin
+Commits this prompt: a4e1ecc - [codex] S4-F1: tune analyst seed pacing
 
-Gate status: PASS
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 after the implementation commit; 152 Vitest tests and 19 Playwright tests passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T04:26:52-07:00
+Timestamp: 2026-05-20T07:48:58-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Changed generated prompt/report writes to deterministic .NET UTF-8 without a
-  BOM, and read generated prompts back as UTF-8 before invocation.
-- Changed `Invoke-CodexProcess` to send prompt stdin as
-  `[System.Text.Encoding]::UTF8.GetBytes(...)` through
-  `StandardInput.BaseStream`, with stderr/log capture when the stdin pipe closes
-  before the write completes.
-- Classified `input is not valid UTF-8` and stdin pipe-closure failures with
-  `stdin is not a terminal` as startup/invocation failures that write blocker
-  evidence and throw immediately.
-- Strengthened `-CodexInvocationSmokeOnly` with a smart-quotes-plus-Omega
-  sentinel built from code points, so Windows PowerShell 5.1 cannot corrupt the
-  script source before the UTF-8 stdin check.
-- Made max-consecutive failed iterations exit non-zero so the watchdog does not
-  restart a broken loop after repeated failures.
-- Fixed the remaining `'-encodedCommand' is not recognized` warning by avoiding
-  the `$Command` dynamic-scope collision in `Invoke-CommandInRepo`; the
-  Playwright install wrapper now exits 0.
-- Verification passed:
-  `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\autonomy-loop.ps1 -FullYolo -CodexInvocationSmokeOnly`;
-  `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-codex-overnight.ps1 -DryRun`;
-  a bounded real watchdog probe reached `AUTONOMY ITERATION 1` and Codex
-  accepted the prompt without UTF-8/stdin startup failure; `git diff --check`;
-  and `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1`.
+- Tuned `prisma/seed.ts` current delivery targets so seeded analyst actions no longer get crowded out by a long list of behind-order rows.
+- Preserved the demo-critical Vancouver routing story: `V5K 0A1` still resolves to Vancouver Metro, and the e2e lead flow still routes to `dealer-order-vancouver-northstar`.
+- Kept three behind-pace active dealer orders, surfaced one stale high-value deal, and surfaced one low-health dealer account in the default top five analyst actions after a fresh seed.
+- Full local gate passed twice after the change; the post-commit run is the authoritative recorded gate.
+
+### Discovered this prompt
+
+- `PLAN.md` section 4 still lists S4-F1 as queued, but this branch now has a green post-commit local gate for S4-F1 and this summary marks the Codex feature done.
+- Other agent summaries still reference historical Sprint 4B work not present in current `PLAN.md` section 4; treated as historical/superseded context because `docs/NEXT-PROMPTS.md` and `prompts/README.md` point to Sprint 4 shared prompts.
+- `PLAN.md` section 9 still says `lint` and `typecheck` do not exist, while the current `package.json`, `docs/LOCAL-GATE.md`, runner correction, and `scripts/local-gate.ps1` include both. I used the current package scripts and local gate as the validation authority.
 
 ### Next action
 
-Run the overnight launcher normally; if Codex stdin startup regresses, the
-watchdog should now stop on the startup/invocation failure instead of burning
-iterations or restarting after max consecutive failures.
+Codex S4-F1 is merge-ready on this branch; continue with merge coordination or a sprint rollover prompt rather than more seed tuning unless PLAN.md changes.
 
 ### Scope confirmation
 
-Cross-zone edits: YES. `scripts/**` is Gemini-owned, but the current prompt
-explicitly scoped `scripts/autonomy-loop.ps1` and
-`scripts/start-codex-overnight.ps1`; implementation stayed inside those files.
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES

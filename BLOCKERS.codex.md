@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: automation
+Sprint: Sprint 4
 
-Feature: Overnight autonomy Codex startup hardening
+Feature: S4-F1 - Demo seed tuning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T04:26:52-07:00
+Timestamp: 2026-05-20T07:48:58-07:00
 
 Escalation required: NO
 
@@ -17,14 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Resolved the repeated real-iteration startup failure:
-  `Failed to read prompt from stdin: input is not valid UTF-8`.
-- Strengthened the Codex invocation smoke with a non-ASCII sentinel and verified
-  it fails when the sentinel is corrupted before stdin, then passes when the
-  prompt is written as UTF-8 bytes.
-- Resolved the lingering `'-encodedCommand' is not recognized` warning from the
-  pre-loop Playwright install wrapper.
-- Ensured max-consecutive iteration failures no longer exit 0, preventing the
-  watchdog from restarting a broken loop.
-- Full local gate passed via `powershell -NoLogo -NoProfile -ExecutionPolicy
-  Bypass -File .\scripts\local-gate.ps1`.
+- None. No Codex-owned blockers were active at the start of this prompt.
