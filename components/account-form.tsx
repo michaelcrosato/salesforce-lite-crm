@@ -2,7 +2,10 @@
 
 import { type FormEvent, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createAccountAction, updateAccountAction } from "@/app/accounts/actions";
+import {
+  createAccountAction,
+  updateAccountAction
+} from "@/app/accounts/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -84,35 +87,64 @@ export function AccountForm({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-4 md:grid-cols-2"
+        >
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" defaultValue={initialValues?.name ?? ""} required />
+            <Input
+              id="name"
+              name="name"
+              defaultValue={initialValues?.name ?? ""}
+              required
+            />
             <FieldError errors={errors?.name} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="domain">Domain</Label>
-            <Input id="domain" name="domain" defaultValue={initialValues?.domain ?? ""} />
+            <Input
+              id="domain"
+              name="domain"
+              defaultValue={initialValues?.domain ?? ""}
+            />
             <FieldError errors={errors?.domain} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="industry">Industry</Label>
-            <Input id="industry" name="industry" defaultValue={initialValues?.industry ?? ""} />
+            <Input
+              id="industry"
+              name="industry"
+              defaultValue={initialValues?.industry ?? ""}
+            />
             <FieldError errors={errors?.industry} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="city">City</Label>
-            <Input id="city" name="city" defaultValue={initialValues?.city ?? ""} />
+            <Input
+              id="city"
+              name="city"
+              defaultValue={initialValues?.city ?? ""}
+            />
             <FieldError errors={errors?.city} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="region">Region</Label>
-            <Input id="region" name="region" defaultValue={initialValues?.region ?? ""} />
+            <Input
+              id="region"
+              name="region"
+              defaultValue={initialValues?.region ?? ""}
+            />
             <FieldError errors={errors?.region} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select id="status" name="status" defaultValue={initialValues?.status ?? "active"}>
+            <Select
+              id="status"
+              name="status"
+              defaultValue={initialValues?.status ?? "active"}
+            >
               {ACCOUNT_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {ACCOUNT_STATUS_LABELS[status]}
@@ -135,7 +167,11 @@ export function AccountForm({
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="ownerId">Owner</Label>
-            <Select id="ownerId" name="ownerId" defaultValue={initialValues?.ownerId ?? ""}>
+            <Select
+              id="ownerId"
+              name="ownerId"
+              defaultValue={initialValues?.ownerId ?? ""}
+            >
               <option value="">Unassigned</option>
               {owners.map((owner) => (
                 <option key={owner.id} value={owner.id}>

@@ -13,13 +13,14 @@ Use PowerShell-compatible commands.
 
 This is Sprint 4B — the 36-hour demo-polish window. You are one
 of four agents:
-- Codex: backend, schema, contract, registry, services, lib (lib/**)
+
+- Codex: backend, schema, contract, registry, services, lib (lib/\*\*)
 - You (Claude Code): app routes (app/**/page.tsx, app/**/actions.ts,
   app/**/loading.tsx, app/**/error.tsx, app/layout.tsx), DEMO.md,
   README.md
 - Grok CLI: components/**, prisma/seed.ts, lib/business/**,
   Tailwind/CSS
-- Gemini CLI: tests/**, e2e/**, scripts/**, Playwright/Vitest
+- Gemini CLI: tests/**, e2e/**, scripts/\*\*, Playwright/Vitest
   config, CI workflows, gate
 
 You wait for Codex's `[UNBLOCK]` commit on
@@ -28,6 +29,7 @@ You wait for Codex's `[UNBLOCK]` commit on
 start — it has no code dependencies.
 
 You and Grok work as a coordinated pair on items 54, 55, 56:
+
 - Grok builds the component (`components/**`).
 - You wire the component into the page (`app/**/page.tsx`).
 - Grok's component MUST be present and exported before you import
@@ -40,7 +42,7 @@ OWNED FILES (whitelist)
 
 - app/**/page.tsx, app/**/layout.tsx, app/**/loading.tsx,
   app/**/error.tsx, app/**/route.ts (if any), app/**/not-found.tsx
-- app/**/actions.ts (server actions used by pages)
+- app/\*\*/actions.ts (server actions used by pages)
 - DEMO.md (you create at repo root)
 - README.md (you edit — limitations section, CI badge)
 - SUMMARY.claude.md, BLOCKERS.claude.md (you create)
@@ -50,11 +52,11 @@ OWNED FILES (whitelist)
 NOT-OWNED FILES (do NOT edit)
 ============================================================
 
-- components/** (Grok) — you IMPORT from these; you do not author
+- components/\*\* (Grok) — you IMPORT from these; you do not author
   them. If a component you need does not exist, file a blocker on
   Grok and ship something else from your queue.
-- lib/** (Codex)
-- prisma/** (Codex / Grok)
+- lib/\*\* (Codex)
+- prisma/\*\* (Codex / Grok)
 - tests/**, e2e/**, scripts/**, .github/workflows/** (Gemini)
 - CRM-CONTRACT.md (Codex) — read-only SSOT
 
@@ -67,6 +69,7 @@ EXECUTION DISCIPLINE — STRICT
 ============================================================
 
 Failure-loop rule, non-negotiable:
+
 - After any failed command: smallest fix, rerun ONCE.
 - Still red: one more focused fix, rerun ONCE.
 - Still red after two attempts: revert (or hide behind a feature
@@ -75,6 +78,7 @@ Failure-loop rule, non-negotiable:
   feature. No third loop.
 
 After each feature:
+
 - Run gate via Gemini's script: `pwsh scripts/local-gate.ps1`.
   If Gemini hasn't shipped it yet, fall back to
   `npm run test && npm run build && npm run test:e2e`.
@@ -83,6 +87,7 @@ After each feature:
 - One-line shipped/blocked note to SUMMARY.claude.md.
 
 TypeScript discipline:
+
 - No `any`, no `@ts-ignore`, no `@ts-expect-error`, no
   `as unknown as` bypasses.
 - After every commit:
@@ -90,6 +95,7 @@ TypeScript discipline:
   — must return no matches in YOUR files.
 
 Server component discipline:
+
 - App Router pages default to server components. Use `"use client"`
   ONLY when interactivity requires it (forms with onChange,
   drawers, tabs). Grok's components mark their own boundaries; you
@@ -100,6 +106,7 @@ Server component discipline:
   on pages that read live data.
 
 data-testid discipline:
+
 - Every interactive element Gemini needs to target in e2e MUST get
   a `data-testid` attribute. Naming: `<entity>-<element>-<purpose>`,
   kebab-case (e.g. `lead-form-postal-input`,
@@ -230,55 +237,56 @@ SLICE 2 — Claude feature queue (sequential after [UNBLOCK])
 
 Wait for Codex `[UNBLOCK]` before starting Feature 2.1.
 
-----------------------------------------------------------------
-Feature 2.1 — (Item 54) Broken-link guard (page-level)
-----------------------------------------------------------------
+---
+
+## Feature 2.1 — (Item 54) Broken-link guard (page-level)
 
 Depends on Codex shipping `lib/featureFlags.ts` and `EXCLUDED_ROUTES`.
 
 a) In `app/layout.tsx` (or wherever the nav lives — if it's in
-   `components/nav/Sidebar.tsx`, that's Grok's; file a blocker
-   asking Grok to consume `EXCLUDED_ROUTES` and hide entries), if
-   you own the nav file, import `EXCLUDED_ROUTES` and filter the
-   nav entries.
+`components/nav/Sidebar.tsx`, that's Grok's; file a blocker
+asking Grok to consume `EXCLUDED_ROUTES` and hide entries), if
+you own the nav file, import `EXCLUDED_ROUTES` and filter the
+nav entries.
 b) For each excluded route that currently has a page file (e.g.
-   `app/tasks/page.tsx` if any exists):
-   - Either delete the page file (preferred if it was a stub), OR
-   - Replace contents with a `app/<route>/not-found.tsx`-style
-     page that renders Grok's `<ExcludedRoutePlaceholder />`
-     component (file blocker if Grok hasn't built it yet) with
-     `data-testid="excluded-route-placeholder"` and a one-liner:
-     "This module is not part of the demo. See CRM-CONTRACT.md."
-c) Add a `notFound()` call in any page that conditionally routes
-   to an excluded path.
-d) Verify by visiting each EXCLUDED_ROUTE in dev:
-   `npm run dev` → curl each path → confirm 404 or placeholder.
+`app/tasks/page.tsx` if any exists):
+
+- Either delete the page file (preferred if it was a stub), OR
+- Replace contents with a `app/<route>/not-found.tsx`-style
+  page that renders Grok's `<ExcludedRoutePlaceholder />`
+  component (file blocker if Grok hasn't built it yet) with
+  `data-testid="excluded-route-placeholder"` and a one-liner:
+  "This module is not part of the demo. See CRM-CONTRACT.md."
+  c) Add a `notFound()` call in any page that conditionally routes
+  to an excluded path.
+  d) Verify by visiting each EXCLUDED_ROUTE in dev:
+  `npm run dev` → curl each path → confirm 404 or placeholder.
 
 Coordinate with Grok via SUMMARY/BLOCKERS — the placeholder
 component is Grok's; the page-level wiring is yours.
 
 Commit: `feat(claude): broken-link page-level guards`
 
-----------------------------------------------------------------
-Feature 2.2 — (Item 55) Routing detail inline display
-----------------------------------------------------------------
+---
+
+## Feature 2.2 — (Item 55) Routing detail inline display
 
 Depends on Codex shipping `getRoutingDecisionForLead` AND Grok
 shipping a `<RoutingDecisionDetail />` component.
 
 a) On `app/leads/page.tsx`: for each lead row, fetch the routing
-   decision via `crmClient.leads.getRoutingDecision(lead.id)` (in
-   a server component, await it; lazy-load if performance is a
-   concern — use Suspense). Pass the decision to Grok's
-   `<RoutingDecisionDetail />` component with
-   `data-testid="routing-detail-{leadId}"`.
+decision via `crmClient.leads.getRoutingDecision(lead.id)` (in
+a server component, await it; lazy-load if performance is a
+concern — use Suspense). Pass the decision to Grok's
+`<RoutingDecisionDetail />` component with
+`data-testid="routing-detail-{leadId}"`.
 b) On the order detail surface — per CRM-CONTRACT, this is
-   `/orders/[id]` if it exists as a page, or a drawer/inline on
-   `/orders`. Mirror the same component there for the order's
-   originating lead.
+`/orders/[id]` if it exists as a page, or a drawer/inline on
+`/orders`. Mirror the same component there for the order's
+originating lead.
 c) The component is hidden by default (collapsed); the page wires
-   an expand control. data-testid for the toggle:
-   `routing-detail-toggle-{leadId}`.
+an expand control. data-testid for the toggle:
+`routing-detail-toggle-{leadId}`.
 
 If Grok's component isn't ready, ship the data-fetching wiring
 behind a feature flag (`FEATURE_FLAGS.routingDetailUi`) set to
@@ -286,77 +294,77 @@ false. File a blocker on Grok to deliver the component.
 
 Commit: `feat(claude): routing decision detail wiring on leads and orders`
 
-----------------------------------------------------------------
-Feature 2.3 — (Item 56) Postal-code validation in lead form
-----------------------------------------------------------------
+---
+
+## Feature 2.3 — (Item 56) Postal-code validation in lead form
 
 Depends on Codex shipping `lib/postal.ts` AND `postalCodeSchema`
 extended into the lead-creation Zod schema in `lib/validation.ts`.
 
 a) In `app/leads/actions.ts` (server action for lead creation):
-   import the extended lead schema, validate on submit, return
-   structured error `{ field: "postal", message: "<reason>" }`
-   when invalid. Do NOT swallow the reason — Grok's input
-   component will display it inline.
+import the extended lead schema, validate on submit, return
+structured error `{ field: "postal", message: "<reason>" }`
+when invalid. Do NOT swallow the reason — Grok's input
+component will display it inline.
 b) In `app/leads/page.tsx` or wherever the form mounts: render
-   Grok's `<PostalCodeInput />` (file blocker if not built yet)
-   with `data-testid="lead-form-postal-input"` and pass the
-   server action's error state down.
+Grok's `<PostalCodeInput />` (file blocker if not built yet)
+with `data-testid="lead-form-postal-input"` and pass the
+server action's error state down.
 c) On valid submit, the action calls `crmClient.leads.create` as
-   before. No behavior change beyond the validation gate.
+before. No behavior change beyond the validation gate.
 
 Commit: `feat(claude): postal validation wired into lead form`
 
-----------------------------------------------------------------
-Feature 2.4 — README limitations + CI badge update
-----------------------------------------------------------------
+---
+
+## Feature 2.4 — README limitations + CI badge update
 
 a) Update README.md "Known limitations" section to match the
-   exclusions list in DEMO.md (single source of truth wording).
+exclusions list in DEMO.md (single source of truth wording).
 b) Add the CI badge that Gemini requested:
-   `[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)`
-   at the top of README. Read the actual repo URL from
-   `package.json` `repository` field or git remote; do not
-   hardcode if those are different.
+`[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)`
+at the top of README. Read the actual repo URL from
+`package.json` `repository` field or git remote; do not
+hardcode if those are different.
 c) Add a "Demo" callout near the top linking to `DEMO.md` and
-   noting "Run `npm run seed` for one-click reset."
+noting "Run `npm run seed` for one-click reset."
 
 Commit: `docs(claude): readme limitations and ci badge`
 
-----------------------------------------------------------------
-Feature 2.5 — Stale page audit and final polish
-----------------------------------------------------------------
+---
+
+## Feature 2.5 — Stale page audit and final polish
 
 Walk every page under `app/`. For each:
 
 a) Has `loading.tsx`? If not, add a minimal one importing Grok's
-   `<PageSkeleton />` (file blocker if missing).
+`<PageSkeleton />` (file blocker if missing).
 b) Has `error.tsx`? If not, add one with a "Something went wrong"
-   message and a "Reset" button.
+message and a "Reset" button.
 c) Has `export const dynamic = "force-dynamic"` where needed (any
-   page that reads live data)?
+page that reads live data)?
 d) `data-testid` on the page-level wrapper, named
-   `page-<route-slug>`.
+`page-<route-slug>`.
 
 Don't add empty states yourself — those are component-level
 (Grok). File blockers for missing component-level states.
 
 Commit: `feat(claude): page-level loading/error/dynamic polish`
 
-----------------------------------------------------------------
-Feature 2.6 — Final audit and handoff
-----------------------------------------------------------------
+---
+
+## Feature 2.6 — Final audit and handoff
 
 a) `rg '\bany\b|@ts-ignore|@ts-expect-error' app`
-   — must return no matches.
+— must return no matches.
 b) `rg '/deals/\[id\]|/deals/\$\{id\}|/deals/:id' app`
-   — only matches in comments explicitly stating route is excluded.
+— only matches in comments explicitly stating route is excluded.
 c) `rg 'href="/tasks"|href="/cases"|href="/campaigns"' app`
-   — must return no matches (broken-link guard verification).
+— must return no matches (broken-link guard verification).
 d) `pwsh scripts/local-gate.ps1` — must be `[GATE PASS]`.
 e) Update SUMMARY.claude.md final section: shipped, deferred,
-   blockers consumed/produced, gate status, test-id catalog
-   (list every new data-testid you added — Gemini uses this).
+blockers consumed/produced, gate status, test-id catalog
+(list every new data-testid you added — Gemini uses this).
 f) Update AGENTS.md "Claude Code" section if changes warrant.
 
 Commit: `docs(claude): sprint 4b final audit and testid catalog`
@@ -373,6 +381,7 @@ FINAL VERIFICATION — read-only
 6. `git archive --format=zip --output ..\salesforce-lite-crm-sprint-4b-claude.zip HEAD`
 
 Final report:
+
 - Sections completed / skipped
 - Commit hashes
 - DEMO.md status: shipped / blocked on seed anchors
@@ -390,6 +399,7 @@ STOPPING CONDITIONS
 ============================================================
 
 Stop if:
+
 - Slice 0 baseline gate red
 - 3 consecutive failure-loop limits
 - Codex `[UNBLOCK]` doesn't appear within first 6 hours of the

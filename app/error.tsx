@@ -23,8 +23,8 @@ export default function GlobalRouteError({
         <h1 className="text-2xl font-semibold">Something went wrong</h1>
         <p className="text-sm text-muted-foreground">
           An unexpected error occurred while rendering this page. Resetting
-          re-runs the failed server work; reloading the browser also clears
-          any client cache.
+          re-runs the failed server work; reloading the browser also clears any
+          client cache.
         </p>
         {error.digest ? (
           <p className="text-xs text-muted-foreground">

@@ -14,7 +14,10 @@ type RoutableLead = {
   } | null;
 };
 
-type PaceOrder = Pick<DealerOrder, "id" | "monthlyQuota" | "status" | "startDate"> & {
+type PaceOrder = Pick<
+  DealerOrder,
+  "id" | "monthlyQuota" | "status" | "startDate"
+> & {
   deliveredThisMonth?: number;
 };
 
@@ -56,17 +59,18 @@ export function normalizePostalCode(raw: string): string {
   return raw.replace(/[^a-z0-9]/gi, "").toUpperCase();
 }
 
-export function parsePostalPrefixes(area: Pick<Area, "postalPrefixes">): string[] {
+export function parsePostalPrefixes(
+  area: Pick<Area, "postalPrefixes">
+): string[] {
   return area.postalPrefixes
     .split(",")
     .map((prefix) => normalizePostalCode(prefix))
     .filter(Boolean);
 }
 
-export function resolveAreaForLead<TArea extends Pick<Area, "id" | "name" | "postalPrefixes">>(
-  lead: RoutableLead,
-  areas: TArea[]
-): TArea | null {
+export function resolveAreaForLead<
+  TArea extends Pick<Area, "id" | "name" | "postalPrefixes">
+>(lead: RoutableLead, areas: TArea[]): TArea | null {
   const suppliedAreaName = lead.areaName?.trim() || lead.area?.name.trim();
 
   if (suppliedAreaName) {
@@ -133,7 +137,8 @@ export function rankEligibleOrders<TOrder extends PaceOrder>(
       const aDelivered = a.deliveredThisMonth ?? 0;
       const bDelivered = b.deliveredThisMonth ?? 0;
       const gapDelta =
-        calculatePaceGap(b, bDelivered, now) - calculatePaceGap(a, aDelivered, now);
+        calculatePaceGap(b, bDelivered, now) -
+        calculatePaceGap(a, aDelivered, now);
 
       if (gapDelta !== 0) {
         return gapDelta;
@@ -200,7 +205,15 @@ export async function routeLead(
     });
 
     if (activeOrders.length === 0) {
-      await markUnrouted(tx, lead, "no_matching_active_order", area, [], [], now);
+      await markUnrouted(
+        tx,
+        lead,
+        "no_matching_active_order",
+        area,
+        [],
+        [],
+        now
+      );
       return {
         order: null,
         reason: "no_matching_active_order"
@@ -298,11 +311,13 @@ export function currentMonthRange(now: Date) {
 
 export function daysRemainingInMonth(now: Date) {
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  return Math.floor(
-    (new Date(now.getFullYear(), now.getMonth(), lastDay).getTime() -
-      new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) /
-      millisecondsPerDay
-  ) + 1;
+  return (
+    Math.floor(
+      (new Date(now.getFullYear(), now.getMonth(), lastDay).getTime() -
+        new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) /
+        millisecondsPerDay
+    ) + 1
+  );
 }
 
 async function countCurrentMonthLeads(
@@ -374,7 +389,8 @@ function failureSummary(reason: Exclude<AssignmentReason, "routed">) {
   const summaries: Record<Exclude<AssignmentReason, "routed">, string> = {
     no_area_match: "No area matched the lead postal code.",
     no_matching_active_order: "The resolved area has no active dealer order.",
-    all_orders_at_quota: "All active dealer orders in the resolved area are at monthly quota."
+    all_orders_at_quota:
+      "All active dealer orders in the resolved area are at monthly quota."
   };
 
   return summaries[reason];
@@ -439,11 +455,11 @@ function routingPayloadString(input: {
 
 function postalTrace(postalCode: string | null) {
   const compact = normalizePostalCode(postalCode ?? "");
-  const normalized = normalizeDisplayPostalCode(postalCode ?? "", "CA") ?? compact;
-  const prefix =
-    normalized.includes(" ")
-      ? extractPostalPrefix(normalized, "CA")
-      : compact.slice(0, 3);
+  const normalized =
+    normalizeDisplayPostalCode(postalCode ?? "", "CA") ?? compact;
+  const prefix = normalized.includes(" ")
+    ? extractPostalPrefix(normalized, "CA")
+    : compact.slice(0, 3);
 
   return {
     compact,

@@ -130,9 +130,12 @@ const invalidCases: ValidationCase[] = [
 ];
 
 describe("CRM validation schemas", () => {
-  it.each(invalidCases)("rejects invalid $entity input", ({ input, schema }) => {
-    expect(schema.safeParse(input).success).toBe(false);
-  });
+  it.each(invalidCases)(
+    "rejects invalid $entity input",
+    ({ input, schema }) => {
+      expect(schema.safeParse(input).success).toBe(false);
+    }
+  );
 
   it("rejects blank required integer fields instead of coercing them to zero", () => {
     expect(
@@ -159,6 +162,8 @@ describe("CRM validation schemas", () => {
     });
 
     expect(parsed.success).toBe(true);
-    expect(parsed.success ? parsed.data.budget : "parse failed").toBeUndefined();
+    expect(
+      parsed.success ? parsed.data.budget : "parse failed"
+    ).toBeUndefined();
   });
 });

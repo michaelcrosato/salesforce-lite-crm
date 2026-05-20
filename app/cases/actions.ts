@@ -39,8 +39,14 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return { ok: false, message: "A record with that unique value already exists." };
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return {
+      ok: false,
+      message: "A record with that unique value already exists."
+    };
   }
 
   return { ok: false, message: "The case could not be saved." };
@@ -51,7 +57,9 @@ function revalidateAll(): void {
   revalidatePath("/dashboard");
 }
 
-export async function createCaseAction(formData: FormData): Promise<ActionResult> {
+export async function createCaseAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = caseCreateSchema.safeParse(buildRawInput(formData));
 
   if (!parsed.success) {

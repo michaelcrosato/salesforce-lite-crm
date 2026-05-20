@@ -39,8 +39,14 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return { ok: false, message: "A record with that unique value already exists." };
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return {
+      ok: false,
+      message: "A record with that unique value already exists."
+    };
   }
 
   return { ok: false, message: "The campaign could not be saved." };
@@ -59,8 +65,12 @@ function normalizeBudget(input: ReturnType<typeof buildRawInput>) {
   return next;
 }
 
-export async function createCampaignAction(formData: FormData): Promise<ActionResult> {
-  const parsed = campaignCreateSchema.safeParse(normalizeBudget(buildRawInput(formData)));
+export async function createCampaignAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = campaignCreateSchema.safeParse(
+    normalizeBudget(buildRawInput(formData))
+  );
 
   if (!parsed.success) {
     return {
@@ -83,7 +93,9 @@ export async function updateCampaignAction(
   campaignId: string,
   formData: FormData
 ): Promise<ActionResult> {
-  const parsed = campaignUpdateSchema.safeParse(normalizeBudget(buildRawInput(formData)));
+  const parsed = campaignUpdateSchema.safeParse(
+    normalizeBudget(buildRawInput(formData))
+  );
 
   if (!parsed.success) {
     return {
@@ -127,7 +139,9 @@ export async function updateCampaignStatusAction(
   }
 }
 
-export async function deleteCampaignAction(campaignId: string): Promise<ActionResult> {
+export async function deleteCampaignAction(
+  campaignId: string
+): Promise<ActionResult> {
   try {
     await deleteCampaign(campaignId);
     revalidateAll();

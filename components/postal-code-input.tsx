@@ -64,7 +64,10 @@ export function PostalCodeInput({
         }`}
       />
       {error ? (
-        <p data-testid="postal-input-error" className="text-sm text-destructive">
+        <p
+          data-testid="postal-input-error"
+          className="text-sm text-destructive"
+        >
           {error}
         </p>
       ) : null}

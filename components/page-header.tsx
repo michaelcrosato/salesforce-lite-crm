@@ -24,7 +24,9 @@ export function PageHeader({
       data-testid={testid}
     >
       <div>
-        <h1 className="text-2xl font-semibold tracking-normal text-foreground">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-normal text-foreground">
+          {title}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
       {children}

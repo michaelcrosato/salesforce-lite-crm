@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { buildAnalystPanel } from "@/lib/business/analyst";
-import { buildForecast, calculateDefaultAssignmentRate } from "@/lib/business/forecast";
+import {
+  buildForecast,
+  calculateDefaultAssignmentRate
+} from "@/lib/business/forecast";
 
 const now = new Date("2026-05-16T12:00:00Z");
 
@@ -54,7 +57,9 @@ describe("forecast simulator math", () => {
       now
     });
 
-    expect(higher.summary.projectedLeads).toBeGreaterThan(base.summary.projectedLeads);
+    expect(higher.summary.projectedLeads).toBeGreaterThan(
+      base.summary.projectedLeads
+    );
   });
 
   it("changes projections when assignment rate changes", () => {
@@ -103,12 +108,12 @@ describe("forecast simulator math", () => {
   });
 
   it("calculates a default assignment rate from current routed lead data", () => {
-    expect(calculateDefaultAssignmentRate({ totalLeads: 100, routedLeads: 80 })).toBe(
-      0.8
-    );
-    expect(calculateDefaultAssignmentRate({ totalLeads: 0, routedLeads: 0 })).toBe(
-      0.75
-    );
+    expect(
+      calculateDefaultAssignmentRate({ totalLeads: 100, routedLeads: 80 })
+    ).toBe(0.8);
+    expect(
+      calculateDefaultAssignmentRate({ totalLeads: 0, routedLeads: 0 })
+    ).toBe(0.75);
   });
 
   it("falls back to safe defaults for non-finite scenario inputs", () => {

@@ -46,7 +46,9 @@ describe("campaigns service", () => {
 
     expect(campaign.status).toBe("planned");
     expect(withRelations.leads.map((lead) => lead.id)).toEqual([leadId]);
-    expect(withRelations.contacts.map((contact) => contact.id)).toEqual([contactId]);
+    expect(withRelations.contacts.map((contact) => contact.id)).toEqual([
+      contactId
+    ]);
   });
 
   it("lists campaigns with status, owner, and start date filters", async () => {

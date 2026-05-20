@@ -25,7 +25,13 @@ const optionalFilterDate = z.preprocess((value) => {
   return new Date(value);
 }, z.date().optional());
 
-const campaignSortByValues = ["startDate", "createdAt", "status", "name", "budget"] as const;
+const campaignSortByValues = [
+  "startDate",
+  "createdAt",
+  "status",
+  "name",
+  "budget"
+] as const;
 const sortOrderSchema = z.enum(["asc", "desc"]);
 const campaignFilterSchema = z
   .object({
@@ -66,26 +72,37 @@ type ParsedCampaignFilters = {
   startDateFrom: Date;
   startDateTo: Date;
 };
-type ParsedCampaignListInput = ListQueryInput<CampaignSortBy, ParsedCampaignFilters>;
+type ParsedCampaignListInput = ListQueryInput<
+  CampaignSortBy,
+  ParsedCampaignFilters
+>;
 
-export type CampaignListInput = ListQueryInput<CampaignSortBy, CampaignFilterInput>;
+export type CampaignListInput = ListQueryInput<
+  CampaignSortBy,
+  CampaignFilterInput
+>;
 export type CampaignCreateInput = z.input<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.input<typeof campaignUpdateSchema>;
 
 export async function createCampaign(input: unknown): Promise<Campaign> {
-  const { contactIds, leadIds, ownerId, ...parsed } = campaignCreateSchema.parse(input);
+  const { contactIds, leadIds, ownerId, ...parsed } =
+    campaignCreateSchema.parse(input);
   const data: Prisma.CampaignCreateInput = {
     ...parsed,
     owner: ownerId ? { connect: { id: ownerId } } : undefined,
     leads: leadIds ? { connect: leadIds.map((id) => ({ id })) } : undefined,
-    contacts: contactIds ? { connect: contactIds.map((id) => ({ id })) } : undefined
+    contacts: contactIds
+      ? { connect: contactIds.map((id) => ({ id })) }
+      : undefined
   };
 
   return prisma.campaign.create({ data });
 }
 
 export async function listCampaigns(input: unknown = {}): Promise<Campaign[]> {
-  return prisma.campaign.findMany(campaignListQuery(parseCampaignListInput(input)));
+  return prisma.campaign.findMany(
+    campaignListQuery(parseCampaignListInput(input))
+  );
 }
 
 function parseCampaignListInput(input: unknown): ParsedCampaignListInput {
@@ -99,7 +116,10 @@ function parseCampaignListInput(input: unknown): ParsedCampaignListInput {
   const { skip, take, ...filters } = legacy;
 
   return {
-    page: skip !== undefined && take !== undefined ? Math.floor(skip / take) + 1 : undefined,
+    page:
+      skip !== undefined && take !== undefined
+        ? Math.floor(skip / take) + 1
+        : undefined,
     pageSize: take,
     filters
   };
@@ -144,13 +164,21 @@ export async function getCampaign(id: string): Promise<Campaign | null> {
   return prisma.campaign.findUnique({ where: { id: idSchema.parse(id) } });
 }
 
-export async function updateCampaign(id: string, input: unknown): Promise<Campaign> {
-  const { contactIds, leadIds, ownerId, ...parsed } = campaignUpdateSchema.parse(input);
+export async function updateCampaign(
+  id: string,
+  input: unknown
+): Promise<Campaign> {
+  const { contactIds, leadIds, ownerId, ...parsed } =
+    campaignUpdateSchema.parse(input);
   const data: Prisma.CampaignUpdateInput = {
     ...parsed,
     owner: ownerId ? { connect: { id: ownerId } } : undefined,
-    leads: leadIds ? { set: leadIds.map((leadId) => ({ id: leadId })) } : undefined,
-    contacts: contactIds ? { set: contactIds.map((contactId) => ({ id: contactId })) } : undefined
+    leads: leadIds
+      ? { set: leadIds.map((leadId) => ({ id: leadId })) }
+      : undefined,
+    contacts: contactIds
+      ? { set: contactIds.map((contactId) => ({ id: contactId })) }
+      : undefined
   };
 
   return prisma.campaign.update({ where: { id: idSchema.parse(id) }, data });

@@ -4,7 +4,10 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { moveDealAction } from "@/app/deals/actions";
-import { DealDetailDrawer, type DrawerDeal } from "@/components/deal-detail-drawer";
+import {
+  DealDetailDrawer,
+  type DrawerDeal
+} from "@/components/deal-detail-drawer";
 import type {
   DealAccountOption,
   DealContactOption,
@@ -16,7 +19,12 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/crm-constants";
-import { formatCurrency, formatDate, formatPercent, formatRelativeDays } from "@/lib/formatters";
+import {
+  formatCurrency,
+  formatDate,
+  formatPercent,
+  formatRelativeDays
+} from "@/lib/formatters";
 
 export type BoardDeal = DrawerDeal;
 
@@ -120,8 +128,12 @@ export function DealBoard({
             >
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div>
-                  <h2 className="text-sm font-semibold">{STAGE_LABELS[stage]}</h2>
-                  <p className="text-xs text-muted-foreground">{formatCurrency(total)}</p>
+                  <h2 className="text-sm font-semibold">
+                    {STAGE_LABELS[stage]}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {formatCurrency(total)}
+                  </p>
                 </div>
                 <Badge variant="outline">{stageDeals.length}</Badge>
               </div>
@@ -153,7 +165,9 @@ export function DealBoard({
                       data-deal-id={deal.id}
                     >
                       <CardHeader className="p-4 pb-2">
-                        <CardTitle className="line-clamp-2 text-sm">{deal.name}</CardTitle>
+                        <CardTitle className="line-clamp-2 text-sm">
+                          {deal.name}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 p-4 pt-0">
                         <div className="space-y-1 text-xs text-muted-foreground">
@@ -183,7 +197,9 @@ export function DealBoard({
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
                             <p className="text-muted-foreground">Value</p>
-                            <p className="font-semibold">{formatCurrency(deal.value)}</p>
+                            <p className="font-semibold">
+                              {formatCurrency(deal.value)}
+                            </p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Probability</p>
@@ -196,9 +212,13 @@ export function DealBoard({
                           Close: {formatDate(deal.expectedCloseDate)}
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {deal.stale ? <Badge variant="danger">Stale</Badge> : null}
+                          {deal.stale ? (
+                            <Badge variant="danger">Stale</Badge>
+                          ) : null}
                           <Badge variant="secondary">
-                            {formatRelativeDays(deal.lastActivityAt ?? deal.createdAt)}
+                            {formatRelativeDays(
+                              deal.lastActivityAt ?? deal.createdAt
+                            )}
                           </Badge>
                         </div>
                         <Select
@@ -208,7 +228,10 @@ export function DealBoard({
                           disabled={isPending}
                           onClick={(event) => event.stopPropagation()}
                           onChange={(event) =>
-                            moveDeal(event.currentTarget.value as DealStage, deal.id)
+                            moveDeal(
+                              event.currentTarget.value as DealStage,
+                              deal.id
+                            )
                           }
                         >
                           {DEAL_STAGES.map((dealStage) => (

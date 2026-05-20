@@ -17,13 +17,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
-import {
-  CAMPAIGN_STATUSES,
-  type CampaignStatus
-} from "@/lib/crm/registry";
+import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 
-type BadgeVariant = "default" | "secondary" | "outline" | "success" | "warning" | "danger";
+type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "outline"
+  | "success"
+  | "warning"
+  | "danger";
 
 export type DrawerCampaign = CampaignFormInitialValues & {
   id: string;
@@ -71,7 +74,10 @@ export function CampaignDetailDrawer({
   function moveStatus(status: string) {
     startTransition(() => {
       void (async () => {
-        const result = await updateCampaignStatusAction(activeCampaignId, status);
+        const result = await updateCampaignStatusAction(
+          activeCampaignId,
+          status
+        );
         showToast({
           title: result.ok ? "Campaign updated" : "Campaign not updated",
           description: result.message,
@@ -133,28 +139,52 @@ export function CampaignDetailDrawer({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Fields</CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit
                 </Button>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
-                <FieldView label="Status" value={STATUS_LABELS[campaign.status]} />
-                <FieldView label="Owner" value={campaign.ownerName ?? "Unassigned"} />
-                <FieldView label="Start date" value={formatDate(campaign.startDate)} />
-                <FieldView label="End date" value={formatDate(campaign.endDate)} />
+                <FieldView
+                  label="Status"
+                  value={STATUS_LABELS[campaign.status]}
+                />
+                <FieldView
+                  label="Owner"
+                  value={campaign.ownerName ?? "Unassigned"}
+                />
+                <FieldView
+                  label="Start date"
+                  value={formatDate(campaign.startDate)}
+                />
+                <FieldView
+                  label="End date"
+                  value={formatDate(campaign.endDate)}
+                />
                 <FieldView
                   label="Budget"
                   value={
-                    typeof campaign.budget === "number" ? formatCurrency(campaign.budget) : "—"
+                    typeof campaign.budget === "number"
+                      ? formatCurrency(campaign.budget)
+                      : "—"
                   }
                 />
-                <FieldView label="Updated" value={formatDate(campaign.updatedAt)} />
+                <FieldView
+                  label="Updated"
+                  value={formatDate(campaign.updatedAt)}
+                />
                 {campaign.description ? (
                   <div className="sm:col-span-2">
                     <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
                       Description
                     </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">{campaign.description}</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">
+                      {campaign.description}
+                    </p>
                   </div>
                 ) : null}
               </CardContent>

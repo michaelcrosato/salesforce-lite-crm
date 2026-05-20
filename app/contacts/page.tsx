@@ -112,7 +112,11 @@ export default async function ContactsPage({
         <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Contact Directory</CardTitle>
           <form action="/contacts" className="w-full sm:max-w-sm">
-            <Input name="q" defaultValue={query} placeholder="Search contacts" />
+            <Input
+              name="q"
+              defaultValue={query}
+              placeholder="Search contacts"
+            />
           </form>
         </CardHeader>
         <CardContent>
@@ -127,9 +131,11 @@ export default async function ContactsPage({
                 email: contact.email,
                 phone: contact.phone,
                 status: contact.status,
-                lastActivityAt: contact.activities[0]?.createdAt.toISOString() ?? null,
-                openDeals: contact.deals.filter((deal) => isOpenDealStage(deal.stage))
-                  .length
+                lastActivityAt:
+                  contact.activities[0]?.createdAt.toISOString() ?? null,
+                openDeals: contact.deals.filter((deal) =>
+                  isOpenDealStage(deal.stage)
+                ).length
               }))}
             />
           ) : (

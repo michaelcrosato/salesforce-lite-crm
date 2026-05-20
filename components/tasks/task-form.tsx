@@ -113,7 +113,11 @@ export function TaskForm({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-4 md:grid-cols-2"
+        >
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="title">Title</Label>
             <Input
@@ -175,7 +179,11 @@ export function TaskForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="ownerId">Owner</Label>
-            <Select id="ownerId" name="ownerId" defaultValue={initialValues?.ownerId ?? ""}>
+            <Select
+              id="ownerId"
+              name="ownerId"
+              defaultValue={initialValues?.ownerId ?? ""}
+            >
               <option value="">Unassigned</option>
               {owners.map((option) => (
                 <option key={option.id} value={option.id}>
@@ -219,7 +227,11 @@ export function TaskForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="dealId">Deal</Label>
-            <Select id="dealId" name="dealId" defaultValue={initialValues?.dealId ?? ""}>
+            <Select
+              id="dealId"
+              name="dealId"
+              defaultValue={initialValues?.dealId ?? ""}
+            >
               <option value="">No deal</option>
               {deals.map((option) => (
                 <option key={option.id} value={option.id}>
@@ -231,7 +243,11 @@ export function TaskForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="leadId">Lead</Label>
-            <Select id="leadId" name="leadId" defaultValue={initialValues?.leadId ?? ""}>
+            <Select
+              id="leadId"
+              name="leadId"
+              defaultValue={initialValues?.leadId ?? ""}
+            >
               <option value="">No lead</option>
               {leads.map((option) => (
                 <option key={option.id} value={option.id}>

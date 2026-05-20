@@ -105,7 +105,10 @@ type OpportunityFilters = {
   ownerId: string;
   search: string;
 };
-export type OpportunityListOptions = ListQueryInput<OpportunitySortBy, OpportunityFilters>;
+export type OpportunityListOptions = ListQueryInput<
+  OpportunitySortBy,
+  OpportunityFilters
+>;
 
 type LeadSortBy = "lastName" | "firstName" | "createdAt" | "updatedAt";
 type LeadFilters = {
@@ -126,14 +129,20 @@ type ActivityFilters = {
   taskId: string;
   caseId: string;
 };
-export type ActivityListOptions = ListQueryInput<ActivitySortBy, ActivityFilters>;
+export type ActivityListOptions = ListQueryInput<
+  ActivitySortBy,
+  ActivityFilters
+>;
 
 type DealerOrderSortBy = "name" | "status" | "startDate" | "createdAt";
 type DealerOrderFilters = {
   status: DealerOrderStatus;
   accountId: string;
 };
-export type DealerOrderListOptions = ListQueryInput<DealerOrderSortBy, DealerOrderFilters>;
+export type DealerOrderListOptions = ListQueryInput<
+  DealerOrderSortBy,
+  DealerOrderFilters
+>;
 
 type AreaSortBy = "name" | "province" | "createdAt";
 type AreaFilters = {
@@ -180,198 +189,212 @@ function contains(value: string): Prisma.StringFilter {
 }
 
 function accountListQuery(opts: AccountListOptions) {
-  return buildListQuery<AccountSortBy, AccountFilters, Prisma.AccountWhereInput, Prisma.AccountOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "name",
-      defaultSortOrder: "asc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        name: (order) => ({ name: order }),
-        createdAt: (order) => ({ createdAt: order }),
-        updatedAt: (order) => ({ updatedAt: order }),
-        healthScore: (order) => ({ healthScore: order })
-      },
-      filterMap: {
-        status: (status) => ({ status }),
-        ownerId: (ownerId) => ({ ownerId }),
-        search: (search) => ({
-          OR: [
-            { name: contains(search) },
-            { domain: contains(search) },
-            { industry: contains(search) },
-            { city: contains(search) },
-            { region: contains(search) }
-          ]
-        })
-      }
+  return buildListQuery<
+    AccountSortBy,
+    AccountFilters,
+    Prisma.AccountWhereInput,
+    Prisma.AccountOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "name",
+    defaultSortOrder: "asc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      name: (order) => ({ name: order }),
+      createdAt: (order) => ({ createdAt: order }),
+      updatedAt: (order) => ({ updatedAt: order }),
+      healthScore: (order) => ({ healthScore: order })
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      ownerId: (ownerId) => ({ ownerId }),
+      search: (search) => ({
+        OR: [
+          { name: contains(search) },
+          { domain: contains(search) },
+          { industry: contains(search) },
+          { city: contains(search) },
+          { region: contains(search) }
+        ]
+      })
     }
-  );
+  });
 }
 
 function contactListQuery(opts: ContactListOptions) {
-  return buildListQuery<ContactSortBy, ContactFilters, Prisma.ContactWhereInput, Prisma.ContactOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "lastName",
-      defaultSortOrder: "asc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        lastName: (order) => ({ lastName: order }),
-        firstName: (order) => ({ firstName: order }),
-        createdAt: (order) => ({ createdAt: order }),
-        updatedAt: (order) => ({ updatedAt: order })
-      },
-      filterMap: {
-        status: (status) => ({ status }),
-        accountId: (accountId) => ({ accountId }),
-        search: (search) => ({
-          OR: [
-            { firstName: contains(search) },
-            { lastName: contains(search) },
-            { email: contains(search) },
-            { title: contains(search) }
-          ]
-        })
-      }
+  return buildListQuery<
+    ContactSortBy,
+    ContactFilters,
+    Prisma.ContactWhereInput,
+    Prisma.ContactOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "lastName",
+    defaultSortOrder: "asc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      lastName: (order) => ({ lastName: order }),
+      firstName: (order) => ({ firstName: order }),
+      createdAt: (order) => ({ createdAt: order }),
+      updatedAt: (order) => ({ updatedAt: order })
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      accountId: (accountId) => ({ accountId }),
+      search: (search) => ({
+        OR: [
+          { firstName: contains(search) },
+          { lastName: contains(search) },
+          { email: contains(search) },
+          { title: contains(search) }
+        ]
+      })
     }
-  );
+  });
 }
 
 function opportunityListQuery(opts: OpportunityListOptions) {
-  return buildListQuery<OpportunitySortBy, OpportunityFilters, Prisma.DealWhereInput, Prisma.DealOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "updatedAt",
-      defaultSortOrder: "desc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        name: (order) => ({ name: order }),
-        stage: (order) => ({ stage: order }),
-        value: (order) => ({ value: order }),
-        createdAt: (order) => ({ createdAt: order }),
-        updatedAt: (order) => ({ updatedAt: order })
-      },
-      filterMap: {
-        stage: (stage) => ({ stage }),
-        accountId: (accountId) => ({ accountId }),
-        ownerId: (ownerId) => ({ ownerId }),
-        search: (search) => ({ name: contains(search) })
-      }
+  return buildListQuery<
+    OpportunitySortBy,
+    OpportunityFilters,
+    Prisma.DealWhereInput,
+    Prisma.DealOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "updatedAt",
+    defaultSortOrder: "desc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      name: (order) => ({ name: order }),
+      stage: (order) => ({ stage: order }),
+      value: (order) => ({ value: order }),
+      createdAt: (order) => ({ createdAt: order }),
+      updatedAt: (order) => ({ updatedAt: order })
+    },
+    filterMap: {
+      stage: (stage) => ({ stage }),
+      accountId: (accountId) => ({ accountId }),
+      ownerId: (ownerId) => ({ ownerId }),
+      search: (search) => ({ name: contains(search) })
     }
-  );
+  });
 }
 
 function leadListQuery(opts: LeadListOptions) {
-  return buildListQuery<LeadSortBy, LeadFilters, Prisma.LeadWhereInput, Prisma.LeadOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "createdAt",
-      defaultSortOrder: "desc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        lastName: (order) => ({ lastName: order }),
-        firstName: (order) => ({ firstName: order }),
-        createdAt: (order) => ({ createdAt: order }),
-        updatedAt: (order) => ({ updatedAt: order })
-      },
-      filterMap: {
-        status: (status) => ({ status }),
-        assignedOrderId: (assignedOrderId) => ({ assignedOrderId }),
-        areaId: (areaId) => ({ areaId }),
-        search: (search) => ({
-          OR: [
-            { firstName: contains(search) },
-            { lastName: contains(search) },
-            { email: contains(search) },
-            { phone: contains(search) },
-            { postalCode: contains(search) },
-            { source: contains(search) }
-          ]
-        })
-      }
+  return buildListQuery<
+    LeadSortBy,
+    LeadFilters,
+    Prisma.LeadWhereInput,
+    Prisma.LeadOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "createdAt",
+    defaultSortOrder: "desc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      lastName: (order) => ({ lastName: order }),
+      firstName: (order) => ({ firstName: order }),
+      createdAt: (order) => ({ createdAt: order }),
+      updatedAt: (order) => ({ updatedAt: order })
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      assignedOrderId: (assignedOrderId) => ({ assignedOrderId }),
+      areaId: (areaId) => ({ areaId }),
+      search: (search) => ({
+        OR: [
+          { firstName: contains(search) },
+          { lastName: contains(search) },
+          { email: contains(search) },
+          { phone: contains(search) },
+          { postalCode: contains(search) },
+          { source: contains(search) }
+        ]
+      })
     }
-  );
+  });
 }
 
 function activityListQuery(opts: ActivityListOptions) {
-  return buildListQuery<ActivitySortBy, ActivityFilters, Prisma.ActivityWhereInput, Prisma.ActivityOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "createdAt",
-      defaultSortOrder: "desc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        createdAt: (order) => ({ createdAt: order }),
-        type: (order) => ({ type: order }),
-        title: (order) => ({ title: order })
-      },
-      filterMap: {
-        type: (type) => ({ type }),
-        accountId: (accountId) => ({ accountId }),
-        contactId: (contactId) => ({ contactId }),
-        dealId: (dealId) => ({ dealId }),
-        leadId: (leadId) => ({ leadId }),
-        taskId: (taskId) => ({ taskId }),
-        caseId: (caseId) => ({ caseId })
-      }
+  return buildListQuery<
+    ActivitySortBy,
+    ActivityFilters,
+    Prisma.ActivityWhereInput,
+    Prisma.ActivityOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "createdAt",
+    defaultSortOrder: "desc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      createdAt: (order) => ({ createdAt: order }),
+      type: (order) => ({ type: order }),
+      title: (order) => ({ title: order })
+    },
+    filterMap: {
+      type: (type) => ({ type }),
+      accountId: (accountId) => ({ accountId }),
+      contactId: (contactId) => ({ contactId }),
+      dealId: (dealId) => ({ dealId }),
+      leadId: (leadId) => ({ leadId }),
+      taskId: (taskId) => ({ taskId }),
+      caseId: (caseId) => ({ caseId })
     }
-  );
+  });
 }
 
 function dealerOrderListQuery(opts: DealerOrderListOptions) {
-  return buildListQuery<DealerOrderSortBy, DealerOrderFilters, Prisma.DealerOrderWhereInput, Prisma.DealerOrderOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "startDate",
-      defaultSortOrder: "desc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        name: (order) => ({ name: order }),
-        status: (order) => ({ status: order }),
-        startDate: (order) => ({ startDate: order }),
-        createdAt: (order) => ({ createdAt: order })
-      },
-      filterMap: {
-        status: (status) => ({ status }),
-        accountId: (accountId) => ({ accountId })
-      }
+  return buildListQuery<
+    DealerOrderSortBy,
+    DealerOrderFilters,
+    Prisma.DealerOrderWhereInput,
+    Prisma.DealerOrderOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "startDate",
+    defaultSortOrder: "desc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      name: (order) => ({ name: order }),
+      status: (order) => ({ status: order }),
+      startDate: (order) => ({ startDate: order }),
+      createdAt: (order) => ({ createdAt: order })
+    },
+    filterMap: {
+      status: (status) => ({ status }),
+      accountId: (accountId) => ({ accountId })
     }
-  );
+  });
 }
 
 function areaListQuery(opts: AreaListOptions) {
-  return buildListQuery<AreaSortBy, AreaFilters, Prisma.AreaWhereInput, Prisma.AreaOrderByWithRelationInput>(
-    opts,
-    {
-      defaultSortBy: "name",
-      defaultSortOrder: "asc",
-      emptyWhere: {},
-      andWhere: (clauses) => ({ AND: clauses }),
-      sortMap: {
-        name: (order) => ({ name: order }),
-        province: (order) => ({ province: order }),
-        createdAt: (order) => ({ createdAt: order })
-      },
-      filterMap: {
-        province: (province) => ({ province }),
-        search: (search) => ({
-          OR: [
-            { name: contains(search) },
-            { province: contains(search) },
-            { region: contains(search) },
-            { postalPrefixes: contains(search) }
-          ]
-        })
-      }
+  return buildListQuery<
+    AreaSortBy,
+    AreaFilters,
+    Prisma.AreaWhereInput,
+    Prisma.AreaOrderByWithRelationInput
+  >(opts, {
+    defaultSortBy: "name",
+    defaultSortOrder: "asc",
+    emptyWhere: {},
+    andWhere: (clauses) => ({ AND: clauses }),
+    sortMap: {
+      name: (order) => ({ name: order }),
+      province: (order) => ({ province: order }),
+      createdAt: (order) => ({ createdAt: order })
+    },
+    filterMap: {
+      province: (province) => ({ province }),
+      search: (search) => ({
+        OR: [
+          { name: contains(search) },
+          { province: contains(search) },
+          { region: contains(search) },
+          { postalPrefixes: contains(search) }
+        ]
+      })
     }
-  );
+  });
 }
 
 function toNote(activity: Activity): Note {
@@ -383,7 +406,9 @@ function toNote(activity: Activity): Note {
 }
 
 /** Lists accounts. Supported filter keys: `status`, `ownerId`, `search`. */
-export async function listAccounts(opts: AccountListOptions = {}): Promise<Account[]> {
+export async function listAccounts(
+  opts: AccountListOptions = {}
+): Promise<Account[]> {
   return prisma.account.findMany(accountListQuery(opts));
 }
 
@@ -391,13 +416,20 @@ export async function getAccount(id: string): Promise<Account | null> {
   return prisma.account.findUnique({ where: { id: parseId(id) } });
 }
 
-export async function createAccount(input: AccountCreateInput): Promise<Account> {
-  const data: Prisma.AccountUncheckedCreateInput = accountCreateSchema.parse(input);
+export async function createAccount(
+  input: AccountCreateInput
+): Promise<Account> {
+  const data: Prisma.AccountUncheckedCreateInput =
+    accountCreateSchema.parse(input);
   return prisma.account.create({ data });
 }
 
-export async function updateAccount(id: string, input: AccountUpdateInput): Promise<Account> {
-  const data: Prisma.AccountUncheckedUpdateInput = accountUpdateSchema.parse(input);
+export async function updateAccount(
+  id: string,
+  input: AccountUpdateInput
+): Promise<Account> {
+  const data: Prisma.AccountUncheckedUpdateInput =
+    accountUpdateSchema.parse(input);
   return prisma.account.update({ where: { id: parseId(id) }, data });
 }
 
@@ -406,7 +438,9 @@ export async function deleteAccount(id: string): Promise<Account> {
 }
 
 /** Lists contacts. Supported filter keys: `status`, `accountId`, `search`. */
-export async function listContacts(opts: ContactListOptions = {}): Promise<Contact[]> {
+export async function listContacts(
+  opts: ContactListOptions = {}
+): Promise<Contact[]> {
   return prisma.contact.findMany(contactListQuery(opts));
 }
 
@@ -414,13 +448,20 @@ export async function getContact(id: string): Promise<Contact | null> {
   return prisma.contact.findUnique({ where: { id: parseId(id) } });
 }
 
-export async function createContact(input: ContactCreateInput): Promise<Contact> {
-  const data: Prisma.ContactUncheckedCreateInput = contactCreateSchema.parse(input);
+export async function createContact(
+  input: ContactCreateInput
+): Promise<Contact> {
+  const data: Prisma.ContactUncheckedCreateInput =
+    contactCreateSchema.parse(input);
   return prisma.contact.create({ data });
 }
 
-export async function updateContact(id: string, input: ContactUpdateInput): Promise<Contact> {
-  const data: Prisma.ContactUncheckedUpdateInput = contactUpdateSchema.parse(input);
+export async function updateContact(
+  id: string,
+  input: ContactUpdateInput
+): Promise<Contact> {
+  const data: Prisma.ContactUncheckedUpdateInput =
+    contactUpdateSchema.parse(input);
   return prisma.contact.update({ where: { id: parseId(id) }, data });
 }
 
@@ -429,7 +470,9 @@ export async function deleteContact(id: string): Promise<Contact> {
 }
 
 /** Lists opportunities. Supported filter keys: `stage`, `accountId`, `ownerId`, `search`. */
-export async function listOpportunities(opts: OpportunityListOptions = {}): Promise<Opportunity[]> {
+export async function listOpportunities(
+  opts: OpportunityListOptions = {}
+): Promise<Opportunity[]> {
   return prisma.deal.findMany(opportunityListQuery(opts));
 }
 
@@ -437,12 +480,18 @@ export async function getOpportunity(id: string): Promise<Opportunity | null> {
   return prisma.deal.findUnique({ where: { id: parseId(id) } });
 }
 
-export async function createOpportunity(input: OpportunityCreateInput): Promise<Opportunity> {
-  const data: Prisma.DealUncheckedCreateInput = opportunityCreateSchema.parse(input);
+export async function createOpportunity(
+  input: OpportunityCreateInput
+): Promise<Opportunity> {
+  const data: Prisma.DealUncheckedCreateInput =
+    opportunityCreateSchema.parse(input);
   return prisma.deal.create({ data });
 }
 
-export async function updateOpportunity(id: string, input: OpportunityUpdateInput): Promise<Opportunity> {
+export async function updateOpportunity(
+  id: string,
+  input: OpportunityUpdateInput
+): Promise<Opportunity> {
   const opportunityId = parseId(id);
   const parsed = opportunityUpdateSchema.parse(input);
   const data: Prisma.DealUncheckedUpdateInput = parsed;
@@ -505,7 +554,10 @@ export async function createLead(input: LeadCreateInput): Promise<Lead> {
   return prisma.lead.create({ data });
 }
 
-export async function updateLead(id: string, input: LeadUpdateInput): Promise<Lead> {
+export async function updateLead(
+  id: string,
+  input: LeadUpdateInput
+): Promise<Lead> {
   const data: Prisma.LeadUncheckedUpdateInput = leadUpdateSchema.parse(input);
   return prisma.lead.update({ where: { id: parseId(id) }, data });
 }
@@ -521,7 +573,9 @@ export async function getRoutingDecisionForLead(
 }
 
 /** Lists activities. Supported filter keys: `type`, `accountId`, `contactId`, `dealId`, `leadId`, `taskId`, `caseId`. */
-export async function listActivities(opts: ActivityListOptions = {}): Promise<Activity[]> {
+export async function listActivities(
+  opts: ActivityListOptions = {}
+): Promise<Activity[]> {
   return prisma.activity.findMany(activityListQuery(opts));
 }
 
@@ -529,13 +583,20 @@ export async function getActivity(id: string): Promise<Activity | null> {
   return prisma.activity.findUnique({ where: { id: parseId(id) } });
 }
 
-export async function createActivity(input: ActivityCreateInput): Promise<Activity> {
-  const data: Prisma.ActivityUncheckedCreateInput = activityCreateSchema.parse(input);
+export async function createActivity(
+  input: ActivityCreateInput
+): Promise<Activity> {
+  const data: Prisma.ActivityUncheckedCreateInput =
+    activityCreateSchema.parse(input);
   return prisma.activity.create({ data });
 }
 
-export async function updateActivity(id: string, input: ActivityUpdateInput): Promise<Activity> {
-  const data: Prisma.ActivityUncheckedUpdateInput = activityUpdateSchema.parse(input);
+export async function updateActivity(
+  id: string,
+  input: ActivityUpdateInput
+): Promise<Activity> {
+  const data: Prisma.ActivityUncheckedUpdateInput =
+    activityUpdateSchema.parse(input);
   return prisma.activity.update({ where: { id: parseId(id) }, data });
 }
 
@@ -558,7 +619,9 @@ export async function addActivityToCase(
 }
 
 /** Lists notes. Supported filter keys match activities and force `type = "note"`. */
-export async function listNotes(opts: ActivityListOptions = {}): Promise<Note[]> {
+export async function listNotes(
+  opts: ActivityListOptions = {}
+): Promise<Note[]> {
   const query = activityListQuery(opts);
   const where: Prisma.ActivityWhereInput = {
     AND: [query.where, { type: "note" }]
@@ -581,7 +644,10 @@ export async function createNote(input: NoteCreateInput): Promise<Note> {
   return toNote(await prisma.activity.create({ data }));
 }
 
-export async function updateNote(id: string, input: NoteUpdateInput): Promise<Note | null> {
+export async function updateNote(
+  id: string,
+  input: NoteUpdateInput
+): Promise<Note | null> {
   const note = await getNote(id);
 
   if (!note) {
@@ -604,7 +670,9 @@ export async function deleteNote(id: string): Promise<Note | null> {
 }
 
 /** Lists dealer orders. Supported filter keys: `status`, `accountId`. */
-export async function listDealerOrders(opts: DealerOrderListOptions = {}): Promise<DealerOrder[]> {
+export async function listDealerOrders(
+  opts: DealerOrderListOptions = {}
+): Promise<DealerOrder[]> {
   return prisma.dealerOrder.findMany(dealerOrderListQuery(opts));
 }
 
@@ -612,13 +680,20 @@ export async function getDealerOrder(id: string): Promise<DealerOrder | null> {
   return prisma.dealerOrder.findUnique({ where: { id: parseId(id) } });
 }
 
-export async function createDealerOrder(input: DealerOrderCreateInput): Promise<DealerOrder> {
-  const data: Prisma.DealerOrderUncheckedCreateInput = dealerOrderCreateSchema.parse(input);
+export async function createDealerOrder(
+  input: DealerOrderCreateInput
+): Promise<DealerOrder> {
+  const data: Prisma.DealerOrderUncheckedCreateInput =
+    dealerOrderCreateSchema.parse(input);
   return prisma.dealerOrder.create({ data });
 }
 
-export async function updateDealerOrder(id: string, input: DealerOrderUpdateInput): Promise<DealerOrder> {
-  const data: Prisma.DealerOrderUncheckedUpdateInput = dealerOrderUpdateSchema.parse(input);
+export async function updateDealerOrder(
+  id: string,
+  input: DealerOrderUpdateInput
+): Promise<DealerOrder> {
+  const data: Prisma.DealerOrderUncheckedUpdateInput =
+    dealerOrderUpdateSchema.parse(input);
   return prisma.dealerOrder.update({ where: { id: parseId(id) }, data });
 }
 
@@ -640,7 +715,10 @@ export async function createArea(input: AreaCreateInput): Promise<Area> {
   return prisma.area.create({ data });
 }
 
-export async function updateArea(id: string, input: AreaUpdateInput): Promise<Area> {
+export async function updateArea(
+  id: string,
+  input: AreaUpdateInput
+): Promise<Area> {
   const data: Prisma.AreaUncheckedUpdateInput = areaUpdateSchema.parse(input);
   return prisma.area.update({ where: { id: parseId(id) }, data });
 }
@@ -662,7 +740,10 @@ export async function createTask(input: TaskCreateInput): Promise<Task> {
   return createTaskService(input);
 }
 
-export async function updateTask(id: string, input: TaskUpdateInput): Promise<Task> {
+export async function updateTask(
+  id: string,
+  input: TaskUpdateInput
+): Promise<Task> {
   return updateTaskService(id, input);
 }
 
@@ -687,7 +768,10 @@ export async function createCase(input: CaseCreateInput): Promise<Case> {
   return createCaseService(input);
 }
 
-export async function updateCase(id: string, input: CaseUpdateInput): Promise<Case> {
+export async function updateCase(
+  id: string,
+  input: CaseUpdateInput
+): Promise<Case> {
   return updateCaseService(id, input);
 }
 
@@ -700,7 +784,9 @@ export async function deleteCase(id: string): Promise<Case> {
 }
 
 /** Lists campaigns. Supported filter keys: `status`, `ownerId`, `startDateFrom`, `startDateTo`. */
-export async function listCampaigns(opts: CampaignListOptions = {}): Promise<Campaign[]> {
+export async function listCampaigns(
+  opts: CampaignListOptions = {}
+): Promise<Campaign[]> {
   return listCampaignsService(opts);
 }
 
@@ -708,11 +794,16 @@ export async function getCampaign(id: string): Promise<Campaign | null> {
   return getCampaignService(id);
 }
 
-export async function createCampaign(input: CampaignCreateInput): Promise<Campaign> {
+export async function createCampaign(
+  input: CampaignCreateInput
+): Promise<Campaign> {
   return createCampaignService(input);
 }
 
-export async function updateCampaign(id: string, input: CampaignUpdateInput): Promise<Campaign> {
+export async function updateCampaign(
+  id: string,
+  input: CampaignUpdateInput
+): Promise<Campaign> {
   return updateCampaignService(id, input);
 }
 

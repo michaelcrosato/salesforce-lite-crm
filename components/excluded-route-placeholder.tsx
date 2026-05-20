@@ -21,14 +21,24 @@ export function ExcludedRoutePlaceholder({
             This module is not part of the demo
           </p>
           <p className="text-sm text-amber-800">
-            Route: <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-amber-900">{route}</code>
+            Route:{" "}
+            <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-amber-900">
+              {route}
+            </code>
           </p>
-          {reason ? (
-            <p className="text-sm text-amber-700">{reason}</p>
-          ) : null}
+          {reason ? <p className="text-sm text-amber-700">{reason}</p> : null}
         </div>
         <p className="text-xs text-amber-600">
-          See <a href="https://github.com/michaelcrosato/salesforce-lite-crm/blob/main/CRM-CONTRACT.md" className="underline hover:text-amber-800" target="_blank" rel="noopener noreferrer">CRM-CONTRACT.md</a> for the supported feature set.
+          See{" "}
+          <a
+            href="https://github.com/michaelcrosato/salesforce-lite-crm/blob/main/CRM-CONTRACT.md"
+            className="underline hover:text-amber-800"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CRM-CONTRACT.md
+          </a>{" "}
+          for the supported feature set.
         </p>
       </CardContent>
     </Card>

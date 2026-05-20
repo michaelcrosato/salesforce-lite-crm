@@ -9,7 +9,11 @@ interface TopAccountsCardProps {
   isLoading?: boolean;
 }
 
-export function TopAccountsCard({ data, limit = 8, isLoading }: TopAccountsCardProps) {
+export function TopAccountsCard({
+  data,
+  limit = 8,
+  isLoading
+}: TopAccountsCardProps) {
   if (isLoading) {
     return (
       <Card>
@@ -53,7 +57,10 @@ export function TopAccountsCard({ data, limit = 8, isLoading }: TopAccountsCardP
       <CardContent>
         <div className="space-y-3">
           {result.rows.map((row) => (
-            <div key={row.accountId} className="flex items-center justify-between text-sm">
+            <div
+              key={row.accountId}
+              className="flex items-center justify-between text-sm"
+            >
               <div className="truncate font-medium">{row.accountName}</div>
               <div className="tabular-nums text-right">
                 {row.formattedValue}
@@ -65,7 +72,9 @@ export function TopAccountsCard({ data, limit = 8, isLoading }: TopAccountsCardP
           ))}
         </div>
         {result.hasMore && (
-          <div className="mt-3 text-xs text-muted-foreground">+ more accounts</div>
+          <div className="mt-3 text-xs text-muted-foreground">
+            + more accounts
+          </div>
         )}
       </CardContent>
     </Card>

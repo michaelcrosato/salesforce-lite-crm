@@ -243,11 +243,12 @@ describe("activity summarizer", () => {
   });
 
   it("handles empty and whitespace-only notes without throwing", () => {
-    expect(deterministicActivitySummarizer.summarize({ rawText: "" }).nextStep).toBe(
-      "Review and schedule follow-up."
-    );
     expect(
-      deterministicActivitySummarizer.summarize({ rawText: "   \n\t  " }).nextStep
+      deterministicActivitySummarizer.summarize({ rawText: "" }).nextStep
+    ).toBe("Review and schedule follow-up.");
+    expect(
+      deterministicActivitySummarizer.summarize({ rawText: "   \n\t  " })
+        .nextStep
     ).toBe("Review and schedule follow-up.");
   });
 });
@@ -294,16 +295,32 @@ describe("dealer lead routing helpers", () => {
 
   it("calculates pace gap for first, middle, last, and completed quota cases", () => {
     expect(
-      calculatePaceGap({ monthlyQuota: 31 }, 0, new Date("2026-05-01T12:00:00Z"))
+      calculatePaceGap(
+        { monthlyQuota: 31 },
+        0,
+        new Date("2026-05-01T12:00:00Z")
+      )
     ).toBe(1);
     expect(
-      calculatePaceGap({ monthlyQuota: 32 }, 0, new Date("2026-05-16T12:00:00Z"))
+      calculatePaceGap(
+        { monthlyQuota: 32 },
+        0,
+        new Date("2026-05-16T12:00:00Z")
+      )
     ).toBe(2);
     expect(
-      calculatePaceGap({ monthlyQuota: 10 }, 5, new Date("2026-05-31T12:00:00Z"))
+      calculatePaceGap(
+        { monthlyQuota: 10 },
+        5,
+        new Date("2026-05-31T12:00:00Z")
+      )
     ).toBe(5);
     expect(
-      calculatePaceGap({ monthlyQuota: 10 }, 12, new Date("2026-05-31T12:00:00Z"))
+      calculatePaceGap(
+        { monthlyQuota: 10 },
+        12,
+        new Date("2026-05-31T12:00:00Z")
+      )
     ).toBe(0);
   });
 
@@ -432,7 +449,11 @@ describe("dealer lead routing transactions", () => {
 
   it("writes all_orders_at_quota when every matching active order is full", async () => {
     await createRouteArea("test-route-area-full", "Full Test", "V8");
-    await createActiveRouteOrder("test-route-order-full", "test-route-area-full", 1);
+    await createActiveRouteOrder(
+      "test-route-order-full",
+      "test-route-area-full",
+      1
+    );
     await prisma.lead.createMany({
       data: [
         {
@@ -473,8 +494,16 @@ describe("dealer lead routing transactions", () => {
 
   it("routes to the matching active order most behind pace", async () => {
     await createRouteArea("test-route-area-van", "Vancouver Test", "Y1");
-    await createActiveRouteOrder("test-route-order-a", "test-route-area-van", 10);
-    await createActiveRouteOrder("test-route-order-b", "test-route-area-van", 10);
+    await createActiveRouteOrder(
+      "test-route-order-a",
+      "test-route-area-van",
+      10
+    );
+    await createActiveRouteOrder(
+      "test-route-order-b",
+      "test-route-area-van",
+      10
+    );
     await prisma.lead.create({
       data: {
         id: "test-route-lead-delivered",
@@ -516,7 +545,11 @@ describe("dealer lead routing transactions", () => {
   });
 });
 
-async function createRouteArea(id: string, name: string, postalPrefixes: string) {
+async function createRouteArea(
+  id: string,
+  name: string,
+  postalPrefixes: string
+) {
   await prisma.area.create({
     data: {
       id,
@@ -526,7 +559,11 @@ async function createRouteArea(id: string, name: string, postalPrefixes: string)
   });
 }
 
-async function createActiveRouteOrder(id: string, areaId: string, monthlyQuota: number) {
+async function createActiveRouteOrder(
+  id: string,
+  areaId: string,
+  monthlyQuota: number
+) {
   await prisma.dealerOrder.create({
     data: {
       id,

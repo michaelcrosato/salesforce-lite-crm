@@ -6,10 +6,7 @@ import {
   TaskDetailDrawer,
   type DrawerTask
 } from "@/components/tasks/task-detail-drawer";
-import {
-  TasksTable,
-  type TaskRow
-} from "@/components/tasks/tasks-table";
+import { TasksTable, type TaskRow } from "@/components/tasks/tasks-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { type TaskOptionItem } from "@/components/tasks/task-form";
 

@@ -32,90 +32,85 @@ const contains = (query: string): Prisma.StringFilter => ({
   contains: query
 });
 
-export async function globalSearch(query: string): Promise<GlobalSearchResults> {
+export async function globalSearch(
+  query: string
+): Promise<GlobalSearchResults> {
   const term = query.trim();
 
   if (term.length === 0) {
     return emptyResults();
   }
 
-  const [
-    accounts,
-    contacts,
-    opportunities,
-    leads,
-    tasks,
-    cases,
-    campaigns
-  ] = await Promise.all([
-    prisma.account.findMany({
-      where: {
-        OR: [
-          { name: contains(term) },
-          { domain: contains(term) },
-          { industry: contains(term) },
-          { city: contains(term) },
-          { region: contains(term) }
-        ]
-      },
-      orderBy: { name: "asc" },
-      take: 10
-    }),
-    prisma.contact.findMany({
-      where: {
-        OR: [
-          { firstName: contains(term) },
-          { lastName: contains(term) },
-          { email: contains(term) },
-          { title: contains(term) }
-        ]
-      },
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-      take: 10
-    }),
-    prisma.deal.findMany({
-      where: {
-        name: contains(term)
-      },
-      orderBy: { name: "asc" },
-      take: 10
-    }),
-    prisma.lead.findMany({
-      where: {
-        OR: [
-          { firstName: contains(term) },
-          { lastName: contains(term) },
-          { email: contains(term) },
-          { phone: contains(term) },
-          { postalCode: contains(term) },
-          { source: contains(term) }
-        ]
-      },
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-      take: 10
-    }),
-    prisma.task.findMany({
-      where: {
-        OR: [{ title: contains(term) }, { description: contains(term) }]
-      },
-      orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
-      take: 10
-    }),
-    prisma.case.findMany({
-      where: {
-        OR: [{ subject: contains(term) }, { description: contains(term) }]
-      },
-      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-      take: 10
-    }),
-    prisma.campaign.findMany({
-      where: {
-        OR: [{ name: contains(term) }, { description: contains(term) }]
-      },
-      orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
-      take: 10
-    })
-  ]);
+  const [accounts, contacts, opportunities, leads, tasks, cases, campaigns] =
+    await Promise.all([
+      prisma.account.findMany({
+        where: {
+          OR: [
+            { name: contains(term) },
+            { domain: contains(term) },
+            { industry: contains(term) },
+            { city: contains(term) },
+            { region: contains(term) }
+          ]
+        },
+        orderBy: { name: "asc" },
+        take: 10
+      }),
+      prisma.contact.findMany({
+        where: {
+          OR: [
+            { firstName: contains(term) },
+            { lastName: contains(term) },
+            { email: contains(term) },
+            { title: contains(term) }
+          ]
+        },
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+        take: 10
+      }),
+      prisma.deal.findMany({
+        where: {
+          name: contains(term)
+        },
+        orderBy: { name: "asc" },
+        take: 10
+      }),
+      prisma.lead.findMany({
+        where: {
+          OR: [
+            { firstName: contains(term) },
+            { lastName: contains(term) },
+            { email: contains(term) },
+            { phone: contains(term) },
+            { postalCode: contains(term) },
+            { source: contains(term) }
+          ]
+        },
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+        take: 10
+      }),
+      prisma.task.findMany({
+        where: {
+          OR: [{ title: contains(term) }, { description: contains(term) }]
+        },
+        orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+        take: 10
+      }),
+      prisma.case.findMany({
+        where: {
+          OR: [{ subject: contains(term) }, { description: contains(term) }]
+        },
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+        take: 10
+      }),
+      prisma.campaign.findMany({
+        where: {
+          OR: [{ name: contains(term) }, { description: contains(term) }]
+        },
+        orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
+        take: 10
+      })
+    ]);
 
   return {
     accounts: accounts.map((account) => ({

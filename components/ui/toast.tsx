@@ -71,7 +71,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <div>
                 <p className="text-sm font-semibold">{toast.title}</p>
                 {toast.description ? (
-                  <p className="mt-1 text-sm text-muted-foreground">{toast.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {toast.description}
+                  </p>
                 ) : null}
               </div>
               <button

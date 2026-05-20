@@ -56,19 +56,35 @@ export {
   type LeadStatus
 };
 
-export const TASK_STATUSES = ["open", "in_progress", "done", "cancelled"] as const;
+export const TASK_STATUSES = [
+  "open",
+  "in_progress",
+  "done",
+  "cancelled"
+] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
 export const TASK_PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 
-export const CASE_STATUSES = ["new", "in_progress", "waiting", "resolved", "closed"] as const;
+export const CASE_STATUSES = [
+  "new",
+  "in_progress",
+  "waiting",
+  "resolved",
+  "closed"
+] as const;
 export type CaseStatus = (typeof CASE_STATUSES)[number];
 
 export const CASE_PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 export type CasePriority = (typeof CASE_PRIORITIES)[number];
 
-export const CAMPAIGN_STATUSES = ["planned", "active", "completed", "cancelled"] as const;
+export const CAMPAIGN_STATUSES = [
+  "planned",
+  "active",
+  "completed",
+  "cancelled"
+] as const;
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
 
 export type CrmEntityName =
@@ -191,5 +207,6 @@ export const ROUTE_REGISTRY = {
   cases: "/cases",
   caseDetail: (id: string) => `/cases?case=${encodeURIComponent(id)}`,
   campaigns: "/campaigns",
-  campaignDetail: (id: string) => `/campaigns?campaign=${encodeURIComponent(id)}`
+  campaignDetail: (id: string) =>
+    `/campaigns?campaign=${encodeURIComponent(id)}`
 } as const;

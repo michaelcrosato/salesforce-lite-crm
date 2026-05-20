@@ -27,10 +27,10 @@ test("create task, edit status, and verify in list", async ({ page }) => {
     page.getByRole("heading", { name: taskTitle, level: 2 })
   ).toBeVisible();
 
-  await page
-    .getByLabel(`Move ${taskTitle} status`)
-    .selectOption("in_progress");
-  await expect(page.getByText("Task status updated.", { exact: true })).toBeVisible();
+  await page.getByLabel(`Move ${taskTitle} status`).selectOption("in_progress");
+  await expect(
+    page.getByText("Task status updated.", { exact: true })
+  ).toBeVisible();
 
   await page.goto("/tasks");
   const refreshedRow = page.getByRole("row").filter({ hasText: taskTitle });

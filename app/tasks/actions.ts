@@ -42,8 +42,14 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return { ok: false, message: "A record with that unique value already exists." };
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return {
+      ok: false,
+      message: "A record with that unique value already exists."
+    };
   }
 
   return { ok: false, message: "The task could not be saved." };
@@ -55,7 +61,9 @@ function revalidateAll(): void {
   revalidatePath("/reports/overdue-tasks");
 }
 
-export async function createTaskAction(formData: FormData): Promise<ActionResult> {
+export async function createTaskAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = taskCreateSchema.safeParse(buildRawInput(formData));
 
   if (!parsed.success) {

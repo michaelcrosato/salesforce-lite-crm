@@ -46,8 +46,9 @@ const REGISTRY_ICONS: Record<string, LucideIcon> = {
   PieChart
 };
 
-const registryNavItems: readonly NavItem[] = ENTITY_REGISTRY
-  .filter((entity) => !baseNavItems.some((item) => item.href === entity.route))
+const registryNavItems: readonly NavItem[] = ENTITY_REGISTRY.filter(
+  (entity) => !baseNavItems.some((item) => item.href === entity.route)
+)
   .filter((entity) => entity.iconName in REGISTRY_ICONS)
   .map((entity) => ({
     href: entity.route,
@@ -55,7 +56,11 @@ const registryNavItems: readonly NavItem[] = ENTITY_REGISTRY
     icon: REGISTRY_ICONS[entity.iconName]
   }));
 
-const reportsItem: NavItem = { href: "/reports", label: "Reports", icon: PieChart };
+const reportsItem: NavItem = {
+  href: "/reports",
+  label: "Reports",
+  icon: PieChart
+};
 
 const navItems: readonly NavItem[] = [
   ...baseNavItems,
@@ -81,7 +86,8 @@ export function SidebarNav({ mobile = false, "data-testid": testid }: SidebarNav
     >
       {navItems.map((item) => {
         const Icon = item.icon;
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        const active =
+          pathname === item.href || pathname.startsWith(`${item.href}/`);
 
         return (
           <Link

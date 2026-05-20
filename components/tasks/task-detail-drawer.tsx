@@ -3,10 +3,7 @@
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import {
-  deleteTaskAction,
-  updateTaskStatusAction
-} from "@/app/tasks/actions";
+import { deleteTaskAction, updateTaskStatusAction } from "@/app/tasks/actions";
 import {
   TaskForm,
   type TaskFormInitialValues,
@@ -42,7 +39,10 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   cancelled: "Cancelled"
 };
 
-const STATUS_VARIANT: Record<TaskStatus, "default" | "secondary" | "outline" | "success" | "warning" | "danger"> = {
+const STATUS_VARIANT: Record<
+  TaskStatus,
+  "default" | "secondary" | "outline" | "success" | "warning" | "danger"
+> = {
   open: "default",
   in_progress: "warning",
   done: "success",
@@ -146,7 +146,12 @@ export function TaskDetailDrawer({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Fields</CardTitle>
-                <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit
                 </Button>
               </CardHeader>
@@ -154,7 +159,10 @@ export function TaskDetailDrawer({
                 <FieldView label="Status" value={STATUS_LABELS[task.status]} />
                 <FieldView label="Priority" value={task.priority} />
                 <FieldView label="Due date" value={formatDate(task.dueDate)} />
-                <FieldView label="Owner" value={task.ownerName ?? "Unassigned"} />
+                <FieldView
+                  label="Owner"
+                  value={task.ownerName ?? "Unassigned"}
+                />
                 <FieldView label="Created" value={formatDate(task.createdAt)} />
                 <FieldView label="Updated" value={formatDate(task.updatedAt)} />
                 {task.description ? (
@@ -162,7 +170,9 @@ export function TaskDetailDrawer({
                     <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
                       Description
                     </p>
-                    <p className="mt-1 whitespace-pre-wrap text-sm">{task.description}</p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">
+                      {task.description}
+                    </p>
                   </div>
                 ) : null}
               </CardContent>

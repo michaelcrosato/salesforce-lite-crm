@@ -2,7 +2,10 @@
 
 import { type FormEvent, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createContactAction, updateContactAction } from "@/app/contacts/actions";
+import {
+  createContactAction,
+  updateContactAction
+} from "@/app/contacts/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -122,7 +125,11 @@ export function ContactForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" defaultValue={initialValues?.title ?? ""} />
+            <Input
+              id="title"
+              name="title"
+              defaultValue={initialValues?.title ?? ""}
+            />
             <FieldError errors={errors?.title} />
           </div>
           <div className="space-y-2">
@@ -137,7 +144,11 @@ export function ContactForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" name="phone" defaultValue={initialValues?.phone ?? ""} />
+            <Input
+              id="phone"
+              name="phone"
+              defaultValue={initialValues?.phone ?? ""}
+            />
             <FieldError errors={errors?.phone} />
           </div>
           <div className="space-y-2">

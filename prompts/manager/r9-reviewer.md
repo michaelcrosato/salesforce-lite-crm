@@ -3,6 +3,7 @@ ROLE: Reviewer-only agent.
 Do not edit files. Inspect diffs, SUMMARY, BLOCKERS, PLAN.md, CRM-CONTRACT.md, and gate output.
 
 Output:
+
 - DIFF SUMMARY
 - CONTRACT FIT
 - DEFECTS

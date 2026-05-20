@@ -3,7 +3,8 @@ import { parseCsv, previewRows } from "@/lib/business/csv-import";
 
 describe("csv import preview helper (RFC 4180 tolerant)", () => {
   it("parses well-formed input with commas and quotes", () => {
-    const input = 'Name,Email,Notes\nAlice,"a,b@example.com","Said ""hi"""\nBob,bob@example.com,Simple';
+    const input =
+      'Name,Email,Notes\nAlice,"a,b@example.com","Said ""hi"""\nBob,bob@example.com,Simple';
     const res = parseCsv(input);
     expect(res.headers).toEqual(["Name", "Email", "Notes"]);
     expect(res.rows).toHaveLength(2);

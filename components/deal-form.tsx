@@ -1,6 +1,12 @@
 "use client";
 
-import { type FormEvent, useMemo, useRef, useState, useTransition } from "react";
+import {
+  type FormEvent,
+  useMemo,
+  useRef,
+  useState,
+  useTransition
+} from "react";
 import { useRouter } from "next/navigation";
 import { createDealAction, updateDealAction } from "@/app/deals/actions";
 import { Button } from "@/components/ui/button";
@@ -64,7 +70,9 @@ export function DealForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<ActionResult | null>(null);
-  const [selectedAccountId, setSelectedAccountId] = useState(initialValues?.accountId ?? "");
+  const [selectedAccountId, setSelectedAccountId] = useState(
+    initialValues?.accountId ?? ""
+  );
   const [selectedStage, setSelectedStage] = useState<DealStage>(
     (initialValues?.stage as DealStage | undefined) ?? "new"
   );
@@ -77,7 +85,9 @@ export function DealForm({
       return contacts;
     }
 
-    return contacts.filter((contact) => contact.accountId === selectedAccountId);
+    return contacts.filter(
+      (contact) => contact.accountId === selectedAccountId
+    );
   }, [contacts, selectedAccountId]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -118,10 +128,19 @@ export function DealForm({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-4 md:grid-cols-2"
+        >
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="name">Deal name</Label>
-            <Input id="name" name="name" defaultValue={initialValues?.name ?? ""} required />
+            <Input
+              id="name"
+              name="name"
+              defaultValue={initialValues?.name ?? ""}
+              required
+            />
             <FieldError errors={errors?.name} />
           </div>
           <div className="space-y-2">
@@ -153,7 +172,9 @@ export function DealForm({
               min={0}
               max={100}
               value={probability}
-              onChange={(event) => setProbability(Number(event.currentTarget.value))}
+              onChange={(event) =>
+                setProbability(Number(event.currentTarget.value))
+              }
             />
             <FieldError errors={errors?.probability} />
           </div>
@@ -185,7 +206,9 @@ export function DealForm({
               id="accountId"
               name="accountId"
               value={selectedAccountId}
-              onChange={(event) => setSelectedAccountId(event.currentTarget.value)}
+              onChange={(event) =>
+                setSelectedAccountId(event.currentTarget.value)
+              }
             >
               <option value="">No account</option>
               {accounts.map((account) => (
@@ -198,7 +221,11 @@ export function DealForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="contactId">Contact</Label>
-            <Select id="contactId" name="contactId" defaultValue={initialValues?.contactId ?? ""}>
+            <Select
+              id="contactId"
+              name="contactId"
+              defaultValue={initialValues?.contactId ?? ""}
+            >
               <option value="">No contact</option>
               {filteredContacts.map((contact) => (
                 <option key={contact.id} value={contact.id}>
@@ -210,7 +237,11 @@ export function DealForm({
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="ownerId">Owner</Label>
-            <Select id="ownerId" name="ownerId" defaultValue={initialValues?.ownerId ?? ""}>
+            <Select
+              id="ownerId"
+              name="ownerId"
+              defaultValue={initialValues?.ownerId ?? ""}
+            >
               <option value="">Unassigned</option>
               {owners.map((owner) => (
                 <option key={owner.id} value={owner.id}>

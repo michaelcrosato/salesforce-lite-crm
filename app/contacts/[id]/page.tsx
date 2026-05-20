@@ -147,7 +147,11 @@ export default async function ContactDetailPage({
               <SummaryItem
                 label="Status"
                 value={
-                  <Badge variant={contact.status === "active" ? "success" : "outline"}>
+                  <Badge
+                    variant={
+                      contact.status === "active" ? "success" : "outline"
+                    }
+                  >
                     {contact.status === "active"
                       ? CONTACT_STATUS_LABELS.active
                       : CONTACT_STATUS_LABELS.inactive}
@@ -157,11 +161,19 @@ export default async function ContactDetailPage({
               <SummaryItem
                 label="Account Health"
                 value={
-                  contact.account ? `${contact.account.healthScore}/100` : "No account"
+                  contact.account
+                    ? `${contact.account.healthScore}/100`
+                    : "No account"
                 }
               />
-              <SummaryItem label="Created" value={formatDate(contact.createdAt)} />
-              <SummaryItem label="Updated" value={formatDate(contact.updatedAt)} />
+              <SummaryItem
+                label="Created"
+                value={formatDate(contact.createdAt)}
+              />
+              <SummaryItem
+                label="Updated"
+                value={formatDate(contact.updatedAt)}
+              />
             </CardContent>
           </Card>
 
@@ -194,18 +206,26 @@ export default async function ContactDetailPage({
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">
-                            {STAGE_LABELS[deal.stage as keyof typeof STAGE_LABELS]}
+                            {
+                              STAGE_LABELS[
+                                deal.stage as keyof typeof STAGE_LABELS
+                              ]
+                            }
                           </Badge>
                         </TableCell>
                         <TableCell>{formatCurrency(deal.value)}</TableCell>
                         <TableCell>{formatPercent(deal.probability)}</TableCell>
-                        <TableCell>{formatDate(deal.expectedCloseDate)}</TableCell>
+                        <TableCell>
+                          {formatDate(deal.expectedCloseDate)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-sm text-muted-foreground">No deals are linked yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No deals are linked yet.
+                </p>
               )}
             </CardContent>
           </Card>

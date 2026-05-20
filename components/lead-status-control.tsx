@@ -4,7 +4,11 @@ import { useTransition } from "react";
 import { updateLeadStatusAction } from "@/app/leads/actions";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
-import { LEAD_STATUSES, LEAD_STATUS_LABELS, type LeadStatus } from "@/lib/crm-constants";
+import {
+  LEAD_STATUSES,
+  LEAD_STATUS_LABELS,
+  type LeadStatus
+} from "@/lib/crm-constants";
 
 export interface LeadStatusControlProps {
   leadId: string;
@@ -43,7 +47,9 @@ export function LeadStatusControl({
       data-testid={testid}
       defaultValue={status}
       disabled={isPending}
-      onChange={(event) => updateStatus(event.currentTarget.value as LeadStatus)}
+      onChange={(event) =>
+        updateStatus(event.currentTarget.value as LeadStatus)
+      }
     >
       {LEAD_STATUSES.map((leadStatus) => (
         <option key={leadStatus} value={leadStatus}>

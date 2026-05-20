@@ -97,19 +97,21 @@ describe("demo QA deterministic logic", () => {
   });
 
   it("classifies dealer order pacing and caps progress percentages", () => {
-    expect(getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 0 }, now)).toBe(
-      "behind"
+    expect(
+      getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 0 }, now)
+    ).toBe("behind");
+    expect(
+      getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 16 }, now)
+    ).toBe("on_pace");
+    expect(
+      getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 20 }, now)
+    ).toBe("ahead");
+    expect(
+      getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 31 }, now)
+    ).toBe("over");
+    expect(pacingPercent({ monthlyQuota: 10, deliveredThisMonth: 12 })).toBe(
+      100
     );
-    expect(getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 16 }, now)).toBe(
-      "on_pace"
-    );
-    expect(getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 20 }, now)).toBe(
-      "ahead"
-    );
-    expect(getPacingStatus({ monthlyQuota: 31, deliveredThisMonth: 31 }, now)).toBe(
-      "over"
-    );
-    expect(pacingPercent({ monthlyQuota: 10, deliveredThisMonth: 12 })).toBe(100);
     expect(pacingPercent({ monthlyQuota: 0, deliveredThisMonth: 12 })).toBe(0);
   });
 

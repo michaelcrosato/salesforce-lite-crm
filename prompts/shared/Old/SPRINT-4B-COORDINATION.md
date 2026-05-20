@@ -13,12 +13,12 @@ see the dependency graph at a glance.
 
 ## Branches
 
-| Agent | Branch | Status file | Blocker file |
-|---|---|---|---|
-| Codex | `feat/codex-services-routing-and-validation` | `SUMMARY.codex.md` | `BLOCKERS.codex.md` |
-| Gemini CLI | `feat/gemini-gate-and-coverage` | `SUMMARY.gemini.md` | `BLOCKERS.gemini.md` |
-| Claude Code | `feat/claude-demo-and-route-polish` | `SUMMARY.claude.md` | `BLOCKERS.claude.md` |
-| Grok CLI | `feat/grok-components-and-seed-tuning` | `SUMMARY.grok.md` | `BLOCKERS.grok.md` |
+| Agent       | Branch                                       | Status file         | Blocker file         |
+| ----------- | -------------------------------------------- | ------------------- | -------------------- |
+| Codex       | `feat/codex-services-routing-and-validation` | `SUMMARY.codex.md`  | `BLOCKERS.codex.md`  |
+| Gemini CLI  | `feat/gemini-gate-and-coverage`              | `SUMMARY.gemini.md` | `BLOCKERS.gemini.md` |
+| Claude Code | `feat/claude-demo-and-route-polish`          | `SUMMARY.claude.md` | `BLOCKERS.claude.md` |
+| Grok CLI    | `feat/grok-components-and-seed-tuning`       | `SUMMARY.grok.md`   | `BLOCKERS.grok.md`   |
 
 Branch off `main` (or wherever Sprint 4A finalized). Each agent
 tags `sprint-4b-start` at first run if not already present.
@@ -80,51 +80,51 @@ rather than guessing.
 
 ### Item 54 — Broken-link guard
 
-| Layer | Owner | File | Output |
-|---|---|---|---|
-| Backend | Codex | `lib/featureFlags.ts` | `EXCLUDED_ROUTES`, `FEATURE_FLAGS`, `isEnabled()` |
-| Component | Grok | `components/excluded-route-placeholder.tsx` | `<ExcludedRoutePlaceholder route={...} />` |
-| Page | Claude | `app/<excluded>/page.tsx` | Imports both, renders placeholder, deletes broken links from nav |
-| E2E | Gemini | `e2e/excluded-routes.spec.ts` | Asserts each excluded route 404s or shows placeholder |
+| Layer     | Owner  | File                                        | Output                                                           |
+| --------- | ------ | ------------------------------------------- | ---------------------------------------------------------------- |
+| Backend   | Codex  | `lib/featureFlags.ts`                       | `EXCLUDED_ROUTES`, `FEATURE_FLAGS`, `isEnabled()`                |
+| Component | Grok   | `components/excluded-route-placeholder.tsx` | `<ExcludedRoutePlaceholder route={...} />`                       |
+| Page      | Claude | `app/<excluded>/page.tsx`                   | Imports both, renders placeholder, deletes broken links from nav |
+| E2E       | Gemini | `e2e/excluded-routes.spec.ts`               | Asserts each excluded route 404s or shows placeholder            |
 
 ### Item 55 — Routing decision detail
 
-| Layer | Owner | File | Output |
-|---|---|---|---|
-| Backend | Codex | `lib/services/leads.ts` + `lib/crm/crmClient.ts` | `getRoutingDecisionForLead(id)` returns `RoutingDecision` |
-| Backend | Codex | `lib/services/routing.ts` (or wherever) | `routing_event` body is structured JSON with `steps` array |
-| Component | Grok | `components/routing-decision-detail.tsx` | `<RoutingDecisionDetail decision={...} />` |
-| Page | Claude | `app/leads/page.tsx`, `app/orders/[id]/page.tsx` | Fetches decision, renders component with testid |
-| E2E | Gemini | `e2e/demo-path.spec.ts` | Clicks toggle, asserts step rows visible |
+| Layer     | Owner  | File                                             | Output                                                     |
+| --------- | ------ | ------------------------------------------------ | ---------------------------------------------------------- |
+| Backend   | Codex  | `lib/services/leads.ts` + `lib/crm/crmClient.ts` | `getRoutingDecisionForLead(id)` returns `RoutingDecision`  |
+| Backend   | Codex  | `lib/services/routing.ts` (or wherever)          | `routing_event` body is structured JSON with `steps` array |
+| Component | Grok   | `components/routing-decision-detail.tsx`         | `<RoutingDecisionDetail decision={...} />`                 |
+| Page      | Claude | `app/leads/page.tsx`, `app/orders/[id]/page.tsx` | Fetches decision, renders component with testid            |
+| E2E       | Gemini | `e2e/demo-path.spec.ts`                          | Clicks toggle, asserts step rows visible                   |
 
 ### Item 56 — Postal validation
 
-| Layer | Owner | File | Output |
-|---|---|---|---|
-| Backend | Codex | `lib/postal.ts` + `lib/validation.ts` extension | `normalizePostalCode`, `validatePostalCode`, `postalCodeSchema` |
-| Component | Grok | `components/postal-code-input.tsx` | `<PostalCodeInput value onChange country error />` |
-| Page | Claude | `app/leads/page.tsx` + `app/leads/actions.ts` | Form mounts component, action validates with schema, returns field errors |
-| E2E | Gemini | within `e2e/demo-path.spec.ts` | Submit invalid postal → assert error appears |
+| Layer     | Owner  | File                                            | Output                                                                    |
+| --------- | ------ | ----------------------------------------------- | ------------------------------------------------------------------------- |
+| Backend   | Codex  | `lib/postal.ts` + `lib/validation.ts` extension | `normalizePostalCode`, `validatePostalCode`, `postalCodeSchema`           |
+| Component | Grok   | `components/postal-code-input.tsx`              | `<PostalCodeInput value onChange country error />`                        |
+| Page      | Claude | `app/leads/page.tsx` + `app/leads/actions.ts`   | Form mounts component, action validates with schema, returns field errors |
+| E2E       | Gemini | within `e2e/demo-path.spec.ts`                  | Submit invalid postal → assert error appears                              |
 
 ---
 
 ## File ownership matrix (quick reference)
 
-| Zone | Owner | Notes |
-|---|---|---|
-| `prisma/schema.prisma`, `prisma/migrations/**` | Codex | Additive only this sprint |
-| `prisma/seed.ts`, seed helpers | Grok | Anchor manifest in SUMMARY.grok.md |
-| `lib/prisma.ts`, `lib/crm/**`, `lib/services/**`, `lib/validation.ts`, `lib/featureFlags.ts`, `lib/postal.ts` | Codex | |
-| `lib/business/**` | Grok | Pure helpers |
-| `app/**/page.tsx`, `app/**/layout.tsx`, `app/**/loading.tsx`, `app/**/error.tsx`, `app/**/actions.ts` | Claude | One narrow exception: Codex may insert a single behavior-preserving service call in `app/deals/actions.ts` for stage history — coordinate via SUMMARY before doing so |
-| `components/**` | Grok | |
-| `tailwind.config.ts`, `app/globals.css` | Grok | |
-| `tests/**`, `e2e/**`, `scripts/**`, Playwright/Vitest config | Gemini | |
-| `.github/workflows/**` | Gemini | |
-| `CRM-CONTRACT.md` | Codex | SSOT — read-only for others |
-| `DEMO.md`, `README.md` | Claude | |
-| `AGENTS.md` | All | Append-only per agent's section |
-| `SUMMARY.<agent>.md`, `BLOCKERS.<agent>.md` | Respective agent | |
+| Zone                                                                                                          | Owner            | Notes                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prisma/schema.prisma`, `prisma/migrations/**`                                                                | Codex            | Additive only this sprint                                                                                                                                             |
+| `prisma/seed.ts`, seed helpers                                                                                | Grok             | Anchor manifest in SUMMARY.grok.md                                                                                                                                    |
+| `lib/prisma.ts`, `lib/crm/**`, `lib/services/**`, `lib/validation.ts`, `lib/featureFlags.ts`, `lib/postal.ts` | Codex            |                                                                                                                                                                       |
+| `lib/business/**`                                                                                             | Grok             | Pure helpers                                                                                                                                                          |
+| `app/**/page.tsx`, `app/**/layout.tsx`, `app/**/loading.tsx`, `app/**/error.tsx`, `app/**/actions.ts`         | Claude           | One narrow exception: Codex may insert a single behavior-preserving service call in `app/deals/actions.ts` for stage history — coordinate via SUMMARY before doing so |
+| `components/**`                                                                                               | Grok             |                                                                                                                                                                       |
+| `tailwind.config.ts`, `app/globals.css`                                                                       | Grok             |                                                                                                                                                                       |
+| `tests/**`, `e2e/**`, `scripts/**`, Playwright/Vitest config                                                  | Gemini           |                                                                                                                                                                       |
+| `.github/workflows/**`                                                                                        | Gemini           |                                                                                                                                                                       |
+| `CRM-CONTRACT.md`                                                                                             | Codex            | SSOT — read-only for others                                                                                                                                           |
+| `DEMO.md`, `README.md`                                                                                        | Claude           |                                                                                                                                                                       |
+| `AGENTS.md`                                                                                                   | All              | Append-only per agent's section                                                                                                                                       |
+| `SUMMARY.<agent>.md`, `BLOCKERS.<agent>.md`                                                                   | Respective agent |                                                                                                                                                                       |
 
 ---
 
@@ -136,7 +136,7 @@ Once Gemini Slice 1 lands:
 pwsh scripts/local-gate.ps1
 ```
 
-Or on a *nix host:
+Or on a \*nix host:
 
 ```bash
 bash scripts/local-gate.sh

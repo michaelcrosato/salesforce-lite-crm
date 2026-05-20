@@ -12,19 +12,26 @@ function formValue(formData: FormData, key: string) {
   return typeof value === "string" ? value : "";
 }
 
-function fieldErrors(error: { flatten: () => { fieldErrors: Record<string, string[] | undefined> } }) {
+function fieldErrors(error: {
+  flatten: () => { fieldErrors: Record<string, string[] | undefined> };
+}) {
   return error.flatten().fieldErrors;
 }
 
 function prismaErrorMessage(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
     return "A record with that unique value already exists.";
   }
 
   return "The record could not be saved.";
 }
 
-export async function createContactAction(formData: FormData): Promise<ActionResult> {
+export async function createContactAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = contactFormSchema.safeParse({
     accountId: formValue(formData, "accountId"),
     firstName: formValue(formData, "firstName"),
@@ -123,7 +130,9 @@ export async function updateContactAction(
   }
 }
 
-export async function addContactNoteAction(formData: FormData): Promise<ActionResult> {
+export async function addContactNoteAction(
+  formData: FormData
+): Promise<ActionResult> {
   const parsed = noteFormSchema.safeParse({
     contactId: formValue(formData, "contactId"),
     dealId: formValue(formData, "dealId"),

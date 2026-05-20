@@ -1,6 +1,10 @@
 import { DEAL_STAGES } from "@/lib/crm-constants";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
-import { isOpenDealStage, isStaleDeal, stageSortIndex } from "@/lib/business/deals";
+import {
+  isOpenDealStage,
+  isStaleDeal,
+  stageSortIndex
+} from "@/lib/business/deals";
 import { prisma } from "@/lib/prisma";
 
 export type PipelineByStageRow = {
@@ -74,14 +78,12 @@ export async function pipelineByStage(): Promise<PipelineByStageRow[]> {
   }
 
   for (const deal of deals) {
-    const existing =
-      rows.get(deal.stage) ??
-      {
-        stage: deal.stage,
-        count: 0,
-        value: 0,
-        weightedValue: 0
-      };
+    const existing = rows.get(deal.stage) ?? {
+      stage: deal.stage,
+      count: 0,
+      value: 0,
+      weightedValue: 0
+    };
 
     existing.count += 1;
     existing.value += deal.value;
@@ -89,7 +91,9 @@ export async function pipelineByStage(): Promise<PipelineByStageRow[]> {
     rows.set(deal.stage, existing);
   }
 
-  return [...rows.values()].sort((left, right) => stageSortIndex(left.stage) - stageSortIndex(right.stage));
+  return [...rows.values()].sort(
+    (left, right) => stageSortIndex(left.stage) - stageSortIndex(right.stage)
+  );
 }
 
 /**
@@ -135,7 +139,10 @@ export async function leadsBySource(): Promise<LeadsBySourceRow[]> {
       count: count.total,
       rate: count.total > 0 ? count.converted / count.total : 0
     }))
-    .sort((left, right) => right.count - left.count || left.source.localeCompare(right.source));
+    .sort(
+      (left, right) =>
+        right.count - left.count || left.source.localeCompare(right.source)
+    );
 }
 
 export async function activityVolumeByDay(
@@ -197,7 +204,11 @@ export async function topAccountsByOpportunityValue(
       route: ROUTE_REGISTRY.accountDetail(account.id)
     }))
     .filter((account) => account.opportunityCount > 0)
-    .sort((left, right) => right.totalValue - left.totalValue || left.accountName.localeCompare(right.accountName))
+    .sort(
+      (left, right) =>
+        right.totalValue - left.totalValue ||
+        left.accountName.localeCompare(right.accountName)
+    )
     .slice(0, limit);
 }
 
@@ -217,7 +228,9 @@ export async function topAccountsByDealValue(
 
   return accounts
     .map((account) => {
-      const openDeals = account.deals.filter((deal) => isOpenDealStage(deal.stage));
+      const openDeals = account.deals.filter((deal) =>
+        isOpenDealStage(deal.stage)
+      );
 
       return {
         accountId: account.id,
@@ -229,12 +242,15 @@ export async function topAccountsByDealValue(
     .filter((account) => account.openDealCount > 0)
     .sort(
       (left, right) =>
-        right.totalValue - left.totalValue || left.accountName.localeCompare(right.accountName)
+        right.totalValue - left.totalValue ||
+        left.accountName.localeCompare(right.accountName)
     )
     .slice(0, limit);
 }
 
-export async function staleOpportunities(now = new Date()): Promise<StaleOpportunityRow[]> {
+export async function staleOpportunities(
+  now = new Date()
+): Promise<StaleOpportunityRow[]> {
   const deals = await prisma.deal.findMany({
     select: {
       id: true,
@@ -259,7 +275,9 @@ export async function staleOpportunities(now = new Date()): Promise<StaleOpportu
     }));
 }
 
-export async function overdueTasks(now = new Date()): Promise<OverdueTaskRow[]> {
+export async function overdueTasks(
+  now = new Date()
+): Promise<OverdueTaskRow[]> {
   const tasks = await prisma.task.findMany({
     where: {
       dueDate: {

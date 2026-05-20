@@ -43,7 +43,10 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   cancelled: "Cancelled"
 };
 
-const STATUS_VARIANT: Record<TaskStatus, "default" | "secondary" | "outline" | "success" | "warning" | "danger"> = {
+const STATUS_VARIANT: Record<
+  TaskStatus,
+  "default" | "secondary" | "outline" | "success" | "warning" | "danger"
+> = {
   open: "default",
   in_progress: "warning",
   done: "success",
@@ -57,7 +60,10 @@ const PRIORITY_LABELS: Record<TaskPriority, string> = {
   urgent: "Urgent"
 };
 
-const PRIORITY_VARIANT: Record<TaskPriority, "default" | "secondary" | "outline" | "success" | "warning" | "danger"> = {
+const PRIORITY_VARIANT: Record<
+  TaskPriority,
+  "default" | "secondary" | "outline" | "success" | "warning" | "danger"
+> = {
   low: "outline",
   normal: "secondary",
   high: "warning",
@@ -82,7 +88,10 @@ export function TasksTable({ tasks }: { tasks: TaskRow[] }) {
         {tasks.map((task) => (
           <TableRow key={task.id}>
             <TableCell className="font-medium">
-              <Link href={ROUTE_REGISTRY.taskDetail(task.id)} className="text-primary hover:underline">
+              <Link
+                href={ROUTE_REGISTRY.taskDetail(task.id)}
+                className="text-primary hover:underline"
+              >
                 {task.title}
               </Link>
             </TableCell>
@@ -101,7 +110,10 @@ export function TasksTable({ tasks }: { tasks: TaskRow[] }) {
             <TableCell>{renderLink(task.linkedRecord)}</TableCell>
             <TableCell>
               <Button asChild variant="ghost" size="icon">
-                <Link href={ROUTE_REGISTRY.taskDetail(task.id)} aria-label="Open task">
+                <Link
+                  href={ROUTE_REGISTRY.taskDetail(task.id)}
+                  aria-label="Open task"
+                >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -120,7 +132,10 @@ function renderLink(record: TaskLinkedRecord) {
 
   if (record.kind === "account") {
     return (
-      <Link href={ROUTE_REGISTRY.accountDetail(record.id)} className="text-primary hover:underline">
+      <Link
+        href={ROUTE_REGISTRY.accountDetail(record.id)}
+        className="text-primary hover:underline"
+      >
         {record.label}
       </Link>
     );
@@ -128,7 +143,10 @@ function renderLink(record: TaskLinkedRecord) {
 
   if (record.kind === "contact") {
     return (
-      <Link href={ROUTE_REGISTRY.contactDetail(record.id)} className="text-primary hover:underline">
+      <Link
+        href={ROUTE_REGISTRY.contactDetail(record.id)}
+        className="text-primary hover:underline"
+      >
         {record.label}
       </Link>
     );
@@ -136,14 +154,20 @@ function renderLink(record: TaskLinkedRecord) {
 
   if (record.kind === "deal") {
     return (
-      <Link href={ROUTE_REGISTRY.opportunityDetail(record.id)} className="text-primary hover:underline">
+      <Link
+        href={ROUTE_REGISTRY.opportunityDetail(record.id)}
+        className="text-primary hover:underline"
+      >
         {record.label}
       </Link>
     );
   }
 
   return (
-    <Link href={ROUTE_REGISTRY.leadDetail(record.id)} className="text-primary hover:underline">
+    <Link
+      href={ROUTE_REGISTRY.leadDetail(record.id)}
+      className="text-primary hover:underline"
+    >
       {record.label}
     </Link>
   );

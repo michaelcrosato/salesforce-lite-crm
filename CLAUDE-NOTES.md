@@ -4,6 +4,7 @@ Working notes for the UI/E2E slice. The contract is `CRM-CONTRACT.md`; this
 file captures the patterns and constraints I am working under.
 
 ## Domain rules (do not violate)
+
 - Lead is a consumer lead routed to DealerOrder. No B2B Lead -> Account +
   Contact + Opportunity conversion flow.
 - Deal is the opportunity-equivalent. Deal detail stays at `/deals?deal=<id>`.
@@ -15,6 +16,7 @@ file captures the patterns and constraints I am working under.
   of it.
 
 ## Owned paths
+
 - `app/tasks/**`, `app/cases/**`, `app/campaigns/**`, `app/reports/**` (NEW)
 - `components/tasks/**`, `components/cases/**`, `components/campaigns/**`,
   `components/reports/**`, `components/command-palette.tsx` (NEW)
@@ -25,6 +27,7 @@ file captures the patterns and constraints I am working under.
 - `CLAUDE-NOTES.md`, `SUMMARY.claude.md`, `BLOCKERS.claude.md`
 
 ## Paths I must not touch
+
 - Existing pages: dashboard, contacts, accounts, deals, leads, orders, areas,
   activities, forecast, search.
 - Existing components: deal-board, dashboard-charts, activity-timeline,
@@ -36,11 +39,12 @@ file captures the patterns and constraints I am working under.
 - `package.json`, `package-lock.json`.
 
 ## What Codex delivered (consumed via crmClient)
+
 - `lib/crm/registry.ts`: ENTITY_REGISTRY (11 entities), ROUTE_REGISTRY with
   helper functions for detail routes, plus TASK/CASE/CAMPAIGN status &
   priority constants and types.
 - `lib/crm/crmClient.ts`: Promise-based adapter with `list/get/create/update/
-  delete` for every entity plus `completeTask`, `resolveCase`,
+delete` for every entity plus `completeTask`, `resolveCase`,
   `completeCampaign`. Input is validated through Zod schemas in
   `lib/validation.ts`.
 - `lib/services/tasks.ts` / `cases.ts` / `campaigns.ts`: backing services
@@ -61,6 +65,7 @@ file captures the patterns and constraints I am working under.
   scope).
 
 ## UI conventions in this repo
+
 - Pages live under `app/<entity>/page.tsx` with optional `[id]/page.tsx`
   detail or `?param=<id>` drawer pattern (depending on the contract).
   `loading.tsx` ships a `Skeleton` placeholder.
@@ -89,6 +94,7 @@ file captures the patterns and constraints I am working under.
   `case`, `campaign`).
 
 ## Test selectors I will use
+
 - Page headings via `getByRole("heading", { name: <title>, exact: true })`.
 - Form fields via `getByLabel(<label>)`.
 - Buttons via `getByRole("button", { name: <submit label> })`.
@@ -96,12 +102,14 @@ file captures the patterns and constraints I am working under.
 - Row matching via `getByRole("row").filter({ hasText: ... })`.
 
 ## Stopping-rules in play
+
 - max 2 fix attempts per command; on third red, feature-flag off / revert
   and log to BLOCKERS.claude.md.
 - After each commit: type scan must return zero matches for `any`,
   `@ts-ignore`, `@ts-expect-error`.
 
 ## Baseline gate post-rebase
+
 - `npm run test`: 12 files / 82 tests passing.
 - `npm run build`: succeeds; no app/reports route yet (expected).
 - `npm run test:e2e`: failed initially because a stale dev server on

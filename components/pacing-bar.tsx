@@ -1,5 +1,9 @@
 import { Badge } from "@/components/ui/badge";
-import { getPacingStatus, pacingPercent, type DealerOpsOrder } from "@/lib/business/dealerOps";
+import {
+  getPacingStatus,
+  pacingPercent,
+  type DealerOpsOrder
+} from "@/lib/business/dealerOps";
 import { cn } from "@/lib/utils";
 
 const pacingLabels = {
@@ -27,7 +31,15 @@ export function PacingBar({
   return (
     <div className="space-y-2" data-testid={testid}>
       <div className="flex items-center justify-between gap-2">
-        <Badge variant={status === "behind" ? "danger" : status === "on_pace" ? "secondary" : "success"}>
+        <Badge
+          variant={
+            status === "behind"
+              ? "danger"
+              : status === "on_pace"
+                ? "secondary"
+                : "success"
+          }
+        >
           {pacingLabels[status]}
         </Badge>
         <span className="text-xs text-muted-foreground">{percent}%</span>

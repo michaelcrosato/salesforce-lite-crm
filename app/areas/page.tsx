@@ -65,8 +65,12 @@ export default async function AreasPage() {
                   {areas.map((area) => (
                     <tr key={area.id} className="border-b last:border-0">
                       <td className="py-3 pr-4 font-medium">{area.name}</td>
-                      <td className="py-3 pr-4">{area.province ?? "No province"}</td>
-                      <td className="py-3 pr-4">{area.region ?? "No region"}</td>
+                      <td className="py-3 pr-4">
+                        {area.province ?? "No province"}
+                      </td>
+                      <td className="py-3 pr-4">
+                        {area.region ?? "No region"}
+                      </td>
                       <td className="py-3 pr-4">
                         <div className="flex flex-wrap gap-1">
                           {area.postalPrefixes.split(",").map((prefix) => (
