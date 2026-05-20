@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CampaignsView } from "@/components/campaigns/campaigns-view";
 import {
@@ -26,6 +27,10 @@ import {
 import { dateQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Campaigns"
+};
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
   planned: "Planned",
@@ -177,7 +182,7 @@ export default async function CampaignsPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Campaign list</CardTitle>
+          <CardTitle>Campaign List</CardTitle>
         </CardHeader>
         <CardContent>
           <CampaignsView

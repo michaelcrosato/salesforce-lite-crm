@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PacingBar } from "@/components/pacing-bar";
 import { PageHeader } from "@/components/page-header";
@@ -14,6 +15,10 @@ import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Dealer Orders"
+};
 
 export default async function OrdersPage() {
   const now = new Date();
@@ -139,7 +144,7 @@ export default async function OrdersPage() {
           ) : (
             <EmptyState
               title="No dealer orders"
-              description="Dealer orders are seeded and demo-managed for now."
+              description="Seeded dealer orders cover this surface; create and edit flows are deferred."
               actionHref="/dashboard"
               actionLabel="Return to dashboard"
             />

@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import {
   TaskForm,
   type TaskOptionItem
@@ -12,6 +15,10 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "New Task"
+};
 
 export default async function NewTaskPage() {
   const [owners, accounts, contacts, deals, leads] = await Promise.all([
@@ -51,7 +58,11 @@ export default async function NewTaskPage() {
       <PageHeader
         title="New Task"
         description="Capture follow-up work and link it to an account, contact, deal, or lead."
-      />
+      >
+        <Button asChild variant="outline">
+          <Link href="/tasks">Back to tasks</Link>
+        </Button>
+      </PageHeader>
       <TaskForm
         title="Create Task"
         submitLabel="Create task"

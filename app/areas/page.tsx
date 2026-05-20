@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Areas"
+};
 
 export default async function AreasPage() {
   const areas = await prisma.area.findMany({
@@ -95,7 +100,7 @@ export default async function AreasPage() {
           ) : (
             <EmptyState
               title="No areas"
-              description="Routing areas are seeded and demo-managed for now."
+              description="Seeded routing areas cover this surface; create and edit flows are deferred."
               actionHref="/dashboard"
               actionLabel="Return to dashboard"
             />

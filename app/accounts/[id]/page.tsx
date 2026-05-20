@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccountForm } from "@/components/account-form";
@@ -14,8 +15,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { STAGE_LABELS } from "@/lib/crm-constants";
-import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
+import { CONTACT_STATUS_LABELS, STAGE_LABELS, type ContactStatus } from "@/lib/crm-constants";
+import { formatCurrency, formatDate, formatNumber, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,19 @@ type AccountDealListItem = {
     lastName: string;
   } | null;
 };
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const account = await prisma.account.findUnique({
+    where: { id },
+    select: { name: true }
+  });
+  return { title: account?.name ?? "Account not found" };
+}
 
 export default async function AccountDetailPage({
   params
@@ -154,8 +168,8 @@ export default async function AccountDetailPage({
           <SummaryItem label="Owner" value={account.owner?.name ?? "Unassigned"} />
           <SummaryItem label="Created" value={formatDate(account.createdAt)} />
           <SummaryItem label="Updated" value={formatDate(account.updatedAt)} />
-          <SummaryItem label="Contacts" value={account.contacts.length.toString()} />
-          <SummaryItem label="Deals" value={account.deals.length.toString()} />
+          <SummaryItem label="Contacts" value={formatNumber(account.contacts.length)} />
+          <SummaryItem label="Deals" value={formatNumber(account.deals.length)} />
         </CardContent>
       </Card>
 
@@ -214,7 +228,7 @@ export default async function AccountDetailPage({
                       <TableCell>{contact.email ?? "No email"}</TableCell>
                       <TableCell>
                         <Badge variant={contact.status === "active" ? "success" : "outline"}>
-                          {contact.status}
+                          {CONTACT_STATUS_LABELS[contact.status as ContactStatus] ?? contact.status}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -222,7 +236,7 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No contacts are linked.</p>
+              <p className="text-sm text-muted-foreground">No contacts are linked yet.</p>
             )}
           </CardContent>
         </Card>
@@ -278,7 +292,7 @@ export default async function AccountDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="text-sm text-muted-foreground">No deals are linked.</p>
+              <p className="text-sm text-muted-foreground">No deals are linked yet.</p>
             )}
           </CardContent>
         </Card>

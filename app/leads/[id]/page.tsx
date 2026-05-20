@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActivityTimeline } from "@/components/activity-timeline";
@@ -15,6 +16,22 @@ import { prisma } from "@/lib/prisma";
 import { isLeadStatus } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const lead = await prisma.lead.findUnique({
+    where: { id },
+    select: { firstName: true, lastName: true }
+  });
+  if (!lead) {
+    return { title: "Lead not found" };
+  }
+  return { title: `${lead.firstName} ${lead.lastName}` };
+}
 
 export default async function LeadDetailPage({
   params
@@ -84,7 +101,7 @@ export default async function LeadDetailPage({
     <div className="crm-page">
       <PageHeader
         title={`${lead.firstName} ${lead.lastName}`}
-        description="Lead routing details, assignment reason, and routing event timeline."
+        description="Lead contact details, status, dealer assignment, and activity timeline."
       />
 
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">

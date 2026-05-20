@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { DealBoard, type BoardDeal } from "@/components/deal-board";
 import { KpiCard } from "@/components/kpi-card";
@@ -10,6 +11,10 @@ import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Deals"
+};
 
 export default async function DealsPage({
   searchParams

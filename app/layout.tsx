@@ -1,12 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
 import { CommandPalette } from "@/components/command-palette";
 import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
-  title: "Salesforce Lite CRM",
-  description: "Local-first CRM for small business revenue operations."
+  title: {
+    default: "Salesforce Lite CRM",
+    template: "%s | Salesforce Lite CRM"
+  },
+  description:
+    "Salesforce-style CRM application foundation for small business revenue operations.",
+  robots: {
+    index: false,
+    follow: false
+  }
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

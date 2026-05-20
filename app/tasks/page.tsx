@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { TasksView } from "@/components/tasks/tasks-view";
 import { type TaskOptionItem } from "@/components/tasks/task-form";
@@ -27,6 +28,10 @@ import type { TaskListOptions } from "@/lib/crm/crmClient";
 import { dateQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Tasks"
+};
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   open: "Open",
@@ -253,7 +258,7 @@ export default async function TasksPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Task list</CardTitle>
+          <CardTitle>Task List</CardTitle>
         </CardHeader>
         <CardContent>
           <TasksView

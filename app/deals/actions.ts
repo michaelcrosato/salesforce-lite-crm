@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
@@ -23,6 +24,13 @@ function closeDateFromForm(value: string | undefined) {
   return value ? new Date(`${value}T12:00:00`) : null;
 }
 
+function prismaErrorMessage(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    return "A record with that unique value already exists.";
+  }
+  return "The deal could not be saved.";
+}
+
 export async function createDealAction(formData: FormData): Promise<ActionResult> {
   const parsed = dealFormSchema.safeParse({
     accountId: formValue(formData, "accountId"),
@@ -44,34 +52,41 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
   }
 
   const now = new Date();
-  await prisma.deal.create({
-    data: {
-      accountId: parsed.data.accountId ?? null,
-      contactId: parsed.data.contactId ?? null,
-      ownerId: parsed.data.ownerId ?? null,
-      name: parsed.data.name,
-      stage: parsed.data.stage,
-      value: parsed.data.value,
-      probability: parsed.data.probability,
-      expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
-      lastActivityAt: now,
-      activities: {
-        create: {
-          accountId: parsed.data.accountId ?? null,
-          contactId: parsed.data.contactId ?? null,
-          userId: parsed.data.ownerId ?? null,
-          type: "status_change",
-          title: `${parsed.data.name} created in ${STAGE_LABELS[parsed.data.stage]}`,
-          summary: `Deal created in ${parsed.data.stage}.`,
-          nextStep:
-            parsed.data.stage === "won" || parsed.data.stage === "lost"
-              ? "Review closed deal outcome."
-              : "Confirm next action for the new stage.",
-          createdAt: now
+  try {
+    await prisma.deal.create({
+      data: {
+        accountId: parsed.data.accountId ?? null,
+        contactId: parsed.data.contactId ?? null,
+        ownerId: parsed.data.ownerId ?? null,
+        name: parsed.data.name,
+        stage: parsed.data.stage,
+        value: parsed.data.value,
+        probability: parsed.data.probability,
+        expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
+        lastActivityAt: now,
+        activities: {
+          create: {
+            accountId: parsed.data.accountId ?? null,
+            contactId: parsed.data.contactId ?? null,
+            userId: parsed.data.ownerId ?? null,
+            type: "status_change",
+            title: `${parsed.data.name} created in ${STAGE_LABELS[parsed.data.stage]}`,
+            summary: `Deal created in ${parsed.data.stage}.`,
+            nextStep:
+              parsed.data.stage === "won" || parsed.data.stage === "lost"
+                ? "Review closed deal outcome."
+                : "Confirm next action for the new stage.",
+            createdAt: now
+          }
         }
-      }
-    },
-  });
+      },
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      message: prismaErrorMessage(error)
+    };
+  }
 
   revalidatePath("/deals");
   revalidatePath("/dashboard");
@@ -120,53 +135,60 @@ export async function updateDealAction(
   }
 
   const now = new Date();
-  await prisma.$transaction(async (tx) => {
-    await tx.deal.update({
-      where: {
-        id: dealId
-      },
-      data: {
-        accountId: parsed.data.accountId ?? null,
-        contactId: parsed.data.contactId ?? null,
-        ownerId: parsed.data.ownerId ?? null,
-        name: parsed.data.name,
-        stage: parsed.data.stage,
-        value: parsed.data.value,
-        probability: parsed.data.probability,
-        expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
-        lastActivityAt: existing.stage === parsed.data.stage ? existing.lastActivityAt : now
-      }
-    });
-
-    if (existing.stage !== parsed.data.stage) {
-      await tx.activity.create({
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.deal.update({
+        where: {
+          id: dealId
+        },
         data: {
           accountId: parsed.data.accountId ?? null,
           contactId: parsed.data.contactId ?? null,
-          dealId,
-          userId: parsed.data.ownerId ?? null,
-          type: "status_change",
-          title: `${parsed.data.name} moved to ${STAGE_LABELS[parsed.data.stage]}`,
-          summary: `Stage changed from ${existing.stage} to ${parsed.data.stage}.`,
-          nextStep:
-            parsed.data.stage === "won" || parsed.data.stage === "lost"
-              ? "Review closed deal outcome."
-              : "Confirm next action for the new stage.",
-          createdAt: now
+          ownerId: parsed.data.ownerId ?? null,
+          name: parsed.data.name,
+          stage: parsed.data.stage,
+          value: parsed.data.value,
+          probability: parsed.data.probability,
+          expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
+          lastActivityAt: existing.stage === parsed.data.stage ? existing.lastActivityAt : now
         }
       });
 
-      await tx.opportunityStageHistory.create({
-        data: {
-          dealId,
-          fromStage: existing.stage,
-          toStage: parsed.data.stage,
-          changedAt: now,
-          changedByUserId: parsed.data.ownerId ?? existing.ownerId
-        }
-      });
-    }
-  });
+      if (existing.stage !== parsed.data.stage) {
+        await tx.activity.create({
+          data: {
+            accountId: parsed.data.accountId ?? null,
+            contactId: parsed.data.contactId ?? null,
+            dealId,
+            userId: parsed.data.ownerId ?? null,
+            type: "status_change",
+            title: `${parsed.data.name} moved to ${STAGE_LABELS[parsed.data.stage]}`,
+            summary: `Stage changed from ${existing.stage} to ${parsed.data.stage}.`,
+            nextStep:
+              parsed.data.stage === "won" || parsed.data.stage === "lost"
+                ? "Review closed deal outcome."
+                : "Confirm next action for the new stage.",
+            createdAt: now
+          }
+        });
+
+        await tx.opportunityStageHistory.create({
+          data: {
+            dealId,
+            fromStage: existing.stage,
+            toStage: parsed.data.stage,
+            changedAt: now,
+            changedByUserId: parsed.data.ownerId ?? existing.ownerId
+          }
+        });
+      }
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      message: prismaErrorMessage(error)
+    };
+  }
 
   revalidatePath("/deals");
   revalidatePath("/dashboard");
@@ -214,41 +236,48 @@ export async function moveDealAction(input: {
   const now = new Date();
   const probability = probabilityForStage(parsed.data.stage);
 
-  await prisma.$transaction([
-    prisma.deal.update({
-      where: {
-        id: deal.id
-      },
-      data: {
-        stage: parsed.data.stage,
-        probability,
-        lastActivityAt: now
-      }
-    }),
-    prisma.activity.create({
-      data: {
-        accountId: deal.accountId,
-        contactId: deal.contactId,
+  try {
+    await prisma.$transaction([
+      prisma.deal.update({
+        where: {
+          id: deal.id
+        },
+        data: {
+          stage: parsed.data.stage,
+          probability,
+          lastActivityAt: now
+        }
+      }),
+      prisma.activity.create({
+        data: {
+          accountId: deal.accountId,
+          contactId: deal.contactId,
+          dealId: deal.id,
+          userId: deal.ownerId,
+          type: "status_change",
+          title: `${deal.name} moved to ${STAGE_LABELS[parsed.data.stage]}`,
+          summary: `Stage changed from ${deal.stage} to ${parsed.data.stage}.`,
+          nextStep:
+            parsed.data.stage === "won" || parsed.data.stage === "lost"
+              ? "Review closed deal outcome."
+              : "Confirm next action for the new stage.",
+          createdAt: now
+        }
+      }),
+      recordOpportunityStageChangeOperation({
         dealId: deal.id,
-        userId: deal.ownerId,
-        type: "status_change",
-        title: `${deal.name} moved to ${STAGE_LABELS[parsed.data.stage]}`,
-        summary: `Stage changed from ${deal.stage} to ${parsed.data.stage}.`,
-        nextStep:
-          parsed.data.stage === "won" || parsed.data.stage === "lost"
-            ? "Review closed deal outcome."
-            : "Confirm next action for the new stage.",
-        createdAt: now
-      }
-    }),
-    recordOpportunityStageChangeOperation({
-      dealId: deal.id,
-      fromStage: deal.stage,
-      toStage: parsed.data.stage,
-      changedAt: now,
-      changedByUserId: deal.ownerId ?? undefined
-    })
-  ]);
+        fromStage: deal.stage,
+        toStage: parsed.data.stage,
+        changedAt: now,
+        changedByUserId: deal.ownerId ?? undefined
+      })
+    ]);
+  } catch (error) {
+    return {
+      ok: false,
+      message: prismaErrorMessage(error)
+    };
+  }
 
   revalidatePath("/deals");
   revalidatePath("/dashboard");

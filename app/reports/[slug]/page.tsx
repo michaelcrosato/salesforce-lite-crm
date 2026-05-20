@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
@@ -29,6 +30,18 @@ import {
 export const dynamic = "force-dynamic";
 
 type ReportParams = { slug: string };
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<ReportParams>;
+}): Promise<Metadata> {
+  const { slug: rawSlug } = await params;
+  if (!isReportSlug(rawSlug)) {
+    return { title: "Report not found" };
+  }
+  return { title: getReportDefinition(rawSlug).title };
+}
 
 export default async function ReportDetailPage({
   params
@@ -68,7 +81,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "pipeline-by-stage") {
     const rows = await pipelineByStage();
     if (rows.length === 0) {
-      return <EmptyState title="No data" description="No opportunity data found." />;
+      return <EmptyState title="No pipeline data" description="No opportunity data found." />;
     }
     return <PipelineByStageTable rows={rows} />;
   }
@@ -76,7 +89,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "leads-by-source") {
     const rows = await leadsBySource();
     if (rows.length === 0) {
-      return <EmptyState title="No data" description="No leads recorded yet." />;
+      return <EmptyState title="No leads" description="No leads recorded yet." />;
     }
     return <LeadsBySourceTable rows={rows} />;
   }
@@ -84,7 +97,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "activity-volume") {
     const rows = await activityVolumeByDay();
     if (rows.length === 0) {
-      return <EmptyState title="No data" description="No activity in the last 30 days." />;
+      return <EmptyState title="No recent activity" description="No activity in the last 30 days." />;
     }
     return <ActivityVolumeTable rows={rows} />;
   }
@@ -92,7 +105,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "top-accounts") {
     const rows = await topAccountsByOpportunityValue();
     if (rows.length === 0) {
-      return <EmptyState title="No data" description="No accounts with opportunities." />;
+      return <EmptyState title="No accounts" description="No accounts with opportunities." />;
     }
     return <TopAccountsTable rows={rows} />;
   }
@@ -100,7 +113,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "stale-opportunities") {
     const rows = await staleOpportunities();
     if (rows.length === 0) {
-      return <EmptyState title="No stale deals" description="All open opportunities have recent activity." />;
+      return <EmptyState title="No stale opportunities" description="All open opportunities have recent activity." />;
     }
     return <StaleOpportunitiesTable rows={rows} />;
   }

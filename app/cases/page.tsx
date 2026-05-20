@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CasesView } from "@/components/cases/cases-view";
 import {
@@ -29,6 +30,10 @@ import {
 import { nonEmptyQueryParam } from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Cases"
+};
 
 const STATUS_LABELS: Record<CaseStatus, string> = {
   new: "New",
@@ -219,7 +224,7 @@ export default async function CasesPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Case list</CardTitle>
+          <CardTitle>Case List</CardTitle>
         </CardHeader>
         <CardContent>
           <CasesView

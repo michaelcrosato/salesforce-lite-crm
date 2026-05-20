@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ContactsTable } from "@/components/contacts-table";
 import { ContactForm } from "@/components/contact-form";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -8,6 +9,10 @@ import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Contacts"
+};
 
 export default async function ContactsPage({
   searchParams
@@ -92,7 +97,7 @@ export default async function ContactsPage({
     <div className="crm-page">
       <PageHeader
         title="Contacts"
-        description="Search contacts, create new stakeholders, and open detail timelines."
+        description="Search contacts, create new ones, and open detail timelines."
       />
 
       <div id="create-contact">
@@ -104,7 +109,7 @@ export default async function ContactsPage({
       </div>
 
       <Card>
-        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Contact Directory</CardTitle>
           <form action="/contacts" className="w-full sm:max-w-sm">
             <Input name="q" defaultValue={query} placeholder="Search contacts" />

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ActivityTimeline } from "@/components/activity-timeline";
 import { PageHeader } from "@/components/page-header";
@@ -10,6 +11,10 @@ import { ACTIVITY_TYPES, ACTIVITY_TYPE_LABELS, type ActivityType } from "@/lib/c
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Activities"
+};
 
 export default async function ActivitiesPage({
   searchParams
@@ -69,7 +74,7 @@ export default async function ActivitiesPage({
       />
 
       <Card>
-        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Activity Feed</CardTitle>
             <div className="mt-2 flex flex-wrap gap-2">

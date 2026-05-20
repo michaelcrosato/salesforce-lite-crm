@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { ExcludedRoutePlaceholder } from "@/components/excluded-route-placeholder";
+
+export const metadata: Metadata = {
+  title: "Search (Unavailable)"
+};
 
 export default function ExcludedSearchPage() {
   return (
