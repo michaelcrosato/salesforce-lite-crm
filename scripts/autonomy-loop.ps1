@@ -275,9 +275,11 @@ function Write-TextFile {
 function Get-CodexInvocationStartupFailure {
   param([AllowNull()][string] $Text)
   if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
-  if ($Text -match "stdin is not a terminal") { return "stdin is not a terminal" }
-  if ($Text -match "input is not valid UTF-8") { return "input is not valid UTF-8" }
-  if ($Text -match "Failed to write UTF-8 prompt bytes to Codex stdin" -or $Text -match "pipe has been ended") {
+  if ($Text -match "(?m)^(?:error:\s*)?Failed to read prompt from stdin:\s*stdin is not a terminal\.?\s*$") { return "stdin is not a terminal" }
+  if ($Text -match "(?m)^(?:error:\s*)?Failed to read prompt from stdin:\s*input is not valid UTF-8\.?\s*$") { return "input is not valid UTF-8" }
+  if ($Text -match "(?m)^stdin is not a terminal\.?\s*$") { return "stdin is not a terminal" }
+  if ($Text -match "(?m)^input is not valid UTF-8\.?\s*$") { return "input is not valid UTF-8" }
+  if ($Text -match "(?m)^Failed to write UTF-8 prompt bytes to Codex stdin:" -or $Text -match "(?m)^.*pipe has been ended\.?\s*$") {
     return "stdin pipe closed before prompt write completed"
   }
   return ""
@@ -422,6 +424,7 @@ function Invoke-CodexProcess {
   $stdout = $stdoutTask.Result
   $stderr = $stderrTask.Result
   $exitCode = $process.ExitCode
+  $writeFailureText = ""
 
   if (-not [string]::IsNullOrWhiteSpace($stdinWriteFailure)) {
     $writeFailureText = "Failed to write UTF-8 prompt bytes to Codex stdin: $stdinWriteFailure"
@@ -433,7 +436,10 @@ function Invoke-CodexProcess {
   }
 
   $script:LastCodexCombinedOutput = (($stdout, $stderr) -join "`n")
-  $script:LastCodexStartupFailure = Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput
+  $script:LastCodexStartupFailure = ($exitCode -ne 0 -and (Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput))
+  if (-not [string]::IsNullOrWhiteSpace($writeFailureText)) {
+    $script:LastCodexStartupFailure = $true
+  }
 
   foreach ($section in @(
     [pscustomobject]@{ Name = "STDOUT"; Text = $stdout },

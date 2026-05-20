@@ -168,9 +168,11 @@ function Test-StopSignal {
 function Get-CodexInvocationStartupFailure {
   param([AllowNull()][string] $Text)
   if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
-  if ($Text -match "stdin is not a terminal") { return "stdin is not a terminal" }
-  if ($Text -match "input is not valid UTF-8") { return "input is not valid UTF-8" }
-  if ($Text -match "Failed to write UTF-8 prompt bytes to Codex stdin" -or $Text -match "pipe has been ended") {
+  if ($Text -match "(?m)^(?:error:\s*)?Failed to read prompt from stdin:\s*stdin is not a terminal\.?\s*$") { return "stdin is not a terminal" }
+  if ($Text -match "(?m)^(?:error:\s*)?Failed to read prompt from stdin:\s*input is not valid UTF-8\.?\s*$") { return "input is not valid UTF-8" }
+  if ($Text -match "(?m)^stdin is not a terminal\.?\s*$") { return "stdin is not a terminal" }
+  if ($Text -match "(?m)^input is not valid UTF-8\.?\s*$") { return "input is not valid UTF-8" }
+  if ($Text -match "(?m)^Failed to write UTF-8 prompt bytes to Codex stdin:" -or $Text -match "(?m)^.*pipe has been ended\.?\s*$") {
     return "stdin pipe closed before prompt write completed"
   }
   return ""
@@ -289,15 +291,12 @@ function Invoke-CodexSmoke {
     }
   }
 
-  $startupFailure = Get-CodexInvocationStartupFailure -Text $combined
-  if (-not [string]::IsNullOrWhiteSpace($startupFailure)) {
-    $evidence = "Codex invocation smoke startup/invocation failure: $startupFailure."
-    Set-LauncherStartupBlockerReport -Evidence $evidence -LogPath $watchLog
-    throw "$evidence Do not start overnight automation."
-  }
-
   if ($exitCode -ne 0) {
     $evidence = "Codex invocation smoke failed with exit code $exitCode."
+    $startupFailure = Get-CodexInvocationStartupFailure -Text $combined
+    if (-not [string]::IsNullOrWhiteSpace($startupFailure)) {
+      $evidence = "Codex invocation smoke startup/invocation failure: $startupFailure."
+    }
     Set-LauncherStartupBlockerReport -Evidence $evidence -LogPath $watchLog
     throw "Codex exec smoke test failed with exit code $exitCode. Do not start overnight automation."
   }
