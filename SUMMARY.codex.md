@@ -14,7 +14,7 @@ Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T10:34:09.5613679-07:00
+Timestamp: 2026-05-20T10:45:06.1139435-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
@@ -22,7 +22,8 @@ Approximate model tokens/spend this prompt: unknown
 
 - Confirmed all four expected worktrees exist and this worktree is clean on `codex/sprint-4-demo-seed-tuning`.
 - Ran the Phase 0 baseline sequence through `npm run build`; install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, tests, and build all passed.
-- Re-read `PLAN.md`, `CRM-CONTRACT.md`, README, active readiness docs, current Sprint 4 prompt artifacts, historical Sprint 4B report context, and all agent report files before selecting work.
+- Re-read `PLAN.md`, `CRM-CONTRACT.md`, README, current report files, cross-agent reports, readiness docs, local-gate docs, roadmap/demo docs, and active Sprint 4 prompt artifacts before selecting work.
+- Reconciled S4-F1 as already done from recent Codex implementation/report history plus green local-gate evidence; no Codex-owned implementation or contract-drift unit remains in scope.
 - Ran the full local gate through `scripts/local-gate.ps1`; it completed successfully with 152 Vitest tests and 19 Playwright tests passing.
 - Refreshed Codex reports only; no runtime, seed, schema, app, component, test, package, script, or other-agent files were changed.
 
