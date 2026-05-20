@@ -2,40 +2,40 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: S4-F1 - Demo seed tuning
+Feature: S4-F1 - Demo seed tuning / PLAN gate script alignment
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 6dd448e - [codex] S4-F1: add seed routing payloads
+Commits this prompt: 0401e43 - [codex] docs: align PLAN gate scripts
 
 Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T09:03:46-07:00
+Timestamp: 2026-05-20T09:28:05-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added deterministic structured JSON payloads to seeded `routing_event` activities in `prisma/seed.ts`, preserving the existing human-readable summaries and next steps.
-- Verified a seeded Vancouver lead (`lead-1`, postal prefix `V5K`) reads back routing steps `normalize`, `extract_prefix`, `match_area`, `filter_orders`, `rank_pace_gap`, and `select`, with ranked Vancouver candidate orders.
-- Updated `docs/schema-changelog.md` with the required seed-change entry.
+- Reconciled repo state after a green Phase 0 baseline; Codex S4-F1 remains merge-ready with no active Codex blockers.
+- Updated `PLAN.md` §9 and §11 so the documented local gate includes the current `npm run lint` and `npm run typecheck` scripts, and no longer warns that those scripts are absent.
+- Updated the PLAN document-control metadata, B-03 backlog wording, and §17 decision log to record the gate-prose alignment.
 - Ran the full local gate through `scripts/local-gate.ps1`; it completed successfully.
 
 ### Discovered this prompt
 
-- `PLAN.md` §4 lists Sprint 4 queued, while historical Claude/Grok/Gemini summaries still reference Sprint 4B branches and statuses. Treated those summaries as historical because `docs/NEXT-PROMPTS.md` and `prompts/README.md` mark the Sprint 4B prompts as superseded.
-- `PLAN.md` §9 still contains stale prose saying `lint` and `typecheck` scripts do not exist, but the current prompt, `package.json`, `docs/LOCAL-GATE.md`, and `scripts/local-gate.ps1` include them. Used the current prompt and local gate output as the higher authority.
+- `PLAN.md` §4 still lists S4-F1 as queued, but `SUMMARY.codex.md` from the prior prompt cited implementation commit `6dd448e` and a green full local gate. This prompt's full local gate also passed, so Codex treats S4-F1 as done and merge-ready.
+- Claude/Grok/Gemini summaries still contain historical Sprint 4B references; `prompts/README.md`, `docs/NEXT-PROMPTS.md`, and the shared `s4-f*.md` prompts mark those older prompt files as superseded.
 
 ### Next action
 
-Codex S4-F1 is merge-ready from this branch; no Codex-owned Sprint 4 blocker remains.
+No further Codex-owned Sprint 4 implementation unit remains; run sprint rollover or merge coordination next.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO - `docs/schema-changelog.md` was updated as the smallest required coordination line for a seed change.
+No cross-ownership edits: NO - `PLAN.md` is a shared planning/decision-zone file edited as the smallest Phase 2 doc-fix for gate documentation drift.
 
 CRM-CONTRACT.md honored: YES
