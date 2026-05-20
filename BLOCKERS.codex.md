@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: Sprint 4
+Sprint: automation
 
-Feature: S4-F1 - Demo seed tuning
+Feature: Overnight autonomy false startup stop investigation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T07:48:58-07:00
+Timestamp: 2026-05-20T08:40:14-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,6 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- None. No Codex-owned blockers were active at the start of this prompt.
+- Resolved the false Codex startup blocker from the 2026-05-20 07:39 run. The actual `codex exec` process exited 0, but the runner matched old `stdin is not a terminal` text echoed inside the prompt/history.
+- Verified `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\autonomy-loop.ps1 -FullYolo -CodexInvocationSmokeOnly` exits 0.
+- Full local gate passed with 152 Vitest tests and 19 Playwright tests.

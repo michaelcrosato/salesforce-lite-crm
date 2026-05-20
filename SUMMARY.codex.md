@@ -1,42 +1,36 @@
 Agent: Codex
 
-Sprint: Sprint 4
+Sprint: automation
 
-Feature: S4-F1 - Demo seed tuning
+Feature: Overnight autonomy false startup stop investigation
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: a4e1ecc - [codex] S4-F1: tune analyst seed pacing
+Commits this prompt: d8cfde5 - [codex] automation: avoid false stdin startup stops
 
-Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 after the implementation commit; 152 Vitest tests and 19 Playwright tests passed.
+Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\local-gate.ps1` exited 0; 152 Vitest tests and 19 Playwright tests passed. Targeted Codex invocation smoke also passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T07:48:58-07:00
+Timestamp: 2026-05-20T08:40:14-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Tuned `prisma/seed.ts` current delivery targets so seeded analyst actions no longer get crowded out by a long list of behind-order rows.
-- Preserved the demo-critical Vancouver routing story: `V5K 0A1` still resolves to Vancouver Metro, and the e2e lead flow still routes to `dealer-order-vancouver-northstar`.
-- Kept three behind-pace active dealer orders, surfaced one stale high-value deal, and surfaced one low-health dealer account in the default top five analyst actions after a fresh seed.
-- Full local gate passed twice after the change; the post-commit run is the authoritative recorded gate.
-
-### Discovered this prompt
-
-- `PLAN.md` section 4 still lists S4-F1 as queued, but this branch now has a green post-commit local gate for S4-F1 and this summary marks the Codex feature done.
-- Other agent summaries still reference historical Sprint 4B work not present in current `PLAN.md` section 4; treated as historical/superseded context because `docs/NEXT-PROMPTS.md` and `prompts/README.md` point to Sprint 4 shared prompts.
-- `PLAN.md` section 9 still says `lint` and `typecheck` do not exist, while the current `package.json`, `docs/LOCAL-GATE.md`, runner correction, and `scripts/local-gate.ps1` include both. I used the current package scripts and local gate as the validation authority.
+- Confirmed the 2026-05-20 07:39 overnight attempt ran one inner autonomy iteration, not multiple feature loops.
+- Found the stop was a wrapper false positive: `codex exec` exited 0 and produced a GREEN final answer, but the runner scanned the echoed prompt/history and matched old text containing `stdin is not a terminal`.
+- Tightened startup-failure detection in `scripts/autonomy-loop.ps1` and `scripts/start-codex-overnight.ps1` so successful Codex runs are not failed by prompt/history text.
+- Preserved real startup failure handling for non-zero Codex exits and actual stdin write failures.
 
 ### Next action
 
-Codex S4-F1 is merge-ready on this branch; continue with merge coordination or a sprint rollover prompt rather than more seed tuning unless PLAN.md changes.
+Rerun the overnight launcher normally. If the next Codex iteration exits cleanly, the watchdog should continue instead of stopping on the old false startup blocker.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES
+Cross-zone edits: YES. `scripts/**` is Gemini-owned, but the current prompt directly investigated and fixed the Codex overnight launcher/loop scripts.
 
 CRM-CONTRACT.md honored: YES
