@@ -14,23 +14,24 @@ Gate status: PASS - `powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T09:48:45-07:00
+Timestamp: 2026-05-20T10:03:26-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
 - Verified all four expected worktrees exist and confirmed this worktree is clean on `codex/sprint-4-demo-seed-tuning`.
-- Re-ran the Phase 0 baseline through build; lint, typecheck, tests, and build all passed.
+- Ran the Phase 0 baseline sequence through `npm run build`; lint, typecheck, tests, and build all passed.
+- Re-read `PLAN.md`, `CRM-CONTRACT.md`, README, active readiness docs, active Sprint 4 prompts, historical Sprint 4B prompt artifacts, and all agent report files before selecting work.
 - Ran the full local gate through `scripts/local-gate.ps1`; it completed successfully with 152 Vitest tests and 19 Playwright tests passing.
-- Reconciled Sprint 4 coordination state: Codex S4-F1 has prior implementation commits and green gate evidence, while PLAN.md still lists S4-F1 as queued.
-- Refreshed Codex reports only; no runtime, test, package, schema, or other-agent files were changed.
+- Refreshed Codex reports only; no runtime, seed, schema, app, component, test, package, script, or other-agent files were changed.
 
 ### Discovered this prompt
 
-- `PLAN.md` §4 still lists S4-F1 as queued, but prior Codex summaries cite S4-F1 implementation commits and green full local-gate evidence. This iteration's baseline gate also passed, so Codex continues treating S4-F1 as done and merge-ready.
-- Claude, Grok, and Gemini reports still include historical Sprint 4B references. `prompts/README.md`, `docs/NEXT-PROMPTS.md`, and the active shared `s4-f*.md` prompts identify those Sprint 4B prompt files as superseded historical artifacts, not active PLAN §4 scope.
-- `next build` lists `/deals/[id]`, but the inspected route at `app/deals/[id]/page.tsx` renders `ExcludedRoutePlaceholder` and is consistent with the contract's placeholder/excluded-route behavior rather than a live deal detail route.
+- `PLAN.md` section 4 still lists S4-F1 as queued, but Codex reports cite prior S4-F1 implementation commits and green local-gate evidence. This iteration's full local gate also passed, so Codex continues treating S4-F1 as done and merge-ready.
+- Claude, Grok, and Gemini reports still contain historical Sprint 4B references. Current prompt docs identify those Sprint 4B prompts as superseded historical artifacts; the old paths referenced by Grok's summary now live under `prompts/*/Old/` or `prompts/shared/Old/`.
+- `next build` lists `/deals/[id]`, but `app/deals/[id]/page.tsx` renders `ExcludedRoutePlaceholder`; this is consistent with the contract's placeholder/excluded-route behavior rather than a live deal detail route.
+- No Codex-owned contract drift was found in the inspected feature-flag, route-registry, routing-decision, or report-service surfaces.
 
 ### Next action
 
