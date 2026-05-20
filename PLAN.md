@@ -10,9 +10,9 @@
 
 |---|---|
 
-| Version | 2.9D |
+| Version | 2.9E |
 
-| Last updated | 2026-05-17 |
+| Last updated | 2026-05-20 |
 
 | Active sprint | Repo readiness pass active by current prompt; Sprint 4 queued |
 
@@ -416,6 +416,10 @@ dev              -> next dev
 
 build            -> next build
 
+lint             -> eslint . --max-warnings=0
+
+typecheck        -> tsc --noEmit --pretty false
+
 seed             -> tsx prisma/seed.ts
 
 test             -> vitest run
@@ -428,7 +432,7 @@ prisma:postgres  -> node scripts/prisma-postgres.mjs
 
 
 
-There are no `lint` or `typecheck` scripts; agents must not invent them or claim they passed. If they are later added, this section is updated before agents run them.
+Agents may claim `lint` or `typecheck` only when the matching `package.json` scripts exist and the exact commands have run. There is no `format` script unless `package.json` later adds one.
 
 
 
@@ -447,6 +451,10 @@ npx prisma generate
 npx prisma db push
 
 npm run seed
+
+npm run lint
+
+npm run typecheck
 
 npm run test
 
@@ -500,7 +508,7 @@ When in doubt, run the full gate. The change-type subset is a floor, not a cap �
 
 
 
-If the gate fails on `main` after a merge, handle it through a rollback, hotfix, or new IFT round as directed by the current prompt or repo workflow. Agents do not act on `main` without explicit scope. If new gate steps are added to the repo later (a lint script, a typecheck script, a secrets scan), they are added to this section before agents start running them.
+If the gate fails on `main` after a merge, handle it through a rollback, hotfix, or new IFT round as directed by the current prompt or repo workflow. Agents do not act on `main` without explicit scope. If new gate steps are added to the repo later, they are added to this section before agents start running them.
 
 
 
@@ -562,7 +570,7 @@ No inter-agent merging or agent-to-agent pull requests without explicit current-
 
 \- Edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md` stay explicit, scoped, and documented.
 
-\- No claims of `lint` or `typecheck` passing. Those scripts do not exist (§9). Do not invent them.
+\- No invented script claims. Claim `lint`, `typecheck`, `format`, or other checks only when the exact `package.json` script exists and the command was run.
 
 \- Cleanup is repo-local and conservative. Use `scripts/clean-local-artifacts.ps1` in dry-run mode first; remove only ignored/generated/local artifacts inside this repo. Leave unknown files in place and record them in BLOCKERS.
 
@@ -890,7 +898,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-02 | Committed local gate script | For example `scripts/local-gate.ps1`, mirroring §9. Reduces drift between §9 and what agents actually run. |
 
-| B-03 | Add `lint` and/or `typecheck` package scripts | Optional. Do not invent these in the §9 gate before they exist in `package.json`. |
+| B-03 | Maintain `lint` and `typecheck` package scripts | Current package scripts include both checks. Keep §9, `docs/LOCAL-GATE.md`, and prompt artifacts aligned when validation commands change. |
 
 | B-04 | Dealer order and area CRUD | Currently seeded/browsable only. Deferred. |
 
@@ -955,6 +963,20 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+
+
+\### 2026-05-20 — Run decision
+
+\*\*Decision:\*\* Align PLAN local-gate prose with the current package validation scripts.
+
+\*\*Rationale:\*\* The current prompt, `package.json`, `docs/LOCAL-GATE.md`, and `scripts/local-gate.ps1` all include `npm run lint` and `npm run typecheck`, while PLAN §9 and §11 still contained older warnings that those scripts did not exist.
+
+\*\*Alternatives rejected:\*\* Leaving the stale warnings in place would keep future agents choosing between contradictory gate instructions; removing lint/typecheck from the actual gate would weaken current validation and conflict with higher-priority repo-local evidence.
+
+\*\*Sections changed:\*\* §1, §9, §11, §16, §17.
+
+\*\*Open questions handled:\*\* Whether agents may run and report `lint` and `typecheck` when the scripts exist in the current tree.
 
 
 
