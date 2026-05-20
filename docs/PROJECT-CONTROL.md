@@ -103,3 +103,11 @@ or repairing worktrees.
 Chat is for current prompts, one-run exceptions, and short coordination context.
 Repo docs are for durable rules, contracts, checklists, scripts, and prompts.
 Do not paste raw chat history into repo files.
+
+## Roadmap Sources
+
+- `docs/ROADMAP.md`: canonical product roadmap, deferred promotion
+  candidates, and roadmap-source artifact link.
+- `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md`: roadmap review trace artifact.
+- `PLAN.md`, `CRM-CONTRACT.md`, and repo-local evidence remain higher authority
+  for active execution scope and product contract details.

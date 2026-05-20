@@ -294,13 +294,16 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 
 ## Roadmap
 
+The canonical roadmap lives in [docs/ROADMAP.md](docs/ROADMAP.md). It records
+queued hardening work, deferred promotion candidates, and guardrails for future
+scope. Current product truth still comes from `CRM-CONTRACT.md`, `PLAN.md`,
+and repo-local evidence.
+
 The current tree includes the Sprint 4B demo-hardening surface: seeded demo
 anchors, route-level QA hooks, shared component polish, task/case/campaign
-workflows, reports, and local gate documentation. New feature work should be
-selected from `PLAN.md`, `CRM-CONTRACT.md`, and `docs/FEATURE-BACKLOG.md`
-rather than inferred from old agent handoff files.
+workflows, reports, and local gate documentation.
 
-Deferred backlog items include Postgres runtime cutover readiness, auth and
-permissions, deployment configuration, a dedicated `/search` page, persistent
-forecast scenarios, dealer order and area CRUD, optional external AI provider
-integration, CSV UI workflows, and any future `/deals/[id]` route.
+Deferred items such as auth, deployment, external AI, global search expansion,
+Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
+CSV UI workflows, and any future `/deals/[id]` route require explicit promotion
+before implementation.

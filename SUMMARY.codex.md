@@ -1,24 +1,53 @@
 Agent: Codex
-Sprint: Sprint 4
-Feature: S4-F1 — Demo seed tuning
-Branch: codex/autonomy
+
+Sprint: 4
+
+Feature: Roadmap documentation finalization
+
+Branch: codex/sprint-4-demo-seed-tuning
+
 Status: done
-Commits this prompt: b08f10d — [codex] S4-F1: seed structured routing decision payloads
-Gate status: PASS — npx prisma generate, npx prisma db push, npm run seed, npm run test, npm run build, npx playwright install chromium, and npm run test:e2e all exited 0
+
+Commits this prompt: e579117 - [codex] docs: finalize canonical roadmap
+
+Gate status: PASS
+
 DoD self-check: PASS
-Timestamp: 2026-05-18T21:50:55.5657347-07:00
+
+Timestamp: 2026-05-19T22:12:51-07:00
+
+Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
-- Updated `prisma/seed.ts` so seeded `routing_event` activities keep the existing human-readable summary and also write a structured `rawText` payload with `version`, `input`, `normalize`, `extract_prefix`, `match_area`, `filter_orders`, `rank_pace_gap`, and `select` data for the routing decision detail panel.
-- Verified `routing-event-lead-1` parses as a version 1 payload with the expected six routing steps, and the full seed-data gate plus Playwright e2e pass remained green.
 
-### Discovered this prompt
-- `PLAN.md` §4 still lists Sprint 4 rows as queued while this branch contains the Sprint 4B merge chain and several agent summaries claim Sprint 4B completion. Per the current loop prompt, this was recorded but not corrected because `SPRINT-ROLLOVER.md` is the only prompt that may add or roll sprint entries.
-- Several cross-agent SUMMARY/BLOCKERS files contain stale narrative details relative to this branch; local gate output was used as the authoritative state for this iteration.
+- Created `docs/ROADMAP.md` as the canonical roadmap, grounded in repo-local
+  sources: `CRM-CONTRACT.md`, `README.md`, `PLAN.md`, `docs/FEATURE-BACKLOG.md`,
+  `lib/crm/registry.ts`, `lib/featureFlags.ts`, app route files, and active
+  Sprint 4 prompt artifacts.
+- Created `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md` as the source/review trace
+  artifact and kept candidate-review detail out of the canonical roadmap.
+- Updated the README roadmap section to point at `docs/ROADMAP.md` instead of
+  carrying a competing roadmap summary.
+- Updated `PLAN.md` section 16 only to reference `docs/ROADMAP.md` as the
+  proposed roadmap source while preserving the backlog as non-authorizing input.
+- Updated `docs/PROJECT-CONTROL.md` to identify `docs/ROADMAP.md` as the
+  canonical roadmap and keep README as a roadmap pointer.
+- Did not create `docs/AI-ROADMAP.md` or `docs/ARCHITECTURE.md`; the roadmap
+  did not need a split AI plan or a new architecture overview.
+- Preserved guardrails in the roadmap: no auth, no external AI, no live
+  `/deals/[id]`, no `/search` expansion, no Postgres default, and no dealer or
+  area CRUD unless future work is explicitly promoted.
+- Verification: `git diff --check` passed, `git diff --cached --check` passed,
+  local roadmap link targets were verified with `Test-Path`, and `git status`
+  was reviewed before commit. Full runtime gate was not run because this was a
+  docs-only change with no runtime claims.
 
 ### Next action
-Run sprint rollover or merge coordination after `PLAN.md` §4 status is reconciled; no further Codex S4-F1 seed payload work is pending.
+
+Idle / awaiting next prompt or PLAN-promoted scope.
 
 ### Scope confirmation
-No cross-ownership edits: YES
+
+No cross-ownership edits: NO  (shared roadmap, PLAN, README, and project-control docs were explicitly in scope for this prompt; see BLOCKERS)
+
 CRM-CONTRACT.md honored:  YES
