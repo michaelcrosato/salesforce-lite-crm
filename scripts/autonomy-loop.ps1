@@ -60,7 +60,11 @@ param(
   [switch] $AllowSprintRollover,
 
   # Poll origin/main for STOP or AUTONOMY.STOP before each iteration.
-  [switch] $PollOriginStop
+  [switch] $PollOriginStop,
+
+  # Used by the overnight watchdog to verify the same codex exec path used by
+  # real autonomy iterations before starting the long-running loop.
+  [switch] $CodexInvocationSmokeOnly
 )
 
 Set-StrictMode -Version Latest
@@ -81,6 +85,8 @@ $script:RolloverPrompt = Join-Path $script:RunRoot ("prompts\{0}\SPRINT-ROLLOVER
 $script:TranscriptPath = Join-Path $script:RunDir ("TRANSCRIPT.{0}.{1}.log" -f $script:Agent, $script:StartedAt)
 $script:MasterLog = Join-Path $script:RunDir "MASTER.log"
 $script:LastGreenHead = $null
+$script:LastCodexCombinedOutput = ""
+$script:LastCodexStartupFailure = $false
 
 New-Item -ItemType Directory -Force -Path $script:RunDir | Out-Null
 
@@ -96,6 +102,74 @@ function Require-Command {
     throw "Required command not found on PATH: $Name"
   }
   return $cmd.Source
+}
+
+function Get-CodexExecutable {
+  $cmdShim = Get-Command "codex.cmd" -ErrorAction SilentlyContinue
+  if ($cmdShim) { return $cmdShim.Source }
+
+  $codex = Get-Command "codex" -ErrorAction SilentlyContinue
+  if (-not $codex) {
+    throw "Required command not found on PATH: codex"
+  }
+
+  if ($codex.Source -and $codex.Source.EndsWith(".ps1", [System.StringComparison]::OrdinalIgnoreCase)) {
+    $siblingCmd = [System.IO.Path]::ChangeExtension($codex.Source, ".cmd")
+    if (Test-Path -LiteralPath $siblingCmd) {
+      return $siblingCmd
+    }
+  }
+
+  return $codex.Source
+}
+
+function Format-NativeArgument {
+  param([Parameter(Mandatory = $true)][AllowEmptyString()][string] $Argument)
+
+  if ($Argument.Length -gt 0 -and $Argument -notmatch '[\s"]') {
+    return $Argument
+  }
+
+  $builder = New-Object System.Text.StringBuilder
+  [void] $builder.Append('"')
+  $backslashes = 0
+
+  foreach ($char in $Argument.ToCharArray()) {
+    if ($char -eq '\') {
+      $backslashes++
+      continue
+    }
+
+    if ($char -eq '"') {
+      [void] $builder.Append(('\' * (($backslashes * 2) + 1)))
+      [void] $builder.Append('"')
+      $backslashes = 0
+      continue
+    }
+
+    if ($backslashes -gt 0) {
+      [void] $builder.Append(('\' * $backslashes))
+      $backslashes = 0
+    }
+    [void] $builder.Append($char)
+  }
+
+  if ($backslashes -gt 0) {
+    [void] $builder.Append(('\' * ($backslashes * 2)))
+  }
+  [void] $builder.Append('"')
+
+  return $builder.ToString()
+}
+
+function Join-NativeArguments {
+  param([Parameter(Mandatory = $true)][string[]] $Arguments)
+
+  $quoted = @()
+  foreach ($arg in $Arguments) {
+    $quoted += (Format-NativeArgument -Argument $arg)
+  }
+  return ($quoted -join " ")
 }
 
 function Get-PowerShellExe {
@@ -186,6 +260,149 @@ function Write-TextFile {
   $parent = Split-Path -Parent $Path
   if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
   Set-Content -LiteralPath $Path -Encoding UTF8 -Value $Text
+}
+
+function Test-CodexStdinStartupFailure {
+  param([AllowNull()][string] $Text)
+  return ($Text -match "stdin is not a terminal")
+}
+
+function Set-StartupBlockerReport {
+  param(
+    [Parameter(Mandatory = $true)][string] $Evidence,
+    [Parameter(Mandatory = $true)][string] $LogPath
+  )
+
+  $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:sszzz"
+  $branch = "<unknown>"
+  $head = "<unknown>"
+  try { $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD") } catch {}
+  try { $head = Get-HeadShort } catch {}
+
+  $blockersPath = Join-Path $script:RunRoot ("BLOCKERS.{0}.md" -f $script:Agent)
+  $summaryPath = Join-Path $script:RunRoot ("SUMMARY.{0}.md" -f $script:Agent)
+  $escapedEvidence = $Evidence.Replace("|", "\|").Replace("`r", " ").Replace("`n", " ")
+  $escapedLogPath = $LogPath.Replace("|", "\|")
+
+  $blockers = @"
+Agent: $script:Agent
+
+Sprint: automation
+
+Feature: overnight autonomy startup
+
+Branch: $branch
+
+Timestamp: $timestamp
+
+Escalation required: YES
+
+### Active blockers
+
+| # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
+|---|--------------|------|-------------|----------|---------|-----------------|
+| 1 | scripts/autonomy-loop.ps1 / scripts/start-codex-overnight.ps1 | gate | Codex automation startup failed before a usable agent turn. | $escapedEvidence See $escapedLogPath. | Fix the Codex invocation path or local Codex CLI startup behavior. | Do not restart the overnight loop until the Codex invocation smoke passes. |
+
+### Resolved this prompt
+
+- None.
+"@
+
+  $summary = @"
+Agent: $script:Agent
+
+Sprint: automation
+
+Feature: overnight autonomy startup
+
+Branch: $branch
+
+Status: blocked
+
+Commits this prompt: none
+
+Gate status: NOT RUN
+
+DoD self-check: FAIL
+
+Timestamp: $timestamp
+
+Approximate model tokens/spend this prompt: unknown
+
+### Completed this prompt
+
+- Overnight automation startup stopped before an agent iteration because Codex
+  invocation preflight failed.
+- Evidence: $Evidence
+- Log: $LogPath
+
+### Next action
+
+Fix the Codex invocation path and rerun the smoke preflight before restarting
+the overnight watchdog.
+
+### Scope confirmation
+
+Cross-zone edits: NO
+
+CRM-CONTRACT.md honored:  YES
+"@
+
+  Write-TextFile -Path $blockersPath -Text $blockers
+  Write-TextFile -Path $summaryPath -Text $summary
+  Write-MasterLog ("startup blocker written for {0} at {1}" -f $Evidence, $head)
+}
+
+function Invoke-CodexProcess {
+  param(
+    [Parameter(Mandatory = $true)][string] $PromptPath,
+    [Parameter(Mandatory = $true)][string[]] $Arguments,
+    [Parameter(Mandatory = $true)][string] $OutputPath
+  )
+
+  $codex = Get-CodexExecutable
+  $promptText = Get-Content -Raw -LiteralPath $PromptPath
+
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
+  $psi.FileName = $codex
+  $psi.Arguments = Join-NativeArguments -Arguments $Arguments
+  $psi.WorkingDirectory = $script:RunRoot
+  $psi.UseShellExecute = $false
+  $psi.RedirectStandardInput = $true
+  $psi.RedirectStandardOutput = $true
+  $psi.RedirectStandardError = $true
+
+  $process = New-Object System.Diagnostics.Process
+  $process.StartInfo = $psi
+
+  [void] $process.Start()
+  $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+  $stderrTask = $process.StandardError.ReadToEndAsync()
+  $process.StandardInput.Write($promptText)
+  $process.StandardInput.Close()
+  $process.WaitForExit()
+
+  $stdout = $stdoutTask.Result
+  $stderr = $stderrTask.Result
+  $exitCode = $process.ExitCode
+
+  $script:LastCodexCombinedOutput = (($stdout, $stderr) -join "`n")
+  $script:LastCodexStartupFailure = Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput
+
+  foreach ($section in @(
+    [pscustomobject]@{ Name = "STDOUT"; Text = $stdout },
+    [pscustomobject]@{ Name = "STDERR"; Text = $stderr }
+  )) {
+    if ([string]::IsNullOrWhiteSpace($section.Text)) { continue }
+    Add-Content -LiteralPath $OutputPath -Value ("[{0}]" -f $section.Name)
+    foreach ($line in ($section.Text -split '\r?\n')) {
+      $trimmed = $line.TrimEnd()
+      if ($trimmed.Length -gt 0) { Write-Host $trimmed }
+      Add-Content -LiteralPath $OutputPath -Value $trimmed
+    }
+  }
+
+  return $exitCode
 }
 
 function Invoke-LoggedNative {
@@ -374,9 +591,6 @@ function Invoke-CodexPrompt {
     [Parameter(Mandatory = $true)][string] $OutputPath
   )
 
-  $codex = Require-Command "codex"
-  $promptText = Get-Content -Raw -LiteralPath $PromptPath
-
   $args = @(
     "exec",
     "--cd", $script:RunRoot,
@@ -396,7 +610,7 @@ function Invoke-CodexPrompt {
   $args += "-"
 
   Add-Content -LiteralPath $OutputPath -Value ""
-  Add-Content -LiteralPath $OutputPath -Value ("COMMAND: codex {0}" -f ($args -join " "))
+  Add-Content -LiteralPath $OutputPath -Value ("COMMAND: codex {0} < {1}" -f (Join-NativeArguments -Arguments $args), $PromptPath)
   Add-Content -LiteralPath $OutputPath -Value ("PWD: {0}" -f $script:RunRoot)
   Add-Content -LiteralPath $OutputPath -Value ("TIME: {0}" -f (Get-Date -Format o))
   Add-Content -LiteralPath $OutputPath -Value "----------------------------------------"
@@ -404,13 +618,7 @@ function Invoke-CodexPrompt {
   Push-Location $script:RunRoot
   try {
     $global:LASTEXITCODE = 0
-    Invoke-NativeCommand { $promptText | & $codex @args 2>&1 } | ForEach-Object {
-      $line = $_ | Out-String
-      $line = $line.TrimEnd()
-      if ($line.Length -gt 0) { Write-Host $line }
-      Add-Content -LiteralPath $OutputPath -Value $line
-    }
-    $exitCode = $script:LastNativeExitCode
+    $exitCode = Invoke-CodexProcess -PromptPath $PromptPath -Arguments $args -OutputPath $OutputPath
   }
   finally {
     Pop-Location
@@ -420,6 +628,12 @@ function Invoke-CodexPrompt {
   Add-Content -LiteralPath $OutputPath -Value ("CODEX_EXIT_CODE: {0}" -f $exitCode)
   Add-Content -LiteralPath $OutputPath -Value ""
   Write-MasterLog ("codex prompt {0}: exit {1}" -f (Split-Path -Leaf $PromptPath), $exitCode)
+
+  if ($script:LastCodexStartupFailure) {
+    $evidence = "Codex exec returned 'stdin is not a terminal' for prompt $(Split-Path -Leaf $PromptPath)."
+    Set-StartupBlockerReport -Evidence $evidence -LogPath $OutputPath
+    throw $evidence
+  }
 
   return $exitCode
 }
@@ -799,6 +1013,47 @@ function Test-SummarySaysBlockedHard {
   return ($Text -match "pre-flight unrecoverable" -or $Text -match "STATUS\s*:\s*BLOCKED")
 }
 
+function Invoke-CodexInvocationSmoke {
+  $smokeDir = Join-Path $script:RunDir "codex-invocation-smoke"
+  New-Item -ItemType Directory -Force -Path $smokeDir | Out-Null
+
+  $promptPath = Join-Path $smokeDir "prompt.md"
+  $summaryPath = Join-Path $smokeDir "final.md"
+  $outputPath = Join-Path $smokeDir "agent-output.log"
+
+  Write-TextFile -Path $promptPath -Text "Return exactly OK."
+
+  Write-Host ""
+  Write-Host "Running Codex invocation smoke with the same codex exec path used by autonomy iterations."
+  Write-MasterLog "codex invocation smoke started"
+
+  $exitCode = Invoke-CodexPrompt -PromptPath $promptPath -SummaryPath $summaryPath -OutputPath $outputPath
+  if ($exitCode -ne 0) {
+    $evidence = "Codex invocation smoke failed with exit code $exitCode."
+    if (Test-CodexStdinStartupFailure -Text $script:LastCodexCombinedOutput) {
+      $evidence = "Codex invocation smoke returned 'stdin is not a terminal'."
+    }
+    Set-StartupBlockerReport -Evidence $evidence -LogPath $outputPath
+    throw $evidence
+  }
+
+  if (-not (Test-Path -LiteralPath $summaryPath)) {
+    $evidence = "Codex invocation smoke did not create --output-last-message file $summaryPath."
+    Set-StartupBlockerReport -Evidence $evidence -LogPath $outputPath
+    throw $evidence
+  }
+
+  $summaryText = (Get-Content -Raw -LiteralPath $summaryPath).Trim()
+  if ($summaryText -ne "OK") {
+    $evidence = "Codex invocation smoke created --output-last-message but returned '$summaryText' instead of OK."
+    Set-StartupBlockerReport -Evidence $evidence -LogPath $outputPath
+    throw $evidence
+  }
+
+  Write-Host "Codex invocation smoke passed."
+  Write-MasterLog "codex invocation smoke passed"
+}
+
 Start-Transcript -Path $script:TranscriptPath -Append | Out-Null
 
 try {
@@ -819,7 +1074,7 @@ try {
   Require-Command "git" | Out-Null
   Require-Command "npm" | Out-Null
   Require-Command "npx" | Out-Null
-  Require-Command "codex" | Out-Null
+  Get-CodexExecutable | Out-Null
 
   foreach ($required in @(
     "README.md",
@@ -841,6 +1096,11 @@ try {
 
   Invoke-Git @("rev-parse", "--is-inside-work-tree") | Out-Null
   Ensure-BranchPolicy
+
+  if ($CodexInvocationSmokeOnly) {
+    Invoke-CodexInvocationSmoke
+    return
+  }
 
   if ($KeepAwake) { Set-KeepAwake }
   if ($StartDockerServices) { Start-DockerServicesIfPresent }

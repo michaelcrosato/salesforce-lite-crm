@@ -139,23 +139,109 @@ function Test-StopSignal {
   return ((Test-Path -LiteralPath $stop) -or (Test-Path -LiteralPath $autonomyStop))
 }
 
+function Test-CodexStdinStartupFailure {
+  param([AllowNull()][string] $Text)
+  return ($Text -match "stdin is not a terminal")
+}
+
+function Set-LauncherStartupBlockerReport {
+  param(
+    [Parameter(Mandatory = $true)][string] $Evidence,
+    [Parameter(Mandatory = $true)][string] $LogPath
+  )
+
+  $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:sszzz"
+  $branch = "<unknown>"
+  try { $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD") } catch {}
+
+  $blockersPath = Join-Path $script:RepoRoot ("BLOCKERS.{0}.md" -f $Agent)
+  $summaryPath = Join-Path $script:RepoRoot ("SUMMARY.{0}.md" -f $Agent)
+  $escapedEvidence = $Evidence.Replace("|", "\|").Replace("`r", " ").Replace("`n", " ")
+  $escapedLogPath = $LogPath.Replace("|", "\|")
+
+  $blockers = @"
+Agent: $Agent
+
+Sprint: automation
+
+Feature: overnight autonomy startup
+
+Branch: $branch
+
+Timestamp: $timestamp
+
+Escalation required: YES
+
+### Active blockers
+
+| # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
+|---|--------------|------|-------------|----------|---------|-----------------|
+| 1 | scripts/autonomy-loop.ps1 / scripts/start-codex-overnight.ps1 | gate | Codex overnight launcher failed before starting the watchdog loop. | $escapedEvidence See $escapedLogPath. | Fix the Codex invocation path or local Codex CLI startup behavior. | Do not restart the overnight loop until the Codex invocation smoke passes. |
+
+### Resolved this prompt
+
+- None.
+"@
+
+  $summary = @"
+Agent: $Agent
+
+Sprint: automation
+
+Feature: overnight autonomy startup
+
+Branch: $branch
+
+Status: blocked
+
+Commits this prompt: none
+
+Gate status: NOT RUN
+
+DoD self-check: FAIL
+
+Timestamp: $timestamp
+
+Approximate model tokens/spend this prompt: unknown
+
+### Completed this prompt
+
+- Overnight launcher stopped before the watchdog loop because Codex invocation
+  preflight failed.
+- Evidence: $Evidence
+- Log: $LogPath
+
+### Next action
+
+Fix the Codex invocation path and rerun the smoke preflight before restarting
+the overnight watchdog.
+
+### Scope confirmation
+
+Cross-zone edits: NO
+
+CRM-CONTRACT.md honored:  YES
+"@
+
+  Set-Content -LiteralPath $blockersPath -Encoding UTF8 -Value $blockers
+  Set-Content -LiteralPath $summaryPath -Encoding UTF8 -Value $summary
+}
+
 function Invoke-CodexSmoke {
   if ($NoCodexSmoke) {
     Write-WatchLog "SKIP Codex exec smoke because -NoCodexSmoke was supplied."
     return
   }
 
-  $codex = Require-Command "codex"
-  Write-WatchLog "== Codex YOLO smoke test using default/latest configured model =="
+  $ps = Get-PowerShellExe
+  $smokeArgs = Get-LoopArguments -CodexInvocationSmokeOnly
+  Write-WatchLog "== Codex invocation smoke using autonomy-loop codex exec path =="
+  Write-WatchLog ("SMOKE COMMAND: {0} {1}" -f $ps, (Format-CommandForLog -CommandArgs $smokeArgs))
 
-  $result = Invoke-NativeCapture {
-    "Return exactly OK." | & $codex exec `
-      --cd $script:RepoRoot `
-      --dangerously-bypass-approvals-and-sandbox `
-      - 2>&1
-  }
+  $result = Invoke-NativeCapture { & $ps @smokeArgs 2>&1 }
   $output = $result.Output
   $exitCode = $result.ExitCode
+  $combined = (($output | Out-String).Trim())
 
   foreach ($line in $output) {
     $text = $line | Out-String
@@ -166,7 +252,15 @@ function Invoke-CodexSmoke {
     }
   }
 
+  if (Test-CodexStdinStartupFailure -Text $combined) {
+    $evidence = "Codex invocation smoke returned 'stdin is not a terminal'."
+    Set-LauncherStartupBlockerReport -Evidence $evidence -LogPath $watchLog
+    throw "$evidence Do not start overnight automation."
+  }
+
   if ($exitCode -ne 0) {
+    $evidence = "Codex invocation smoke failed with exit code $exitCode."
+    Set-LauncherStartupBlockerReport -Evidence $evidence -LogPath $watchLog
     throw "Codex exec smoke test failed with exit code $exitCode. Do not start overnight automation."
   }
 }
@@ -212,6 +306,8 @@ function Format-CommandForLog {
 }
 
 function Get-LoopArguments {
+  param([switch] $CodexInvocationSmokeOnly)
+
   $args = @(
     "-NoLogo",
     "-NoProfile",
@@ -242,6 +338,7 @@ function Get-LoopArguments {
   if (-not $NoAllowSprintRollover) { $args += "-AllowSprintRollover" }
   if (-not $NoPush) { $args += "-Push" }
   if ($PollOriginStop) { $args += "-PollOriginStop" }
+  if ($CodexInvocationSmokeOnly) { $args += "-CodexInvocationSmokeOnly" }
 
   return $args
 }
@@ -266,7 +363,8 @@ if (Test-StopSignal) {
 if ($DryRun) {
   $ps = Get-PowerShellExe
   $loopArgs = Get-LoopArguments
-  Write-WatchLog "DRY RUN: would run Codex smoke unless -NoCodexSmoke is supplied."
+  $smokeArgs = Get-LoopArguments -CodexInvocationSmokeOnly
+  Write-WatchLog ("DRY RUN: would run Codex smoke via {0} {1} unless -NoCodexSmoke is supplied." -f $ps, (Format-CommandForLog -CommandArgs $smokeArgs))
   Write-WatchLog "DRY RUN: would ensure rollback tag $RollbackTag and push it unless -NoRollbackTagPush is supplied."
   Write-WatchLog ("DRY RUN: would invoke {0} {1}" -f $ps, (Format-CommandForLog -CommandArgs $loopArgs))
   exit 0
@@ -289,6 +387,11 @@ while (-not (Test-StopSignal)) {
 
   $exitLine = "EXIT autonomy-loop at $(Get-Date -Format o) with code $exitCode"
   Write-WatchLog $exitLine
+
+  if ($exitCode -ne 0) {
+    Write-WatchLog "Autonomy loop exited non-zero. Watchdog will not restart a failed startup/run."
+    exit $exitCode
+  }
 
   if (Test-StopSignal) {
     Write-WatchLog "Stop file found under repo root. Watchdog exiting."
