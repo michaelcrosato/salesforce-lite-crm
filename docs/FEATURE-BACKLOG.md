@@ -7,10 +7,12 @@ roadmap and does not authorize feature work.
 
 | ID | Scope | Owner | Status |
 |---|---|---|---|
-| S4-F1 | Demo seed tuning | Codex | queued |
+| S4-F1 | Demo seed tuning | Codex | done |
 | S4-F2 | Route visual QA | Claude | queued |
 | S4-F3 | Component polish | Grok | queued |
 | S4-F4 | Demo smoke and gate hardening | Gemini | queued |
+| S5-F1 | Server CSV export contracts | Codex | queued |
+| S5-F2 | CSV import preview validation | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -24,6 +26,9 @@ roadmap and does not authorize feature work.
 - Postgres cutover as the default runtime.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
+- CSV product UI, bulk import writes, file storage, mapping wizard, and
+  Salesforce-connected import/export remain deferred while Sprint 5 queues
+  server-side CSV groundwork.
 
 ## Implemented Contract Routes
 
