@@ -13,8 +13,10 @@ roadmap and does not authorize feature work.
 | S4-F4 | Demo smoke and gate hardening | Gemini | queued |
 | S5-F1 | Server CSV export contracts | Codex | done |
 | S5-F2 | CSV import preview validation | Codex | done |
-| S6-F1 | CSV import template contracts | Codex | queued |
-| S6-F2 | CSV import preflight diagnostics | Codex | queued |
+| S6-F1 | CSV import template contracts | Codex | done |
+| S6-F2 | CSV import preflight diagnostics | Codex | done |
+| S7-F1 | CSV capability catalog | Codex | queued |
+| S7-F2 | CSV preview issue summaries | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -29,8 +31,8 @@ roadmap and does not authorize feature work.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
 - CSV product UI, bulk import writes, file storage, mapping wizard, and
-  Salesforce-connected import/export remain deferred while Sprint 6 queues
-  server-side CSV readiness contracts.
+  Salesforce-connected import/export remain deferred while Sprint 7 queues
+  server-side CSV handoff manifests and issue summaries.
 
 ## Implemented Contract Routes
 
