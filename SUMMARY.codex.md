@@ -2,52 +2,58 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: Roadmap documentation finalization
+Feature: Overnight autonomy watchdog hardening
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: e579117 - [codex] docs: finalize canonical roadmap
+Commits this prompt: 80edfdc - [codex] automation: add overnight watchdog launcher
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T22:12:51-07:00
+Timestamp: 2026-05-19T23:20:14-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Created `docs/ROADMAP.md` as the canonical roadmap, grounded in repo-local
-  sources: `CRM-CONTRACT.md`, `README.md`, `PLAN.md`, `docs/FEATURE-BACKLOG.md`,
-  `lib/crm/registry.ts`, `lib/featureFlags.ts`, app route files, and active
-  Sprint 4 prompt artifacts.
-- Created `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md` as the source/review trace
-  artifact and kept candidate-review detail out of the canonical roadmap.
-- Updated the README roadmap section to point at `docs/ROADMAP.md` instead of
-  carrying a competing roadmap summary.
-- Updated `PLAN.md` section 16 only to reference `docs/ROADMAP.md` as the
-  proposed roadmap source while preserving the backlog as non-authorizing input.
-- Updated `docs/PROJECT-CONTROL.md` to identify `docs/ROADMAP.md` as the
-  canonical roadmap and keep README as a roadmap pointer.
-- Did not create `docs/AI-ROADMAP.md` or `docs/ARCHITECTURE.md`; the roadmap
-  did not need a split AI plan or a new architecture overview.
-- Preserved guardrails in the roadmap: no auth, no external AI, no live
-  `/deals/[id]`, no `/search` expansion, no Postgres default, and no dealer or
-  area CRUD unless future work is explicitly promoted.
-- Verification: `git diff --check` passed, `git diff --cached --check` passed,
-  local roadmap link targets were verified with `Test-Path`, and `git status`
-  was reviewed before commit. Full runtime gate was not run because this was a
-  docs-only change with no runtime claims.
+- Added `scripts/start-codex-overnight.ps1`, a repo-rooted Codex watchdog
+  launcher that can be started from any PowerShell working directory.
+- Fixed the operator failure mode from `C:\WINDOWS\system32` by using
+  `git -C`, absolute `RunRoot`/script paths, and repo-rooted `STOP` /
+  `AUTONOMY.STOP` checks.
+- Replaced the invalid `Test-Path .\STOP -or Test-Path .\AUTONOMY.STOP`
+  pattern with a helper that evaluates each `Test-Path` call separately.
+- Added rollback tag creation/push and Codex exec smoke preflight to the
+  launcher before it starts the overnight loop.
+- Added watchdog restart logging under ignored `agent-runs/` and defaulted the
+  launcher to the intended overnight options: unlimited iterations, FullYolo,
+  keep-awake, baseline gate, browser install, Docker service start,
+  auto-revert-broken, sprint rollover, and push.
+- Added `npm run autonomy:watchdog` and documented the safer launcher in
+  `README.md`, `docs/LOCAL-GATE.md`, and `docs/AGENT-LOOPS.md`.
+- Pushed/verified rollback tag `safe-before-yolo-20260519-225620` on `origin`.
+- Verification: PowerShell parser check passed, launcher dry-run passed from
+  `C:\WINDOWS\system32`, launcher dry-run passed from the repo root,
+  `git ls-remote --tags origin safe-before-yolo-20260519-225620` confirmed the
+  remote tag, and `scripts/local-gate.ps1` passed.
 
 ### Next action
 
-Idle / awaiting next prompt or PLAN-promoted scope.
+Start the overnight loop with:
+
+```powershell
+powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\dev\salesforce-lite-crm\scripts\start-codex-overnight.ps1
+```
 
 ### Scope confirmation
 
-No cross-ownership edits: NO  (shared roadmap, PLAN, README, and project-control docs were explicitly in scope for this prompt; see BLOCKERS)
+Cross-ownership edits: YES. `scripts/**` is Gemini-owned and `package.json` /
+docs are shared/planning zones, but the current prompt explicitly requested an
+automation fix for unattended Codex overnight operation. Edits were limited to
+the launcher, package script registration, and operator docs.
 
-CRM-CONTRACT.md honored:  YES
+CRM-CONTRACT.md honored: YES
