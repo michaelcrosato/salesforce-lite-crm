@@ -180,17 +180,19 @@ const dealerOrderAreaLinks = [
 
 const currentDeliveryTargets = [
   ["dealer-order-vancouver-northstar", 5],
-  ["dealer-order-vancouver-cascade", 10],
-  ["dealer-order-burnaby-orbit", 4],
-  ["dealer-order-kelowna-riverbend", 2],
-  ["dealer-order-calgary-luma", 5],
+  ["dealer-order-vancouver-cascade", 17],
+  ["dealer-order-burnaby-orbit", 11],
+  ["dealer-order-kelowna-riverbend", 7],
+  ["dealer-order-calgary-luma", 15],
   ["dealer-order-calgary-summit", 3],
-  ["dealer-order-edmonton-apex", 4],
-  ["dealer-order-reddeer-harbor", 2],
+  ["dealer-order-edmonton-apex", 14],
+  ["dealer-order-reddeer-harbor", 5],
   ["dealer-order-toronto-orbit", 8],
-  ["dealer-order-toronto-zenith", 4],
-  ["dealer-order-gtawest-northstar", 3],
-  ["dealer-order-ottawa-cascade", 2],
+  ["dealer-order-toronto-zenith", 11],
+  ["dealer-order-gtawest-northstar", 9],
+  ["dealer-order-ottawa-cascade", 7],
+  ["dealer-order-ottawa-summit", 5],
+  ["dealer-order-gtawest-zenith", 8],
   ["dealer-order-victoria-apex", 3]
 ] as const;
 
