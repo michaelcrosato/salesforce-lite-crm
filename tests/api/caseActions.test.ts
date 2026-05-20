@@ -51,6 +51,9 @@ describe("Case Actions", () => {
     );
 
     expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error("Expected case validation to fail");
+    }
     expect(result.fieldErrors).toBeDefined();
     expect(result.fieldErrors?.subject).toBeDefined();
   });

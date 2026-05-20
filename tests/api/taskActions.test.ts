@@ -52,6 +52,9 @@ describe("Task Actions", () => {
     );
 
     expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error("Expected task validation to fail");
+    }
     expect(result.fieldErrors).toBeDefined();
     expect(result.fieldErrors?.title).toBeDefined();
   });

@@ -52,6 +52,9 @@ describe("Campaign Actions", () => {
     );
 
     expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error("Expected campaign validation to fail");
+    }
     expect(result.fieldErrors).toBeDefined();
     expect(result.fieldErrors?.name).toBeDefined();
   });
