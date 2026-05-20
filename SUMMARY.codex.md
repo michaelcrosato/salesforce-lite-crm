@@ -2,44 +2,42 @@ Agent: Codex
 
 Sprint: 6
 
-Feature: Sprint 6 rollover planning
+Feature: S6-F1 - CSV import template contracts
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 112bbc2 - [codex] sprint 6: plan codex track
-- ca956c7 - [codex] sprint 6: backlog refresh
+- a81eb2a - [codex] S6-F1: add CSV import template contracts
 
-Gate status: PASS - Phase 0 full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0. Phase 4 verification subset (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`) also exited 0; Vitest reported 26 files / 162 tests.
+Gate status: PASS - Full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 27 files / 166 tests and Playwright reported 19 passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T15:05:11.7257910-07:00
+Timestamp: 2026-05-20T15:20:12.9377442-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
-- Read `PLAN.md`, `CRM-CONTRACT.md`, README known limitations and roadmap notes, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
-- Confirmed Codex Sprint 5 was complete from local gate evidence and commits: S5-F1 commit `a61f59e`, S5-F2 commit `43b9d66`, and empty active Codex blockers.
-- Updated `PLAN.md` document control to version 2.11A, marked S5-F1 and S5-F2 done, and queued Sprint 6 Codex features S6-F1 and S6-F2 with carried-forward non-goals.
-- Synced `docs/FEATURE-BACKLOG.md` so S5-F1/S5-F2 are done and S6-F1/S6-F2 are queued.
-- Ran the required planning verification subset after commits; lint, typecheck, test, and build all exited 0.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: all expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and baseline `npm install`, Prisma generate/db push, seed, lint, typecheck, test, and build all exited 0.
+- Implemented `lib/server/csvImportTemplates.ts`, deriving supported import templates from existing CSV preview definitions so canonical headers, required metadata, aliases, routes, filenames, and content type stay aligned.
+- Added deterministic header-only CSV export for import templates with no routes, UI, storage, external services, database writes, or bulk import/apply behavior.
+- Added cross-zone Vitest coverage in `tests/api/csv-import-templates.test.ts` because PLAN.md §8 requires feature coverage; this was the smallest direct way to validate the server contract.
+- Verified the change with `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and then the full `scripts/local-gate.ps1`.
 
 ### Discovered this prompt
 
-- PLAN.md still lists other agents' Sprint 4 rows as queued, while their historical reports describe Sprint 4B work as complete. This rollover was explicitly scoped to Codex, so no non-Codex Sprint 4 status rows were changed.
-- `SUMMARY.grok.md` and `BLOCKERS.grok.md` contain historical stale blocker text before later resolved notes. Codex blockers remain empty and unrelated to Sprint 6 planning.
+- PLAN.md §4 still lists S4-F2, S4-F3, and S4-F4 as queued while historical Claude/Grok/Gemini summaries describe Sprint 4B work as complete or integrated. The discrepancy is outside Codex S6-F1 scope and was not edited.
+- `SUMMARY.grok.md` and `BLOCKERS.grok.md` still contain stale historical blocker text, but current Codex blockers are empty and the local gate is green.
 
 ### Next action
 
-Run LOOP.md to begin S6-F1.
+Run LOOP.md to begin S6-F2 - CSV import preflight diagnostics.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (only prompt-authorized planning, backlog, and Codex report files were touched)
+No cross-ownership edits: NO (added `tests/api/csv-import-templates.test.ts` for required S6-F1 coverage; no other cross-zone implementation files were touched)
 
 CRM-CONTRACT.md honored: YES
