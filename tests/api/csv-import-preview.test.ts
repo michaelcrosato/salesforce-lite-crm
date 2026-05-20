@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { prisma } from "@/lib/prisma";
 import {
   CSV_IMPORT_PREVIEW_ENTITIES,
   getCsvImportPreviewDefinition,
@@ -6,6 +7,7 @@ import {
   listCsvImportPreviewDefinitions,
   previewCsvImport
 } from "@/lib/server/csvImportPreview";
+import { previewCsvImportWithPreflightDiagnostics } from "@/lib/server/csvImportPreflight";
 
 describe("server CSV import preview validation", () => {
   it("publishes import preview definitions for supported entities", () => {
@@ -132,3 +134,175 @@ describe("server CSV import preview validation", () => {
     expect(preview.rows.map((row) => row.rowNumber)).toEqual([2, 3]);
   });
 });
+
+describe("server CSV import preflight diagnostics", () => {
+  beforeEach(async () => {
+    await cleanupPreflightFixtures();
+  });
+
+  afterEach(async () => {
+    await cleanupPreflightFixtures();
+  });
+
+  it("adds deterministic contact duplicate, contactability, and relationship warnings", async () => {
+    await prisma.contact.create({
+      data: {
+        id: "csv-preflight-existing-contact",
+        firstName: "Alice",
+        lastName: "Ng",
+        email: "alice.ng@example.test",
+        phone: "604-555-0100",
+        status: "active"
+      }
+    });
+
+    const csv = [
+      "First Name,Last Name,Email,Status,Phone,Account ID",
+      "Alice,Ng,ALICE.NG@example.test,active,604-555-0100,missing-account-id",
+      "No,Method,,active,,"
+    ].join("\n");
+
+    const preview = await previewCsvImportWithPreflightDiagnostics("contacts", csv);
+
+    expect(preview.validRows).toBe(2);
+    expect(preview.warningRows).toBe(2);
+    expect(preview.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      "contact_duplicate_email",
+      "contact_account_not_found",
+      "contact_missing_contact_method"
+    ]);
+    expect(preview.rows[0].diagnostics).toMatchObject([
+      {
+        category: "duplicate",
+        fieldKey: "email",
+        relatedRecord: {
+          entity: "contacts",
+          id: "csv-preflight-existing-contact"
+        }
+      },
+      {
+        category: "relationship",
+        fieldKey: "accountId",
+        relatedRecord: null
+      }
+    ]);
+    expect(preview.rows[1].diagnostics).toMatchObject([
+      {
+        category: "contactability",
+        fieldKey: null,
+        relatedRecord: null
+      }
+    ]);
+  });
+
+  it("adds lead diagnostics from database context without importing or routing rows", async () => {
+    await prisma.lead.create({
+      data: {
+        id: "csv-preflight-existing-lead",
+        firstName: "Riley",
+        lastName: "Park",
+        email: "riley.park@example.test",
+        phone: "555-0123",
+        status: "new"
+      }
+    });
+
+    const before = await countPreflightFixtures();
+    const csv = [
+      "First Name,Last Name,Email,Phone,Postal Code,Source",
+      "Riley,Park,RILEY.PARK@example.test,555-0123,Q9Q9Q9,Website",
+      "No,Reach,,,,Website"
+    ].join("\n");
+
+    const preview = await previewCsvImportWithPreflightDiagnostics("leads", csv);
+    const after = await countPreflightFixtures();
+
+    expect(after).toEqual(before);
+    expect(preview.validRows).toBe(2);
+    expect(preview.warningRows).toBe(2);
+    expect(preview.rows[0].diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      "lead_duplicate_email",
+      "lead_area_not_found"
+    ]);
+    expect(preview.rows[1].diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      "lead_missing_contact_method",
+      "lead_postal_missing"
+    ]);
+    expect(await prisma.lead.count({
+      where: {
+        firstName: "No",
+        lastName: "Reach"
+      }
+    })).toBe(0);
+  });
+});
+
+async function cleanupPreflightFixtures() {
+  await prisma.activity.deleteMany({
+    where: {
+      leadId: "csv-preflight-existing-lead"
+    }
+  });
+  await prisma.lead.deleteMany({
+    where: {
+      OR: [
+        {
+          id: "csv-preflight-existing-lead"
+        },
+        {
+          email: "riley.park@example.test"
+        },
+        {
+          firstName: "No",
+          lastName: "Reach"
+        }
+      ]
+    }
+  });
+  await prisma.contact.deleteMany({
+    where: {
+      OR: [
+        {
+          id: "csv-preflight-existing-contact"
+        },
+        {
+          email: "alice.ng@example.test"
+        }
+      ]
+    }
+  });
+}
+
+async function countPreflightFixtures() {
+  const [leads, contacts, activities] = await Promise.all([
+    prisma.lead.count({
+      where: {
+        OR: [
+          {
+            id: "csv-preflight-existing-lead"
+          },
+          {
+            firstName: "No",
+            lastName: "Reach"
+          }
+        ]
+      }
+    }),
+    prisma.contact.count({
+      where: {
+        id: "csv-preflight-existing-contact"
+      }
+    }),
+    prisma.activity.count({
+      where: {
+        leadId: "csv-preflight-existing-lead"
+      }
+    })
+  ]);
+
+  return {
+    leads,
+    contacts,
+    activities
+  };
+}
