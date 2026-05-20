@@ -2,58 +2,45 @@ Agent: Codex
 
 Sprint: 4
 
-Feature: Overnight autonomy watchdog hardening
+Feature: Overnight autonomy native stderr hardening
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 80edfdc - [codex] automation: add overnight watchdog launcher
+Commits this prompt: 149a1f9 - [codex] automation: tolerate native stderr
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T23:20:14-07:00
+Timestamp: 2026-05-19T23:49:30.2268322-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `scripts/start-codex-overnight.ps1`, a repo-rooted Codex watchdog
-  launcher that can be started from any PowerShell working directory.
-- Fixed the operator failure mode from `C:\WINDOWS\system32` by using
-  `git -C`, absolute `RunRoot`/script paths, and repo-rooted `STOP` /
-  `AUTONOMY.STOP` checks.
-- Replaced the invalid `Test-Path .\STOP -or Test-Path .\AUTONOMY.STOP`
-  pattern with a helper that evaluates each `Test-Path` call separately.
-- Added rollback tag creation/push and Codex exec smoke preflight to the
-  launcher before it starts the overnight loop.
-- Added watchdog restart logging under ignored `agent-runs/` and defaulted the
-  launcher to the intended overnight options: unlimited iterations, FullYolo,
-  keep-awake, baseline gate, browser install, Docker service start,
-  auto-revert-broken, sprint rollover, and push.
-- Added `npm run autonomy:watchdog` and documented the safer launcher in
-  `README.md`, `docs/LOCAL-GATE.md`, and `docs/AGENT-LOOPS.md`.
-- Pushed/verified rollback tag `safe-before-yolo-20260519-225620` on `origin`.
-- Verification: PowerShell parser check passed, launcher dry-run passed from
-  `C:\WINDOWS\system32`, launcher dry-run passed from the repo root,
-  `git ls-remote --tags origin safe-before-yolo-20260519-225620` confirmed the
-  remote tag, and `scripts/local-gate.ps1` passed.
+- Added scoped native-command wrappers to `scripts/start-codex-overnight.ps1`
+  and `scripts/autonomy-loop.ps1` so Codex, Git, child PowerShell, Docker,
+  and push calls can emit stderr without PowerShell stopping before exit-code
+  handling.
+- Preserved default/latest Codex model behavior, FullYolo defaults, rollback
+  tag creation/push, watchdog restart, STOP/AUTONOMY.STOP checks, local gate
+  handling, AutoRevertBroken, and green-gate-only push behavior.
+- Made `scripts/autonomy-loop.ps1` default `RunRoot` to the script's repo root
+  when launched directly from any working directory.
+- Verification: parser check passed, launcher dry-run passed from
+  `C:\WINDOWS\system32`, direct loop launch from `C:\WINDOWS\system32`
+  handled Codex stderr by exit code, and `scripts/local-gate.ps1` passed.
 
 ### Next action
 
-Start the overnight loop with:
-
-```powershell
-powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\dev\salesforce-lite-crm\scripts\start-codex-overnight.ps1
-```
+Start the overnight loop with the repo-rooted launcher command below.
 
 ### Scope confirmation
 
-Cross-ownership edits: YES. `scripts/**` is Gemini-owned and `package.json` /
-docs are shared/planning zones, but the current prompt explicitly requested an
-automation fix for unattended Codex overnight operation. Edits were limited to
-the launcher, package script registration, and operator docs.
+No cross-ownership edits: NO. `scripts/**` is Gemini-owned, but the current
+prompt explicitly requested automation fixes in `scripts/start-codex-overnight.ps1`
+and `scripts/autonomy-loop.ps1`; edits were limited to that scope.
 
 CRM-CONTRACT.md honored: YES
