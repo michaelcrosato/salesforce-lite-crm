@@ -1,42 +1,37 @@
 Agent: Codex
 
-Sprint: 4
+Sprint: 5
 
-Feature: S4-F1 - Demo seed tuning / quiescence report
+Feature: SPRINT-ROLLOVER - plan Codex track
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: none
+Commits this prompt:
+- e739b93 - [codex] sprint 5: plan codex track
+- 5c6e6b0 - [codex] sprint 5: backlog refresh
 
-Gate status: PASS - Phase 0 baseline sequence through `npm run build` exited 0; report-only subset reviewed with `git status --short` showing only Codex report files modified.
+Gate status: PASS - Phase 0 full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Phase 4 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` each exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T12:38:15.1604960-07:00
+Timestamp: 2026-05-20T13:06:05.3017252-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed all four expected worktrees exist, this worktree is clean, and the active branch is `codex/sprint-4-demo-seed-tuning`.
-- Ran the Phase 0 baseline sequence through `npm run build`; install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, tests, and build all exited 0.
-- Re-read `PLAN.md`, `CRM-CONTRACT.md`, README, current and cross-agent reports, decisions, readiness/gate/merge/roadmap/demo docs, active Sprint 4 prompt artifacts, and referenced roadmap/control docs.
-- Reconciled S4-F1 as already implemented from Codex S4-F1 commits `a4e1ecc` and `6dd448e`, seed-anchor coverage, and green local evidence.
-- Selected a report-only quiescence unit because no unresolved Codex blocker, Codex-owned implementation gap, or Codex-zone contract drift remained.
-- Refreshed Codex reports only; no runtime, seed, schema, app, component, test, package, script, or other-agent files were changed.
-
-### Discovered this prompt
-
-- `PLAN.md` section 4 still lists S4-F1 as queued, while `SUMMARY.codex.md`, Codex S4-F1 implementation commits, seed-anchor tests, and the current clean baseline support treating Codex S4-F1 as done on this branch.
-- `PLAN.md` identifies the repo-readiness pass as active by current prompt while Sprint 4 remains queued. This iteration stayed in report-only quiescence scope because no Codex-owned implementation fix remained.
-- Claude, Grok, and Gemini reports still include historical Sprint 4B references; current docs identify those Sprint 4B prompts as superseded historical artifacts.
-- `next build` still lists `/deals/[id]`, but current docs and e2e coverage treat it as excluded or placeholder-only behavior, not a live deal detail route.
+- Ran the Phase 0 full local gate; install, Prisma generate/db push, seed, lint, typecheck, Vitest, build, Playwright install, and e2e all exited 0.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, `docs/ROADMAP.md`, and the last 30 days of git history.
+- Confirmed Codex Sprint 4 work is complete from `SUMMARY.codex.md`, the clean Codex blocker file, and current green local gate evidence.
+- Planned Sprint 5 for Codex with S5-F1 server CSV export contracts and S5-F2 CSV import preview validation, keeping all permanent non-goals out of scope.
+- Updated `PLAN.md` and `docs/FEATURE-BACKLOG.md`, then committed the planning and backlog changes separately.
+- Re-ran the required planning verification checks: `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 ### Next action
 
-Codex has no remaining owned Sprint 4 implementation unit on this branch; proceed with merge coordination or sprint rollover after the current readiness/merge decision.
+Run LOOP.md to begin S5-F1.
 
 ### Scope confirmation
 
