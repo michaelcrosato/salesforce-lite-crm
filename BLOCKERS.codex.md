@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 4
+Sprint: automation
 
 Feature: Overnight autonomy Codex startup hardening
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T01:54:32-07:00
+Timestamp: 2026-05-20T04:26:52-07:00
 
 Escalation required: NO
 
@@ -17,14 +17,14 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Resolved the overnight automation startup failure where every autonomy
-  iteration exited with `Error: stdin is not a terminal` after a green baseline
-  gate.
-- Added a Codex invocation smoke that uses the same native process path as real
-  iterations and includes `--output-last-message`.
-- Added fail-fast blocker-report behavior for future `stdin is not a terminal`
-  startup failures so the watchdog does not restart the broken loop repeatedly.
-- Eliminated the direct PowerShell pipeline smoke path; no encoded-command path
-  is used by the updated launcher.
+- Resolved the repeated real-iteration startup failure:
+  `Failed to read prompt from stdin: input is not valid UTF-8`.
+- Strengthened the Codex invocation smoke with a non-ASCII sentinel and verified
+  it fails when the sentinel is corrupted before stdin, then passes when the
+  prompt is written as UTF-8 bytes.
+- Resolved the lingering `'-encodedCommand' is not recognized` warning from the
+  pre-loop Playwright install wrapper.
+- Ensured max-consecutive iteration failures no longer exit 0, preventing the
+  watchdog from restarting a broken loop.
 - Full local gate passed via `powershell -NoLogo -NoProfile -ExecutionPolicy
   Bypass -File .\scripts\local-gate.ps1`.
