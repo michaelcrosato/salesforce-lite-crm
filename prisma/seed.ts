@@ -1,5 +1,9 @@
 import { deterministicActivitySummarizer } from "../lib/ai/activitySummarizer";
 import { probabilityForStage } from "../lib/business/deals";
+import {
+  extractPostalPrefix,
+  normalizePostalCode as normalizeDisplayPostalCode
+} from "../lib/postal";
 import { prisma } from "../lib/prisma";
 
 function daysFromNow(days: number) {
@@ -273,6 +277,26 @@ type DealerLeadSeed = {
   assignedOrderId: string | null;
   assignmentReason: string;
   createdAt: Date;
+};
+
+type DealerOrderSeed = (typeof dealerOrders)[number];
+type DealerAreaSeed = (typeof dealerAreas)[number];
+type RoutingPayloadJson =
+  | string
+  | number
+  | boolean
+  | null
+  | { readonly [key: string]: RoutingPayloadJson }
+  | readonly RoutingPayloadJson[];
+type RoutingPayloadStep = {
+  step: string;
+  result: RoutingPayloadJson;
+};
+type SeedRankedOrder = {
+  orderId: string;
+  dealerName: string;
+  paceGap: number;
+  rank: number;
 };
 
 function currentMonthDay(day: number) {
@@ -557,6 +581,12 @@ async function main() {
       ? dealerOrderById.get(lead.assignedOrderId)
       : undefined;
     const area = lead.areaId ? areaById.get(lead.areaId) : undefined;
+    const summary =
+      lead.assignmentReason === "routed" && assignedOrder && area
+        ? `Resolved ${area[1]}; selected ${assignedOrder[2]} for dealer pacing.`
+        : routingFailureSummary(lead.assignmentReason);
+    const filteredOrders = area ? seedActiveOrdersForArea(area[0]) : [];
+    const rankedOrders = seedRankedOrderSummaries(filteredOrders);
 
     return {
       id: `routing-event-${lead.id}`,
@@ -567,10 +597,15 @@ async function main() {
         lead.assignmentReason === "routed" && assignedOrder
           ? `${lead.firstName} ${lead.lastName} routed to ${assignedOrder[2]}`
           : `${lead.firstName} ${lead.lastName} was not routed`,
-      summary:
-        lead.assignmentReason === "routed" && assignedOrder && area
-          ? `Resolved ${area[1]}; selected ${assignedOrder[2]} for dealer pacing.`
-          : routingFailureSummary(lead.assignmentReason),
+      rawText: seedRoutingPayloadString({
+        lead,
+        area: area ?? null,
+        filteredOrders,
+        rankedOrders,
+        selectedOrderId: lead.assignedOrderId,
+        summary
+      }),
+      summary,
       nextStep:
         lead.assignmentReason === "routed"
           ? "Dealer should contact the assigned lead."
@@ -772,6 +807,147 @@ function routingFailureSummary(reason: string) {
   };
 
   return summaries[reason] ?? "Lead routing did not produce an assignment.";
+}
+
+function seedRoutingPayloadString(input: {
+  lead: DealerLeadSeed;
+  area: DealerAreaSeed | null;
+  filteredOrders: readonly DealerOrderSeed[];
+  rankedOrders: readonly SeedRankedOrder[];
+  selectedOrderId: string | null;
+  summary: string;
+}) {
+  const postal = seedPostalTrace(input.lead.postalCode);
+  const steps: RoutingPayloadStep[] = [
+    {
+      step: "normalize",
+      result: postal.normalized
+    },
+    {
+      step: "extract_prefix",
+      result: postal.prefix
+    },
+    {
+      step: "match_area",
+      result: input.area ? { id: input.area[0], name: input.area[1] } : null
+    },
+    {
+      step: "filter_orders",
+      result: {
+        count: input.filteredOrders.length,
+        orderIds: input.filteredOrders.map((order) => order[0])
+      }
+    },
+    {
+      step: "rank_pace_gap",
+      result: input.rankedOrders
+    },
+    {
+      step: "select",
+      result: {
+        orderId: input.selectedOrderId
+      }
+    }
+  ];
+
+  return JSON.stringify({
+    version: 1,
+    input: {
+      postal: postal.compact,
+      leadId: input.lead.id
+    },
+    steps,
+    summary: input.summary
+  });
+}
+
+function seedPostalTrace(postalCode: string) {
+  const compact = postalCode.replace(/[^a-z0-9]/gi, "").toUpperCase();
+  const normalized = normalizeDisplayPostalCode(postalCode, "CA") ?? compact;
+  const prefix =
+    normalized.includes(" ")
+      ? extractPostalPrefix(normalized, "CA")
+      : compact.slice(0, 3);
+
+  return {
+    compact,
+    normalized,
+    prefix
+  };
+}
+
+function seedActiveOrdersForArea(areaId: string) {
+  const linkedOrderIds = new Set(
+    dealerOrderAreaLinks
+      .filter((link) => link[1] === areaId)
+      .map((link) => link[0])
+  );
+
+  return dealerOrders.filter(
+    (order) => linkedOrderIds.has(order[0]) && order[4] === "active"
+  );
+}
+
+function seedRankedOrderSummaries(orders: readonly DealerOrderSeed[]) {
+  const now = new Date();
+  const rankedOrders = orders
+    .map((order) => ({
+      id: order[0],
+      name: order[2],
+      monthlyQuota: order[3],
+      status: order[4],
+      startOffset: order[5],
+      deliveredThisMonth: seedDeliveredThisMonth(order[0])
+    }))
+    .filter(
+      (order) =>
+        order.status === "active" && order.deliveredThisMonth < order.monthlyQuota
+    )
+    .sort((a, b) => {
+      const gapDelta = seedPaceGap(b, now) - seedPaceGap(a, now);
+
+      if (gapDelta !== 0) {
+        return gapDelta;
+      }
+
+      if (a.deliveredThisMonth !== b.deliveredThisMonth) {
+        return a.deliveredThisMonth - b.deliveredThisMonth;
+      }
+
+      return a.startOffset - b.startOffset;
+    });
+
+  return rankedOrders.map((order, index) => ({
+    orderId: order.id,
+    dealerName: order.name,
+    paceGap: Number(seedPaceGap(order, now).toFixed(2)),
+    rank: index + 1
+  }));
+}
+
+function seedDeliveredThisMonth(orderId: string) {
+  return currentDeliveryTargets.find((target) => target[0] === orderId)?.[1] ?? 0;
+}
+
+function seedPaceGap(
+  order: { monthlyQuota: number; deliveredThisMonth: number },
+  now: Date
+) {
+  const remainingQuota = Math.max(0, order.monthlyQuota - order.deliveredThisMonth);
+  const daysRemaining = Math.max(seedDaysRemainingInMonth(now), 1);
+
+  return remainingQuota / daysRemaining;
+}
+
+function seedDaysRemainingInMonth(now: Date) {
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  return (
+    Math.floor(
+      (new Date(now.getFullYear(), now.getMonth(), lastDay).getTime() -
+        new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) /
+        86_400_000
+    ) + 1
+  );
 }
 
 main()
