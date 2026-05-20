@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 6
+Sprint: 7
 
-Feature: S6-F2 - CSV import preflight diagnostics
+Feature: Sprint 7 rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T15:45:49.8451423-07:00
+Timestamp: 2026-05-20T16:52:14.3184010-07:00
 
 Escalation required: NO
 
