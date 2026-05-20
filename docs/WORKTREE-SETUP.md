@@ -11,16 +11,9 @@ C:\dev\salesforce-lite-crm-grok
 C:\dev\salesforce-lite-crm-gemini
 ```
 
-Observed during the 2026-05-19 documentation audit:
-
-```text
-C:/dev/salesforce-lite-crm        b7e0633 [main]
-C:/dev/salesforce-lite-crm-claude a0f5372 [claude/autonomy]
-C:/dev/salesforce-lite-crm-gemini 2437f87 [gemini/autonomy]
-C:/dev/salesforce-lite-crm-grok   e7ea824 [grok/autonomy]
-```
-
-Use `git worktree list` for the current commit SHA at each path.
+Do not rely on frozen commit SHAs in this document. Use `git worktree list` and
+`scripts/check-worktrees.ps1` for the current branch, commit, and dirty state at
+each path.
 
 ## Inspect Worktrees
 

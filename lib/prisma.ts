@@ -14,12 +14,6 @@ function createPrismaClient() {
     databaseUrl.startsWith("postgresql://")
   ) {
     return new PrismaClient({
-      // @ts-expect-error - generated client for sqlite types datasources as never
-      datasources: {
-        db: {
-          url: databaseUrl
-        }
-      },
       log:
         process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
     });

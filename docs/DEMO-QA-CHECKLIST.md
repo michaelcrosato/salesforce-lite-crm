@@ -106,8 +106,8 @@ Use this checklist for visual and workflow QA. It does not expand product scope.
 - `/deals/[id]`, `/search`, `/command-palette`, `/orders/new`,
   `/orders/[id]/edit`, `/areas/new`, and `/areas/[id]/edit` return 404 or
   render the excluded-route placeholder.
-- Ctrl/Cmd+K does not open a command palette while `commandPalette` remains
-  excluded.
+- Ctrl/Cmd+K opens the global command palette; only the dedicated
+  `/command-palette` route remains excluded.
 
 ## Final Gate
 

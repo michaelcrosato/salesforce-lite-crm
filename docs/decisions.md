@@ -50,7 +50,7 @@
 
 - Added a separate Postgres Prisma schema and kept SQLite as the default schema for local development.
 - The Postgres prep script temporarily swaps schemas and restores SQLite afterward so normal local commands do not change.
-- Switching for real requires a Postgres `DATABASE_URL` and replacing the SQLite adapter in `lib/prisma.ts`.
+- Switching for real requires a Postgres `DATABASE_URL`, a Prisma Client generated from the Postgres schema, and explicit promotion of Postgres as the runtime default.
 - No SQLite-specific query workarounds were found in the app queries; status and stage remain strings enforced by Zod.
 
 ## Sprint 3B Dealer Revenue Command Center

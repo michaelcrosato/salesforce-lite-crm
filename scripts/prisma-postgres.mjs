@@ -29,4 +29,5 @@ try {
   run("npx", ["prisma", "db", "push"]);
 } finally {
   writeFileSync(schemaPath, originalSchema);
+  run("npx", ["prisma", "generate"]);
 }

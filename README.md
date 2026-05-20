@@ -115,9 +115,9 @@ npm run prisma:postgres
 That script temporarily copies the Postgres schema over `prisma/schema.prisma`,
 runs `prisma generate` and `prisma db push`, then restores the SQLite schema.
 For an actual production Postgres cutover, `DATABASE_URL` must point at
-Postgres and `lib/prisma.ts` still needs to move from the SQLite adapter to a
-Postgres-compatible Prisma Client configuration. SQLite remains the default
-local workflow until that cutover is explicitly promoted.
+Postgres and the generated Prisma Client must be produced from the Postgres
+schema. SQLite remains the default local workflow until that cutover is
+explicitly promoted.
 
 ## Core Routes And Workflows
 

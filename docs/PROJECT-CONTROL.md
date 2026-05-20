@@ -3,11 +3,12 @@
 ## Current Status
 
 - Branch observed this pass: `main`
-- Commit observed this pass: `b7e0633 chore: add shared IFT v22 prompt (#2)`
-- Current pass: documentation audit against repo-local evidence.
-- Product feature work: not changed during this pass. Non-product code edits
-  were limited to app metadata copy, a command-palette test id, and the
-  matching Playwright assertion for the existing command-palette behavior.
+- Commit observed this pass: use `git rev-parse HEAD` for the current local
+  commit; this file intentionally avoids freezing a SHA that stales after
+  documentation-only commits.
+- Current pass: repository scan and documentation drift cleanup against
+  repo-local evidence.
+- Product feature work: not changed during this pass.
 - Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
   statuses, routes, search surfaces, report services, and adapter signatures.
 - Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
@@ -69,13 +70,12 @@ feature work.
 
 ## Branch And Worktree Topology
 
-Observed with `git worktree list` on 2026-05-19:
+Current branch and dirty-state details are intentionally not frozen here. Run
+the repo-local helpers for live state:
 
-```text
-C:/dev/salesforce-lite-crm        b7e0633 [main]
-C:/dev/salesforce-lite-crm-claude a0f5372 [claude/autonomy]
-C:/dev/salesforce-lite-crm-gemini 2437f87 [gemini/autonomy]
-C:/dev/salesforce-lite-crm-grok   e7ea824 [grok/autonomy]
+```powershell
+git worktree list
+scripts/check-worktrees.ps1
 ```
 
 Expected but missing locally:

@@ -12,7 +12,7 @@
 
 | Version | 2.9D |
 
-| Last updated | 2026-05-19 |
+| Last updated | 2026-05-20 |
 
 | Active sprint | Documentation audit active by current prompt; Sprint 4B demo-hardening work is present in `main`; next feature sprint not selected. |
 
@@ -423,17 +423,23 @@ build            -> next build
 
 seed             -> tsx prisma/seed.ts
 
+lint             -> eslint . --max-warnings=0
+
+typecheck        -> tsc --noEmit --pretty false
+
 test             -> vitest run
 
 test:e2e         -> npm run seed \&\& playwright test
 
 prisma:postgres  -> node scripts/prisma-postgres.mjs
 
+autonomy:overnight -> powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
+
 ```
 
 
 
-There are no `lint` or `typecheck` scripts; agents must not invent them or claim they passed. If they are later added, this section is updated before agents run them.
+There is no `format` package script unless `package.json` later adds one. Agents must not claim a check passed unless the exact script or command exists and was run.
 
 
 
@@ -452,6 +458,10 @@ npx prisma generate
 npx prisma db push
 
 npm run seed
+
+npm run lint
+
+npm run typecheck
 
 npm run test
 
@@ -567,7 +577,7 @@ No inter-agent merging or agent-to-agent pull requests without explicit current-
 
 \- Edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md` stay explicit, scoped, and documented.
 
-\- No claims of `lint` or `typecheck` passing. Those scripts do not exist (§9). Do not invent them.
+\- No claims of checks passing unless the exact command exists and was run. `lint` and `typecheck` exist in §9; `format` does not.
 
 \- Cleanup is repo-local and conservative. Use `scripts/clean-local-artifacts.ps1` in dry-run mode first; remove only ignored/generated/local artifacts inside this repo. Leave unknown files in place and record them in BLOCKERS.
 
@@ -891,11 +901,11 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 |---|---|---|
 
-| B-01 | Create `CRM-CONTRACT.md` | Compact product contract covering current entities, routes, invariants, non-goals, and deterministic behavior. Closes the contract-gap-invention risk in §8. |
+| B-01 | Maintain `CRM-CONTRACT.md` | Present in `main`; keep it aligned when entity names, routes, statuses, registries, or adapter signatures change. |
 
-| B-02 | Committed local gate script | For example `scripts/local-gate.ps1`, mirroring §9. Reduces drift between §9 and what agents actually run. |
+| B-02 | Local gate script maintenance | Present in `main` as `scripts/local-gate.ps1` and `scripts/local-gate.sh`; keep both mirrored with §9. |
 
-| B-03 | Add `lint` and/or `typecheck` package scripts | Optional. Do not invent these in the §9 gate before they exist in `package.json`. |
+| B-03 | Lint/typecheck script maintenance | Present in `main`; both scripts are part of the §9 gate. |
 
 | B-04 | Dealer order and area CRUD | Currently seeded/browsable only. Deferred. |
 
@@ -905,7 +915,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-07 | Persistent forecast scenarios | Current simulator is transparent and non-persistent. Deferred. |
 
-| B-08 | Postgres cutover readiness | Make `lib/prisma.ts` swap-clean between SQLite and Postgres adapters; add a CI matrix for both. SQLite remains local-default unless the current prompt or config explicitly switches. |
+| B-08 | Postgres cutover readiness | SQLite remains the local default. `lib/prisma.ts` has a DATABASE_URL-based Postgres branch and `npm run prisma:postgres` performs schema-push prep, but a default-runtime cutover and CI matrix remain deferred. |
 
 | B-09 | External AI provider integration | Deterministic local summarizer/routing/analyst remains default. Deferred. |
 
