@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 4
+Sprint: 5 candidate
 
-Feature: Roadmap documentation finalization
+Feature: Roadmap canon
 
-Branch: codex/sprint-4-demo-seed-tuning
+Branch: codex/sprint-5-roadmap-canon
 
-Timestamp: 2026-05-19T22:12:51-07:00
+Timestamp: 2026-05-20T00:12:55-07:00
 
 Escalation required: NO
 
@@ -19,9 +19,8 @@ Escalation required: NO
 
 - No active blockers.
 - Shared coordination exception documented: `PLAN.md`, `README.md`,
-  `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`, and
-  `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md` were edited under the current prompt's
-  explicit roadmap-documentation scope.
-- Runtime gate not run: the change was docs-only and made no runtime behavior
-  claims. Docs-safe checks passed: `git diff --check`,
-  `git diff --cached --check`, and local roadmap link-target verification.
+  `docs/FEATURE-BACKLOG.md`, `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`,
+  `docs/AI-ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/EVALS.md`, and
+  `docs/SECURITY-PRIVACY.md` were edited under the current prompt's explicit
+  roadmap-documentation scope.
+- Full local gate passed via `scripts/local-gate.ps1`.
