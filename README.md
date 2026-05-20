@@ -279,16 +279,12 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 
 ## Roadmap
 
-Sprint 4 is queued for focused hardening of the existing product surface:
+The canonical roadmap lives in [docs/ROADMAP.md](docs/ROADMAP.md). It records
+queued hardening work, deferred promotion candidates, and guardrails for future
+scope.
 
-- S4-F1 - Codex: tune seed data for the reference CRM workflow.
-- S4-F2 - Claude: route-level visual QA for implemented CRM pages.
-- S4-F3 - Grok: shared component polish for stable spacing, empty states, and
-  deterministic ordering.
-- S4-F4 - Gemini: smoke and gate hardening for Vitest, Playwright, and local
-  validation.
-
-Deferred backlog items include Postgres runtime cutover readiness, auth and
-permissions, deployment configuration, broader global search, persistent
-forecast scenarios, dealer order and area CRUD, optional external AI provider
-integration, and any future `/deals/[id]` route.
+Sprint 4 remains focused on hardening the existing product surface: demo seed
+tuning, route visual QA, component polish, and smoke/gate coverage. Deferred
+items such as auth, deployment, external AI, global search expansion, Postgres
+runtime cutover, dealer or area CRUD, persistent forecast scenarios, and any
+future `/deals/[id]` route require explicit promotion before implementation.

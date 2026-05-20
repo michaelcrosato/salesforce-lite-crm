@@ -107,7 +107,9 @@ Do not paste raw chat history into repo files.
   ownership, reports.
 - `README.md`: product overview, AI-agent read-first list, local run
   instructions, implemented routes/workflows, database notes, tests,
-  limitations, and roadmap.
+  limitations, and roadmap pointer.
+- `docs/ROADMAP.md`: canonical product roadmap, deferred promotion
+  candidates, and roadmap-source artifact link.
 - `CRM-CONTRACT.md`: entity names, statuses, routes, adapter signatures.
 - `AGENTS.md`: short operational handoff for CLI agents.
 
