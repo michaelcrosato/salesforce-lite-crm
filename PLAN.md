@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.9E |
+| Version | 2.10A |
 
 | Last updated | 2026-05-20 |
 
-| Active sprint | Repo readiness pass active by current prompt; Sprint 4 queued |
+| Active sprint | Sprint 5 queued for Codex; Sprint 4 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -92,9 +92,9 @@ Roster rules:
 
 
 
-\*\*Current prompt scope — Repo Readiness\*\*
+\*\*Current prompt scope — Sprint Rollover\*\*
 
-Status: active for this run. Scope is repo hygiene, PLAN/README alignment, agent coordination docs, prompt folders, helper scripts, report files, safe local artifact cleanup, drift scans, and the local gate. This pass does not build product features or expand product scope.
+Status: active for this run. Scope is planning-only Codex sprint rollover, PLAN/backlog/report updates, commit/push bookkeeping, and the required gates. This pass does not build product features or expand runtime behavior.
 
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
@@ -108,7 +108,7 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 |---|---|---|---|
 
-| S4-F1 — Demo seed tuning | Codex | queued | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
+| S4-F1 — Demo seed tuning | Codex | done | Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), behind-pace dealer orders, stale high-value deals, low-health dealer accounts, and deterministic analyst actions. No schema expansion unless the current prompt or contract scope calls for it. |
 
 | S4-F2 — Route visual QA | Claude | queued | Demo-critical routes render coherently: `/dashboard`, `/leads`, `/orders`, `/orders/\[id]`, `/areas`, `/forecast`, `/accounts`, `/contacts`, and `/deals`. Visual fixes must not change business logic. |
 
@@ -143,6 +143,41 @@ Goal: harden the five-minute demo path using existing product scope. Do not add 
 
 
 Acceptance details live in `CRM-CONTRACT.md` and this section. Status updates are agent-reported in SUMMARY; only the local gate (§9) authorizes a status of `done`.
+
+\*\*Sprint 5 — Data Portability Foundation\*\*
+
+Goal: promote a narrow server-side CSV portability foundation while preserving current routes, deterministic local behavior, and excluded-route guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S5-F1 — Server CSV export contracts | Codex | queued | Server-side CSV export mapping covers current CRM list data with deterministic RFC4180 output and later-UI-ready contracts. No routes, buttons, file storage, external services, or product UI are added. |
+| S5-F2 — CSV import preview validation | Codex | queued | Server-side CSV import preview parses CSV text, normalizes headers, validates contact and consumer-lead rows with existing schemas/helpers, and returns row-level errors without database writes. No bulk create/update, mapping wizard, product UI, or background jobs are added. |
+
+\*\*Sprint 5 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import jobs.
+
+\- No database writes from CSV import preview.
+
+\- No Salesforce integration.
 
 
 
