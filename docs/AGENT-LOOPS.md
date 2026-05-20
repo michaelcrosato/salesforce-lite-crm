@@ -81,6 +81,13 @@ starts `scripts\autonomy-loop.ps1` with full overnight defaults:
 `-AllowSprintRollover`, and `-Push`. It restarts the inner loop after exit
 unless `STOP` or `AUTONOMY.STOP` exists under the repo root.
 
+If the inner loop exits non-zero, the watchdog stays in continuous mode by
+default: it logs the failure, re-runs the Codex invocation smoke, waits briefly,
+and starts the inner loop again. Because the inner loop runs with
+`-BaselineGate`, a red repo state enters the repair prompt path before new work.
+Use `-StopOnLoopFailure` or `-StopOnCodexSmokeFailure` only when deliberately
+debugging the launcher itself.
+
 `-MaxIterations 0` means no artificial iteration cap. Stop conditions still
 apply.
 

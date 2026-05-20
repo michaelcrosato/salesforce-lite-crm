@@ -20,11 +20,14 @@ param(
   [string] $Agent = "codex",
   [string] $RollbackTag = "",
   [int] $RestartDelaySeconds = 90,
+  [int] $FailureRestartDelaySeconds = 120,
   [int] $MaxIterations = 0,
   [int] $RepairAttemptsPerIteration = 5,
   [int] $MaxConsecutiveFailedIterations = 100,
   [int] $MaxNoProgressIterations = 0,
   [switch] $DryRun,
+  [switch] $StopOnLoopFailure,
+  [switch] $StopOnCodexSmokeFailure,
   [switch] $NoCodexSmoke,
   [switch] $NoRollbackTagPush,
   [switch] $NoFullYolo,
@@ -302,6 +305,32 @@ function Invoke-CodexSmoke {
   }
 }
 
+function Invoke-CodexSmokeWithRetry {
+  param([Parameter(Mandatory = $true)][string] $Reason)
+
+  while (-not (Test-StopSignal)) {
+    try {
+      Invoke-CodexSmoke
+      return $true
+    }
+    catch {
+      $message = $_.Exception.Message
+      Write-WatchLog ("Codex invocation smoke failed during {0}: {1}" -f $Reason, $message)
+
+      if ($StopOnCodexSmokeFailure) {
+        Write-WatchLog "StopOnCodexSmokeFailure supplied. Watchdog exiting."
+        throw
+      }
+
+      Write-WatchLog "Watchdog will retry Codex smoke in $FailureRestartDelaySeconds seconds. Create STOP or AUTONOMY.STOP under the repo root to stop."
+      Start-Sleep -Seconds $FailureRestartDelaySeconds
+    }
+  }
+
+  Write-WatchLog "Stop file found while waiting for Codex smoke recovery. Watchdog exiting."
+  return $false
+}
+
 function Ensure-RollbackTag {
   Write-WatchLog "== Ensure rollback tag $RollbackTag =="
 
@@ -404,14 +433,18 @@ if ($DryRun) {
   Write-WatchLog ("DRY RUN: would run Codex smoke via {0} {1} unless -NoCodexSmoke is supplied." -f $ps, (Format-CommandForLog -CommandArgs $smokeArgs))
   Write-WatchLog "DRY RUN: would ensure rollback tag $RollbackTag and push it unless -NoRollbackTagPush is supplied."
   Write-WatchLog ("DRY RUN: would invoke {0} {1}" -f $ps, (Format-CommandForLog -CommandArgs $loopArgs))
+  Write-WatchLog "DRY RUN: on non-zero loop exit, watchdog would re-run Codex smoke and restart the loop after $FailureRestartDelaySeconds seconds unless -StopOnLoopFailure is supplied."
   exit 0
 }
 
-Invoke-CodexSmoke
+if (-not (Invoke-CodexSmokeWithRetry -Reason "initial preflight")) {
+  exit 0
+}
 Ensure-RollbackTag
 
 $psExe = Get-PowerShellExe
 $loopArguments = Get-LoopArguments
+$consecutiveLoopFailures = 0
 
 while (-not (Test-StopSignal)) {
   $branch = Get-GitText @("branch", "--show-current")
@@ -426,9 +459,30 @@ while (-not (Test-StopSignal)) {
   Write-WatchLog $exitLine
 
   if ($exitCode -ne 0) {
-    Write-WatchLog "Autonomy loop exited non-zero. Watchdog will not restart a failed startup/run."
-    exit $exitCode
+    $consecutiveLoopFailures++
+    Write-WatchLog ("Autonomy loop exited non-zero. Consecutive loop failures: {0}." -f $consecutiveLoopFailures)
+
+    if ($StopOnLoopFailure) {
+      Write-WatchLog "StopOnLoopFailure supplied. Watchdog will not restart a failed loop."
+      exit $exitCode
+    }
+
+    if (Test-StopSignal) {
+      Write-WatchLog "Stop file found after non-zero loop exit. Watchdog exiting."
+      break
+    }
+
+    Write-WatchLog "Running Codex smoke before recovery restart."
+    if (-not (Invoke-CodexSmokeWithRetry -Reason ("loop failure {0}" -f $consecutiveLoopFailures))) {
+      break
+    }
+
+    Write-WatchLog "Recovery smoke passed. Restarting autonomy loop in $FailureRestartDelaySeconds seconds; the next loop baseline gate will invoke repair if the repo is red."
+    Start-Sleep -Seconds $FailureRestartDelaySeconds
+    continue
   }
+
+  $consecutiveLoopFailures = 0
 
   if (Test-StopSignal) {
     Write-WatchLog "Stop file found under repo root. Watchdog exiting."
