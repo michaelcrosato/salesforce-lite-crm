@@ -81,14 +81,54 @@ function Get-PowerShellExe {
   throw "Could not find pwsh or powershell on PATH."
 }
 
-function Get-GitText {
-  param([Parameter(Mandatory = $true)][string[]] $Args)
+function Invoke-NativeCommand {
+  param([Parameter(Mandatory = $true)][scriptblock] $NativeCommand)
 
-  $output = & git -C $script:RepoRoot @Args 2>&1
-  $exitCode = $LASTEXITCODE
+  $oldErrorActionPreference = $ErrorActionPreference
+  $nativePreference = Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue
+  $hasNativePreference = $null -ne $nativePreference
+  $oldNativePreference = $null
+  if ($hasNativePreference) {
+    $oldNativePreference = $nativePreference.Value
+  }
+
+  try {
+    $ErrorActionPreference = "Continue"
+    if ($hasNativePreference) {
+      $PSNativeCommandUseErrorActionPreference = $false
+    }
+
+    & $NativeCommand
+  }
+  finally {
+    $script:LastNativeExitCode = $LASTEXITCODE
+    if ($hasNativePreference) {
+      $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+    }
+    $ErrorActionPreference = $oldErrorActionPreference
+  }
+}
+
+function Invoke-NativeCapture {
+  param([Parameter(Mandatory = $true)][scriptblock] $NativeCommand)
+
+  $script:LastNativeExitCode = 0
+  $output = Invoke-NativeCommand -NativeCommand $NativeCommand
+  return [pscustomobject]@{
+    Output = $output
+    ExitCode = $script:LastNativeExitCode
+  }
+}
+
+function Get-GitText {
+  param([Parameter(Mandatory = $true)][string[]] $GitArgs)
+
+  $result = Invoke-NativeCapture { & git -C $script:RepoRoot @GitArgs 2>&1 }
+  $output = $result.Output
+  $exitCode = $result.ExitCode
   if ($exitCode -ne 0) {
     $text = (($output | Out-String).Trim())
-    throw "git $($Args -join ' ') failed with exit code $exitCode. $text"
+    throw "git $($GitArgs -join ' ') failed with exit code $exitCode. $text"
   }
   return (($output | Out-String).Trim())
 }
@@ -108,11 +148,14 @@ function Invoke-CodexSmoke {
   $codex = Require-Command "codex"
   Write-WatchLog "== Codex YOLO smoke test using default/latest configured model =="
 
-  $output = "Return exactly OK." | & $codex exec `
-    --cd $script:RepoRoot `
-    --dangerously-bypass-approvals-and-sandbox `
-    - 2>&1
-  $exitCode = $LASTEXITCODE
+  $result = Invoke-NativeCapture {
+    "Return exactly OK." | & $codex exec `
+      --cd $script:RepoRoot `
+      --dangerously-bypass-approvals-and-sandbox `
+      - 2>&1
+  }
+  $output = $result.Output
+  $exitCode = $result.ExitCode
 
   foreach ($line in $output) {
     $text = $line | Out-String
@@ -131,12 +174,12 @@ function Invoke-CodexSmoke {
 function Ensure-RollbackTag {
   Write-WatchLog "== Ensure rollback tag $RollbackTag =="
 
-  $null = & git -C $script:RepoRoot rev-parse -q --verify ("refs/tags/{0}" -f $RollbackTag) 2>$null
-  if ($LASTEXITCODE -eq 0) {
+  Invoke-NativeCommand { & git -C $script:RepoRoot rev-parse -q --verify ("refs/tags/{0}" -f $RollbackTag) 2>$null } | Out-Null
+  if ($script:LastNativeExitCode -eq 0) {
     Write-WatchLog "Rollback tag already exists locally: $RollbackTag"
   } else {
-    & git -C $script:RepoRoot tag $RollbackTag HEAD
-    if ($LASTEXITCODE -ne 0) {
+    Invoke-NativeCommand { & git -C $script:RepoRoot tag $RollbackTag HEAD } | Out-Null
+    if ($script:LastNativeExitCode -ne 0) {
       throw "Failed to create rollback tag $RollbackTag."
     }
     Write-WatchLog "Created rollback tag at HEAD: $RollbackTag"
@@ -148,17 +191,17 @@ function Ensure-RollbackTag {
   }
 
   Write-WatchLog "== Push rollback tag $RollbackTag =="
-  & git -C $script:RepoRoot push origin ("refs/tags/{0}:refs/tags/{0}" -f $RollbackTag)
-  if ($LASTEXITCODE -ne 0) {
+  Invoke-NativeCommand { & git -C $script:RepoRoot push origin ("refs/tags/{0}:refs/tags/{0}" -f $RollbackTag) }
+  if ($script:LastNativeExitCode -ne 0) {
     throw "Rollback tag push failed. Do not start if you want remote rollback protection."
   }
 }
 
 function Format-CommandForLog {
-  param([Parameter(Mandatory = $true)][string[]] $Args)
+  param([Parameter(Mandatory = $true)][string[]] $CommandArgs)
 
   $parts = @()
-  foreach ($arg in $Args) {
+  foreach ($arg in $CommandArgs) {
     if ($arg -match '[\s"`]') {
       $parts += ('"{0}"' -f ($arg -replace '"', '\"'))
     } else {
@@ -225,7 +268,7 @@ if ($DryRun) {
   $loopArgs = Get-LoopArguments
   Write-WatchLog "DRY RUN: would run Codex smoke unless -NoCodexSmoke is supplied."
   Write-WatchLog "DRY RUN: would ensure rollback tag $RollbackTag and push it unless -NoRollbackTagPush is supplied."
-  Write-WatchLog ("DRY RUN: would invoke {0} {1}" -f $ps, (Format-CommandForLog -Args $loopArgs))
+  Write-WatchLog ("DRY RUN: would invoke {0} {1}" -f $ps, (Format-CommandForLog -CommandArgs $loopArgs))
   exit 0
 }
 
@@ -241,8 +284,8 @@ while (-not (Test-StopSignal)) {
   $startLine = "START autonomy-loop at $(Get-Date -Format o) on $branch / $head"
   Write-WatchLog $startLine
 
-  & $psExe @loopArguments
-  $exitCode = $LASTEXITCODE
+  Invoke-NativeCommand { & $psExe @loopArguments }
+  $exitCode = $script:LastNativeExitCode
 
   $exitLine = "EXIT autonomy-loop at $(Get-Date -Format o) with code $exitCode"
   Write-WatchLog $exitLine

@@ -24,7 +24,7 @@ param(
   [ValidateSet("codex")]
   [string] $Agent = "codex",
 
-  [string] $RunRoot = "C:\dev\salesforce-lite-crm",
+  [string] $RunRoot = "",
 
   # 0 means no iteration cap. Stop conditions still apply.
   [int] $MaxIterations = 8,
@@ -66,6 +66,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+if ([string]::IsNullOrWhiteSpace($RunRoot)) {
+  $RunRoot = Join-Path $PSScriptRoot ".."
+}
+
 $script:RunRoot = (Resolve-Path -LiteralPath $RunRoot).Path
 $script:Agent = $Agent
 $script:BranchPrefix = $BranchPrefix
@@ -104,20 +108,60 @@ function Get-PowerShellExe {
   throw "Could not find pwsh or powershell on PATH."
 }
 
-function Invoke-Git {
-  param([Parameter(Mandatory = $true)][string[]] $Args)
+function Invoke-NativeCommand {
+  param([Parameter(Mandatory = $true)][scriptblock] $NativeCommand)
 
-  & git -C $script:RunRoot @Args
-  $exitCode = $LASTEXITCODE
+  $oldErrorActionPreference = $ErrorActionPreference
+  $nativePreference = Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue
+  $hasNativePreference = $null -ne $nativePreference
+  $oldNativePreference = $null
+  if ($hasNativePreference) {
+    $oldNativePreference = $nativePreference.Value
+  }
+
+  try {
+    $ErrorActionPreference = "Continue"
+    if ($hasNativePreference) {
+      $PSNativeCommandUseErrorActionPreference = $false
+    }
+
+    & $NativeCommand
+  }
+  finally {
+    $script:LastNativeExitCode = $LASTEXITCODE
+    if ($hasNativePreference) {
+      $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+    }
+    $ErrorActionPreference = $oldErrorActionPreference
+  }
+}
+
+function Invoke-NativeCapture {
+  param([Parameter(Mandatory = $true)][scriptblock] $NativeCommand)
+
+  $script:LastNativeExitCode = 0
+  $output = Invoke-NativeCommand -NativeCommand $NativeCommand
+  return [pscustomobject]@{
+    Output = $output
+    ExitCode = $script:LastNativeExitCode
+  }
+}
+
+function Invoke-Git {
+  param([Parameter(Mandatory = $true)][string[]] $GitArgs)
+
+  Invoke-NativeCommand { & git -C $script:RunRoot @GitArgs }
+  $exitCode = $script:LastNativeExitCode
   if ($exitCode -ne 0) {
-    throw "git $($Args -join ' ') failed with exit code $exitCode"
+    throw "git $($GitArgs -join ' ') failed with exit code $exitCode"
   }
 }
 
 function Get-GitText {
-  param([Parameter(Mandatory = $true)][string[]] $Args)
+  param([Parameter(Mandatory = $true)][string[]] $GitArgs)
 
-  $output = & git -C $script:RunRoot @Args 2>&1
+  $result = Invoke-NativeCapture { & git -C $script:RunRoot @GitArgs 2>&1 }
+  $output = $result.Output
   return (($output | Out-String).Trim())
 }
 
@@ -160,13 +204,13 @@ function Invoke-LoggedNative {
   Push-Location $script:RunRoot
   try {
     $global:LASTEXITCODE = 0
-    & $Command 2>&1 | ForEach-Object {
+    Invoke-NativeCommand { & $Command 2>&1 } | ForEach-Object {
       $line = $_ | Out-String
       $line = $line.TrimEnd()
       if ($line.Length -gt 0) { Write-Host $line }
       Add-Content -LiteralPath $LogPath -Value $line
     }
-    $exitCode = $LASTEXITCODE
+    $exitCode = $script:LastNativeExitCode
   }
   finally {
     Pop-Location
@@ -215,12 +259,13 @@ function Test-StopSignal {
   }
 
   if ($PollOriginStop) {
-    $remote = & git -C $script:RunRoot remote get-url origin 2>$null
-    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($remote | Out-String).Trim())) {
-      & git -C $script:RunRoot fetch --quiet origin main 2>$null | Out-Null
+    $remoteResult = Invoke-NativeCapture { & git -C $script:RunRoot remote get-url origin 2>$null }
+    $remote = $remoteResult.Output
+    if ($remoteResult.ExitCode -eq 0 -and -not [string]::IsNullOrWhiteSpace(($remote | Out-String).Trim())) {
+      Invoke-NativeCommand { & git -C $script:RunRoot fetch --quiet origin main 2>$null } | Out-Null
       foreach ($name in @("STOP", "AUTONOMY.STOP")) {
-        $null = & git -C $script:RunRoot show ("origin/main:{0}" -f $name) 2>$null
-        if ($LASTEXITCODE -eq 0) {
+        Invoke-NativeCommand { & git -C $script:RunRoot show ("origin/main:{0}" -f $name) 2>$null } | Out-Null
+        if ($script:LastNativeExitCode -eq 0) {
           Write-Host "Remote stop signal found on origin/main: $name"
           Write-MasterLog ("remote stop signal found: {0}" -f $name)
           return $true
@@ -240,9 +285,9 @@ function Set-KeepAwake {
     return
   }
 
-  & powercfg /change standby-timeout-ac 0 | Out-Null
-  & powercfg /change hibernate-timeout-ac 0 | Out-Null
-  & powercfg /change monitor-timeout-ac 30 | Out-Null
+  Invoke-NativeCommand { & powercfg /change standby-timeout-ac 0 } | Out-Null
+  Invoke-NativeCommand { & powercfg /change hibernate-timeout-ac 0 } | Out-Null
+  Invoke-NativeCommand { & powercfg /change monitor-timeout-ac 30 } | Out-Null
 }
 
 function Start-DockerServicesIfPresent {
@@ -268,8 +313,9 @@ function Start-DockerServicesIfPresent {
 
   Push-Location $script:RunRoot
   try {
-    $services = & docker compose config --services 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    $servicesResult = Invoke-NativeCapture { & docker compose config --services 2>$null }
+    $services = $servicesResult.Output
+    if ($servicesResult.ExitCode -ne 0) {
       Write-Host "docker compose config failed. Skipping Docker startup."
       return
     }
@@ -283,7 +329,7 @@ function Start-DockerServicesIfPresent {
 
     if ($targets.Count -gt 0) {
       Write-Host ("Starting Docker services: {0}" -f ($targets -join ", "))
-      & docker compose up -d @targets
+      Invoke-NativeCommand { & docker compose up -d @targets } | Out-Null
     } else {
       Write-Host "No postgres/postgresql/redis service detected."
     }
@@ -358,13 +404,13 @@ function Invoke-CodexPrompt {
   Push-Location $script:RunRoot
   try {
     $global:LASTEXITCODE = 0
-    $promptText | & $codex @args 2>&1 | ForEach-Object {
+    Invoke-NativeCommand { $promptText | & $codex @args 2>&1 } | ForEach-Object {
       $line = $_ | Out-String
       $line = $line.TrimEnd()
       if ($line.Length -gt 0) { Write-Host $line }
       Add-Content -LiteralPath $OutputPath -Value $line
     }
-    $exitCode = $LASTEXITCODE
+    $exitCode = $script:LastNativeExitCode
   }
   finally {
     Pop-Location
@@ -713,15 +759,16 @@ function Push-GreenBranchIfRequested {
     return $false
   }
 
-  $remote = & git -C $script:RunRoot remote get-url origin 2>$null
-  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($remote | Out-String).Trim())) {
+  $remoteResult = Invoke-NativeCapture { & git -C $script:RunRoot remote get-url origin 2>$null }
+  $remote = $remoteResult.Output
+  if ($remoteResult.ExitCode -ne 0 -or [string]::IsNullOrWhiteSpace(($remote | Out-String).Trim())) {
     Write-Host "No origin remote configured. Skipping push."
     return $true
   }
 
   Write-Host "Pushing green branch to origin HEAD."
-  & git -C $script:RunRoot push origin HEAD
-  if ($LASTEXITCODE -ne 0) {
+  Invoke-NativeCommand { & git -C $script:RunRoot push origin HEAD }
+  if ($script:LastNativeExitCode -ne 0) {
     Write-Host "Push failed. Stopping after green local state."
     return $false
   }
@@ -805,10 +852,10 @@ try {
 
   Write-Host ""
   Write-Host "Initial branch/status:"
-  git -C $script:RunRoot rev-parse --abbrev-ref HEAD
-  git -C $script:RunRoot status --short
+  Invoke-NativeCommand { & git -C $script:RunRoot rev-parse --abbrev-ref HEAD }
+  Invoke-NativeCommand { & git -C $script:RunRoot status --short }
   Write-Host "Recent commits:"
-  git -C $script:RunRoot log --oneline -8
+  Invoke-NativeCommand { & git -C $script:RunRoot log --oneline -8 }
 
   $checkWorktrees = Join-Path $script:RunRoot "scripts\check-worktrees.ps1"
   if (Test-Path -LiteralPath $checkWorktrees) {
@@ -987,9 +1034,9 @@ try {
   Write-Host ("Finished: {0}" -f (Get-Date))
   Write-Host ("HEAD: {0}" -f (Get-HeadShort))
   Write-Host "Latest commits:"
-  git -C $script:RunRoot log --oneline -12
+  Invoke-NativeCommand { & git -C $script:RunRoot log --oneline -12 }
   Write-Host "Current status:"
-  git -C $script:RunRoot status --short
+  Invoke-NativeCommand { & git -C $script:RunRoot status --short }
   Write-Host ("Logs: {0}" -f $script:RunDir)
   Write-Host "========================================"
 
