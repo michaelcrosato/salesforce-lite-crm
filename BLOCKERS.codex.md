@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 6
 
-Feature: S6-F1 - CSV import template contracts
+Feature: S6-F2 - CSV import preflight diagnostics
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T15:20:12.9377442-07:00
+Timestamp: 2026-05-20T15:45:49.8451423-07:00
 
 Escalation required: NO
 
