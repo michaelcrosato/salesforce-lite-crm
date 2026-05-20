@@ -3,6 +3,7 @@
 import { ArrowUpDown, Eye } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +43,12 @@ type SortKey =
   | "lastActivity"
   | "openDeals";
 
-export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] }) {
+export interface ContactsTableProps {
+  contacts: ContactTableRowData[];
+  "data-testid"?: string;
+}
+
+export function ContactsTable({ contacts, "data-testid": testid }: ContactsTableProps) {
   const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>({
     key: "name",
     direction: "asc"
@@ -51,7 +57,8 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
   const sortedContacts = useMemo(() => {
     return [...contacts].sort((a, b) => {
       const modifier = sort.direction === "asc" ? 1 : -1;
-      return compareContact(a, b, sort.key) * modifier;
+      const cmp = compareContact(a, b, sort.key);
+      return (cmp !== 0 ? cmp : a.id.localeCompare(b.id)) * modifier;
     });
   }, [contacts, sort]);
 
@@ -62,8 +69,20 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
     }));
   }
 
+  if (contacts.length === 0) {
+    return (
+      <EmptyState
+        title="No contacts"
+        description="No contacts match the current filters."
+        compact
+        data-testid={testid ? `${testid}-empty` : "contacts-table-empty"}
+      />
+    );
+  }
+
   return (
-    <Table>
+    <div data-testid={testid}>
+      <Table>
       <TableHeader>
         <TableRow>
           <SortableHead label="Name" sortKey="name" onSort={toggleSort} />
@@ -124,6 +143,7 @@ export function ContactsTable({ contacts }: { contacts: ContactTableRowData[] })
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

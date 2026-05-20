@@ -1,5 +1,6 @@
 import { AlertCircle, Inbox, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -9,6 +10,11 @@ interface EmptyStateProps {
   actionHref?: string;
   actionLabel?: string;
   variant?: "empty" | "loading" | "error";
+  /** Compact mode for dense containers (e.g. kanban columns, small cards) — tighter spacing */
+  compact?: boolean;
+  /** Optional data-testid for test targeting of the empty state container */
+  "data-testid"?: string;
+  className?: string;
 }
 
 export function EmptyState({
@@ -16,15 +22,19 @@ export function EmptyState({
   description,
   actionHref,
   actionLabel,
-  variant = "empty"
+  variant = "empty",
+  compact = false,
+  "data-testid": testId,
+  className
 }: EmptyStateProps) {
+  const iconSize = compact ? "h-4 w-4" : "h-5 w-5";
   const icon =
     variant === "loading" ? (
-      <Loader2 className="h-5 w-5 animate-spin" />
+      <Loader2 className={`${iconSize} animate-spin`} />
     ) : variant === "error" ? (
-      <AlertCircle className="h-5 w-5" />
+      <AlertCircle className={iconSize} />
     ) : (
-      <Inbox className="h-5 w-5" />
+      <Inbox className={iconSize} />
     );
 
   const iconBg =
@@ -32,9 +42,12 @@ export function EmptyState({
       ? "bg-destructive/10 text-destructive"
       : "bg-muted text-muted-foreground";
 
+  const contentPadding = compact ? "py-6" : "py-12";
+  const rootClass = compact ? "border-dashed" : "border-dashed";
+
   return (
-    <Card className="border-dashed">
-      <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+    <Card className={cn(rootClass, className)} data-testid={testId}>
+      <CardContent className={`flex flex-col items-center gap-3 ${contentPadding} text-center`}>
         <div className={`rounded-full p-3 ${iconBg}`}>
           {icon}
         </div>

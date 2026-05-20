@@ -3,6 +3,7 @@
 import { ArrowUpDown, Eye } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { AccountStatusBadge, HealthBadge } from "@/components/account-badges";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +39,13 @@ type SortKey =
   | "contacts"
   | "pipeline";
 
-export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] }) {
+export interface AccountsTableProps {
+  accounts: AccountTableRowData[];
+  /** Optional data-testid for the whole table container */
+  "data-testid"?: string;
+}
+
+export function AccountsTable({ accounts, "data-testid": testid }: AccountsTableProps) {
   const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>({
     key: "name",
     direction: "asc"
@@ -46,7 +53,8 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
   const sortedAccounts = useMemo(() => {
     return [...accounts].sort((a, b) => {
       const modifier = sort.direction === "asc" ? 1 : -1;
-      return compareAccount(a, b, sort.key) * modifier;
+      const cmp = compareAccount(a, b, sort.key);
+      return (cmp !== 0 ? cmp : a.id.localeCompare(b.id)) * modifier;
     });
   }, [accounts, sort]);
 
@@ -57,8 +65,20 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
     }));
   }
 
+  if (accounts.length === 0) {
+    return (
+      <EmptyState
+        title="No accounts"
+        description="No accounts match the current filters."
+        compact
+        data-testid={testid ? `${testid}-empty` : "accounts-table-empty"}
+      />
+    );
+  }
+
   return (
-    <Table>
+    <div data-testid={testid}>
+      <Table>
       <TableHeader>
         <TableRow>
           <SortableHead label="Name" sortKey="name" onSort={toggleSort} />
@@ -98,6 +118,7 @@ export function AccountsTable({ accounts }: { accounts: AccountTableRowData[] })
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

@@ -221,7 +221,7 @@ export function DealForm({
             <FieldError errors={errors?.ownerId} />
           </div>
           <div className="flex items-center justify-end gap-3 md:col-span-2">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" loading={isPending}>
               {isPending ? "Saving..." : submitLabel}
             </Button>
           </div>

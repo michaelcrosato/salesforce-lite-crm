@@ -48,19 +48,23 @@ export type DrawerDeal = {
   activities: TimelineActivity[];
 };
 
-export function DealDetailDrawer({
-  deal,
-  accounts,
-  contacts,
-  owners,
-  onClose
-}: {
+export interface DealDetailDrawerProps {
   deal: DrawerDeal | null;
   accounts: DealAccountOption[];
   contacts: DealContactOption[];
   owners: DealOwnerOption[];
   onClose: () => void;
-}) {
+  "data-testid"?: string;
+}
+
+export function DealDetailDrawer({
+  deal,
+  accounts,
+  contacts,
+  owners,
+  onClose,
+  "data-testid": testid
+}: DealDetailDrawerProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -91,7 +95,7 @@ export function DealDetailDrawer({
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50" data-testid={testid}>
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/30"

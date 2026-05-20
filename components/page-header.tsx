@@ -1,14 +1,28 @@
-export function PageHeader({
-  title,
-  description,
-  children
-}: {
+import { cn } from "@/lib/utils";
+
+export interface PageHeaderProps {
   title: string;
   description: string;
   children?: React.ReactNode;
-}) {
+  "data-testid"?: string;
+  className?: string;
+}
+
+export function PageHeader({
+  title,
+  description,
+  children,
+  "data-testid": testid,
+  className
+}: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div
+      className={cn(
+        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
+        className
+      )}
+      data-testid={testid}
+    >
       <div>
         <h1 className="text-2xl font-semibold tracking-normal text-foreground">{title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>

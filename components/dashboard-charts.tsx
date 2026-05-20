@@ -11,6 +11,7 @@ import {
   YAxis
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatCurrency } from "@/lib/formatters";
 
 export type StageChartDatum = {
@@ -22,9 +23,53 @@ export type StageChartDatum = {
 
 const colors = ["#1d4ed8", "#0f766e", "#a16207", "#be123c", "#15803d", "#475569"];
 
-export function DashboardCharts({ data }: { data: StageChartDatum[] }) {
+export interface DashboardChartsProps {
+  data: StageChartDatum[];
+  isLoading?: boolean;
+  /** data-testid for the whole analyst/pipeline panel in demo flows */
+  "data-testid"?: string;
+}
+
+export function DashboardCharts({ data, isLoading, "data-testid": testid }: DashboardChartsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 xl:grid-cols-2" data-testid={testid}>
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Pipeline Value by Stage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EmptyState variant="loading" title="Loading charts" description="Computing pipeline metrics..." compact />
+          </CardContent>
+        </Card>
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Deals by Stage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EmptyState variant="loading" title="Loading charts" description="Computing stage distribution..." compact />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const hasData = data && data.length > 0 && data.some((d) => (d.value || 0) > 0 || (d.count || 0) > 0);
+
+  if (!hasData) {
+    return (
+      <div data-testid={testid}>
+        <EmptyState
+          title="No pipeline data"
+          description="Create deals or adjust filters to see charts."
+          compact
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
+    <div className="grid gap-4 xl:grid-cols-2" data-testid={testid}>
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle>Pipeline Value by Stage</CardTitle>

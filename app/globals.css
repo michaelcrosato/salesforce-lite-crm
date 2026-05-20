@@ -44,4 +44,30 @@
   .crm-section-grid {
     @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
   }
+
+  /* YOLO demo polish: stronger focus, softer cards, consistent interactive feel */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  }
+
+  .crm-card {
+    @apply rounded-lg border bg-card p-5 shadow-soft transition-shadow hover:shadow-md;
+  }
+
+  .crm-table-row {
+    @apply transition-colors hover:bg-muted/50;
+  }
+
+  /* Autonomous YOLO demo excellence */
+  .demo-stable {
+    @apply transition-all duration-150;
+  }
+
+  .crm-kpi-value {
+    @apply font-semibold tabular-nums tracking-tight;
+  }
 }

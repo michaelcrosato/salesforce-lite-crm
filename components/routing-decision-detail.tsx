@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { RoutingDecision } from "@/lib/services/leads";
 
 interface RoutingDecisionDetailProps {
@@ -14,9 +15,12 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
 
   if (!decision) {
     return (
-      <div data-testid={testid ? `${testid}-empty` : "routing-detail-empty"} className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-        No routing record found for this lead.
-      </div>
+      <EmptyState
+        title="No routing decision"
+        description="No routing record found for this lead."
+        compact
+        data-testid={testid ? `${testid}-empty` : "routing-detail-empty"}
+      />
     );
   }
 

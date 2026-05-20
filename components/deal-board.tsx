@@ -12,6 +12,7 @@ import type {
 } from "@/components/deal-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/crm-constants";
@@ -19,19 +20,25 @@ import { formatCurrency, formatDate, formatPercent, formatRelativeDays } from "@
 
 export type BoardDeal = DrawerDeal;
 
-export function DealBoard({
-  deals,
-  highlightedDealId,
-  accounts,
-  contacts,
-  owners
-}: {
+export interface DealBoardProps {
   deals: BoardDeal[];
   highlightedDealId?: string;
   accounts: DealAccountOption[];
   contacts: DealContactOption[];
   owners: DealOwnerOption[];
-}) {
+  isLoading?: boolean;
+  "data-testid"?: string;
+}
+
+export function DealBoard({
+  deals,
+  highlightedDealId,
+  accounts,
+  contacts,
+  owners,
+  isLoading,
+  "data-testid": testid
+}: DealBoardProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [selectedDealId, setSelectedDealId] = useState<string | null>(
@@ -40,6 +47,33 @@ export function DealBoard({
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const selectedDeal = deals.find((deal) => deal.id === selectedDealId) ?? null;
+
+  if (isLoading) {
+    return (
+      <div data-testid={testid} className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-6">
+        {DEAL_STAGES.map((stage) => (
+          <Card key={stage} className="min-h-[300px]">
+            <CardHeader>
+              <CardTitle>{STAGE_LABELS[stage]}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EmptyState variant="loading" title="Loading deals" description="Fetching pipeline..." compact />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (deals.length === 0) {
+    return (
+      <EmptyState
+        title="No deals yet"
+        description="Create your first opportunity to see the board."
+        data-testid={testid ? `${testid}-empty` : "deal-board-empty"}
+      />
+    );
+  }
 
   function moveDeal(stage: DealStage, dealId: string | null) {
     if (!dealId) {
@@ -187,9 +221,12 @@ export function DealBoard({
                     </Card>
                   ))
                 ) : (
-                  <div className="rounded-md border border-dashed bg-background p-4 text-center text-xs text-muted-foreground">
-                    No deals in this stage.
-                  </div>
+                  <EmptyState
+                    title="No deals"
+                    description="No deals in this stage."
+                    compact
+                    data-testid={`deal-board-empty-${stage}`}
+                  />
                 )}
               </div>
             </section>
