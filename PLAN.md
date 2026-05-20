@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.10A |
+| Version | 2.11A |
 
 | Last updated | 2026-05-20 |
 
-| Active sprint | Sprint 5 queued for Codex; Sprint 4 Codex track done |
+| Active sprint | Sprint 6 queued for Codex; Sprint 5 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -150,8 +150,8 @@ Goal: promote a narrow server-side CSV portability foundation while preserving c
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S5-F1 — Server CSV export contracts | Codex | queued | Server-side CSV export mapping covers current CRM list data with deterministic RFC4180 output and later-UI-ready contracts. No routes, buttons, file storage, external services, or product UI are added. |
-| S5-F2 — CSV import preview validation | Codex | queued | Server-side CSV import preview parses CSV text, normalizes headers, validates contact and consumer-lead rows with existing schemas/helpers, and returns row-level errors without database writes. No bulk create/update, mapping wizard, product UI, or background jobs are added. |
+| S5-F1 — Server CSV export contracts | Codex | done | Server-side CSV export mapping covers current CRM list data with deterministic RFC4180 output and later-UI-ready contracts. No routes, buttons, file storage, external services, or product UI are added. |
+| S5-F2 — CSV import preview validation | Codex | done | Server-side CSV import preview parses CSV text, normalizes headers, validates contact and consumer-lead rows with existing schemas/helpers, and returns row-level errors without database writes. No bulk create/update, mapping wizard, product UI, or background jobs are added. |
 
 \*\*Sprint 5 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -178,6 +178,44 @@ Goal: promote a narrow server-side CSV portability foundation while preserving c
 \- No database writes from CSV import preview.
 
 \- No Salesforce integration.
+
+
+\*\*Sprint 6 — CSV Readiness Contracts\*\*
+
+Goal: finish the server-side CSV readiness layer needed for later UI wiring without adding routes, persistence workflows, or external integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S6-F1 — CSV import template contracts | Codex | queued | Server-side import templates are published for supported CSV preview entities with canonical header order, required-field metadata, aliases, and header-only CSV output suitable for later UI wiring. No routes, buttons, storage, external services, or database writes are added. |
+| S6-F2 — CSV import preflight diagnostics | Codex | queued | CSV import preview can run database-backed preflight diagnostics for contact and consumer-lead rows, reporting duplicate/contactability and relationship warnings without mutating data. Diagnostics are row-level and deterministic, with no routing execution or import writes. |
+
+\*\*Sprint 6 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import preview or preflight diagnostics.
+
+\- No bulk create/update or import apply flow.
+
+\- No routing reassignment, external enrichment, or Salesforce integration.
 
 
 
