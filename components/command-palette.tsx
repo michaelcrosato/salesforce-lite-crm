@@ -91,7 +91,6 @@ export function CommandPalette() {
 
     const trimmed = query.trim();
     if (trimmed.length === 0) {
-      setResults(EMPTY_RESULTS);
       return;
     }
 
@@ -108,7 +107,11 @@ export function CommandPalette() {
   }, [query, open]);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    setQuery(event.currentTarget.value);
+    const nextQuery = event.currentTarget.value;
+    setQuery(nextQuery);
+    if (nextQuery.trim().length === 0) {
+      setResults(EMPTY_RESULTS);
+    }
   }
 
   function navigate(route: string) {

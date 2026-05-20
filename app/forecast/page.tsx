@@ -16,8 +16,8 @@ import {
 } from "@/lib/business/forecast";
 import { formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
+import { boundedNumberQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
-import { forecastQuerySchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +29,15 @@ export default async function ForecastPage({
   const now = new Date();
   const { start, end } = currentMonthRange(now);
   const params = await searchParams;
-  const parsedParams = forecastQuerySchema.safeParse(params);
-  const query = parsedParams.success ? parsedParams.data : {};
+  const leadVolumeMultiplierParam = boundedNumberQueryParam(params.multiplier, {
+    min: 0.5,
+    max: 3
+  });
+  const assignmentRateParam = boundedNumberQueryParam(params.assignmentRate, {
+    min: 10,
+    max: 100
+  });
+  const selectedAreaId = nonEmptyQueryParam(params.area);
   const [orders, areas, totalLeadsThisMonth, routedLeadsThisMonth] = await Promise.all([
     prisma.dealerOrder.findMany({
       where: {
@@ -101,11 +108,10 @@ export default async function ForecastPage({
     totalLeads: totalLeadsThisMonth,
     routedLeads: routedLeadsThisMonth
   });
-  const leadVolumeMultiplier = clampLeadVolumeMultiplier(query.multiplier ?? 1);
+  const leadVolumeMultiplier = clampLeadVolumeMultiplier(leadVolumeMultiplierParam ?? 1);
   const assignmentRate = clampAssignmentRate(
-    query.assignmentRate === undefined ? defaultAssignmentRate : query.assignmentRate / 100
+    assignmentRateParam === undefined ? defaultAssignmentRate : assignmentRateParam / 100
   );
-  const selectedAreaId = query.area;
   const forecast = buildForecast({
     leadVolumeMultiplier,
     assignmentRate,

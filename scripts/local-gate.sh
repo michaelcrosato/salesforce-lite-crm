@@ -33,6 +33,14 @@ echo "==> npm run seed"
 npm run seed
 
 echo ""
+echo "==> npm run lint"
+npm run lint
+
+echo ""
+echo "==> npm run typecheck"
+npm run typecheck
+
+echo ""
 echo "==> npm run test"
 npm run test
 

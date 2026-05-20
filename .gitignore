@@ -26,3 +26,9 @@ prisma/dev.db-shm
 *.db-journal
 *.db-wal
 *.db-shm
+
+agent-runs/
+status/
+
+next-env.d.ts
+*.tsbuildinfo

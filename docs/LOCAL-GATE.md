@@ -8,6 +8,8 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 npx prisma generate
 npx prisma db push
 npm run seed
+npm run lint
+npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium
@@ -31,12 +33,14 @@ Current `package.json` scripts:
 postinstall      node scripts/ensure-sqlite-db.mjs
 dev              next dev
 build            next build
+lint             eslint . --max-warnings=0
+typecheck        tsc --noEmit --pretty false
 seed             tsx prisma/seed.ts
 test             vitest run --maxWorkers=1 --minWorkers=1
 test:e2e         npm run seed && playwright test
 prisma:postgres  node scripts/prisma-postgres.mjs
+autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
 ```
 
-There are no `lint`, `typecheck`, or `format` package scripts unless
-`package.json` later adds them. Do not claim those checks passed unless the
-exact commands exist and were run.
+There is no `format` package script unless `package.json` later adds one. Do
+not claim checks passed unless the exact commands exist and were run.

@@ -77,7 +77,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- Existing UI routes are preserved. `/tasks`, `/cases`, and `/campaigns` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
+- Existing UI routes are preserved. `/tasks`, `/cases`, `/campaigns`, and `/reports` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
 
 ## Status Constants
 
@@ -96,7 +96,7 @@ Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/
 ## Feature Flags And Excluded Routes
 
 `lib/featureFlags.ts` exports `FEATURE_FLAGS`, `EXCLUDED_ROUTES`, and `isEnabled(flag)`.
-Remaining excluded-route flags default to `false`.
+Remaining excluded-route flags default to `false` until a later prompt and contract update explicitly promote them.
 
 | Flag | Purpose | Excluded route(s) | Authority |
 |---|---|---|---|

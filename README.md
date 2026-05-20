@@ -132,7 +132,7 @@ local workflow until that cutover is explicitly promoted.
 | `/contacts/<id>` | Contact detail, activity history, note capture, and deterministic summary/next-step output. |
 | `/deals` | Opportunity board and list using the existing `Deal` model. |
 | `/deals/new` | Opportunity creation. |
-| `/deals?deal=<id>` | Opportunity detail drawer. There is no `/deals/[id]` route in the current contract. |
+| `/deals?deal=<id>` | Opportunity detail drawer. There is no live `/deals/[id]` detail route in the current contract. |
 | `/activities` | Activity timeline for notes, calls, emails, meetings, status changes, and routing events. |
 | `/leads` | Consumer lead creation and dealer-order routing. |
 | `/leads/<id>` | Lead detail and status updates. |
@@ -199,14 +199,16 @@ Current `package.json` scripts:
 postinstall      node scripts/ensure-sqlite-db.mjs
 dev              next dev
 build            next build
+lint             eslint . --max-warnings=0
+typecheck        tsc --noEmit --pretty false
 seed             tsx prisma/seed.ts
 test             vitest run --maxWorkers=1 --minWorkers=1
 test:e2e         npm run seed && playwright test
 prisma:postgres  node scripts/prisma-postgres.mjs
+autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
 ```
 
-There are no `lint`, `typecheck`, or `format` scripts unless `package.json`
-later adds them.
+There is no `format` script unless `package.json` later adds one.
 
 ## Full Local Gate
 
@@ -218,6 +220,8 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 npx prisma generate
 npx prisma db push
 npm run seed
+npm run lint
+npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium
@@ -272,7 +276,7 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - `Lead` means a consumer lead routed to a dealer order, not a generic B2B
   lead-conversion object.
 - Deal detail stays in the `/deals?deal=<id>` drawer flow; `/deals/[id]` is not
-  implemented.
+  implemented as a live detail route.
 - Dealer orders and areas are seeded and browsable, but create/edit flows for
   them are deferred.
 - The header search form routes to contacts only. Cross-entity search is

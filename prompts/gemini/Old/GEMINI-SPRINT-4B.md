@@ -1,4 +1,9 @@
-#GEMINI-SPRINT-4B
+# GEMINI-SPRINT-4B
+
+> Historical artifact. This prompt is superseded by `PLAN.md`,
+> `CRM-CONTRACT.md`, `docs/NEXT-PROMPTS.md`, and
+> `prompts/shared/s4-f4-gemini-demo-smoke-gate.md`.
+> Do not use it as the active next-push prompt.
 
 You are Gemini CLI, working in YOLO mode (danger-full-access, never
 approval) on an EXISTING Salesforce Lite CRM POC at

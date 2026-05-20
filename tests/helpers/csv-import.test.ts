@@ -12,6 +12,17 @@ describe("csv import preview helper (RFC 4180 tolerant)", () => {
     expect(res.errors).toHaveLength(0);
   });
 
+  it("parses quoted fields containing newlines", () => {
+    const input = 'Name,Notes\nAlice,"Line one\nLine two"\nBob,Simple';
+    const res = parseCsv(input);
+
+    expect(res.errors).toHaveLength(0);
+    expect(res.rows).toEqual([
+      ["Alice", "Line one\nLine two"],
+      ["Bob", "Simple"]
+    ]);
+  });
+
   it("returns errors for malformed unclosed quotes, does not throw", () => {
     const input = 'Name,Email\n"Bad, no close\nGood,good@example.com';
     const res = parseCsv(input);

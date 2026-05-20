@@ -9,7 +9,7 @@ export default function ExcludedCommandPalettePage() {
     >
       <ExcludedRoutePlaceholder
         route="/command-palette"
-        reason="The command palette mounts globally via the Ctrl/Cmd+K shortcut; it has no dedicated page."
+        reason="The command palette is excluded by the current contract and has no live UI surface."
       />
     </div>
   );

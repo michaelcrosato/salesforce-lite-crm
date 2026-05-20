@@ -48,7 +48,12 @@ export function isStaleDeal(
   }
 
   const activityDate = deal.lastActivityAt ?? deal.createdAt;
-  const ageInMs = now.getTime() - new Date(activityDate).getTime();
+  const parsedActivityDate = activityDate instanceof Date ? activityDate : new Date(activityDate);
+  if (Number.isNaN(parsedActivityDate.getTime())) {
+    return false;
+  }
+
+  const ageInMs = now.getTime() - parsedActivityDate.getTime();
   const ageInDays = Math.floor(ageInMs / 86_400_000);
 
   return ageInDays >= staleAfterDays;

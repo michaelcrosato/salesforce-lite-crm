@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildListQuery, type ListQueryConfig } from "@/lib/services/listQuery";
+import {
+  buildListQuery,
+  type ListQueryConfig,
+  type ListQueryInput
+} from "@/lib/services/listQuery";
 
 type TestSortBy = "name" | "createdAt";
 type TestFilters = {
@@ -38,6 +42,10 @@ const config: ListQueryConfig<TestSortBy, TestFilters, TestWhere, TestOrderBy> =
   }
 };
 
+function listInput(input: unknown): ListQueryInput<TestSortBy, TestFilters> {
+  return input as ListQueryInput<TestSortBy, TestFilters>;
+}
+
 describe("list query helper", () => {
   it("returns default where, order, skip, and take clauses", () => {
     expect(buildListQuery({}, config)).toEqual({
@@ -68,6 +76,46 @@ describe("list query helper", () => {
       },
       skip: 100,
       take: 50
+    });
+  });
+
+  it("uses safe defaults for non-finite pagination", () => {
+    expect(
+      buildListQuery(
+        {
+          page: Number.NaN,
+          pageSize: Number.NaN,
+          sortBy: "createdAt",
+          sortOrder: "desc"
+        },
+        config
+      )
+    ).toEqual({
+      where: {},
+      orderBy: {
+        createdAt: "desc"
+      },
+      skip: 0,
+      take: 20
+    });
+  });
+
+  it("uses default sorting for invalid runtime sort input", () => {
+    expect(
+      buildListQuery(
+        listInput({
+          sortBy: "missing",
+          sortOrder: "sideways"
+        }),
+        config
+      )
+    ).toEqual({
+      where: {},
+      orderBy: {
+        name: "asc"
+      },
+      skip: 0,
+      take: 20
     });
   });
 

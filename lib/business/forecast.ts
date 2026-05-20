@@ -48,20 +48,29 @@ export type ForecastResult = {
   rows: ForecastRow[];
 };
 
+const defaultLeadVolumeMultiplier = 1;
+const defaultAssignmentRate = 0.75;
+
 export function clampLeadVolumeMultiplier(value: number) {
-  return Math.min(3, Math.max(0.5, value));
+  const finiteValue = Number.isFinite(value) ? value : defaultLeadVolumeMultiplier;
+  return Math.min(3, Math.max(0.5, finiteValue));
 }
 
 export function clampAssignmentRate(value: number) {
-  return Math.min(1, Math.max(0.1, value));
+  const finiteValue = Number.isFinite(value) ? value : defaultAssignmentRate;
+  return Math.min(1, Math.max(0.1, finiteValue));
 }
 
 export function calculateDefaultAssignmentRate(input: {
   totalLeads: number;
   routedLeads: number;
 }) {
+  if (!Number.isFinite(input.totalLeads) || !Number.isFinite(input.routedLeads)) {
+    return defaultAssignmentRate;
+  }
+
   if (input.totalLeads <= 0) {
-    return 0.75;
+    return defaultAssignmentRate;
   }
 
   return clampAssignmentRate(input.routedLeads / input.totalLeads);
@@ -78,11 +87,13 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     : input.orders;
 
   const rows = orders.map((order) => {
-    const currentRunRate = order.deliveredThisMonth / elapsedDays;
+    const deliveredThisMonth = nonNegativeFinite(order.deliveredThisMonth);
+    const monthlyQuota = nonNegativeFinite(order.monthlyQuota);
+    const currentRunRate = deliveredThisMonth / elapsedDays;
     const projectedDelivered = Math.round(
       currentRunRate * daysInMonth * leadVolumeMultiplier * assignmentRate
     );
-    const risk = forecastRisk(projectedDelivered, order.monthlyQuota);
+    const risk = forecastRisk(projectedDelivered, monthlyQuota);
 
     return {
       orderId: order.id,
@@ -90,11 +101,11 @@ export function buildForecast(input: ForecastInput): ForecastResult {
       accountId: order.account.id,
       accountName: order.account.name,
       areas: order.areas.map((area) => area.name),
-      currentDelivered: order.deliveredThisMonth,
-      monthlyQuota: order.monthlyQuota,
+      currentDelivered: deliveredThisMonth,
+      monthlyQuota,
       projectedDelivered,
       risk,
-      additionalLeadsNeeded: Math.max(0, order.monthlyQuota - projectedDelivered)
+      additionalLeadsNeeded: Math.max(0, monthlyQuota - projectedDelivered)
     };
   });
 
@@ -119,4 +130,8 @@ function forecastRisk(projectedDelivered: number, monthlyQuota: number): Forecas
   }
 
   return "hit";
+}
+
+function nonNegativeFinite(value: number) {
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
 }

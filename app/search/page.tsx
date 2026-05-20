@@ -9,7 +9,7 @@ export default function ExcludedSearchPage() {
     >
       <ExcludedRoutePlaceholder
         route="/search"
-        reason="Global search expansion is out of scope. Use the command palette (Ctrl/Cmd+K) for cross-entity search."
+        reason="Global search expansion is out of scope. Use the top search field for contacts."
       />
     </div>
   );

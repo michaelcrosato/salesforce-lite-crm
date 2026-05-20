@@ -1,5 +1,9 @@
 # BLOCKERS.grok.md — Grok Agent Blockers & Requests
 
+> 2026-05-18 Codex readiness note: this is a historical Grok blocker snapshot
+> from a prior branch/session. Current blocker state for this readiness pass is
+> in `BLOCKERS.codex.md`.
+
 **Agent:** Grok
 **Branch (current session):** grok/autonomy
 **Timestamp:** 2026-05-19

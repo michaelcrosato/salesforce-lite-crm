@@ -1,4 +1,9 @@
-#CODEX-SPRINT-4B
+# CODEX-SPRINT-4B
+
+> Historical artifact. This prompt is superseded by `PLAN.md`,
+> `CRM-CONTRACT.md`, `docs/NEXT-PROMPTS.md`, and
+> `prompts/shared/s4-f1-codex-demo-seed-tuning.md`.
+> Do not use it as the active next-push prompt.
 
 You are Codex, working in YOLO mode (danger-full-access, never
 approval) on an EXISTING Salesforce Lite CRM POC at

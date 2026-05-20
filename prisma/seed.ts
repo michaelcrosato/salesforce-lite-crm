@@ -79,19 +79,19 @@ const contacts = [
 ] as const;
 
 const deals = [
-  ["deal-1", "acct-northstar", "contact-1", "user-ava", "Northstar dispatch team rollout", "proposal", 118000, 9, 5],
+  ["deal-1", "acct-northstar", "contact-1", "user-ava", "Northstar dispatch team rollout", "proposal", 118000, 9, 21],
   ["deal-2", "acct-northstar", "contact-21", "user-ava", "Finance reporting workspace", "qualified", 42000, 16, 18],
   ["deal-3", "acct-luma", "contact-3", "user-marcus", "Luma patient intake CRM", "negotiation", 156000, 3, 2],
   ["deal-4", "acct-luma", "contact-4", "user-marcus", "Support handoff pilot", "new", 28000, 21, 30],
   ["deal-5", "acct-cascade", "contact-5", "user-ava", "Cascade enterprise expansion", "won", 210000, 1, 1],
   ["deal-6", "acct-cascade", "contact-6", "user-ava", "Sales operations analytics", "qualified", 64000, 7, 9],
-  ["deal-7", "acct-harbor", "contact-7", "user-elena", "Advisor desk modernization", "proposal", 98000, 22, 12],
+  ["deal-7", "acct-harbor", "contact-7", "user-elena", "Advisor desk modernization", "proposal", 98000, 22, 23],
   ["deal-8", "acct-harbor", "contact-8", "user-elena", "Compliance workflow pilot", "lost", 36000, 40, 35],
   ["deal-9", "acct-orbit", "contact-9", "user-marcus", "Retail territory planning", "negotiation", 132000, 15, 4],
   ["deal-10", "acct-orbit", "contact-10", "user-marcus", "Store manager mobile CRM", "new", 52000, 0, 20],
   ["deal-11", "acct-zenith", "contact-11", "user-elena", "Biotech commercial launch", "proposal", 175000, 6, 3],
   ["deal-12", "acct-zenith", "contact-12", "user-elena", "Finance approvals automation", "qualified", 73000, 11, 10],
-  ["deal-13", "acct-summit", "contact-13", "user-ava", "Energy partner portal", "negotiation", 225000, 31, 8],
+  ["deal-13", "acct-summit", "contact-13", "user-ava", "Energy partner portal", "negotiation", 225000, 31, 28],
   ["deal-14", "acct-summit", "contact-14", "user-ava", "Legal contract workspace", "proposal", 87000, 18, 6],
   ["deal-15", "acct-evergreen", "contact-15", "user-marcus", "Studio advertiser CRM", "lost", 59000, 60, 45],
   ["deal-16", "acct-apex", "contact-17", "user-elena", "Kitchen expansion pipeline", "won", 126000, 2, 1],
@@ -130,6 +130,8 @@ const dealerAreas = [
  * These values are the contract for Gemini's anchor tests and the live demo story.
  * - V5K 0A1 must always resolve to area-vancouver and route successfully.
  * - Multiple DealerOrders must have negative pace gaps (behind-pace) for the analyst panel.
+ * - Multiple high-value open deals must be stale for the analyst panel.
+ * - Low-health accounts must be attached to active behind-pace dealer orders.
  * - Lead sources must include routed + other sources.
  * - Top accounts must have multiple open deals.
  * - Seeded routing events must carry structured rawText for the decision detail panel.
@@ -727,9 +729,7 @@ async function main() {
     data: [...activityData, ...routingEvents]
   });
 
-  // === NEW SECTION: Task seed data (Grok G1) — ~40 tasks preserving dealer-routing story ===
-  // Mix: overdue (past dueDate, open/in_progress), due-today, upcoming (1-30d), completed (done).
-  // Links to existing Accounts, Contacts, Deals, Leads, Users. No changes to prior seed sections.
+  // Task seed data preserves overdue, due-today, upcoming, completed, and linked-record states.
   const taskTemplates = [
     "Follow up on proposal pricing",
     "Schedule demo with decision maker",
@@ -763,24 +763,24 @@ async function main() {
     let priority: string;
 
     if (mod < 4) {
-      // overdue (past due, open or in_progress)
+      // Overdue tasks stay open or in progress for report and filter coverage.
       dueDate = new Date(Date.now() - (3 + (i % 5)) * 86400000);
       status = i % 2 === 0 ? "open" : "in_progress";
       priority = ["high", "urgent", "normal"][i % 3] as string;
     } else if (mod < 6) {
-      // due today
+      // Due-today tasks support date-filter and dashboard checks.
       const today = new Date();
       today.setHours(17, 30, 0, 0);
       dueDate = today;
       status = "open";
       priority = "normal";
     } else if (mod < 9) {
-      // upcoming +1 to +30 days
+      // Upcoming tasks cover the next 30 days.
       dueDate = new Date(Date.now() + (mod - 5) * 3 * 86400000);
       status = "open";
       priority = ["low", "normal", "high"][i % 3] as string;
     } else {
-      // completed
+      // Completed tasks preserve done-state coverage.
       dueDate = new Date(Date.now() - (mod - 8) * 2 * 86400000);
       status = "done";
       priority = "normal";
@@ -809,8 +809,7 @@ async function main() {
     data: taskData
   });
 
-  // === NEW SECTION: Case seed data (Grok G2) — ~20 cases linked to accounts/contacts ===
-  // Mix of statuses (new/in_progress/waiting/resolved/closed) and priorities.
+  // Case seed data covers support queue statuses and priorities.
   const caseTemplates = [
     "Billing discrepancy on last invoice",
     "Onboarding delayed for new portal",
@@ -853,8 +852,7 @@ async function main() {
     data: caseData
   });
 
-  // === NEW SECTION: Campaign seed data (Grok G3) — ~8 campaigns with varied statuses/dates ===
-  // Links some to leads/contacts via join tables (many-to-many).
+  // Campaign seed data covers varied statuses, dates, and lead/contact associations.
   const campaignTemplates = [
     "Spring Fleet Lead Push",
     "Dealer Onboarding Wave Q2",
@@ -894,7 +892,7 @@ async function main() {
     data: campaignData
   });
 
-  // Link some campaigns to leads/contacts (many-to-many, after create)
+  // Link selected campaigns to leads and contacts after create.
   const firstCampaignId = "campaign-001";
   const secondCampaignId = "campaign-002";
   await prisma.campaign.update({
@@ -908,127 +906,6 @@ async function main() {
     where: { id: secondCampaignId },
     data: {
       leads: { connect: campaignLeadIds.slice(4, 7).map((id) => ({ id })) }
-    }
-  });
-
-  // === YOLO EASTER EGG: Dealer Glory Trophies & Mascots (Grok special) ===
-  // A few ceremonial "Trophy Award" tasks so the most improved dealers get recognized.
-  // These are 100% non-functional but bring immense joy to the Dealer Revenue Command Center.
-  const trophyTasks = [
-    {
-      id: "task-trophy-001",
-      title: "🏆 Present Golden Shovel to most improved dealer",
-      description: "Ceremony for the dealer who dug themselves out of the biggest pacing hole this month. Mandatory fun.",
-      dueDate: new Date(Date.now() + 3 * 86400000),
-      status: "open",
-      priority: "high",
-      ownerId: "user-elena",
-      accountId: "acct-luma",
-      contactId: "contact-3",
-      dealId: null,
-      leadId: null,
-    },
-    {
-      id: "task-trophy-002",
-      title: "🦙 Crown Turbo Llama of the Month",
-      description: "Fastest quota acceleration award. The llama costume is in the mail.",
-      dueDate: new Date(Date.now() + 5 * 86400000),
-      status: "in_progress",
-      priority: "urgent",
-      ownerId: "user-ava",
-      accountId: "acct-northstar",
-      contactId: "contact-1",
-      dealId: "deal-1",
-      leadId: null,
-    },
-    {
-      id: "task-trophy-003",
-      title: "🐆 Pacing Panther Appreciation Call",
-      description: "Quietly terrifying efficiency deserves recognition. Send the good panther vibes.",
-      dueDate: new Date(Date.now() + 7 * 86400000),
-      status: "open",
-      priority: "normal",
-      ownerId: "user-marcus",
-      accountId: "acct-cascade",
-      contactId: "contact-5",
-      dealId: null,
-      leadId: null,
-    },
-  ];
-
-  await prisma.task.createMany({
-    data: trophyTasks,
-  });
-
-  // One extra ridiculous trophy-themed campaign
-  await prisma.campaign.create({
-    data: {
-      id: "campaign-trophy-001",
-      name: "Dealer Glory Awards 2026 — The Reckoning",
-      description: "Annual (monthly) celebration of the most majestic, chaotic, and majestic-chaotic dealers in the network. Prizes include bragging rights and a novelty giant check.",
-      status: "active",
-      startDate: new Date(Date.now() - 5 * 86400000),
-      endDate: new Date(Date.now() + 20 * 86400000),
-      budget: 4200,
-      ownerId: "user-elena",
-    }
-  });
-
-  // === FULL YOLO MODE: More ceremonial chaos (Grok special) ===
-  const moreTrophyTasks = [
-    {
-      id: "task-trophy-004",
-      title: "🐋 Neon Narwhal Deep-Dive Strategy Session",
-      description: "The narwhal has spoken. We go to the bottom of the territory map and surface with closed deals.",
-      dueDate: new Date(Date.now() + 2 * 86400000),
-      status: "open",
-      priority: "high",
-      ownerId: "user-marcus",
-      accountId: "acct-cascade",
-      contactId: "contact-7",
-      dealId: null,
-      leadId: null,
-    },
-    {
-      id: "task-trophy-005",
-      title: "🦥 Savage Sloth Slow-Quota Intervention",
-      description: "Sometimes the fastest path to quota is the one that looks like you're doing nothing. Teach the younglings.",
-      dueDate: new Date(Date.now() + 9 * 86400000),
-      status: "in_progress",
-      priority: "normal",
-      ownerId: "user-ava",
-      accountId: "acct-luma",
-      contactId: "contact-3",
-      dealId: "deal-4",
-      leadId: null,
-    },
-    {
-      id: "task-trophy-006",
-      title: "🦴 Crypto Coyote Territory Origin Story Recording",
-      description: "Document how the coyote got in early on the Cascade postal codes. Future dealers must know the lore.",
-      dueDate: new Date(Date.now() + 14 * 86400000),
-      status: "open",
-      priority: "low",
-      ownerId: "user-elena",
-      accountId: "acct-northstar",
-      contactId: "contact-1",
-      dealId: null,
-      leadId: null,
-    },
-  ];
-
-  await prisma.task.createMany({ data: moreTrophyTasks });
-
-  await prisma.campaign.create({
-    data: {
-      id: "campaign-trophy-002",
-      name: "Mascot Draft Night 2026 — Live from the Llama Lounge",
-      description: "The annual bloodless bloodbath where dealers fight (verbally) over which mascot represents their brand for the next quarter. Streaming on internal only. Bring your own chant.",
-      status: "planned",
-      startDate: new Date(Date.now() + 12 * 86400000),
-      endDate: new Date(Date.now() + 13 * 86400000),
-      budget: 1337,
-      ownerId: "user-ava",
     }
   });
 }

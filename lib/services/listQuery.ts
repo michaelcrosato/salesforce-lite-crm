@@ -33,6 +33,15 @@ export type ListQueryConfig<
   };
 };
 
+function positiveIntegerOrDefault(value: number, fallback: number) {
+  const truncated = Math.trunc(value);
+  return Number.isFinite(truncated) ? Math.max(1, truncated) : fallback;
+}
+
+function isSortOrder(value: unknown): value is SortOrder {
+  return value === "asc" || value === "desc";
+}
+
 export function buildListQuery<
   SortBy extends string,
   Filters extends Record<string, unknown>,
@@ -42,13 +51,21 @@ export function buildListQuery<
   input: ListQueryInput<SortBy, Filters>,
   config: ListQueryConfig<SortBy, Filters, Where, OrderBy>
 ): ListQueryClauses<Where, OrderBy> {
-  const defaultPageSize = config.defaultPageSize ?? 25;
-  const maxPageSize = config.maxPageSize ?? 100;
-  const page = Math.max(1, Math.trunc(input.page ?? 1));
-  const requestedPageSize = Math.trunc(input.pageSize ?? defaultPageSize);
-  const take = Math.min(Math.max(1, requestedPageSize), maxPageSize);
-  const sortBy = input.sortBy ?? config.defaultSortBy;
-  const sortOrder = input.sortOrder ?? config.defaultSortOrder;
+  const defaultPageSize = positiveIntegerOrDefault(config.defaultPageSize ?? 25, 25);
+  const maxPageSize = positiveIntegerOrDefault(config.maxPageSize ?? 100, 100);
+  const page = positiveIntegerOrDefault(input.page ?? 1, 1);
+  const requestedPageSize = positiveIntegerOrDefault(
+    input.pageSize ?? defaultPageSize,
+    defaultPageSize
+  );
+  const take = Math.min(requestedPageSize, maxPageSize);
+  const sortBy =
+    input.sortBy && Object.hasOwn(config.sortMap, input.sortBy)
+      ? input.sortBy
+      : config.defaultSortBy;
+  const sortOrder = isSortOrder(input.sortOrder)
+    ? input.sortOrder
+    : config.defaultSortOrder;
   const filters: Partial<Filters> = input.filters ?? {};
   const whereClauses: Where[] = [];
 
