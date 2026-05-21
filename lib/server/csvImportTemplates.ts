@@ -15,6 +15,16 @@ export const CSV_IMPORT_TEMPLATE_ENTITIES = CSV_IMPORT_PREVIEW_ENTITIES;
 export type CsvImportTemplateEntity = CsvImportPreviewEntity;
 export type CsvImportTemplateField = CsvImportPreviewField;
 
+export type CsvImportTemplateExampleField = CsvImportTemplateField & {
+  value: string;
+};
+
+export type CsvImportTemplateExampleRow = {
+  rowNumber: 2;
+  values: Record<string, string>;
+  fields: readonly CsvImportTemplateExampleField[];
+};
+
 export type CsvImportTemplate = {
   entity: CsvImportTemplateEntity;
   label: string;
@@ -24,12 +34,65 @@ export type CsvImportTemplate = {
   headers: readonly string[];
   requiredHeaders: readonly string[];
   fields: readonly CsvImportTemplateField[];
+  exampleRow: CsvImportTemplateExampleRow;
 };
 
 export type CsvImportTemplateCsv = CsvImportTemplate & {
   rowCount: 0;
   csv: string;
 };
+
+export type CsvImportTemplateExampleCsv = Omit<CsvImportTemplate, "filename"> & {
+  filename: string;
+  templateFilename: string;
+  rowCount: 1;
+  csv: string;
+};
+
+const exampleValuesByEntity: Record<CsvImportTemplateEntity, Record<string, string>> = {
+  contacts: {
+    firstName: "Maya",
+    lastName: "Singh",
+    email: "maya.singh@example.test",
+    phone: "604-555-0101",
+    title: "Operations Manager",
+    status: "active",
+    accountId: "acct-example"
+  },
+  leads: {
+    firstName: "Riley",
+    lastName: "Park",
+    phone: "604-555-0188",
+    email: "riley.park@example.test",
+    postalCode: "V5K 0A1",
+    province: "BC",
+    source: "Website",
+    status: "new"
+  }
+};
+
+function buildExampleRow(
+  entity: CsvImportTemplateEntity,
+  fields: readonly CsvImportTemplateField[]
+): CsvImportTemplateExampleRow {
+  const exampleValues = exampleValuesByEntity[entity];
+  const exampleFields = fields.map((field) => ({
+    key: field.key,
+    label: field.label,
+    required: field.required,
+    aliases: [...field.aliases],
+    value: exampleValues[field.key] ?? ""
+  }));
+  const values = Object.fromEntries(
+    exampleFields.map((field) => [field.key, field.value])
+  );
+
+  return {
+    rowNumber: 2,
+    values,
+    fields: exampleFields
+  };
+}
 
 function buildTemplate(definition: CsvImportPreviewDefinition): CsvImportTemplate {
   const fields = definition.fields.map((field) => ({
@@ -49,17 +112,28 @@ function buildTemplate(definition: CsvImportPreviewDefinition): CsvImportTemplat
     requiredHeaders: fields
       .filter((field) => field.required)
       .map((field) => field.label),
-    fields
+    fields,
+    exampleRow: buildExampleRow(definition.entity, fields)
   };
 }
 
-function renderHeaderOnlyCsv(template: CsvImportTemplate): string {
-  const columns: CsvColumn<Record<string, unknown>>[] = template.fields.map((field) => ({
+function columnsForTemplate(template: CsvImportTemplate): CsvColumn<Record<string, string>>[] {
+  return template.fields.map((field) => ({
     key: field.key,
     label: field.label
   }));
+}
 
-  return toCsv<Record<string, unknown>>([], columns);
+function renderHeaderOnlyCsv(template: CsvImportTemplate): string {
+  const columns = columnsForTemplate(template);
+
+  return toCsv<Record<string, string>>([], columns);
+}
+
+function renderExampleCsv(template: CsvImportTemplate): string {
+  const columns = columnsForTemplate(template);
+
+  return toCsv<Record<string, string>>([template.exampleRow.values], columns);
 }
 
 export function isCsvImportTemplateEntity(value: string): value is CsvImportTemplateEntity {
@@ -81,5 +155,19 @@ export function exportCsvImportTemplateCsv(entity: CsvImportTemplateEntity): Csv
     ...template,
     rowCount: 0,
     csv: renderHeaderOnlyCsv(template)
+  };
+}
+
+export function exportCsvImportTemplateExampleCsv(
+  entity: CsvImportTemplateEntity
+): CsvImportTemplateExampleCsv {
+  const template = getCsvImportTemplate(entity);
+
+  return {
+    ...template,
+    filename: `${template.entity}-import-example.csv`,
+    templateFilename: template.filename,
+    rowCount: 1,
+    csv: renderExampleCsv(template)
   };
 }
