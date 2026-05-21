@@ -63,6 +63,23 @@ describe("server CSV import preview validation", () => {
     expect(preview.rows[1].errors.join(" ")).toContain("First Name");
     expect(preview.rows[1].errors.join(" ")).toContain("Email");
     expect(preview.rows[1].errors.join(" ")).toContain("Status");
+    expect(preview.issueSummary).toMatchObject({
+      errorCount: preview.rows[1].errors.length,
+      warningCount: 0,
+      affectedRows: 1
+    });
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "row_validation",
+      severity: "error",
+      issueCount: preview.rows[1].errors.length,
+      affectedRows: 1
+    });
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "diagnostic_warning",
+      severity: "warning",
+      issueCount: 0,
+      affectedRows: 0
+    });
   });
 
   it("validates consumer lead rows through postal helpers and applies schema defaults", () => {
@@ -107,6 +124,12 @@ describe("server CSV import preview validation", () => {
     });
     expect(preview.rows[0].values.firstName).toBe("Alice");
     expect(preview.rows[0].status).toBe("valid");
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "header",
+      severity: "error",
+      issueCount: 1,
+      affectedRows: 0
+    });
   });
 
   it("propagates malformed CSV parse errors and column-count row errors", () => {
@@ -117,6 +140,21 @@ describe("server CSV import preview validation", () => {
 
     expect(preview.parseErrors.length).toBeGreaterThan(0);
     expect(preview.rows[0].errors).toContain("Expected 3 columns but found 2.");
+    expect(preview.issueSummary.errorCount).toBe(
+      preview.parseErrors.length + preview.rows[0].errors.length
+    );
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "parse",
+      severity: "error",
+      issueCount: preview.parseErrors.length,
+      affectedRows: 0
+    });
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "row_validation",
+      severity: "error",
+      issueCount: preview.rows[0].errors.length,
+      affectedRows: 1
+    });
   });
 
   it("bounds preview rows while preserving total row count", () => {
@@ -166,6 +204,17 @@ describe("server CSV import preflight diagnostics", () => {
 
     expect(preview.validRows).toBe(2);
     expect(preview.warningRows).toBe(2);
+    expect(preview.issueSummary).toMatchObject({
+      errorCount: 0,
+      warningCount: 3,
+      affectedRows: 2
+    });
+    expect(preview.issueSummary.categories).toContainEqual({
+      category: "diagnostic_warning",
+      severity: "warning",
+      issueCount: 3,
+      affectedRows: 2
+    });
     expect(preview.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
       "contact_duplicate_email",
       "contact_account_not_found",

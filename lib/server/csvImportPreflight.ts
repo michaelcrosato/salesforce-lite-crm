@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveAreaForLead } from "@/lib/routing/leadRouter";
 import {
   previewCsvImport,
+  summarizeCsvImportIssues,
   type CsvImportPreviewEntity,
   type CsvImportPreviewOptions,
   type CsvImportPreviewResult,
@@ -418,6 +419,12 @@ export async function previewCsvImportWithPreflightDiagnostics(
     ...preview,
     rows,
     diagnostics,
-    warningRows: rows.filter((row) => row.diagnostics.length > 0).length
+    warningRows: rows.filter((row) => row.diagnostics.length > 0).length,
+    issueSummary: summarizeCsvImportIssues({
+      headerErrors: preview.headerErrors,
+      parseErrors: preview.parseErrors,
+      rows,
+      diagnostics
+    })
   };
 }

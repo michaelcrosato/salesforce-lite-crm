@@ -26,6 +26,28 @@ export type CsvImportPreviewOptions = {
   limit?: number;
 };
 
+export type CsvImportIssueSummaryCategory =
+  | "header"
+  | "parse"
+  | "row_validation"
+  | "diagnostic_warning";
+
+export type CsvImportIssueSummarySeverity = "error" | "warning";
+
+export type CsvImportIssueSummaryCategoryCount = {
+  category: CsvImportIssueSummaryCategory;
+  severity: CsvImportIssueSummarySeverity;
+  issueCount: number;
+  affectedRows: number;
+};
+
+export type CsvImportIssueSummary = {
+  errorCount: number;
+  warningCount: number;
+  affectedRows: number;
+  categories: CsvImportIssueSummaryCategoryCount[];
+};
+
 export type CsvImportPreviewHeaderStatus = "mapped" | "duplicate" | "ignored";
 
 export type CsvImportPreviewHeader = {
@@ -59,7 +81,18 @@ export type CsvImportPreviewResult = CsvImportPreviewDefinition & {
   previewedRows: number;
   validRows: number;
   invalidRows: number;
+  issueSummary: CsvImportIssueSummary;
   rows: CsvImportPreviewRow[];
+};
+
+type CsvImportIssueSummaryRow = {
+  rowNumber: number;
+  errors: readonly string[];
+};
+
+type CsvImportIssueSummaryDiagnostic = {
+  rowNumber: number;
+  severity: "warning";
 };
 
 const csvImportPreviewEntitySet: ReadonlySet<string> = new Set(CSV_IMPORT_PREVIEW_ENTITIES);
@@ -391,6 +424,66 @@ function buildRowErrors(
   return [...errors];
 }
 
+export function summarizeCsvImportIssues(input: {
+  headerErrors: readonly string[];
+  parseErrors: readonly string[];
+  rows: readonly CsvImportIssueSummaryRow[];
+  diagnostics?: readonly CsvImportIssueSummaryDiagnostic[];
+}): CsvImportIssueSummary {
+  const diagnosticWarnings = input.diagnostics?.filter(
+    (diagnostic) => diagnostic.severity === "warning"
+  ) ?? [];
+  const rowValidationIssueCount = input.rows.reduce(
+    (total, row) => total + row.errors.length,
+    0
+  );
+  const rowValidationRows = input.rows.filter((row) => row.errors.length > 0);
+  const affectedRowNumbers = new Set<number>();
+
+  for (const row of rowValidationRows) {
+    affectedRowNumbers.add(row.rowNumber);
+  }
+
+  for (const diagnostic of diagnosticWarnings) {
+    affectedRowNumbers.add(diagnostic.rowNumber);
+  }
+
+  const categories: CsvImportIssueSummaryCategoryCount[] = [
+    {
+      category: "header",
+      severity: "error",
+      issueCount: input.headerErrors.length,
+      affectedRows: 0
+    },
+    {
+      category: "parse",
+      severity: "error",
+      issueCount: input.parseErrors.length,
+      affectedRows: 0
+    },
+    {
+      category: "row_validation",
+      severity: "error",
+      issueCount: rowValidationIssueCount,
+      affectedRows: rowValidationRows.length
+    },
+    {
+      category: "diagnostic_warning",
+      severity: "warning",
+      issueCount: diagnosticWarnings.length,
+      affectedRows: new Set(diagnosticWarnings.map((diagnostic) => diagnostic.rowNumber))
+        .size
+    }
+  ];
+
+  return {
+    errorCount: input.headerErrors.length + input.parseErrors.length + rowValidationIssueCount,
+    warningCount: diagnosticWarnings.length,
+    affectedRows: affectedRowNumbers.size,
+    categories
+  };
+}
+
 export function isCsvImportPreviewEntity(value: string): value is CsvImportPreviewEntity {
   return csvImportPreviewEntitySet.has(value);
 }
@@ -452,6 +545,11 @@ export function previewCsvImport(
     previewedRows: rows.length,
     validRows,
     invalidRows: rows.length - validRows,
+    issueSummary: summarizeCsvImportIssues({
+      headerErrors,
+      parseErrors: parsed.errors,
+      rows
+    }),
     rows
   };
 }
