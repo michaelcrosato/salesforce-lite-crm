@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 8
 
-Feature: Sprint 8 rollover planning
+Feature: S8-F1 - CSV import example contracts
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T18:00:10.3832288-07:00
+Timestamp: 2026-05-20T18:18:32.2813396-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were present; none were opened.
+- Blocker #1 resolved: `tests/api/csv-import-templates.test.ts` ownership boundary was touched only to cover the new Codex-owned server contract; `scripts/local-gate.ps1` exited 0 and no follow-up is needed.

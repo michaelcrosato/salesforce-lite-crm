@@ -2,45 +2,43 @@ Agent: Codex
 
 Sprint: 8
 
-Feature: Sprint 8 rollover planning
+Feature: S8-F1 - CSV import example contracts
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 0ad8ae0 - [codex] sprint 8: plan codex track
-- 9a06e6c - [codex] sprint 8: backlog refresh
+- 423813c - [codex] S8-F1: add CSV import example contracts
 
-Gate status: PASS - Phase 0 full local gate via `scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 172 tests and Playwright reported 19 passed. Phase 4 verification subset (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`) also exited 0.
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 175 tests and Playwright reported 19 passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T18:00:10.3832288-07:00
+Timestamp: 2026-05-20T18:18:32.2813396-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
-- Read `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
-- Confirmed Codex Sprint 7 was complete from report and commit evidence: S7-F1 commit `b547bc4`, S7-F2 commit `6e6373f`, green local gates in Codex reports, and no active Codex blockers.
-- Updated `PLAN.md` document control to version 2.13A, marked S7-F1 and S7-F2 done, and queued Sprint 8 Codex features S8-F1 and S8-F2 with carried-forward permanent non-goals.
-- Synced `docs/FEATURE-BACKLOG.md` so S7-F1/S7-F2 are done and S8-F1/S8-F2 are queued.
-- Ran the required planning verification subset after commits; lint, typecheck, test, and build all exited 0.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and setup, Prisma, seed, lint, typecheck, Vitest, and build all exited 0.
+- Added deterministic `CsvImportTemplate.exampleRow` metadata for supported import preview entities using existing validation fields only.
+- Added `exportCsvImportTemplateExampleCsv(entity)` so later UI wiring can request a one-row example CSV without database writes, routing execution, file storage, external services, or UI work.
+- Updated `tests/api/csv-import-templates.test.ts` as a minimal §10 cross-zone coverage edit to prove example metadata is deterministic and validates through `previewCsvImport`.
+- Ran the full local gate through `scripts/local-gate.ps1`; lint, typecheck, Vitest, build, Playwright install, and e2e all passed.
 
 ### Discovered this prompt
 
-- `README.md` has a `Known Limitations` section but no `Next Recommended Build Step` heading in this worktree.
-- PLAN.md still lists other agents' Sprint 4 rows as queued, while their historical reports describe Sprint 4B work as complete. This rollover was explicitly scoped to Codex, so no non-Codex Sprint 4 status rows were changed.
-- `SUMMARY.grok.md`, `BLOCKERS.grok.md`, and `BLOCKERS.gemini.md` contain stale historical blocker text, but current Codex blockers are empty and unrelated to Sprint 8 planning.
+- PLAN.md §4 queues Sprint 8 for Codex with S8-F1 and S8-F2; S8-F1 is now complete with local gate evidence.
+- PLAN.md §4 still lists the non-Codex Sprint 4 rows as queued while historical agent reports describe Sprint 4B work as complete. Codex did not modify non-Codex sprint rows.
+- `next build` still lists placeholder/excluded app-router paths such as `/deals/[id]`; the e2e excluded-route guard passed, so this is not a Codex S8 blocker.
 
 ### Next action
 
-Run LOOP.md to begin S8-F1.
+Run LOOP.md to begin S8-F2 - CSV export preflight summaries.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (only prompt-authorized planning, backlog, and Codex report files were touched)
+No cross-ownership edits: NO (minimal `tests/api/csv-import-templates.test.ts` coverage edit; see BLOCKERS resolved note)
 
 CRM-CONTRACT.md honored: YES
