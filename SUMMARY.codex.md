@@ -1,42 +1,40 @@
 Agent: Codex
 
-Sprint: 10
+Sprint: 11
 
-Feature: S10-F2 - CSV preview capability metadata
+Feature: Sprint 11 planning - CSV Review Bundles
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- a825464 - [codex] S10-F2: add CSV preview capability metadata
+- 081cc88 - [codex] sprint 11: plan codex track
+- 7345d93 - [codex] sprint 11: backlog refresh
 
-Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 28 Vitest files / 180 tests and 19 Playwright tests passing.
+Gate status: PASS - Phase 0 full `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 28 Vitest files / 180 tests and 19 Playwright tests; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` also exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T20:34:19.5416716-07:00
+Timestamp: 2026-05-20T21:01:07.6494136-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; worktree was clean, branch used the `codex/` prefix, and the full PowerShell local gate passed before edits.
-- Added read-only CSV capability metadata to `lib/server/csvCapabilities.ts`, including export row limits, export preview/snippet availability, import preview limits, import issue-summary availability, preflight diagnostics/readiness/action availability, and no-preview template metadata.
-- Extended `tests/api/csv-capabilities.test.ts` to cover the new S10-F2 metadata; this was a narrow §10 test-zone exception because the behavior is a Codex-owned server contract and PLAN §8 requires feature coverage.
-- Verified the implementation with focused `npm run test -- tests/api/csv-capabilities.test.ts`, then the full PowerShell local gate.
-
-### Discovered this prompt
-
-- `PLAN.md` still contains the stale "Current prompt scope - Sprint Rollover" active line from a prior planning run, and Sprint 10 rows still read `queued` even though S10-F1 has a green local-gate implementation commit and S10-F2 is now complete on this branch.
-- Claude, Grok, and Gemini reports still contain historical Sprint 4B context and older blocker language, but current repo docs mark those artifacts superseded and the local gate is green.
+- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full PowerShell local gate completed successfully before planning edits.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git log.
+- Confirmed Codex Sprint 10 completion from green report evidence: S10-F1 implementation commit `6569e52`, S10-F2 implementation commit `a825464`, and no active Codex blockers.
+- Updated `PLAN.md` to mark S10-F1 and S10-F2 done, bump document control to Version 2.16A, set the active sprint to Sprint 11, and queue S11-F1 and S11-F2 for Codex.
+- Synced `docs/FEATURE-BACKLOG.md` so S10 features are done and S11 features are queued.
+- Verified the planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 ### Next action
 
-Sprint rollover or merge review is needed; no queued Codex-owned Sprint 10 feature remains after S10-F2.
+Run LOOP.md to begin S11-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (see BLOCKERS for the resolved test-zone exception)
+No cross-ownership edits: NO (prompt-authorized planning edits to `PLAN.md` and `docs/FEATURE-BACKLOG.md`; see BLOCKERS resolved note)
 
 CRM-CONTRACT.md honored: YES

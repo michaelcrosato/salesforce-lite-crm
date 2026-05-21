@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 10
+Sprint: 11
 
-Feature: S10-F2 - CSV preview capability metadata
+Feature: Sprint 11 planning - CSV Review Bundles
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T20:34:19.5416716-07:00
+Timestamp: 2026-05-20T21:01:07.6494136-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Ownership exception resolved: `tests/api/csv-capabilities.test.ts` was updated to cover the Codex-owned `lib/server/csvCapabilities.ts` server contract for S10-F2. Evidence: implementation commit `a825464`; focused Vitest passed; full `scripts/local-gate.ps1` passed with 28 Vitest files / 180 tests and 19 Playwright tests. No follow-up needed.
+- Ownership exception resolved: `PLAN.md` and `docs/FEATURE-BACKLOG.md` were edited under explicit sprint-rollover prompt scope. Evidence: commits `081cc88` and `7345d93`; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0. No follow-up needed.
