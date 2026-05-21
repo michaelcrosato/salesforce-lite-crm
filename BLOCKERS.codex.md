@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 17
+Sprint: 18
 
-Feature: S17-F2 - CSV contract release digest
+Feature: Sprint rollover - plan S18 Codex track
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-21T12:43:13.7618251-07:00
+Timestamp: 2026-05-21T14:28:42.9034313-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blocker carried into this prompt. The `tests/api/csv-contract-release-digest.test.ts` edit was a narrow, documented §10 validation exception for the Codex-owned server helper and needs no follow-up.
+- No active Codex blocker carried into rollover. Phase 0 full local gate and Phase 4 planning checks were green, so no gate blocker was filed.
