@@ -1,0 +1,59 @@
+{
+    "schemaVersion":  1,
+    "algorithm":  "SHA256",
+    "note":  "Protected-file drift detector. Delete or update intentionally only by human action.",
+    "files":  [
+                  {
+                      "path":  "docs/AGENT-LOOP.md",
+                      "sha256":  "3aac28268846a0b27ff5acb387b5cae20a2ff47f28f14c19f8d863e90756b08e"
+                  },
+                  {
+                      "path":  "docs/AXIOMS.md",
+                      "sha256":  "5f69b0e24f0b8d43fd28cbe0b26436a20dc628b055c73b80636d2159641f9efb"
+                  },
+                  {
+                      "path":  "eslint.config.mjs",
+                      "sha256":  "61d10ceab60cc4628a4725230cb460b1a32c4c30b84e7ffdc79773ab3070ab77"
+                  },
+                  {
+                      "path":  "package.json",
+                      "sha256":  "843794f940f1c242c04df6c812148462d3d3138bfb5054524ba02a5c160a71c5"
+                  },
+                  {
+                      "path":  "package-lock.json",
+                      "sha256":  "fa36e55fbaf67879c5aaf7f5adc66f86c61cb8cdf232f4e031daa707654eb4a6"
+                  },
+                  {
+                      "path":  "playwright.config.ts",
+                      "sha256":  "6f3f2d9dc3bd0a13ec645aaa3b7f9d5173bcf77708bd2e2fe677d142f4f33c93"
+                  },
+                  {
+                      "path":  "prisma.config.ts",
+                      "sha256":  "b93862feca9a05f4bb842445a7995c295b763a36eefabc1a9a8d2ac61fbeef32"
+                  },
+                  {
+                      "path":  "prisma/schema.prisma",
+                      "sha256":  "645d364220e733997cf7d4a93542e1c9c669a6ccf048962cb3c4311c3d939fa5"
+                  },
+                  {
+                      "path":  "scripts/assert-gate-integrity.ps1",
+                      "sha256":  "057ca23ed41bba45adc7e1904301d2877a083bf0eb221ae5ed617b37fb7eba8a"
+                  },
+                  {
+                      "path":  "scripts/local-gate.ps1",
+                      "sha256":  "459a64f4f0f242e7f47d751d7f0727b641da57e615f97e1530eb5aa71f248b86"
+                  },
+                  {
+                      "path":  "scripts/run-codex-yolo-loop.ps1",
+                      "sha256":  "49e93f891e7380b596d71446280a0a7e7b76504a88814d6de1bcf13bd66dedb9"
+                  },
+                  {
+                      "path":  "tsconfig.json",
+                      "sha256":  "3f5959bc879a441de6fb28f0a42db8b1bcf1aeaa2a1d7f3f1c4a9134a52529d6"
+                  },
+                  {
+                      "path":  "vitest.config.ts",
+                      "sha256":  "34595b94f9902457865e1705c93ea52e781e622d70d2640a4ba7188532668a1e"
+                  }
+              ]
+}
