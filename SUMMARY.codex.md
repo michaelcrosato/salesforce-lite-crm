@@ -2,39 +2,38 @@ Agent: Codex
 
 Sprint: 12
 
-Feature: Sprint 12 planning - CSV Transfer Packets
+Feature: S12-F1 - CSV export delivery packets
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 2dfb5d3 - [codex] sprint 12: plan codex track
-- e34fe19 - [codex] sprint 12: backlog refresh
+- a96071e - [codex] S12-F1: add CSV export delivery packets
 
-Gate status: PASS - Phase 0 full `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 30 Vitest files / 190 tests and 19 Playwright tests; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` also exited 0.
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 31 Vitest files / 195 tests and 19 Playwright tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T22:18:00.3730711-07:00
+Timestamp: 2026-05-20T22:36:46.1899678-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full PowerShell local gate completed successfully before planning edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git log.
-- Confirmed Codex Sprint 11 completion from green report evidence: S11-F1 implementation commit `5909c39`, S11-F2 implementation commit `4acb13c`, and no active Codex blockers.
-- Updated `PLAN.md` to mark S11-F1 and S11-F2 done, bump document control to Version 2.17A, set the active sprint to Sprint 12, and queue S12-F1 and S12-F2 for Codex.
-- Synced `docs/FEATURE-BACKLOG.md` so S11 features are done and S12 features are queued.
-- Verified the planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
+- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full PowerShell local gate completed successfully before implementation.
+- Reconciled current coordination state: `PLAN.md` queues Sprint 12 for Codex; historical Claude/Grok/Gemini reports still reference Sprint 4B, which is not a PLAN §4 sprint ID, but does not block this Codex server work because the local gate is green and Codex Sprint 12 is the current queue.
+- Added `lib/server/csvExportDeliveryPackets.ts`, a read-only server helper surface that builds deterministic export delivery packets with generated CSV, row counts, applied limit metadata, review notes, and no-write flags.
+- Added focused Vitest coverage in `tests/api/csv-export-delivery-packets.test.ts`; this was a narrow cross-zone test exception to verify the Codex-owned server helper.
+- Verified the new focused test with `npx vitest run tests/api/csv-export-delivery-packets.test.ts --maxWorkers=1 --minWorkers=1`.
+- Ran the full local gate after implementation; `npm install`, env bootstrap, Prisma generate/db push, seed, lint, typecheck, unit tests, build, Chromium install, and e2e all passed.
 
 ### Next action
 
-Run LOOP.md to begin S12-F1.
+Run LOOP.md to begin S12-F2.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (prompt-authorized planning edits to `PLAN.md` and `docs/FEATURE-BACKLOG.md`; see BLOCKERS resolved note)
+No cross-ownership edits: NO (test coverage added under `tests/api/`; see BLOCKERS resolved note)
 
 CRM-CONTRACT.md honored: YES
