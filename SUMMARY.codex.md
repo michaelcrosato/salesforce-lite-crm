@@ -2,37 +2,37 @@ Agent: Codex
 
 Sprint: 15
 
-Feature: Sprint 15 rollover planning
+Feature: S15-F1 - CSV operator readiness scorecards
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 50976ec - [codex] sprint 15: plan codex track; 986a594 - [codex] sprint 15: backlog refresh
+Commits this prompt: 6a9eb69 - [codex] S15-F1: add CSV operator readiness scorecards
 
-Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0; post-planning `npm run lint`, `npm run typecheck`, `npm run test` (36 files / 220 tests), and `npm run build` all exited 0.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0; 37 Vitest files / 224 tests and 19 Playwright tests passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-21T03:28:18.8105648-07:00
+Timestamp: 2026-05-21T03:48:25.1483015-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the repo-local full gate exited 0.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md` known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the 30-day git log before planning.
-- Confirmed Sprint 14 Codex work was complete from local evidence: S14-F1 and S14-F2 both have implementation/report commits, green gate reporting, and no active Codex blockers.
-- Updated `PLAN.md` to mark S14-F1/S14-F2 done, bump Document Control to version 2.20A, set Sprint 15 as the active queued Codex sprint, and add S15-F1/S15-F2 with carried-forward permanent non-goals.
-- Synced `docs/FEATURE-BACKLOG.md` so the active table marks Sprint 14 done and queues Sprint 15.
-- Ran the required post-planning checks: `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`; all passed.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: all expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and baseline commands through `npm run build` exited 0.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, and referenced docs/prompts before selecting work.
+- Reconciled that `SUMMARY.claude.md`, `SUMMARY.grok.md`, and `SUMMARY.gemini.md` still reference historical Sprint 4B labels not present as a current PLAN §4 sprint; treated them as historical because PLAN §4 and the current LOOP prompt queue Sprint 15 for Codex.
+- Added `lib/server/csvOperatorReadinessScorecards.ts`, a deterministic metadata-only scorecard helper combining the CSV handoff index and field coverage summaries into operation/entity statuses, counts, warning codes, read flags, and explicit no-write flags.
+- Added focused Vitest coverage in `tests/api/csv-operator-readiness-scorecards.test.ts`; this was a minimal cross-zone test edit needed to satisfy PLAN §8 coverage for a Codex-owned server helper.
+- Verified with `npx vitest run tests/api/csv-operator-readiness-scorecards.test.ts --maxWorkers=1 --minWorkers=1`, `npm run typecheck`, `npm run lint`, and the full `scripts/local-gate.ps1`; all exited 0.
 
 ### Next action
 
-Run LOOP.md to begin S15-F1.
+Run LOOP.md for S15-F2 - CSV contract QA checks.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES
+No cross-ownership edits: NO (minimal `tests/api` coverage file added for the new server helper; see BLOCKERS resolved note)
 
 CRM-CONTRACT.md honored: YES

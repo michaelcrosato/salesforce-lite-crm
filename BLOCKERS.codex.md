@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 15
 
-Feature: Sprint 15 rollover planning
+Feature: S15-F1 - CSV operator readiness scorecards
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-21T03:28:18.8105648-07:00
+Timestamp: 2026-05-21T03:48:25.1483015-07:00
 
 Escalation required: NO
 
@@ -17,5 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers.
-- Sprint 14 rollover completed after S14-F1 and S14-F2 were confirmed done from Codex reports and green local-gate evidence.
+- Ownership note resolved: `tests/api/csv-operator-readiness-scorecards.test.ts` is in Gemini's zone, but the minimal cross-zone test edit was required by PLAN §8 to cover new Codex-owned server behavior; full local gate passed and no ongoing blocker remains.
