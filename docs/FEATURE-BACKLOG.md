@@ -35,8 +35,10 @@ roadmap and does not authorize feature work.
 | S15-F2 | CSV contract QA checks | Codex | done |
 | S16-F1 | CSV operator remediation runbooks | Codex | done |
 | S16-F2 | CSV contract drift snapshots | Codex | done |
-| S17-F1 | CSV operator handoff packets | Codex | queued |
-| S17-F2 | CSV contract release digest | Codex | queued |
+| S17-F1 | CSV operator handoff packets | Codex | done |
+| S17-F2 | CSV contract release digest | Codex | done |
+| S18-F1 | CSV release verification manifests | Codex | queued |
+| S18-F2 | CSV operator fixture bundles | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -51,9 +53,9 @@ roadmap and does not authorize feature work.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
 - CSV product UI, bulk import writes, file storage, mapping wizard, persistent
-  CSV snapshot history, and Salesforce-connected import/export remain deferred
-  while Sprint 17 queues read-only CSV operator handoff packets and contract
-  release digests.
+  CSV verification/fixture/snapshot history, and Salesforce-connected
+  import/export remain deferred while Sprint 18 queues read-only CSV release
+  verification manifests and operator fixture bundles.
 
 ## Implemented Contract Routes
 
