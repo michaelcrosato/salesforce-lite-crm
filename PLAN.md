@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.15A |
+| Version | 2.16A |
 
 | Last updated | 2026-05-20 |
 
-| Active sprint | Sprint 10 queued for Codex; Sprint 9 Codex track done |
+| Active sprint | Sprint 11 queued for Codex; Sprint 10 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -336,8 +336,8 @@ Goal: finish read-only server-side CSV handoff metadata so later UI work can pre
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S10-F1 — CSV import action manifests | Codex | queued | CSV import preflight exposes deterministic row action metadata and aggregate action counts for supported preview entities, derived from existing validation, readiness, and diagnostics. No database writes, import apply flow, create/update/upsert/merge logic, routing execution, product UI, file storage, or external services are added. |
-| S10-F2 — CSV preview capability metadata | Codex | queued | The CSV capability catalog reflects the current read-only preview surface, including import readiness/preflight and export preview/snippet availability, default/max limits where applicable, content types, filenames, and explicit no-write safety flags for later UI consumption. No routes, buttons, file storage, background jobs, CSV writes, or integrations are added. |
+| S10-F1 — CSV import action manifests | Codex | done | CSV import preflight exposes deterministic row action metadata and aggregate action counts for supported preview entities, derived from existing validation, readiness, and diagnostics. No database writes, import apply flow, create/update/upsert/merge logic, routing execution, product UI, file storage, or external services are added. |
+| S10-F2 — CSV preview capability metadata | Codex | done | The CSV capability catalog reflects the current read-only preview surface, including import readiness/preflight and export preview/snippet availability, default/max limits where applicable, content types, filenames, and explicit no-write safety flags for later UI consumption. No routes, buttons, file storage, background jobs, CSV writes, or integrations are added. |
 
 \*\*Sprint 10 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -364,6 +364,43 @@ Goal: finish read-only server-side CSV handoff metadata so later UI work can pre
 \- No database writes from CSV import action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
 
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+\*\*Sprint 11 — CSV Review Bundles\*\*
+
+Goal: package the existing read-only CSV contracts into deterministic server-side review bundles for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S11-F1 — CSV import review bundles | Codex | queued | Server-side import review bundles combine template metadata, preview/preflight output, issue summaries, readiness counts, action counts, and a bounded row sample for supported import preview entities. No database writes, import apply flow, product UI, routes, file storage, routing execution, or external services are added. |
+| S11-F2 — CSV export review bundles | Codex | queued | Server-side export review bundles combine capability metadata, preflight row counts, limits, canonical headers, preview rows, optional CSV snippets, and deterministic empty/limit notes for supported export entities. No routes, buttons, file storage, background jobs, export writes, saved history, or integrations are added. |
+
+\*\*Sprint 11 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV import/export review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
 
 \- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
 
