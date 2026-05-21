@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.17A |
+| Version | 2.18A |
 
 | Last updated | 2026-05-21 |
 
-| Active sprint | Sprint 12 queued for Codex; Sprint 11 Codex track done |
+| Active sprint | Sprint 13 queued for Codex; Sprint 12 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -411,8 +411,8 @@ Goal: turn the read-only CSV review layer into deterministic server-side transfe
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S12-F1 — CSV export delivery packets | Codex | queued | Server-side helpers produce deterministic export packets for supported export entities, combining filename, content type, generated CSV, row counts, applied limits, review notes, and explicit no-write flags. No routes, buttons, file storage, export history, scheduled delivery, background jobs, or integrations are added. |
-| S12-F2 — CSV import dry-run receipts | Codex | queued | Server-side helpers produce deterministic import dry-run receipts for supported import preview entities, combining source metadata, review bundle output, issue/readiness/action summaries, bounded samples, and explicit no-write safety metadata. No database writes, import apply flow, product UI, routes, file storage, routing execution, or external services are added. |
+| S12-F1 — CSV export delivery packets | Codex | done | Server-side helpers produce deterministic export packets for supported export entities, combining filename, content type, generated CSV, row counts, applied limits, review notes, and explicit no-write flags. No routes, buttons, file storage, export history, scheduled delivery, background jobs, or integrations are added. |
+| S12-F2 — CSV import dry-run receipts | Codex | done | Server-side helpers produce deterministic import dry-run receipts for supported import preview entities, combining source metadata, review bundle output, issue/readiness/action summaries, bounded samples, and explicit no-write safety metadata. No database writes, import apply flow, product UI, routes, file storage, routing execution, or external services are added. |
 
 \*\*Sprint 12 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -437,6 +437,44 @@ Goal: turn the read-only CSV review layer into deterministic server-side transfe
 \- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
 
 \- No database writes from CSV import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+
+\*\*Sprint 13 — CSV Handoff Assurance\*\*
+
+Goal: tighten the read-only CSV handoff layer with deterministic transfer manifests and compatibility reports for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S13-F1 — CSV transfer manifest catalog | Codex | queued | Server-side helpers publish deterministic transfer manifests for supported CSV export delivery and import dry-run receipt surfaces, including entity ids, operations, content types, filenames, limits, source/input metadata, and explicit read/no-write flags. No routes, product UI, database writes, file storage, background jobs, export history, or integrations are added. |
+| S13-F2 — CSV compatibility reports | Codex | queued | Server-side helpers publish deterministic read-only compatibility reports comparing export columns, import templates/examples, preview support, required fields, and transfer manifest coverage for overlapping entities, with warnings for one-way fields or unsupported directions. No supported-entity expansion, header remapping wizard, user-upload parsing, database writes, import apply flow, routing execution, or Salesforce sync is added. |
+
+\*\*Sprint 13 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
 
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
 
