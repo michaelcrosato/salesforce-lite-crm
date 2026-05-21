@@ -1,11 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   CSV_EXPORT_CONTENT_TYPE,
+  CSV_EXPORT_DEFAULT_LIMIT,
   CSV_EXPORT_ENTITIES,
+  CSV_EXPORT_MAX_LIMIT,
   exportCrmListCsv,
   getCsvExportDefinition,
+  getCsvExportPreflightSummary,
   isCsvExportEntity,
-  listCsvExportDefinitions
+  listCsvExportDefinitions,
+  listCsvExportPreflightSummaries
 } from "@/lib/server/csvExport";
 import { prisma } from "@/lib/prisma";
 
@@ -67,6 +71,28 @@ describe("server CSV export contracts", () => {
     expect(result.csv).toBe(
       "Account ID,Name,Domain,Industry,City,Region,Status,Health Score,Owner ID,Owner Name,Owner Email,Created At,Updated At\n"
     );
+  });
+
+  it("publishes read-only export preflight summaries for later UI confirmation", async () => {
+    const summaries = await listCsvExportPreflightSummaries();
+    const contactDefinition = getCsvExportDefinition("contacts");
+    const contactSummary = await getCsvExportPreflightSummary("contacts");
+    const contactRowCount = await prisma.contact.count();
+
+    expect(summaries.map((summary) => summary.entity)).toEqual(CSV_EXPORT_ENTITIES);
+    expect(contactSummary).toMatchObject({
+      entity: "contacts",
+      route: "/contacts",
+      filename: "contacts.csv",
+      contentType: CSV_EXPORT_CONTENT_TYPE,
+      defaultLimit: CSV_EXPORT_DEFAULT_LIMIT,
+      maxLimit: CSV_EXPORT_MAX_LIMIT,
+      rowCount: contactRowCount
+    });
+    expect(contactSummary.canonicalHeaders).toEqual(
+      contactDefinition.columns.map((column) => column.label)
+    );
+    expect(contactSummary.columns).toEqual(contactDefinition.columns);
   });
 });
 

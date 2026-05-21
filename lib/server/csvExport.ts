@@ -45,6 +45,14 @@ export type CsvExportResult = CsvExportDefinition & {
   csv: string;
 };
 
+export type CsvExportPreflightSummary = CsvExportDefinition & {
+  contentType: typeof CSV_EXPORT_CONTENT_TYPE;
+  canonicalHeaders: readonly string[];
+  defaultLimit: typeof CSV_EXPORT_DEFAULT_LIMIT;
+  maxLimit: typeof CSV_EXPORT_MAX_LIMIT;
+  rowCount: number;
+};
+
 type CsvCell = string | number | Date | null;
 type CsvRow = Record<string, CsvCell>;
 
@@ -55,6 +63,7 @@ type InternalCsvExportDefinition<Row extends CsvRow> = {
   filename: string;
   columns: readonly CsvColumn<Row>[];
   loadRows: (take: number) => Promise<Row[]>;
+  countRows: () => Promise<number>;
 };
 
 type AccountCsvRow = {
@@ -265,6 +274,20 @@ async function buildCsvExport<Row extends CsvRow>(
     contentType: CSV_EXPORT_CONTENT_TYPE,
     rowCount: rows.length,
     csv: toCsv(rows, definition.columns)
+  };
+}
+
+async function buildCsvExportPreflightSummary<Row extends CsvRow>(
+  definition: InternalCsvExportDefinition<Row>
+): Promise<CsvExportPreflightSummary> {
+  const publicDefinition = toPublicDefinition(definition);
+  return {
+    ...publicDefinition,
+    contentType: CSV_EXPORT_CONTENT_TYPE,
+    canonicalHeaders: publicDefinition.columns.map((column) => column.label),
+    defaultLimit: CSV_EXPORT_DEFAULT_LIMIT,
+    maxLimit: CSV_EXPORT_MAX_LIMIT,
+    rowCount: await definition.countRows()
   };
 }
 
@@ -825,7 +848,8 @@ const accountExportDefinition: InternalCsvExportDefinition<AccountCsvRow> = {
   route: "/accounts",
   filename: "accounts.csv",
   columns: accountColumns,
-  loadRows: loadAccountRows
+  loadRows: loadAccountRows,
+  countRows: () => prisma.account.count()
 };
 
 const contactExportDefinition: InternalCsvExportDefinition<ContactCsvRow> = {
@@ -834,7 +858,8 @@ const contactExportDefinition: InternalCsvExportDefinition<ContactCsvRow> = {
   route: "/contacts",
   filename: "contacts.csv",
   columns: contactColumns,
-  loadRows: loadContactRows
+  loadRows: loadContactRows,
+  countRows: () => prisma.contact.count()
 };
 
 const opportunityExportDefinition: InternalCsvExportDefinition<OpportunityCsvRow> = {
@@ -843,7 +868,8 @@ const opportunityExportDefinition: InternalCsvExportDefinition<OpportunityCsvRow
   route: "/deals",
   filename: "opportunities.csv",
   columns: opportunityColumns,
-  loadRows: loadOpportunityRows
+  loadRows: loadOpportunityRows,
+  countRows: () => prisma.deal.count()
 };
 
 const leadExportDefinition: InternalCsvExportDefinition<LeadCsvRow> = {
@@ -852,7 +878,8 @@ const leadExportDefinition: InternalCsvExportDefinition<LeadCsvRow> = {
   route: "/leads",
   filename: "leads.csv",
   columns: leadColumns,
-  loadRows: loadLeadRows
+  loadRows: loadLeadRows,
+  countRows: () => prisma.lead.count()
 };
 
 const activityExportDefinition: InternalCsvExportDefinition<ActivityCsvRow> = {
@@ -861,7 +888,8 @@ const activityExportDefinition: InternalCsvExportDefinition<ActivityCsvRow> = {
   route: "/activities",
   filename: "activities.csv",
   columns: activityColumns,
-  loadRows: loadActivityRows
+  loadRows: loadActivityRows,
+  countRows: () => prisma.activity.count()
 };
 
 const dealerOrderExportDefinition: InternalCsvExportDefinition<DealerOrderCsvRow> = {
@@ -870,7 +898,8 @@ const dealerOrderExportDefinition: InternalCsvExportDefinition<DealerOrderCsvRow
   route: "/orders",
   filename: "dealer-orders.csv",
   columns: dealerOrderColumns,
-  loadRows: loadDealerOrderRows
+  loadRows: loadDealerOrderRows,
+  countRows: () => prisma.dealerOrder.count()
 };
 
 const areaExportDefinition: InternalCsvExportDefinition<AreaCsvRow> = {
@@ -879,7 +908,8 @@ const areaExportDefinition: InternalCsvExportDefinition<AreaCsvRow> = {
   route: "/areas",
   filename: "areas.csv",
   columns: areaColumns,
-  loadRows: loadAreaRows
+  loadRows: loadAreaRows,
+  countRows: () => prisma.area.count()
 };
 
 const taskExportDefinition: InternalCsvExportDefinition<TaskCsvRow> = {
@@ -888,7 +918,8 @@ const taskExportDefinition: InternalCsvExportDefinition<TaskCsvRow> = {
   route: "/tasks",
   filename: "tasks.csv",
   columns: taskColumns,
-  loadRows: loadTaskRows
+  loadRows: loadTaskRows,
+  countRows: () => prisma.task.count()
 };
 
 const caseExportDefinition: InternalCsvExportDefinition<CaseCsvRow> = {
@@ -897,7 +928,8 @@ const caseExportDefinition: InternalCsvExportDefinition<CaseCsvRow> = {
   route: "/cases",
   filename: "cases.csv",
   columns: caseColumns,
-  loadRows: loadCaseRows
+  loadRows: loadCaseRows,
+  countRows: () => prisma.case.count()
 };
 
 const campaignExportDefinition: InternalCsvExportDefinition<CampaignCsvRow> = {
@@ -906,7 +938,8 @@ const campaignExportDefinition: InternalCsvExportDefinition<CampaignCsvRow> = {
   route: "/campaigns",
   filename: "campaigns.csv",
   columns: campaignColumns,
-  loadRows: loadCampaignRows
+  loadRows: loadCampaignRows,
+  countRows: () => prisma.campaign.count()
 };
 
 export function isCsvExportEntity(value: string): value is CsvExportEntity {
@@ -950,6 +983,48 @@ export function getCsvExportDefinition(entity: CsvExportEntity): CsvExportDefini
       return toPublicDefinition(caseExportDefinition);
     case "campaigns":
       return toPublicDefinition(campaignExportDefinition);
+  }
+}
+
+export async function listCsvExportPreflightSummaries(): Promise<CsvExportPreflightSummary[]> {
+  return Promise.all([
+    buildCsvExportPreflightSummary(accountExportDefinition),
+    buildCsvExportPreflightSummary(contactExportDefinition),
+    buildCsvExportPreflightSummary(opportunityExportDefinition),
+    buildCsvExportPreflightSummary(leadExportDefinition),
+    buildCsvExportPreflightSummary(activityExportDefinition),
+    buildCsvExportPreflightSummary(dealerOrderExportDefinition),
+    buildCsvExportPreflightSummary(areaExportDefinition),
+    buildCsvExportPreflightSummary(taskExportDefinition),
+    buildCsvExportPreflightSummary(caseExportDefinition),
+    buildCsvExportPreflightSummary(campaignExportDefinition)
+  ]);
+}
+
+export async function getCsvExportPreflightSummary(
+  entity: CsvExportEntity
+): Promise<CsvExportPreflightSummary> {
+  switch (entity) {
+    case "accounts":
+      return buildCsvExportPreflightSummary(accountExportDefinition);
+    case "contacts":
+      return buildCsvExportPreflightSummary(contactExportDefinition);
+    case "opportunities":
+      return buildCsvExportPreflightSummary(opportunityExportDefinition);
+    case "leads":
+      return buildCsvExportPreflightSummary(leadExportDefinition);
+    case "activities":
+      return buildCsvExportPreflightSummary(activityExportDefinition);
+    case "dealer-orders":
+      return buildCsvExportPreflightSummary(dealerOrderExportDefinition);
+    case "areas":
+      return buildCsvExportPreflightSummary(areaExportDefinition);
+    case "tasks":
+      return buildCsvExportPreflightSummary(taskExportDefinition);
+    case "cases":
+      return buildCsvExportPreflightSummary(caseExportDefinition);
+    case "campaigns":
+      return buildCsvExportPreflightSummary(campaignExportDefinition);
   }
 }
 
