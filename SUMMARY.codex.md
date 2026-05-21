@@ -2,39 +2,41 @@ Agent: Codex
 
 Sprint: 11
 
-Feature: Sprint 11 planning - CSV Review Bundles
+Feature: S11-F1 - CSV import review bundles
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt:
-- 081cc88 - [codex] sprint 11: plan codex track
-- 7345d93 - [codex] sprint 11: backlog refresh
+Commits this prompt: 5909c39 - [codex] S11-F1: add CSV import review bundles
 
-Gate status: PASS - Phase 0 full `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 28 Vitest files / 180 tests and 19 Playwright tests; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` also exited 0.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation with 29 Vitest files / 185 tests and 19 Playwright tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T21:01:07.6494136-07:00
+Timestamp: 2026-05-20T21:18:29.4494960-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full PowerShell local gate completed successfully before planning edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git log.
-- Confirmed Codex Sprint 10 completion from green report evidence: S10-F1 implementation commit `6569e52`, S10-F2 implementation commit `a825464`, and no active Codex blockers.
-- Updated `PLAN.md` to mark S10-F1 and S10-F2 done, bump document control to Version 2.16A, set the active sprint to Sprint 11, and queue S11-F1 and S11-F2 for Codex.
-- Synced `docs/FEATURE-BACKLOG.md` so S10 features are done and S11 features are queued.
-- Verified the planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
+- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; the worktree was clean on `codex/sprint-4-demo-seed-tuning` and the full PowerShell local gate completed successfully before edits.
+- Added `lib/server/csvImportReviewBundles.ts` with read-only import review bundle definitions, entity guards, `getCsvImportReviewBundle`, and `listCsvImportReviewBundles`.
+- The new bundle API composes import template metadata with preflight diagnostics, issue summaries, readiness counts, action counts, no-write flags, and a bounded deterministic row sample.
+- Added focused Vitest coverage in `tests/api/csv-import-review-bundles.test.ts` for supported entities, bundle composition, no-write behavior, list generation, and sample-limit clamping.
+- Verified the implementation with `npx vitest run tests/api/csv-import-review-bundles.test.ts --maxWorkers=1 --minWorkers=1`, `npm run lint`, `npm run typecheck`, and the full `scripts/local-gate.ps1`.
+
+### Discovered this prompt
+
+- `PLAN.md` section 4 still contains a stale "Current prompt scope - Sprint Rollover" paragraph even though the prior Codex report marks Sprint 11 planning done and the current LOOP prompt selected Sprint 11 implementation work.
+- `PLAN.md` and `docs/FEATURE-BACKLOG.md` still list S4-F2, S4-F3, and S4-F4 as queued while other-agent reports cite completed or green Sprint 4B work. This did not block S11-F1 because the local gate was green and Codex had no active blockers.
 
 ### Next action
 
-Run LOOP.md to begin S11-F1.
+Run LOOP.md to begin S11-F2 - CSV export review bundles.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (prompt-authorized planning edits to `PLAN.md` and `docs/FEATURE-BACKLOG.md`; see BLOCKERS resolved note)
+No cross-ownership edits: NO (added focused Vitest coverage in `tests/api/csv-import-review-bundles.test.ts`; see BLOCKERS resolved note)
 
 CRM-CONTRACT.md honored: YES
