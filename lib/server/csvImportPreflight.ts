@@ -80,9 +80,38 @@ export type CsvImportReadinessSummary = {
   globalErrorCount: number;
 };
 
+export type CsvImportRowActionKind =
+  | "create_candidate"
+  | "review_candidate"
+  | "blocked";
+
+export type CsvImportRowAction = {
+  action: CsvImportRowActionKind;
+  label: string;
+  canProceed: boolean;
+  requiresReview: boolean;
+  reasonCodes: string[];
+  message: string;
+};
+
+export type CsvImportActionCount = {
+  action: CsvImportRowActionKind;
+  rowCount: number;
+};
+
+export type CsvImportActionSummary = {
+  totalRows: number;
+  createCandidateRows: number;
+  reviewCandidateRows: number;
+  blockedRows: number;
+  importableRows: number;
+  actionCounts: CsvImportActionCount[];
+};
+
 export type CsvImportPreflightRow = CsvImportPreviewRow & {
   diagnostics: CsvImportPreflightDiagnostic[];
   readiness: CsvImportRowReadiness;
+  action: CsvImportRowAction;
 };
 
 export type CsvImportPreflightResult = Omit<CsvImportPreviewResult, "rows"> & {
@@ -90,6 +119,7 @@ export type CsvImportPreflightResult = Omit<CsvImportPreviewResult, "rows"> & {
   diagnostics: CsvImportPreflightDiagnostic[];
   warningRows: number;
   readinessSummary: CsvImportReadinessSummary;
+  actionSummary: CsvImportActionSummary;
 };
 
 type ContactImportData = z.infer<typeof contactCreateSchema>;
@@ -134,11 +164,23 @@ function createEmptyReadiness(): CsvImportRowReadiness {
   };
 }
 
+function createEmptyAction(): CsvImportRowAction {
+  return {
+    action: "create_candidate",
+    label: "Ready create candidate",
+    canProceed: true,
+    requiresReview: false,
+    reasonCodes: [],
+    message: "Row is valid and has no preflight warnings."
+  };
+}
+
 function clonePreviewRows(preview: CsvImportPreviewResult): CsvImportPreflightRow[] {
   return preview.rows.map((row) => ({
     ...row,
     diagnostics: [],
-    readiness: createEmptyReadiness()
+    readiness: createEmptyReadiness(),
+    action: createEmptyAction()
   }));
 }
 
@@ -200,12 +242,44 @@ function buildRowReadiness(
   };
 }
 
+function uniqueReasonCodes(readiness: CsvImportRowReadiness): string[] {
+  return [...new Set(readiness.reasons.map((reason) => reason.code))];
+}
+
+function buildRowAction(readiness: CsvImportRowReadiness): CsvImportRowAction {
+  const reasonCodes = uniqueReasonCodes(readiness);
+
+  switch (readiness.status) {
+    case "ready":
+      return createEmptyAction();
+    case "needs_review":
+      return {
+        action: "review_candidate",
+        label: "Review create candidate",
+        canProceed: true,
+        requiresReview: true,
+        reasonCodes,
+        message: "Row is valid but has preflight warnings to review before import."
+      };
+    case "blocked":
+      return {
+        action: "blocked",
+        label: "Blocked",
+        canProceed: false,
+        requiresReview: true,
+        reasonCodes,
+        message: "Resolve validation or CSV structure errors before import."
+      };
+  }
+}
+
 function applyReadiness(
   rows: CsvImportPreflightRow[],
   globalReasons: readonly CsvImportReadinessReason[]
 ) {
   for (const row of rows) {
     row.readiness = buildRowReadiness(row, globalReasons);
+    row.action = buildRowAction(row.readiness);
   }
 }
 
@@ -238,6 +312,38 @@ function summarizeReadiness(
     errorReasons,
     warningReasons,
     globalErrorCount
+  };
+}
+
+function summarizeActions(rows: readonly CsvImportPreflightRow[]): CsvImportActionSummary {
+  const createCandidateRows = rows.filter(
+    (row) => row.action.action === "create_candidate"
+  ).length;
+  const reviewCandidateRows = rows.filter(
+    (row) => row.action.action === "review_candidate"
+  ).length;
+  const blockedRows = rows.filter((row) => row.action.action === "blocked").length;
+
+  return {
+    totalRows: rows.length,
+    createCandidateRows,
+    reviewCandidateRows,
+    blockedRows,
+    importableRows: rows.filter((row) => row.action.canProceed).length,
+    actionCounts: [
+      {
+        action: "create_candidate",
+        rowCount: createCandidateRows
+      },
+      {
+        action: "review_candidate",
+        rowCount: reviewCandidateRows
+      },
+      {
+        action: "blocked",
+        rowCount: blockedRows
+      }
+    ]
   };
 }
 
@@ -568,6 +674,7 @@ export async function previewCsvImportWithPreflightDiagnostics(
     diagnostics,
     warningRows: rows.filter((row) => row.diagnostics.length > 0).length,
     readinessSummary: summarizeReadiness(rows, globalReadinessReasons.length),
+    actionSummary: summarizeActions(rows),
     issueSummary: summarizeCsvImportIssues({
       headerErrors: preview.headerErrors,
       parseErrors: preview.parseErrors,

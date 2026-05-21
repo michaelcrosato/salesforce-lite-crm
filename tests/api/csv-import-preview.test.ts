@@ -276,15 +276,52 @@ describe("server CSV import preflight diagnostics", () => {
       warningReasons: 2,
       globalErrorCount: 0
     });
+    expect(preview.actionSummary).toEqual({
+      totalRows: 4,
+      createCandidateRows: 1,
+      reviewCandidateRows: 2,
+      blockedRows: 1,
+      importableRows: 3,
+      actionCounts: [
+        {
+          action: "create_candidate",
+          rowCount: 1
+        },
+        {
+          action: "review_candidate",
+          rowCount: 2
+        },
+        {
+          action: "blocked",
+          rowCount: 1
+        }
+      ]
+    });
     expect(preview.rows.map((row) => row.readiness.status)).toEqual([
       "ready",
       "needs_review",
       "blocked",
       "needs_review"
     ]);
+    expect(preview.rows.map((row) => row.action.action)).toEqual([
+      "create_candidate",
+      "review_candidate",
+      "blocked",
+      "review_candidate"
+    ]);
     expect(preview.rows[0].readiness).toMatchObject({
       canImport: true,
       reasonCount: 0
+    });
+    expect(preview.rows[0].action).toMatchObject({
+      canProceed: true,
+      requiresReview: false,
+      reasonCodes: []
+    });
+    expect(preview.rows[1].action).toMatchObject({
+      canProceed: true,
+      requiresReview: true,
+      reasonCodes: ["contact_duplicate_email"]
     });
     expect(preview.rows[1].readiness.reasons).toContainEqual({
       source: "diagnostic_warning",
@@ -296,6 +333,11 @@ describe("server CSV import preflight diagnostics", () => {
     expect(preview.rows[2].readiness).toMatchObject({
       canImport: false,
       reasonCount: 1
+    });
+    expect(preview.rows[2].action).toMatchObject({
+      canProceed: false,
+      requiresReview: true,
+      reasonCodes: ["row_validation_error"]
     });
     expect(preview.rows[3].readiness).toMatchObject({
       status: "needs_review",
