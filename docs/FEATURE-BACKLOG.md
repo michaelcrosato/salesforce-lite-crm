@@ -23,8 +23,10 @@ roadmap and does not authorize feature work.
 | S9-F2 | CSV export preview snippets | Codex | done |
 | S10-F1 | CSV import action manifests | Codex | done |
 | S10-F2 | CSV preview capability metadata | Codex | done |
-| S11-F1 | CSV import review bundles | Codex | queued |
-| S11-F2 | CSV export review bundles | Codex | queued |
+| S11-F1 | CSV import review bundles | Codex | done |
+| S11-F2 | CSV export review bundles | Codex | done |
+| S12-F1 | CSV export delivery packets | Codex | queued |
+| S12-F2 | CSV import dry-run receipts | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -39,8 +41,8 @@ roadmap and does not authorize feature work.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
 - CSV product UI, bulk import writes, file storage, mapping wizard, and
-  Salesforce-connected import/export remain deferred while Sprint 11 queues
-  read-only CSV import and export review bundles.
+  Salesforce-connected import/export remain deferred while Sprint 12 queues
+  read-only CSV export delivery packets and import dry-run receipts.
 
 ## Implemented Contract Routes
 
