@@ -1,43 +1,38 @@
 Agent: Codex
 
-Sprint: 16
+Sprint: 17
 
-Feature: S16-F2 - CSV contract drift snapshots
+Feature: Sprint rollover - plan S17 Codex track
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 98e8739 - [codex] S16-F2: add CSV contract drift snapshots
+Commits this prompt: 3b47d26 - [codex] sprint 17: plan codex track; 90b4fe5 - [codex] sprint 17: backlog refresh
 
-Gate status: PASS - Phase 0 baseline checks exited 0 through `npm run build`; Phase 5 `scripts/local-gate.ps1` exited 0 with 40 Vitest files / 238 tests and 19 Playwright tests passing.
+Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0; Phase 4 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-21T09:26:07.4557460-07:00
+Timestamp: 2026-05-21T11:18:21.9911267-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; all expected worktrees existed, the worktree was clean, branch prefix was `codex/`, and baseline install, Prisma, seed, lint, typecheck, test, and build commands exited 0.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, current local-gate/roadmap/worktree/next-prompt docs, and referenced prompt artifacts before selecting work.
-- Added `lib/server/csvContractDriftSnapshots.ts`, a read-only server helper that publishes deterministic CSV contract drift snapshots with SHA-256 source fingerprints, status/issue/readiness rollups, source content types, and explicit no-write flags.
-- Added `tests/api/csv-contract-drift-snapshots.test.ts` with coverage for deterministic fingerprints, rollups, source content types, contact watch status, unsupported account import drift, operation aggregates, no-write flags, and unknown entity/operation rejection.
-- Used a minimal cross-zone test edit in `tests/**` to satisfy PLAN §8 test coverage for the new Codex server helper; see `BLOCKERS.codex.md` resolved item.
-- Verified the implementation with focused Vitest, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and the full `scripts/local-gate.ps1`.
-
-### Discovered this prompt
-
-- PLAN §4 still marks S16-F1 and S16-F2 as `queued`, while `SUMMARY.codex.md` now records both as completed with green local-gate evidence. Treated the current local gate and implementation commits as authoritative for this iteration.
-- Other-agent reports still reference Sprint 4B, which is not listed as the current Sprint 16 Codex queue in PLAN §4. Treated those reports as historical coordination context.
+- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full local gate exited 0, including 40 Vitest files / 238 tests and 19 Playwright tests.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations/roadmap note, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and `git log --oneline --since="30 days ago"`.
+- Confirmed Sprint 16 rollover was valid for Codex: `SUMMARY.codex.md` reported S16-F1 and S16-F2 complete with green gate evidence, and `BLOCKERS.codex.md` had no active blockers.
+- Updated `PLAN.md` document control, marked S16-F1/S16-F2 done, and queued Sprint 17 Codex features S17-F1 and S17-F2 with permanent and CSV-specific non-goals.
+- Synced `docs/FEATURE-BACKLOG.md` active items and deferred CSV limitation note to match the Sprint 17 plan.
+- Verified planning-only changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`, all exit 0.
 
 ### Next action
 
-Run `SPRINT-ROLLOVER.md` to plan the next Codex sprint; no further Codex-owned Sprint 16 feature remains after S16-F2.
+Run LOOP.md to begin S17-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (minimal `tests/**` coverage exception; see BLOCKERS resolved item)
+No cross-ownership edits: YES (only prompt-authorized planning/backlog/report files)
 
 CRM-CONTRACT.md honored: YES

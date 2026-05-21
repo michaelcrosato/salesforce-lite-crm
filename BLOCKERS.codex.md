@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 16
+Sprint: 17
 
-Feature: S16-F2 - CSV contract drift snapshots
+Feature: Sprint rollover - plan S17 Codex track
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-21T09:26:07.4557460-07:00
+Timestamp: 2026-05-21T11:18:21.9911267-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Ownership boundary documented: `tests/api/csv-contract-drift-snapshots.test.ts` is in Gemini's `tests/**` zone, but the current LOOP required a test path and PLAN §8 requires coverage for new behavior. The edit was limited to a focused Vitest file covering the Codex-owned server helper, and `scripts/local-gate.ps1` exited 0.
+- No active Codex blocker carried into rollover. Phase 0 full local gate and Phase 4 planning checks were green, so no gate blocker was filed.
