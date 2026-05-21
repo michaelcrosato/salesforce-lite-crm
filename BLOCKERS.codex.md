@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 16
 
-Feature: Sprint 16 planning - CSV Operator Runbooks
+Feature: S16-F1 - CSV operator remediation runbooks
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-21T06:27:11.7465928-07:00
+Timestamp: 2026-05-21T06:48:27.9359105-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were present during sprint rollover; no blocker resolution was required.
+- Ownership boundary documented: `tests/api/csv-operator-remediation-runbooks.test.ts` is in Gemini's `tests/**` zone, but the current LOOP required a test path and PLAN §8 requires coverage for new behavior. The edit was limited to a focused Vitest file covering the Codex-owned server helper, and `scripts/local-gate.ps1` exited 0.
