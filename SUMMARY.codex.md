@@ -2,44 +2,44 @@ Agent: Codex
 
 Sprint: 7
 
-Feature: Sprint 7 rollover planning
+Feature: S7-F1 - CSV capability catalog
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- e7254fe - [codex] sprint 7: plan codex track
-- b9aa12e - [codex] sprint 7: backlog refresh
+- b547bc4 - [codex] S7-F1: add CSV capability catalog
 
-Gate status: PASS - Phase 0 full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 27 files / 168 tests and Playwright reported 19 passed. Phase 4 verification subset (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`) also exited 0.
+Gate status: PASS - Phase 0 full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Phase 5 subset `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0. Vitest reported 28 files / 172 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T16:52:14.3184010-07:00
+Timestamp: 2026-05-20T17:09:46.4002643-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
-- Read `PLAN.md`, `CRM-CONTRACT.md`, README known limitations and next-step sections, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
-- Confirmed Codex Sprint 6 was complete from report and commit evidence: S6-F1 commit `a81eb2a`, S6-F2 commit `b334372`, green local gates in their reports, and no active Codex blockers.
-- Updated `PLAN.md` document control to version 2.12A, marked S6-F1 and S6-F2 done, and queued Sprint 7 Codex features S7-F1 and S7-F2 with carried-forward permanent non-goals.
-- Synced `docs/FEATURE-BACKLOG.md` so S6-F1/S6-F2 are done and S7-F1/S7-F2 are queued.
-- Ran the required planning verification subset after commits; lint, typecheck, test, and build all exited 0.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: all four expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
+- Read `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, `docs/FEATURE-BACKLOG.md`, local-gate/worktree/project-control docs, roadmap docs, merge playbook, prompt docs, git diff stats, and recent git history.
+- Reconciled Sprint 7 as the next Codex queue while carrying forward the known discrepancy that PLAN still lists non-Codex Sprint 4 rows as queued despite historical Sprint 4B reports claiming completion.
+- Added `lib/server/csvCapabilities.ts`, a deterministic server-side capability catalog for CSV export, import preview, import template, and import preflight operations.
+- Catalog entries include operation, entity, route, filename, CSV input/output content types, canonical headers, required import field/header metadata, and explicit read/write safety flags. Export and preflight are marked database-read only; every operation is marked no database/file/external-service/routing writes.
+- Added focused coverage in `tests/api/csv-capabilities.test.ts`. This is a minimal cross-zone test exception because PLAN §8 requires test coverage for done work and the server feature needs API contract coverage.
+- Verified the feature with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`, all exit 0.
 
 ### Discovered this prompt
 
-- PLAN.md still lists other agents' Sprint 4 rows as queued, while their historical reports describe Sprint 4B work as complete. This rollover was explicitly scoped to Codex, so no non-Codex Sprint 4 status rows were changed.
-- `SUMMARY.grok.md`, `BLOCKERS.grok.md`, and `BLOCKERS.gemini.md` contain stale historical blocker text, but current Codex blockers are empty and unrelated to Sprint 7 planning.
+- No new Codex blockers were found.
+- Other-agent blocker files still contain stale historical Grok/Gemini items, but none blocks S7-F1.
 
 ### Next action
 
-Run LOOP.md to begin S7-F1.
+Run LOOP.md to begin S7-F2 - CSV preview issue summaries.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (only prompt-authorized planning, backlog, and Codex report files were touched)
+No cross-ownership edits: NO (see BLOCKERS: resolved ownership exception for `tests/api/csv-capabilities.test.ts`)
 
 CRM-CONTRACT.md honored: YES
