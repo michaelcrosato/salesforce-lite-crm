@@ -2,37 +2,36 @@ Agent: Codex
 
 Sprint: 17
 
-Feature: Sprint rollover - plan S17 Codex track
+Feature: S17-F1 - CSV operator handoff packets
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 3b47d26 - [codex] sprint 17: plan codex track; 90b4fe5 - [codex] sprint 17: backlog refresh
+Commits this prompt: 90b851e - [codex] S17-F1: add CSV operator handoff packets
 
-Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0; Phase 4 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0.
+Gate status: PASS - Phase 0 and Phase 5 `scripts/local-gate.ps1` exited 0; final gate included 41 Vitest files / 244 tests and 19 Playwright tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-21T11:18:21.9911267-07:00
+Timestamp: 2026-05-21T11:40:18.6958174-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full local gate exited 0, including 40 Vitest files / 238 tests and 19 Playwright tests.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations/roadmap note, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and `git log --oneline --since="30 days ago"`.
-- Confirmed Sprint 16 rollover was valid for Codex: `SUMMARY.codex.md` reported S16-F1 and S16-F2 complete with green gate evidence, and `BLOCKERS.codex.md` had no active blockers.
-- Updated `PLAN.md` document control, marked S16-F1/S16-F2 done, and queued Sprint 17 Codex features S17-F1 and S17-F2 with permanent and CSV-specific non-goals.
-- Synced `docs/FEATURE-BACKLOG.md` active items and deferred CSV limitation note to match the Sprint 17 plan.
-- Verified planning-only changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`, all exit 0.
+- Ran pre-flight from `C:\dev\salesforce-lite-crm`; worktree was clean, branch matched `codex/`, and the full local gate exited 0 before edits.
+- Reconciled `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, and referenced local-gate/backlog/prompt docs; no active Codex blocker was present.
+- Implemented `lib/server/csvOperatorHandoffPackets.ts`, publishing deterministic root, per-entity, and per-operation handoff packets over the current CSV capabilities, handoff index, readiness scorecards, remediation runbooks, drift snapshots, source content types, and explicit no-write flags.
+- Added focused Vitest coverage in `tests/api/csv-operator-handoff-packets.test.ts`; this is a documented §10 cross-zone validation exception because the existing CSV server-helper tests live under Gemini-owned `tests/api`.
+- Verified the change with focused `npm run lint`, `npm run typecheck`, and `npx vitest run tests/api/csv-operator-handoff-packets.test.ts --maxWorkers=1 --minWorkers=1`, then with the full `scripts/local-gate.ps1`.
 
 ### Next action
 
-Run LOOP.md to begin S17-F1.
+Run LOOP.md for S17-F2 - CSV contract release digest.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (only prompt-authorized planning/backlog/report files)
+No cross-ownership edits: NO (documented §10 validation exception for `tests/api/csv-operator-handoff-packets.test.ts`)
 
 CRM-CONTRACT.md honored: YES
