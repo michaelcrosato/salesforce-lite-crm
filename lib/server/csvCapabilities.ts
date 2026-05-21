@@ -1,10 +1,17 @@
 import {
   CSV_EXPORT_CONTENT_TYPE,
+  CSV_EXPORT_DEFAULT_LIMIT,
   listCsvExportDefinitions,
+  CSV_EXPORT_MAX_LIMIT,
+  CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+  CSV_EXPORT_PREVIEW_MAX_LIMIT,
+  type CsvExportDefinition,
   type CsvExportEntity
 } from "@/lib/server/csvExport";
 import {
+  CSV_IMPORT_PREVIEW_DEFAULT_LIMIT,
   listCsvImportPreviewDefinitions,
+  CSV_IMPORT_PREVIEW_MAX_LIMIT,
   type CsvImportPreviewDefinition,
   type CsvImportPreviewEntity,
   type CsvImportPreviewField
@@ -38,6 +45,35 @@ export type CsvCapabilityWriteFlags = {
   routingAssignments: false;
 };
 
+export type CsvCapabilityLimit = {
+  defaultLimit: number;
+  maxLimit: number;
+};
+
+export type CsvCapabilityLimits = {
+  exportRows: CsvCapabilityLimit | null;
+  previewRows: CsvCapabilityLimit | null;
+};
+
+export type CsvCapabilityPreviewFlags = {
+  rows: boolean;
+  csvSnippet: boolean;
+  issueSummary: boolean;
+  diagnostics: boolean;
+  readinessSummary: boolean;
+  actionSummary: boolean;
+};
+
+export type CsvCapabilitySurfaceFlags = {
+  exportPreflightSummary: boolean;
+  exportPreview: boolean;
+  importPreview: boolean;
+  importTemplate: boolean;
+  importPreflightDiagnostics: boolean;
+  importReadinessSummary: boolean;
+  importActionSummary: boolean;
+};
+
 export type CsvCapability = {
   operation: CsvCapabilityOperation;
   entity: CsvCapabilityEntity;
@@ -54,6 +90,9 @@ export type CsvCapability = {
   canonicalHeaders: readonly string[];
   requiredImportFields: readonly string[];
   requiredImportHeaders: readonly string[];
+  limits: CsvCapabilityLimits;
+  preview: CsvCapabilityPreviewFlags;
+  surface: CsvCapabilitySurfaceFlags;
   read: CsvCapabilityReadFlags;
   write: CsvCapabilityWriteFlags;
 };
@@ -75,6 +114,69 @@ function noWrites(): CsvCapabilityWriteFlags {
   };
 }
 
+function limitMetadata(defaultLimit: number, maxLimit: number): CsvCapabilityLimit {
+  return {
+    defaultLimit,
+    maxLimit
+  };
+}
+
+function exportLimits(): CsvCapabilityLimits {
+  return {
+    exportRows: limitMetadata(CSV_EXPORT_DEFAULT_LIMIT, CSV_EXPORT_MAX_LIMIT),
+    previewRows: limitMetadata(
+      CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+      CSV_EXPORT_PREVIEW_MAX_LIMIT
+    )
+  };
+}
+
+function importPreviewLimits(): CsvCapabilityLimits {
+  return {
+    exportRows: null,
+    previewRows: limitMetadata(
+      CSV_IMPORT_PREVIEW_DEFAULT_LIMIT,
+      CSV_IMPORT_PREVIEW_MAX_LIMIT
+    )
+  };
+}
+
+function noLimits(): CsvCapabilityLimits {
+  return {
+    exportRows: null,
+    previewRows: null
+  };
+}
+
+function previewFlags(
+  flags: Partial<CsvCapabilityPreviewFlags> = {}
+): CsvCapabilityPreviewFlags {
+  return {
+    rows: false,
+    csvSnippet: false,
+    issueSummary: false,
+    diagnostics: false,
+    readinessSummary: false,
+    actionSummary: false,
+    ...flags
+  };
+}
+
+function surfaceFlags(
+  flags: Partial<CsvCapabilitySurfaceFlags> = {}
+): CsvCapabilitySurfaceFlags {
+  return {
+    exportPreflightSummary: false,
+    exportPreview: false,
+    importPreview: false,
+    importTemplate: false,
+    importPreflightDiagnostics: false,
+    importReadinessSummary: false,
+    importActionSummary: false,
+    ...flags
+  };
+}
+
 function headersFromFields(fields: readonly CsvImportPreviewField[]): string[] {
   return fields.map((field) => field.label);
 }
@@ -89,6 +191,34 @@ function requiredFieldHeaders(fields: readonly CsvImportPreviewField[]): string[
   return fields
     .filter((field) => field.required)
     .map((field) => field.label);
+}
+
+function buildExportCapability(definition: CsvExportDefinition): CsvCapability {
+  return {
+    operation: "export",
+    entity: definition.entity,
+    label: definition.label,
+    route: definition.route,
+    filename: definition.filename,
+    inputContentType: null,
+    outputContentType: CSV_EXPORT_CONTENT_TYPE,
+    acceptsCsvInput: false,
+    returnsCsv: true,
+    canonicalHeaders: definition.columns.map((column) => column.label),
+    requiredImportFields: [],
+    requiredImportHeaders: [],
+    limits: exportLimits(),
+    preview: previewFlags({
+      rows: true,
+      csvSnippet: true
+    }),
+    surface: surfaceFlags({
+      exportPreflightSummary: true,
+      exportPreview: true
+    }),
+    read: readFlags(true, false),
+    write: noWrites()
+  };
 }
 
 function buildImportPreviewCapability(
@@ -107,6 +237,14 @@ function buildImportPreviewCapability(
     canonicalHeaders: headersFromFields(definition.fields),
     requiredImportFields: requiredFieldKeys(definition.fields),
     requiredImportHeaders: requiredFieldHeaders(definition.fields),
+    limits: importPreviewLimits(),
+    preview: previewFlags({
+      rows: true,
+      issueSummary: true
+    }),
+    surface: surfaceFlags({
+      importPreview: true
+    }),
     read: readFlags(false, true),
     write: noWrites()
   };
@@ -126,6 +264,11 @@ function buildImportTemplateCapability(template: CsvImportTemplate): CsvCapabili
     canonicalHeaders: [...template.headers],
     requiredImportFields: requiredFieldKeys(template.fields),
     requiredImportHeaders: [...template.requiredHeaders],
+    limits: noLimits(),
+    preview: previewFlags(),
+    surface: surfaceFlags({
+      importTemplate: true
+    }),
     read: readFlags(false, false),
     write: noWrites()
   };
@@ -147,28 +290,27 @@ function buildImportPreflightCapability(
     canonicalHeaders: headersFromFields(definition.fields),
     requiredImportFields: requiredFieldKeys(definition.fields),
     requiredImportHeaders: requiredFieldHeaders(definition.fields),
+    limits: importPreviewLimits(),
+    preview: previewFlags({
+      rows: true,
+      issueSummary: true,
+      diagnostics: true,
+      readinessSummary: true,
+      actionSummary: true
+    }),
+    surface: surfaceFlags({
+      importPreview: true,
+      importPreflightDiagnostics: true,
+      importReadinessSummary: true,
+      importActionSummary: true
+    }),
     read: readFlags(true, true),
     write: noWrites()
   };
 }
 
 export function listCsvCapabilities(): CsvCapability[] {
-  const exportCapabilities = listCsvExportDefinitions().map((definition): CsvCapability => ({
-    operation: "export",
-    entity: definition.entity,
-    label: definition.label,
-    route: definition.route,
-    filename: definition.filename,
-    inputContentType: null,
-    outputContentType: CSV_EXPORT_CONTENT_TYPE,
-    acceptsCsvInput: false,
-    returnsCsv: true,
-    canonicalHeaders: definition.columns.map((column) => column.label),
-    requiredImportFields: [],
-    requiredImportHeaders: [],
-    read: readFlags(true, false),
-    write: noWrites()
-  }));
+  const exportCapabilities = listCsvExportDefinitions().map(buildExportCapability);
   const previewDefinitions = listCsvImportPreviewDefinitions();
 
   return [

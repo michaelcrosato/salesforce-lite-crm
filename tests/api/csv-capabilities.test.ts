@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   CSV_EXPORT_CONTENT_TYPE,
+  CSV_EXPORT_DEFAULT_LIMIT,
   CSV_EXPORT_ENTITIES,
+  CSV_EXPORT_MAX_LIMIT,
+  CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+  CSV_EXPORT_PREVIEW_MAX_LIMIT,
   getCsvExportDefinition
 } from "@/lib/server/csvExport";
 import {
   CSV_IMPORT_PREVIEW_ENTITIES,
+  CSV_IMPORT_PREVIEW_DEFAULT_LIMIT,
+  CSV_IMPORT_PREVIEW_MAX_LIMIT,
   getCsvImportPreviewDefinition
 } from "@/lib/server/csvImportPreview";
 import {
@@ -52,6 +58,33 @@ describe("server CSV capability catalog", () => {
       outputContentType: CSV_EXPORT_CONTENT_TYPE,
       acceptsCsvInput: false,
       returnsCsv: true,
+      limits: {
+        exportRows: {
+          defaultLimit: CSV_EXPORT_DEFAULT_LIMIT,
+          maxLimit: CSV_EXPORT_MAX_LIMIT
+        },
+        previewRows: {
+          defaultLimit: CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+          maxLimit: CSV_EXPORT_PREVIEW_MAX_LIMIT
+        }
+      },
+      preview: {
+        rows: true,
+        csvSnippet: true,
+        issueSummary: false,
+        diagnostics: false,
+        readinessSummary: false,
+        actionSummary: false
+      },
+      surface: {
+        exportPreflightSummary: true,
+        exportPreview: true,
+        importPreview: false,
+        importTemplate: false,
+        importPreflightDiagnostics: false,
+        importReadinessSummary: false,
+        importActionSummary: false
+      },
       read: {
         metadata: true,
         database: true,
@@ -85,7 +118,31 @@ describe("server CSV capability catalog", () => {
       inputContentType: CSV_IMPORT_TEMPLATE_CONTENT_TYPE,
       outputContentType: null,
       acceptsCsvInput: true,
-      returnsCsv: false
+      returnsCsv: false,
+      limits: {
+        exportRows: null,
+        previewRows: {
+          defaultLimit: CSV_IMPORT_PREVIEW_DEFAULT_LIMIT,
+          maxLimit: CSV_IMPORT_PREVIEW_MAX_LIMIT
+        }
+      },
+      preview: {
+        rows: true,
+        csvSnippet: false,
+        issueSummary: true,
+        diagnostics: false,
+        readinessSummary: false,
+        actionSummary: false
+      },
+      surface: {
+        exportPreflightSummary: false,
+        exportPreview: false,
+        importPreview: true,
+        importTemplate: false,
+        importPreflightDiagnostics: false,
+        importReadinessSummary: false,
+        importActionSummary: false
+      }
     });
     expect(previewCapability?.canonicalHeaders).toEqual(
       previewDefinition.fields.map((field) => field.label)
@@ -109,7 +166,28 @@ describe("server CSV capability catalog", () => {
       inputContentType: null,
       outputContentType: CSV_IMPORT_TEMPLATE_CONTENT_TYPE,
       acceptsCsvInput: false,
-      returnsCsv: true
+      returnsCsv: true,
+      limits: {
+        exportRows: null,
+        previewRows: null
+      },
+      preview: {
+        rows: false,
+        csvSnippet: false,
+        issueSummary: false,
+        diagnostics: false,
+        readinessSummary: false,
+        actionSummary: false
+      },
+      surface: {
+        exportPreflightSummary: false,
+        exportPreview: false,
+        importPreview: false,
+        importTemplate: true,
+        importPreflightDiagnostics: false,
+        importReadinessSummary: false,
+        importActionSummary: false
+      }
     });
     expect(templateCapability?.canonicalHeaders).toEqual(template.headers);
     expect(templateCapability?.requiredImportFields).toEqual(["firstName", "lastName"]);
@@ -128,6 +206,30 @@ describe("server CSV capability catalog", () => {
       outputContentType: null,
       acceptsCsvInput: true,
       returnsCsv: false,
+      limits: {
+        exportRows: null,
+        previewRows: {
+          defaultLimit: CSV_IMPORT_PREVIEW_DEFAULT_LIMIT,
+          maxLimit: CSV_IMPORT_PREVIEW_MAX_LIMIT
+        }
+      },
+      preview: {
+        rows: true,
+        csvSnippet: false,
+        issueSummary: true,
+        diagnostics: true,
+        readinessSummary: true,
+        actionSummary: true
+      },
+      surface: {
+        exportPreflightSummary: false,
+        exportPreview: false,
+        importPreview: true,
+        importTemplate: false,
+        importPreflightDiagnostics: true,
+        importReadinessSummary: true,
+        importActionSummary: true
+      },
       read: {
         metadata: true,
         database: true,
