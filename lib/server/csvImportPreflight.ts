@@ -46,14 +46,50 @@ export type CsvImportPreflightDiagnostic = {
   relatedRecord: CsvImportPreflightRelatedRecord | null;
 };
 
+export type CsvImportReadinessStatus = "ready" | "needs_review" | "blocked";
+
+export type CsvImportReadinessReasonSource =
+  | "header"
+  | "parse"
+  | "row_validation"
+  | "diagnostic_warning";
+
+export type CsvImportReadinessReason = {
+  source: CsvImportReadinessReasonSource;
+  severity: "error" | "warning";
+  code: string;
+  fieldKey: string | null;
+  message: string;
+};
+
+export type CsvImportRowReadiness = {
+  status: CsvImportReadinessStatus;
+  canImport: boolean;
+  reasonCount: number;
+  reasons: CsvImportReadinessReason[];
+};
+
+export type CsvImportReadinessSummary = {
+  totalRows: number;
+  readyRows: number;
+  needsReviewRows: number;
+  blockedRows: number;
+  importableRows: number;
+  errorReasons: number;
+  warningReasons: number;
+  globalErrorCount: number;
+};
+
 export type CsvImportPreflightRow = CsvImportPreviewRow & {
   diagnostics: CsvImportPreflightDiagnostic[];
+  readiness: CsvImportRowReadiness;
 };
 
 export type CsvImportPreflightResult = Omit<CsvImportPreviewResult, "rows"> & {
   rows: CsvImportPreflightRow[];
   diagnostics: CsvImportPreflightDiagnostic[];
   warningRows: number;
+  readinessSummary: CsvImportReadinessSummary;
 };
 
 type ContactImportData = z.infer<typeof contactCreateSchema>;
@@ -89,11 +125,120 @@ type ValidPreflightRow<TData extends ImportPersonData> = {
   data: TData;
 };
 
+function createEmptyReadiness(): CsvImportRowReadiness {
+  return {
+    status: "ready",
+    canImport: true,
+    reasonCount: 0,
+    reasons: []
+  };
+}
+
 function clonePreviewRows(preview: CsvImportPreviewResult): CsvImportPreflightRow[] {
   return preview.rows.map((row) => ({
     ...row,
-    diagnostics: []
+    diagnostics: [],
+    readiness: createEmptyReadiness()
   }));
+}
+
+function buildGlobalReadinessReasons(
+  preview: Pick<CsvImportPreviewResult, "headerErrors" | "parseErrors">
+): CsvImportReadinessReason[] {
+  return [
+    ...preview.headerErrors.map((message): CsvImportReadinessReason => ({
+      source: "header",
+      severity: "error",
+      code: "header_error",
+      fieldKey: null,
+      message
+    })),
+    ...preview.parseErrors.map((message): CsvImportReadinessReason => ({
+      source: "parse",
+      severity: "error",
+      code: "parse_error",
+      fieldKey: null,
+      message
+    }))
+  ];
+}
+
+function buildRowReadiness(
+  row: CsvImportPreflightRow,
+  globalReasons: readonly CsvImportReadinessReason[]
+): CsvImportRowReadiness {
+  const reasons: CsvImportReadinessReason[] = [
+    ...globalReasons,
+    ...row.errors.map((message): CsvImportReadinessReason => ({
+      source: "row_validation",
+      severity: "error",
+      code: "row_validation_error",
+      fieldKey: null,
+      message
+    })),
+    ...row.diagnostics.map((diagnostic): CsvImportReadinessReason => ({
+      source: "diagnostic_warning",
+      severity: diagnostic.severity,
+      code: diagnostic.code,
+      fieldKey: diagnostic.fieldKey,
+      message: diagnostic.message
+    }))
+  ];
+  const hasErrors = reasons.some((reason) => reason.severity === "error");
+  const hasWarnings = reasons.some((reason) => reason.severity === "warning");
+  const status: CsvImportReadinessStatus = hasErrors
+    ? "blocked"
+    : hasWarnings
+      ? "needs_review"
+      : "ready";
+
+  return {
+    status,
+    canImport: !hasErrors,
+    reasonCount: reasons.length,
+    reasons
+  };
+}
+
+function applyReadiness(
+  rows: CsvImportPreflightRow[],
+  globalReasons: readonly CsvImportReadinessReason[]
+) {
+  for (const row of rows) {
+    row.readiness = buildRowReadiness(row, globalReasons);
+  }
+}
+
+function summarizeReadiness(
+  rows: readonly CsvImportPreflightRow[],
+  globalErrorCount: number
+): CsvImportReadinessSummary {
+  const readyRows = rows.filter((row) => row.readiness.status === "ready").length;
+  const needsReviewRows = rows.filter(
+    (row) => row.readiness.status === "needs_review"
+  ).length;
+  const blockedRows = rows.filter((row) => row.readiness.status === "blocked").length;
+  const errorReasons = rows.reduce(
+    (total, row) =>
+      total + row.readiness.reasons.filter((reason) => reason.severity === "error").length,
+    0
+  );
+  const warningReasons = rows.reduce(
+    (total, row) =>
+      total + row.readiness.reasons.filter((reason) => reason.severity === "warning").length,
+    0
+  );
+
+  return {
+    totalRows: rows.length,
+    readyRows,
+    needsReviewRows,
+    blockedRows,
+    importableRows: readyRows + needsReviewRows,
+    errorReasons,
+    warningReasons,
+    globalErrorCount
+  };
 }
 
 function validRowsForSchema<TData extends ImportPersonData>(
@@ -413,6 +558,8 @@ export async function previewCsvImportWithPreflightDiagnostics(
       break;
   }
 
+  const globalReadinessReasons = buildGlobalReadinessReasons(preview);
+  applyReadiness(rows, globalReadinessReasons);
   const diagnostics = rows.flatMap((row) => row.diagnostics);
 
   return {
@@ -420,6 +567,7 @@ export async function previewCsvImportWithPreflightDiagnostics(
     rows,
     diagnostics,
     warningRows: rows.filter((row) => row.diagnostics.length > 0).length,
+    readinessSummary: summarizeReadiness(rows, globalReadinessReasons.length),
     issueSummary: summarizeCsvImportIssues({
       headerErrors: preview.headerErrors,
       parseErrors: preview.parseErrors,

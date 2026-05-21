@@ -244,6 +244,94 @@ describe("server CSV import preflight diagnostics", () => {
     ]);
   });
 
+  it("classifies contact preflight readiness with aggregate counts", async () => {
+    await prisma.contact.create({
+      data: {
+        id: "csv-preflight-existing-contact",
+        firstName: "Alice",
+        lastName: "Ng",
+        email: "alice.ng@example.test",
+        phone: "604-555-0100",
+        status: "active"
+      }
+    });
+
+    const csv = [
+      "First Name,Last Name,Email,Status,Phone",
+      "Clean,Ready,clean.ready@example.test,active,604-555-0111",
+      "Alice,Ng,ALICE.NG@example.test,active,604-555-0100",
+      ",Broken,broken@example.test,active,604-555-0122",
+      "No,Method,,active,"
+    ].join("\n");
+
+    const preview = await previewCsvImportWithPreflightDiagnostics("contacts", csv);
+
+    expect(preview.readinessSummary).toMatchObject({
+      totalRows: 4,
+      readyRows: 1,
+      needsReviewRows: 2,
+      blockedRows: 1,
+      importableRows: 3,
+      errorReasons: 1,
+      warningReasons: 2,
+      globalErrorCount: 0
+    });
+    expect(preview.rows.map((row) => row.readiness.status)).toEqual([
+      "ready",
+      "needs_review",
+      "blocked",
+      "needs_review"
+    ]);
+    expect(preview.rows[0].readiness).toMatchObject({
+      canImport: true,
+      reasonCount: 0
+    });
+    expect(preview.rows[1].readiness.reasons).toContainEqual({
+      source: "diagnostic_warning",
+      severity: "warning",
+      code: "contact_duplicate_email",
+      fieldKey: "email",
+      message: "Existing contact has this email: Alice Ng."
+    });
+    expect(preview.rows[2].readiness).toMatchObject({
+      canImport: false,
+      reasonCount: 1
+    });
+    expect(preview.rows[3].readiness).toMatchObject({
+      status: "needs_review",
+      canImport: true
+    });
+  });
+
+  it("blocks preflight readiness for global header errors", async () => {
+    const csv = [
+      "First Name,First,Last Name,Status,Phone",
+      "Alice,Duplicate,Ng,active,604-555-0100"
+    ].join("\n");
+
+    const preview = await previewCsvImportWithPreflightDiagnostics("contacts", csv);
+
+    expect(preview.headerErrors).toEqual(["Duplicate header for First Name: First."]);
+    expect(preview.readinessSummary).toMatchObject({
+      totalRows: 1,
+      readyRows: 0,
+      needsReviewRows: 0,
+      blockedRows: 1,
+      importableRows: 0,
+      globalErrorCount: 1
+    });
+    expect(preview.rows[0].readiness).toMatchObject({
+      status: "blocked",
+      canImport: false,
+      reasonCount: 1
+    });
+    expect(preview.rows[0].readiness.reasons[0]).toMatchObject({
+      source: "header",
+      severity: "error",
+      code: "header_error"
+    });
+  });
+
   it("adds lead diagnostics from database context without importing or routing rows", async () => {
     await prisma.lead.create({
       data: {
@@ -269,6 +357,17 @@ describe("server CSV import preflight diagnostics", () => {
     expect(after).toEqual(before);
     expect(preview.validRows).toBe(2);
     expect(preview.warningRows).toBe(2);
+    expect(preview.readinessSummary).toMatchObject({
+      totalRows: 2,
+      readyRows: 0,
+      needsReviewRows: 2,
+      blockedRows: 0,
+      importableRows: 2,
+      errorReasons: 0,
+      warningReasons: 4,
+      globalErrorCount: 0
+    });
+    expect(preview.rows.every((row) => row.readiness.canImport)).toBe(true);
     expect(preview.rows[0].diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
       "lead_duplicate_email",
       "lead_area_not_found"
