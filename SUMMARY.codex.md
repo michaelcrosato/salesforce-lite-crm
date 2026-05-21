@@ -1,45 +1,39 @@
 Agent: Codex
 
-Sprint: 8
+Sprint: 9
 
-Feature: S8-F2 - CSV export preflight summaries
+Feature: Sprint 9 Codex planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 755f549 - [codex] S8-F2: add CSV export preflight summaries
+- e346ea3 - [codex] sprint 9: plan codex track
+- 4f0bbe5 - [codex] sprint 9: backlog refresh
 
-Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 176 tests and Playwright reported 19 passed.
+Gate status: PASS - baseline `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0. Vitest reported 28 files / 176 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T18:35:43.3535670-07:00
+Timestamp: 2026-05-20T18:54:39.8145468-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
 - Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
-- Added read-only CSV export preflight summaries for every supported export entity with filename, content type, canonical headers, default/max limits, and current database row count.
-- Reused existing CSV export definitions and added Prisma count callbacks; no routes, UI, file storage, background jobs, export writes, external services, or package changes were added.
-- Updated `tests/api/csv-export-contracts.test.ts` as a minimal §10 cross-zone coverage edit for the new Codex-owned server contract.
-- Verified the focused test, the business-logic subset (`npm run test`, `npm run build`), and the full `scripts/local-gate.ps1` gate.
-
-### Discovered this prompt
-
-- PLAN.md §4 still lists S8-F1 and S8-F2 as queued; local green commit evidence now shows both Codex Sprint 8 features completed on this branch.
-- PLAN.md §4 also retains a sprint-rollover current prompt note; this LOOP run selected S8-F2 from the active Codex queue under the current runner context and did not have scope to edit PLAN.md.
-- Non-Codex Sprint 4B report files remain historical context and do not block the Codex S8 server contract path.
-- `next build` still lists placeholder/excluded app-router paths such as `/deals/[id]`; the e2e excluded-route guard passed, so this is not a Codex S8 blocker.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git log.
+- Confirmed Sprint 8 Codex work is complete from SUMMARY evidence: S8-F1 and S8-F2 both have implementation commits and green gate reports, with no active Codex blockers.
+- Updated `PLAN.md`: bumped Document Control to version 2.14A, marked S8-F1 and S8-F2 done, set Active sprint to Sprint 9, and queued S9-F1/S9-F2 with carried-forward non-goals.
+- Synced `docs/FEATURE-BACKLOG.md` so S8 rows are done and S9 rows are queued.
 
 ### Next action
 
-Sprint 8 Codex queue is complete; run sprint rollover or merge review before assigning more Codex product work.
+Run LOOP.md to begin S9-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (minimal `tests/api/csv-export-contracts.test.ts` coverage edit; see Completed this prompt)
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES
