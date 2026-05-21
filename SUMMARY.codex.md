@@ -2,39 +2,41 @@ Agent: Codex
 
 Sprint: 10
 
-Feature: Sprint 10 planning - CSV Operator Handoff Contracts
+Feature: S10-F1 - CSV import action manifests
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- d2621b1 - [codex] sprint 10: plan codex track
-- da9aba9 - [codex] sprint 10: backlog refresh
+- 6569e52 - [codex] S10-F1: add CSV import action manifests
 
-Gate status: PASS - Phase 0 full `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 28 Vitest files / 180 tests and 19 Playwright tests; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` also exited 0.
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0 with 28 Vitest files / 180 tests and 19 Playwright tests passing.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T19:56:31.2470705-07:00
+Timestamp: 2026-05-20T20:11:12.1749764-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the full PowerShell local gate completed successfully before planning edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git log.
-- Confirmed Codex Sprint 9 completion from green report evidence: S9-F1 implementation commit `ab0bd54`, S9-F2 implementation commit `2315b8b`, and no active Codex blockers.
-- Updated `PLAN.md` to mark S9-F1 and S9-F2 done, bump document control to Version 2.15A, set the active sprint to Sprint 10, and queue S10-F1 and S10-F2 for Codex.
-- Synced `docs/FEATURE-BACKLOG.md` so S9 features are done and S10 features are queued.
-- Verified the planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
+- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; worktree was clean, branch used the `codex/` prefix, and install, Prisma generate/db push, seed, lint, typecheck, Vitest, and build all passed before edits.
+- Added metadata-only CSV import row action manifests to `previewCsvImportWithPreflightDiagnostics`, including deterministic `create_candidate`, `review_candidate`, and `blocked` row actions plus aggregate action counts.
+- Extended `tests/api/csv-import-preview.test.ts` to cover the new action manifest contract; this was a narrow §10 test-zone exception because the behavior is a Codex-owned server contract.
+- Verified the implementation with focused `npm run test -- tests/api/csv-import-preview.test.ts`, then the full PowerShell local gate.
+
+### Discovered this prompt
+
+- `PLAN.md` still contains the stale "Current prompt scope - Sprint Rollover" active line from the prior planning run, while document control, `docs/FEATURE-BACKLOG.md`, and the current prompt all point Codex at Sprint 10 implementation work.
+- Claude, Grok, and Gemini reports reference Sprint 4B historical work and prompt paths that are now superseded or moved under `prompts/*/Old`; no current Codex blocker is created because the repo docs mark those artifacts historical and the local gate is green.
 
 ### Next action
 
-Run LOOP.md to begin S10-F1.
+Run LOOP.md to begin S10-F2 - CSV preview capability metadata.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (prompt-authorized planning edits to `PLAN.md` and `docs/FEATURE-BACKLOG.md`; see BLOCKERS resolved note)
+No cross-ownership edits: NO (see BLOCKERS for the resolved test-zone exception)
 
 CRM-CONTRACT.md honored: YES
