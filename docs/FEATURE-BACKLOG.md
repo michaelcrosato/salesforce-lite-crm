@@ -31,8 +31,10 @@ roadmap and does not authorize feature work.
 | S13-F2 | CSV compatibility reports | Codex | done |
 | S14-F1 | CSV handoff index | Codex | done |
 | S14-F2 | CSV field coverage summaries | Codex | done |
-| S15-F1 | CSV operator readiness scorecards | Codex | queued |
-| S15-F2 | CSV contract QA checks | Codex | queued |
+| S15-F1 | CSV operator readiness scorecards | Codex | done |
+| S15-F2 | CSV contract QA checks | Codex | done |
+| S16-F1 | CSV operator remediation runbooks | Codex | queued |
+| S16-F2 | CSV contract drift snapshots | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -46,9 +48,10 @@ roadmap and does not authorize feature work.
 - Postgres cutover as the default runtime.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
-- CSV product UI, bulk import writes, file storage, mapping wizard, and
-  Salesforce-connected import/export remain deferred while Sprint 15 queues
-  read-only CSV operator readiness scorecards and contract QA checks.
+- CSV product UI, bulk import writes, file storage, mapping wizard, persistent
+  CSV snapshot history, and Salesforce-connected import/export remain deferred
+  while Sprint 16 queues read-only CSV operator remediation runbooks and
+  contract drift snapshots.
 
 ## Implemented Contract Routes
 
