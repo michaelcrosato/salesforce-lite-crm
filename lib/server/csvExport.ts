@@ -17,6 +17,8 @@ export const CSV_EXPORT_ENTITIES = [
 export const CSV_EXPORT_CONTENT_TYPE = "text/csv; charset=utf-8" as const;
 export const CSV_EXPORT_DEFAULT_LIMIT = 1000;
 export const CSV_EXPORT_MAX_LIMIT = 5000;
+export const CSV_EXPORT_PREVIEW_DEFAULT_LIMIT = 5;
+export const CSV_EXPORT_PREVIEW_MAX_LIMIT = 25;
 
 export type CsvExportEntity = (typeof CSV_EXPORT_ENTITIES)[number];
 
@@ -51,6 +53,27 @@ export type CsvExportPreflightSummary = CsvExportDefinition & {
   defaultLimit: typeof CSV_EXPORT_DEFAULT_LIMIT;
   maxLimit: typeof CSV_EXPORT_MAX_LIMIT;
   rowCount: number;
+};
+
+export type CsvExportPreviewOptions = {
+  limit?: number;
+  includeCsv?: boolean;
+};
+
+export type CsvExportPreviewCell = string | number | null;
+export type CsvExportPreviewRow = Record<string, CsvExportPreviewCell>;
+
+export type CsvExportPreview = CsvExportDefinition & {
+  contentType: typeof CSV_EXPORT_CONTENT_TYPE;
+  canonicalHeaders: readonly string[];
+  defaultLimit: typeof CSV_EXPORT_PREVIEW_DEFAULT_LIMIT;
+  maxLimit: typeof CSV_EXPORT_PREVIEW_MAX_LIMIT;
+  previewLimit: number;
+  totalRowCount: number;
+  previewRowCount: number;
+  hasMoreRows: boolean;
+  rows: readonly CsvExportPreviewRow[];
+  csvSnippet: string | null;
 };
 
 type CsvCell = string | number | Date | null;
@@ -234,18 +257,34 @@ function fullName(person: { firstName: string; lastName: string } | null): strin
   return person ? `${person.firstName} ${person.lastName}` : null;
 }
 
-function normalizeLimit(limit: number | undefined): number {
+function normalizeBoundedLimit(
+  limit: number | undefined,
+  defaultLimit: number,
+  maxLimit: number
+): number {
   if (limit === undefined) {
-    return CSV_EXPORT_DEFAULT_LIMIT;
+    return defaultLimit;
   }
 
   const truncated = Math.trunc(limit);
 
   if (!Number.isFinite(truncated)) {
-    return CSV_EXPORT_DEFAULT_LIMIT;
+    return defaultLimit;
   }
 
-  return Math.min(Math.max(truncated, 0), CSV_EXPORT_MAX_LIMIT);
+  return Math.min(Math.max(truncated, 0), maxLimit);
+}
+
+function normalizeLimit(limit: number | undefined): number {
+  return normalizeBoundedLimit(limit, CSV_EXPORT_DEFAULT_LIMIT, CSV_EXPORT_MAX_LIMIT);
+}
+
+function normalizePreviewLimit(limit: number | undefined): number {
+  return normalizeBoundedLimit(
+    limit,
+    CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+    CSV_EXPORT_PREVIEW_MAX_LIMIT
+  );
 }
 
 function toPublicDefinition<Row extends CsvRow>(
@@ -288,6 +327,53 @@ async function buildCsvExportPreflightSummary<Row extends CsvRow>(
     defaultLimit: CSV_EXPORT_DEFAULT_LIMIT,
     maxLimit: CSV_EXPORT_MAX_LIMIT,
     rowCount: await definition.countRows()
+  };
+}
+
+function toPreviewCell(value: CsvCell): CsvExportPreviewCell {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return value;
+}
+
+function buildCsvExportPreviewRows<Row extends CsvRow>(
+  rows: readonly Row[],
+  columns: readonly CsvColumn<Row>[]
+): CsvExportPreviewRow[] {
+  return rows.map((row) => {
+    const previewRow: CsvExportPreviewRow = {};
+
+    for (const column of columns) {
+      previewRow[String(column.key)] = toPreviewCell(row[column.key]);
+    }
+
+    return previewRow;
+  });
+}
+
+async function buildCsvExportPreview<Row extends CsvRow>(
+  definition: InternalCsvExportDefinition<Row>,
+  options: CsvExportPreviewOptions = {}
+): Promise<CsvExportPreview> {
+  const previewLimit = normalizePreviewLimit(options.limit);
+  const rows = previewLimit === 0 ? [] : await definition.loadRows(previewLimit);
+  const publicDefinition = toPublicDefinition(definition);
+  const totalRowCount = await definition.countRows();
+
+  return {
+    ...publicDefinition,
+    contentType: CSV_EXPORT_CONTENT_TYPE,
+    canonicalHeaders: publicDefinition.columns.map((column) => column.label),
+    defaultLimit: CSV_EXPORT_PREVIEW_DEFAULT_LIMIT,
+    maxLimit: CSV_EXPORT_PREVIEW_MAX_LIMIT,
+    previewLimit,
+    totalRowCount,
+    previewRowCount: rows.length,
+    hasMoreRows: totalRowCount > rows.length,
+    rows: buildCsvExportPreviewRows(rows, definition.columns),
+    csvSnippet: options.includeCsv === true ? toCsv(rows, definition.columns) : null
   };
 }
 
@@ -1025,6 +1111,51 @@ export async function getCsvExportPreflightSummary(
       return buildCsvExportPreflightSummary(caseExportDefinition);
     case "campaigns":
       return buildCsvExportPreflightSummary(campaignExportDefinition);
+  }
+}
+
+export async function listCsvExportPreviews(
+  options: CsvExportPreviewOptions = {}
+): Promise<CsvExportPreview[]> {
+  return Promise.all([
+    buildCsvExportPreview(accountExportDefinition, options),
+    buildCsvExportPreview(contactExportDefinition, options),
+    buildCsvExportPreview(opportunityExportDefinition, options),
+    buildCsvExportPreview(leadExportDefinition, options),
+    buildCsvExportPreview(activityExportDefinition, options),
+    buildCsvExportPreview(dealerOrderExportDefinition, options),
+    buildCsvExportPreview(areaExportDefinition, options),
+    buildCsvExportPreview(taskExportDefinition, options),
+    buildCsvExportPreview(caseExportDefinition, options),
+    buildCsvExportPreview(campaignExportDefinition, options)
+  ]);
+}
+
+export async function getCsvExportPreview(
+  entity: CsvExportEntity,
+  options: CsvExportPreviewOptions = {}
+): Promise<CsvExportPreview> {
+  switch (entity) {
+    case "accounts":
+      return buildCsvExportPreview(accountExportDefinition, options);
+    case "contacts":
+      return buildCsvExportPreview(contactExportDefinition, options);
+    case "opportunities":
+      return buildCsvExportPreview(opportunityExportDefinition, options);
+    case "leads":
+      return buildCsvExportPreview(leadExportDefinition, options);
+    case "activities":
+      return buildCsvExportPreview(activityExportDefinition, options);
+    case "dealer-orders":
+      return buildCsvExportPreview(dealerOrderExportDefinition, options);
+    case "areas":
+      return buildCsvExportPreview(areaExportDefinition, options);
+    case "tasks":
+      return buildCsvExportPreview(taskExportDefinition, options);
+    case "cases":
+      return buildCsvExportPreview(caseExportDefinition, options);
+    case "campaigns":
+      return buildCsvExportPreview(campaignExportDefinition, options);
   }
 }
 
