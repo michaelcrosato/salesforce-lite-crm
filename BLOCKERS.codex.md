@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 12
+Sprint: 13
 
-Feature: S12-F2 - CSV import dry-run receipts
+Feature: Sprint rollover - plan Codex track
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T23:07:20.0157393-07:00
+Timestamp: 2026-05-20T23:37:20.4184078-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Ownership exception resolved: `tests/api/csv-import-dry-run-receipts.test.ts` was added as the smallest direct verification for the new Codex-owned `lib/server/csvImportDryRunReceipts.ts` helper. Evidence: implementation commit `490f551`; focused Vitest and full local gate exited 0. No follow-up needed.
+- No active Codex blockers. Prompt-authorized planning and report edits completed, and both the Phase 0 full local gate and Phase 4 planning checks exited 0.
