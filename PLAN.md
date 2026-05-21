@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.20A |
+| Version | 2.21A |
 
 | Last updated | 2026-05-21 |
 
-| Active sprint | Sprint 15 queued for Codex; Sprint 14 Codex track done |
+| Active sprint | Sprint 16 queued for Codex; Sprint 15 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -526,8 +526,8 @@ Goal: turn the existing read-only CSV handoff metadata into deterministic server
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S15-F1 — CSV operator readiness scorecards | Codex | queued | Server-side helpers publish deterministic readiness scorecards per existing CSV entity and operation by combining the handoff index and field coverage summaries into statuses, counts, warning codes, and explicit no-write flags for later UI. No CSV product UI, upload/download routes, file storage, background jobs, import apply flow, database writes, header remapping, supported-entity expansion, routing execution, or Salesforce sync is added. |
-| S15-F2 — CSV contract QA checks | Codex | queued | Server-side helpers publish deterministic QA checks across existing CSV contracts, flagging inconsistent headers, missing handoff surfaces, unsupported operation gaps, and read/no-write flag drift without reinterpreting UI state. No routes, product UI, package/config changes, CI changes, file storage, background jobs, database writes, import apply flow, routing execution, or integrations are added. |
+| S15-F1 — CSV operator readiness scorecards | Codex | done | Server-side helpers publish deterministic readiness scorecards per existing CSV entity and operation by combining the handoff index and field coverage summaries into statuses, counts, warning codes, and explicit no-write flags for later UI. No CSV product UI, upload/download routes, file storage, background jobs, import apply flow, database writes, header remapping, supported-entity expansion, routing execution, or Salesforce sync is added. |
+| S15-F2 — CSV contract QA checks | Codex | done | Server-side helpers publish deterministic QA checks across existing CSV contracts, flagging inconsistent headers, missing handoff surfaces, unsupported operation gaps, and read/no-write flag drift without reinterpreting UI state. No routes, product UI, package/config changes, CI changes, file storage, background jobs, database writes, import apply flow, routing execution, or integrations are added. |
 
 \*\*Sprint 15 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -556,6 +556,44 @@ Goal: turn the existing read-only CSV handoff metadata into deterministic server
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, or routing execution.
 
 \- No supported-entity expansion, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 16 — CSV Operator Runbooks\*\*
+
+Goal: package the read-only CSV assurance layer into deterministic operator guidance and snapshot metadata for later UI handoff without adding routes, writes, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S16-F1 — CSV operator remediation runbooks | Codex | queued | Server-side helpers publish deterministic remediation runbooks from existing CSV operator readiness scorecards and contract QA checks, grouped by entity and operation with severity, explanation, next-action metadata, source content types, and explicit no-write flags. No CSV product UI, upload/download routes, file storage, background jobs, import apply flow, database writes, header remapping, supported-entity expansion, routing execution, persistent history, external AI, Salesforce sync, package/config changes, or CI changes are added. |
+| S16-F2 — CSV contract drift snapshots | Codex | queued | Server-side helpers publish deterministic snapshot metadata over existing CSV contracts, including stable source fingerprints, status/issue/readiness rollups, source content types, and explicit read/no-write flags for later handoff review. No persistent baselines or comparison storage, routes, product UI, package/config changes, CI changes, file storage, background jobs, database writes, import apply flow, routing execution, or integrations are added. |
+
+\*\*Sprint 16 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV operator remediation runbooks, contract drift snapshots, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, or routing execution.
+
+\- No supported-entity expansion, persistent snapshot or baseline storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
