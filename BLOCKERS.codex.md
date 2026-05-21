@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 7
+Sprint: 8
 
-Feature: S7-F2 - CSV preview issue summaries
+Feature: Sprint 8 rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T17:38:55.1176661-07:00
+Timestamp: 2026-05-20T18:00:10.3832288-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Ownership exception resolved: `tests/api/csv-import-preview.test.ts` is in Gemini's zone, but adding focused Vitest coverage there was the smallest direct way to satisfy PLAN §8 test coverage for the Codex-owned CSV preview/preflight result contract. No ongoing blocker remains.
+- No active Codex blockers were present; none were opened.

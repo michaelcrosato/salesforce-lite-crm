@@ -1,46 +1,46 @@
 Agent: Codex
 
-Sprint: 7
+Sprint: 8
 
-Feature: S7-F2 - CSV preview issue summaries
+Feature: Sprint 8 rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 6e6373f - [codex] S7-F2: add CSV preview issue summaries
+- 0ad8ae0 - [codex] sprint 8: plan codex track
+- 9a06e6c - [codex] sprint 8: backlog refresh
 
-Gate status: PASS - Phase 0 full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Phase 5 subset `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0. Vitest reported 28 files / 172 tests.
+Gate status: PASS - Phase 0 full local gate via `scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 172 tests and Playwright reported 19 passed. Phase 4 verification subset (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`) also exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T17:38:55.1176661-07:00
+Timestamp: 2026-05-20T18:00:10.3832288-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: all four expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
-- Read `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, local gate/project/worktree/roadmap/merge docs, `docs/NEXT-PROMPTS.md`, and the shared Sprint 4 prompt artifacts referenced by the coordination docs.
-- Reconciled Sprint 7 as the active Codex queue from the current prompt and repo evidence, while carrying forward stale PLAN rows that still show S7-F1 and S7-F2 as queued.
-- Added deterministic `issueSummary` metadata to CSV import preview results, with aggregate counts for header errors, parse errors, row-validation errors, and diagnostic warnings.
-- Updated preflight diagnostics so `previewCsvImportWithPreflightDiagnostics` recomputes the summary after database-backed warnings are attached, without changing parsing, validation, routing, or database-write behavior.
-- Added focused coverage in `tests/api/csv-import-preview.test.ts`. This is a minimal cross-zone test exception because PLAN §8 requires test coverage for done work and the server result contract is already covered in that Gemini-owned test file.
-- Verified the feature with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`, all exit 0.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
+- Read `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Confirmed Codex Sprint 7 was complete from report and commit evidence: S7-F1 commit `b547bc4`, S7-F2 commit `6e6373f`, green local gates in Codex reports, and no active Codex blockers.
+- Updated `PLAN.md` document control to version 2.13A, marked S7-F1 and S7-F2 done, and queued Sprint 8 Codex features S8-F1 and S8-F2 with carried-forward permanent non-goals.
+- Synced `docs/FEATURE-BACKLOG.md` so S7-F1/S7-F2 are done and S8-F1/S8-F2 are queued.
+- Ran the required planning verification subset after commits; lint, typecheck, test, and build all exited 0.
 
 ### Discovered this prompt
 
-- `PLAN.md` §4 still lists S7-F1 and S7-F2 as queued, but local green gate evidence and Codex implementation commits now support both as done.
-- `PLAN.md` §4 still includes a stale "Current prompt scope - Sprint Rollover" block; the current LOOP.md prompt and runner state are authoritative for this iteration.
-- Other-agent blocker files still contain stale historical Grok/Gemini items, but none blocks S7-F2.
+- `README.md` has a `Known Limitations` section but no `Next Recommended Build Step` heading in this worktree.
+- PLAN.md still lists other agents' Sprint 4 rows as queued, while their historical reports describe Sprint 4B work as complete. This rollover was explicitly scoped to Codex, so no non-Codex Sprint 4 status rows were changed.
+- `SUMMARY.grok.md`, `BLOCKERS.grok.md`, and `BLOCKERS.gemini.md` contain stale historical blocker text, but current Codex blockers are empty and unrelated to Sprint 8 planning.
 
 ### Next action
 
-Run sprint rollover or manager queue selection; no further Codex-owned Sprint 7 feature remains after S7-F2.
+Run LOOP.md to begin S8-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (see BLOCKERS: resolved ownership exception for `tests/api/csv-import-preview.test.ts`)
+No cross-ownership edits: YES (only prompt-authorized planning, backlog, and Codex report files were touched)
 
 CRM-CONTRACT.md honored: YES
