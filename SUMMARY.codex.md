@@ -2,43 +2,44 @@ Agent: Codex
 
 Sprint: 8
 
-Feature: S8-F1 - CSV import example contracts
+Feature: S8-F2 - CSV export preflight summaries
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
 Commits this prompt:
-- 423813c - [codex] S8-F1: add CSV import example contracts
+- 755f549 - [codex] S8-F2: add CSV export preflight summaries
 
-Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 175 tests and Playwright reported 19 passed.
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0; Vitest reported 28 files / 176 tests and Playwright reported 19 passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T18:18:32.2813396-07:00
+Timestamp: 2026-05-20T18:35:43.3535670-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and setup, Prisma, seed, lint, typecheck, Vitest, and build all exited 0.
-- Added deterministic `CsvImportTemplate.exampleRow` metadata for supported import preview entities using existing validation fields only.
-- Added `exportCsvImportTemplateExampleCsv(entity)` so later UI wiring can request a one-row example CSV without database writes, routing execution, file storage, external services, or UI work.
-- Updated `tests/api/csv-import-templates.test.ts` as a minimal §10 cross-zone coverage edit to prove example metadata is deterministic and validates through `previewCsvImport`.
-- Ran the full local gate through `scripts/local-gate.ps1`; lint, typecheck, Vitest, build, Playwright install, and e2e all passed.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`: expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate exited 0.
+- Added read-only CSV export preflight summaries for every supported export entity with filename, content type, canonical headers, default/max limits, and current database row count.
+- Reused existing CSV export definitions and added Prisma count callbacks; no routes, UI, file storage, background jobs, export writes, external services, or package changes were added.
+- Updated `tests/api/csv-export-contracts.test.ts` as a minimal §10 cross-zone coverage edit for the new Codex-owned server contract.
+- Verified the focused test, the business-logic subset (`npm run test`, `npm run build`), and the full `scripts/local-gate.ps1` gate.
 
 ### Discovered this prompt
 
-- PLAN.md §4 queues Sprint 8 for Codex with S8-F1 and S8-F2; S8-F1 is now complete with local gate evidence.
-- PLAN.md §4 still lists the non-Codex Sprint 4 rows as queued while historical agent reports describe Sprint 4B work as complete. Codex did not modify non-Codex sprint rows.
+- PLAN.md §4 still lists S8-F1 and S8-F2 as queued; local green commit evidence now shows both Codex Sprint 8 features completed on this branch.
+- PLAN.md §4 also retains a sprint-rollover current prompt note; this LOOP run selected S8-F2 from the active Codex queue under the current runner context and did not have scope to edit PLAN.md.
+- Non-Codex Sprint 4B report files remain historical context and do not block the Codex S8 server contract path.
 - `next build` still lists placeholder/excluded app-router paths such as `/deals/[id]`; the e2e excluded-route guard passed, so this is not a Codex S8 blocker.
 
 ### Next action
 
-Run LOOP.md to begin S8-F2 - CSV export preflight summaries.
+Sprint 8 Codex queue is complete; run sprint rollover or merge review before assigning more Codex product work.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (minimal `tests/api/csv-import-templates.test.ts` coverage edit; see BLOCKERS resolved note)
+No cross-ownership edits: NO (minimal `tests/api/csv-export-contracts.test.ts` coverage edit; see Completed this prompt)
 
 CRM-CONTRACT.md honored: YES
