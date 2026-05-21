@@ -2,38 +2,37 @@ Agent: Codex
 
 Sprint: 13
 
-Feature: Sprint rollover - plan Codex track
+Feature: S13-F1 - CSV transfer manifest catalog
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 42462bb - [codex] sprint 13: plan codex track; a04025c - [codex] sprint 13: backlog refresh
+Commits this prompt: 39c33fb - [codex] S13-F1: add CSV transfer manifest catalog
 
-Gate status: PASS - Phase 0 full local gate exited 0; Phase 4 `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0 with 32 Vitest files / 200 tests.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0; 33 Vitest files / 205 tests passed, build passed, and 19 Playwright tests passed.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-20T23:37:20.4184078-07:00
+Timestamp: 2026-05-20T23:58:57.2020138-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the Phase 0 baseline full local gate from `C:\dev\salesforce-lite-crm`; it completed successfully before planning changes.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
-- Confirmed Codex Sprint 12 was complete from `SUMMARY.codex.md` evidence and no active Codex blockers.
-- Planned Sprint 13 for Codex with two queued read-only CSV handoff features: S13-F1 CSV transfer manifest catalog and S13-F2 CSV compatibility reports.
-- Updated `PLAN.md` to mark S12-F1/S12-F2 done, append Sprint 13, bump document control to 2.18A, and set the active sprint to Sprint 13.
-- Synced `docs/FEATURE-BACKLOG.md` with the Sprint 12 completion and Sprint 13 queued features.
-- Ran the required post-planning checks: lint, typecheck, unit tests, and build all passed.
+- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`; the worktree was clean, branch prefix was valid, and the baseline commands through `npm run build` passed.
+- Reconciled PLAN/contract/report context; noted other agents' historical `Sprint 4B` summaries reference a sprint id not present as an active PLAN.md §4 sprint, with no current Codex dependency.
+- Added `lib/server/csvTransferManifests.ts` with deterministic export-delivery and import-dry-run transfer manifest definitions, validators, single-manifest builders, and list helpers.
+- Added minimal Vitest coverage in `tests/api/csv-transfer-manifests.test.ts` for manifest definitions, operation/entity detection, source/input metadata, bounded limits, read flags, and explicit no-write flags.
+- Cross-zone reason: `tests/api/csv-transfer-manifests.test.ts` is in Gemini's zone, but PLAN.md §8 requires test coverage for new server behavior and this was the smallest direct coverage path for the Codex-owned helper.
+- Verified S13-F1 with targeted Vitest, lint, typecheck, unit suite, build, and the full repo-local `scripts/local-gate.ps1`.
 
 ### Next action
 
-Run LOOP.md to begin S13-F1.
+Run LOOP.md to begin S13-F2 - CSV compatibility reports.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (prompt-authorized planning/report scope covered `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
+No cross-ownership edits: NO (see cross-zone Vitest coverage note above)
 
 CRM-CONTRACT.md honored: YES
