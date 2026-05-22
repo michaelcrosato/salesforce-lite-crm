@@ -39,8 +39,10 @@ roadmap and does not authorize feature work.
 | S17-F2 | CSV contract release digest | Codex | done |
 | S18-F1 | CSV release verification manifests | Codex | done |
 | S18-F2 | CSV operator fixture bundles | Codex | done |
-| S19-F1 | CSV handoff release notes packet | Codex | queued |
-| S19-F2 | CSV operator acceptance checklists | Codex | queued |
+| S19-F1 | CSV handoff release notes packet | Codex | done |
+| S19-F2 | CSV operator acceptance checklists | Codex | done |
+| S20-F1 | CSV operator walkthrough manifests | Codex | queued |
+| S20-F2 | CSV release closure scorecards | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -55,9 +57,9 @@ roadmap and does not authorize feature work.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
 - CSV product UI, bulk import writes, file storage, mapping wizard, persistent
-  CSV release-note/acceptance/verification/fixture/snapshot history, and
-  Salesforce-connected import/export remain deferred while Sprint 19 queues
-  read-only CSV handoff publication and acceptance metadata.
+  CSV release-note/acceptance/verification/fixture/snapshot/walkthrough/scorecard
+  history, and Salesforce-connected import/export remain deferred while Sprint
+  20 queues read-only CSV operator release readiness metadata.
 
 ## Implemented Contract Routes
 
