@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 20
+Sprint: 21
 
-Feature: S20-F2 - CSV release closure scorecards
+Feature: Sprint rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-21T23:15:37.4361828-07:00
+Timestamp: 2026-05-22T01:07:48.2105444-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blocker carried into this iteration. The S20-F2 implementation and full local gate completed successfully, so no gate blocker was filed.
+- No active Codex blocker carried into rollover. The stale Sprint 20 planning status in `PLAN.md` and `docs/FEATURE-BACKLOG.md` was resolved by marking S20-F1 and S20-F2 done from existing green-gate evidence.
