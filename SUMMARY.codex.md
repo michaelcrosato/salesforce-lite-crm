@@ -1,33 +1,33 @@
 Agent: Codex
 
-Sprint: 22
+Sprint: 23
 
-Feature: S22-F2 — CSV release readiness packets
+Feature: S23-F1 - CSV dedupe candidate packets
 
 Branch: main
 
-Status: done
+Status: queued
 
-Commits this prompt: de719fb - [codex] S22-F2: add CSV release readiness packets
+Commits this prompt: daae502 - [codex] sprint 23: plan codex track; ee02070 - [codex] sprint 23: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` completed successfully.
+Gate status: PASS - Phase 0 baseline passed `npm install`, Prisma generate/db push, seed, lint, typecheck, test, and build; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (57 files / 317 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T09:36:53.8874250-07:00
+Timestamp: 2026-05-22T12:12:11.1295133-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/server/csvReleaseReadinessPackets.ts`, a deterministic read-only S22-F2 server helper that composes release disposition, digest, verification, closure, and exception surfaces into root/entity/operation readiness packets with pass/watch/block totals, remediation anchors, source fingerprints, and explicit no-write flags.
-- Added `tests/api/csv-release-readiness-packets.test.ts` covering deterministic root metadata, representative entity and operation packets, remediation anchors, no-write behavior, and invalid entity/operation rejection.
-- Reconciled stale non-Codex report context against current `PLAN.md`, `CRM-CONTRACT.md`, `docs/PROJECT-CONTROL.md`, and a green local gate; historical Claude/Grok/Gemini report drift did not affect this root-mode Codex work unit.
-- Ran the full local gate through `scripts/local-gate.ps1`; install, Prisma generate/db push, seed, lint, typecheck, 57 Vitest files / 317 tests, build, Playwright Chromium install, and 19 e2e tests all passed.
+- Marked S22-F2 complete in `PLAN.md` from Codex SUMMARY evidence and a green local baseline.
+- Added Sprint 23 to `PLAN.md` with S23-F1 CSV dedupe candidate packets and S23-F2 CSV dedupe review bundles queued for Codex.
+- Synced `docs/FEATURE-BACKLOG.md` so S22-F2 is done and S23-F1/S23-F2 are queued.
+- Verified planning changes with lint, typecheck, Vitest, and build after the commits.
 
 ### Next action
 
-Run `SPRINT-ROLLOVER.md` for Codex to mark S22-F2 complete in `PLAN.md` and queue the next valid Codex work, or stop if no sprint scope should be added.
+Run LOOP.md to begin S23-F1.
 
 ### Scope confirmation
 

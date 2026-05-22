@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 22
+Sprint: 23
 
-Feature: S22-F2 — CSV release readiness packets
+Feature: S23-F1 - CSV dedupe candidate packets
 
 Branch: main
 
-Timestamp: 2026-05-22T09:36:53.8874250-07:00
+Timestamp: 2026-05-22T12:12:11.1295133-07:00
 
 Escalation required: NO
 
