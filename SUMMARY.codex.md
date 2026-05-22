@@ -1,42 +1,38 @@
 Agent: Codex
 
-Sprint: 18
+Sprint: 19
 
-Feature: S18-F2 - CSV operator fixture bundles
+Feature: Sprint rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: e950868 - [codex] S18-F2: add CSV operator fixture bundles
+Commits this prompt: 3ae599a - [codex] sprint 19: plan codex track; 7fe51a7 - [codex] sprint 19: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation with 44 Vitest files / 258 tests and 19 Playwright tests passing.
+Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0 with 44 Vitest files / 258 tests and 19 Playwright tests passing; post-plan `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-21T15:41:23.6133359-07:00
+Timestamp: 2026-05-21T17:05:51.3513050-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; all four expected worktrees existed, branch matched `codex/`, the tree was clean, and the baseline install/Prisma/seed/lint/typecheck/test/build sequence exited 0 before edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, referenced project docs/prompts, `git diff main...HEAD --stat`, and recent commits before selection.
-- Added `lib/server/csvOperatorFixtureBundles.ts`, a read-only server helper that publishes deterministic bounded fixture bundles from export delivery packet snippets, deterministic import dry-run receipt samples, operator handoff summaries, and release digest metadata.
-- Added focused Vitest coverage in `tests/api/csv-operator-fixture-bundles.test.ts` for deterministic root/entity/operation bundles, bounded sample metadata, no-write guarantees, DB no-mutation checks, and unknown key rejection. Cross-zone reason: PLAN §8 requires feature coverage before done, and existing Codex CSV server contracts are verified under `tests/api/`.
-- Verified the implementation with `npm run lint`, `npm run typecheck`, focused `npm run test -- tests/api/csv-operator-fixture-bundles.test.ts`, `npm run build`, and the full `scripts/local-gate.ps1`.
-
-### Discovered this prompt
-
-- `PLAN.md` §4 still lists S18-F1 and S18-F2 as `queued`, while recent Codex commits and green local gates show S18-F1 was already completed and this prompt completed S18-F2. Per PLAN §2, the current prompt and local gate evidence were treated as authoritative.
-- Historical Sprint 4B prompt references in older agent reports now live under `prompts/*/Old/` or are superseded by the current shared Sprint 4 prompt files; this did not block S18-F2.
+- Ran the full Phase 0 baseline from `C:\dev\salesforce-lite-crm`; local gate completed successfully before planning edits.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, recent `git log --since="30 days ago"`, and the existing `lib/server` CSV surface.
+- Confirmed Sprint 18 Codex work is complete from `SUMMARY.codex.md`, zero active Codex blockers, commits `ed78428` / `e950868`, and green gate evidence.
+- Updated `PLAN.md` to mark S18-F1 and S18-F2 done, bump document version to 2.24A, set Sprint 19 as active for Codex, and queue S19-F1 and S19-F2 with permanent non-goals carried forward.
+- Synced `docs/FEATURE-BACKLOG.md` so S18 is done and S19 is queued.
+- Verified planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 ### Next action
 
-Sprint 18 Codex track is complete; run sprint rollover or merge-readiness review before assigning more Codex implementation work.
+Run LOOP.md to begin S19-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO (cross-zone Vitest coverage in `tests/api/csv-operator-fixture-bundles.test.ts` was the smallest direct way to satisfy PLAN §8 for this Codex server feature)
+No cross-ownership edits: YES (only prompt-authorized planning/report files were edited)
 
 CRM-CONTRACT.md honored: YES
