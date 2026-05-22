@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.26A |
+| Version | 2.27A |
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 21 queued for Codex; Sprint 20 Codex track done |
+| Active sprint | Sprint 22 queued for Codex; Sprint 21 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -750,8 +750,8 @@ Goal: package the existing read-only CSV release readiness surface into determin
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S21-F1 — CSV release handoff catalog | Codex | queued | Server-side helpers publish a deterministic release handoff catalog that indexes the existing S20 walkthrough manifests and release closure scorecards by entity and operation, with source fingerprints, status rollups, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes or runtime workflow behavior. |
-| S21-F2 — CSV release exception register | Codex | queued | Server-side helpers publish deterministic read-only exception registers for watch/block CSV release items by composing closure scorecards, acceptance checklists, fixture coverage, and walkthrough notes into ordered remediation-ready entries. Output includes counts, severity, source anchors, and no-write safety metadata without changing import/export behavior. |
+| S21-F1 — CSV release handoff catalog | Codex | done | Server-side helpers publish a deterministic release handoff catalog that indexes the existing S20 walkthrough manifests and release closure scorecards by entity and operation, with source fingerprints, status rollups, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes or runtime workflow behavior. |
+| S21-F2 — CSV release exception register | Codex | done | Server-side helpers publish deterministic read-only exception registers for watch/block CSV release items by composing closure scorecards, acceptance checklists, fixture coverage, and walkthrough notes into ordered remediation-ready entries. Output includes counts, severity, source anchors, and no-write safety metadata without changing import/export behavior. |
 
 \*\*Sprint 21 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -780,6 +780,44 @@ Goal: package the existing read-only CSV release readiness surface into determin
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
 
 \- No supported-entity expansion, persistent CSV handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 22 — CSV Release Disposition\*\*
+
+Goal: convert the read-only CSV release handoff surface into deterministic disposition and readiness packets for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S22-F1 — CSV release disposition manifests | Codex | queued | Server-side helpers compose the S21 release handoff catalog and exception register into deterministic per-entity and per-operation dispositions with ready/watch/block counts, source fingerprints, trace anchors, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes, persistence, or runtime workflow behavior. |
+| S22-F2 — CSV release readiness packets | Codex | queued | Server-side helpers publish bounded release readiness packets that combine disposition manifests with the existing release digest, verification manifests, closure scorecards, and exception metadata into release-consumer summaries with pass/watch/block totals and remediation anchors. Output remains deterministic and read-only without adding approval workflows or CSV product UI. |
+
+\*\*Sprint 22 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload/download buttons, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV release disposition manifests, release readiness packets, release handoff catalogs, release exception registers, operator walkthrough manifests, release closure scorecards, handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV disposition/readiness/handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, approval workflow, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
