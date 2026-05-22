@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 21
 
-Feature: Sprint rollover planning
+Feature: S21-F1 - CSV release handoff catalog
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-22T01:07:48.2105444-07:00
+Timestamp: 2026-05-22T01:37:53.5639602-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,5 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blocker carried into rollover. The stale Sprint 20 planning status in `PLAN.md` and `docs/FEATURE-BACKLOG.md` was resolved by marking S20-F1 and S20-F2 done from existing green-gate evidence.
+- No active Codex blocker carried into this prompt.
+- The focused cross-zone test file for S21-F1 is documented in `SUMMARY.codex.md` and does not leave an unresolved ownership blocker.

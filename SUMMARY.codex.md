@@ -2,37 +2,38 @@ Agent: Codex
 
 Sprint: 21
 
-Feature: Sprint rollover planning
+Feature: S21-F1 - CSV release handoff catalog
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: 6861089 - [codex] sprint 21: plan codex track; f7db315 - [codex] sprint 21: backlog refresh
+Commits this prompt: e74dd90 - [codex] S21-F1: add CSV release handoff catalog
 
-Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0 after npm install, Prisma generate/db push, seed, lint, typecheck, 48 Vitest files / 275 tests, build, Playwright chromium install, and 19 Playwright tests; post-plan `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0.
+Gate status: PASS - Phase 0 and Phase 5 `scripts/local-gate.ps1` both exited 0. Final gate covered npm install, Prisma generate/db push, seed, lint, typecheck, 49 Vitest files / 279 tests, build, Playwright chromium install, and 19 Playwright tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T01:07:48.2105444-07:00
+Timestamp: 2026-05-22T01:37:53.5639602-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the full Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the local gate completed successfully before planning edits and left the worktree clean.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, `docs/ROADMAP.md`, `scripts/local-gate.ps1`, and recent `git log --since="30 days ago"` evidence.
-- Confirmed Sprint 20 Codex work is complete from implementation commits `41d2a1d` and `41f2139`, report commits `e7b9e92` and `3219e5f`, green local-gate evidence, and zero active Codex blockers.
-- Updated `PLAN.md` to mark S20-F1 and S20-F2 done, bump document version to 2.26A, set Sprint 21 as active for Codex, queue S21-F1 and S21-F2, carry forward permanent non-goals, and remove the stale one-run rollover scope note.
-- Synced `docs/FEATURE-BACKLOG.md` so S20 is done and S21 is queued.
-- Verified planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
+- Ran Phase 0 from `C:\dev\salesforce-lite-crm`; the expected Codex, Claude, Grok, and Gemini worktrees existed, the branch was `codex/sprint-4-demo-seed-tuning`, the tree was clean, and the full local gate passed before edits.
+- Read and reconciled `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, `docs/FEATURE-BACKLOG.md`, `docs/ROADMAP.md`, `docs/LOCAL-GATE.md`, `docs/PROJECT-CONTROL.md`, `docs/MERGE-PLAYBOOK.md`, `docs/NEXT-PROMPTS.md`, `docs/WORKTREE-SETUP.md`, `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md`, `prompts/README.md`, and current shared S4 prompt artifacts.
+- Discovered this prompt: the other agents' reports still carry historical Sprint 4B language while `PLAN.md` §4 now queues Sprint 21 for Codex. Those reports are stale for Codex S21 selection and did not block this work.
+- Implemented `lib/server/csvReleaseHandoffCatalog.ts`, a deterministic read-only server catalog that composes S20 operator walkthrough manifests and release closure scorecards by entity and operation, with source fingerprints, status rollups, read flags, and explicit no-write flags.
+- Added `tests/api/csv-release-handoff-catalog.test.ts` as a documented §10 cross-zone test exception. The file validates deterministic root/entity/operation catalogs, source fingerprints, status rollups, unknown-key handling, and no-write database state.
+- Fixed one implementation bug caught by the focused test: item status merging now counts merged statuses before deriving `ready/watch/block`.
+- Verified with focused `npm run test -- tests/api/csv-release-handoff-catalog.test.ts`, `npm run lint`, `npm run typecheck`, and final full `scripts/local-gate.ps1`.
 
 ### Next action
 
-Run LOOP.md to begin S21-F1.
+Run LOOP.md to begin S21-F2 - CSV release exception register.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (only prompt-authorized planning/report files were edited)
+No cross-ownership edits: NO - added one focused Vitest file under `tests/api/` as the smallest direct validation for the new Codex-owned server helper; no app, component, e2e, config, package, route, schema, or runtime workflow files changed.
 
 CRM-CONTRACT.md honored: YES
