@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 24
 
-Feature: Sprint rollover planning - S24
+Feature: S24-F1 - CSV export operator UI
 
 Branch: main
 
-Timestamp: 2026-05-22T14:35:44.1183153-07:00
+Timestamp: 2026-05-22T15:03:57.6845595-07:00
 
 Escalation required: NO
 
@@ -18,4 +18,4 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
-- Sprint 23 rollover evidence was sufficient: S23-F1 and S23-F2 implementation/report commits are present on `main`, `SUMMARY.codex.md` reported S23-F2 done, and the Phase 0 baseline gate passed.
+- Full pre-flight and post-implementation gates passed with `scripts/local-gate.ps1`.
