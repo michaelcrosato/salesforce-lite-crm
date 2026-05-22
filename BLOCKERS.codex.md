@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 21
 
-Feature: S21-F1 - CSV release handoff catalog
+Feature: S21-F2 - CSV release exception register
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-22T01:37:53.5639602-07:00
+Timestamp: 2026-05-22T03:38:56.1603845-07:00
 
 Escalation required: NO
 
@@ -18,4 +18,4 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blocker carried into this prompt.
-- The focused cross-zone test file for S21-F1 is documented in `SUMMARY.codex.md` and does not leave an unresolved ownership blocker.
+- The focused cross-zone test file for S21-F2 is documented in `SUMMARY.codex.md` and does not leave an unresolved ownership blocker.
