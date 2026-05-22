@@ -43,8 +43,10 @@ roadmap and does not authorize feature work.
 | S19-F2 | CSV operator acceptance checklists | Codex | done |
 | S20-F1 | CSV operator walkthrough manifests | Codex | done |
 | S20-F2 | CSV release closure scorecards | Codex | done |
-| S21-F1 | CSV release handoff catalog | Codex | queued |
-| S21-F2 | CSV release exception register | Codex | queued |
+| S21-F1 | CSV release handoff catalog | Codex | done |
+| S21-F2 | CSV release exception register | Codex | done |
+| S22-F1 | CSV release disposition manifests | Codex | queued |
+| S22-F2 | CSV release readiness packets | Codex | queued |
 
 ## Deferred README-Known Limitations
 
@@ -60,8 +62,9 @@ roadmap and does not authorize feature work.
 - Persistent forecast scenarios.
 - CSV product UI, bulk import writes, file storage, mapping wizard, persistent
   CSV release-note/acceptance/verification/fixture/snapshot/walkthrough/scorecard/
-  handoff/exception history, and Salesforce-connected import/export remain
-  deferred while Sprint 21 queues read-only CSV release handoff metadata.
+  handoff/exception/disposition/readiness history, and Salesforce-connected
+  import/export remain deferred while Sprint 22 queues read-only CSV release
+  disposition metadata.
 
 ## Implemented Contract Routes
 
