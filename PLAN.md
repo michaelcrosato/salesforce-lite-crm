@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.25A |
+| Version | 2.26A |
 
-| Last updated | 2026-05-21 |
+| Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 20 queued for Codex; Sprint 19 Codex track done |
+| Active sprint | Sprint 21 queued for Codex; Sprint 20 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -91,10 +91,6 @@ Roster rules:
 \## 4. Current Sprint
 
 
-
-\*\*Current prompt scope — Sprint Rollover\*\*
-
-Status: active for this run. Scope is planning-only Codex sprint rollover, PLAN/backlog/report updates, commit/push bookkeeping, and the required gates. This pass does not build product features or expand runtime behavior.
 
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
@@ -716,8 +712,8 @@ Goal: turn the existing read-only CSV publication and acceptance metadata into d
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S20-F1 — CSV operator walkthrough manifests | Codex | queued | Server-side helpers publish deterministic ordered walkthrough manifests for each supported CSV operation by composing existing capability, template/example, dry-run/export packet, fixture, release-note, and acceptance-checklist surfaces. The output includes source fingerprints, step labels, blocking/watch notes, and explicit no-write flags for later UI/docs/tests. No product UI, routes, upload/download actions, file storage, background jobs, import apply flow, user-upload parsing, header remapping, database writes, persistence, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
-| S20-F2 — CSV release closure scorecards | Codex | queued | Server-side helpers aggregate S19 release notes and acceptance checklists into per-entity and per-operation closure statuses with ready/watch/block counts, release-note anchors, fixture coverage, and no-write safety metadata. The surface is deterministic and read-only. No product UI, routes, upload/download actions, file storage, persistent baselines/history, database writes, import apply flow, routing execution, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
+| S20-F1 — CSV operator walkthrough manifests | Codex | done | Server-side helpers publish deterministic ordered walkthrough manifests for each supported CSV operation by composing existing capability, template/example, dry-run/export packet, fixture, release-note, and acceptance-checklist surfaces. The output includes source fingerprints, step labels, blocking/watch notes, and explicit no-write flags for later UI/docs/tests. No product UI, routes, upload/download actions, file storage, background jobs, import apply flow, user-upload parsing, header remapping, database writes, persistence, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
+| S20-F2 — CSV release closure scorecards | Codex | done | Server-side helpers aggregate S19 release notes and acceptance checklists into per-entity and per-operation closure statuses with ready/watch/block counts, release-note anchors, fixture coverage, and no-write safety metadata. The surface is deterministic and read-only. No product UI, routes, upload/download actions, file storage, persistent baselines/history, database writes, import apply flow, routing execution, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
 
 \*\*Sprint 20 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -746,6 +742,44 @@ Goal: turn the existing read-only CSV publication and acceptance metadata into d
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
 
 \- No supported-entity expansion, persistent CSV release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 21 — CSV Release Handoff\*\*
+
+Goal: package the existing read-only CSV release readiness surface into deterministic handoff and exception metadata for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S21-F1 — CSV release handoff catalog | Codex | queued | Server-side helpers publish a deterministic release handoff catalog that indexes the existing S20 walkthrough manifests and release closure scorecards by entity and operation, with source fingerprints, status rollups, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes or runtime workflow behavior. |
+| S21-F2 — CSV release exception register | Codex | queued | Server-side helpers publish deterministic read-only exception registers for watch/block CSV release items by composing closure scorecards, acceptance checklists, fixture coverage, and walkthrough notes into ordered remediation-ready entries. Output includes counts, severity, source anchors, and no-write safety metadata without changing import/export behavior. |
+
+\*\*Sprint 21 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload/download buttons, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV release handoff catalogs, release exception registers, operator walkthrough manifests, release closure scorecards, handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
