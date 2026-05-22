@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: repair
+Sprint: 22
 
-Feature: local-gate repair attempt 1
+Feature: sprint rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-22T05:25:50.7443597-07:00
+Timestamp: 2026-05-22T05:43:11.8654122-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,5 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- The reported `scripts/local-gate.ps1` failure at `npm install` with exit code `-1073740791` did not reproduce. Direct `npm install` and the full local gate both exited 0.
+- No active Codex blocker carried into this prompt.
+- Sprint 21 rollover evidence was verified from committed S21 report snapshots after the latest repair report superseded the root `SUMMARY.codex.md`.
