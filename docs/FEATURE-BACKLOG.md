@@ -4,7 +4,7 @@ This file records verified repo facts and deferred items only. It is not a
 roadmap and does not authorize feature work. Proposed B-NN roadmap entries live
 in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 
-## Recently Landed In Main
+## Recently Landed And Active Sprint Scope
 
 | ID | Scope | Owner | Status |
 |---|---|---|---|
@@ -47,7 +47,9 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S21-F1 | CSV release handoff catalog | Codex | done |
 | S21-F2 | CSV release exception register | Codex | done |
 | S22-F1 | CSV release disposition manifests | Codex | done |
-| S22-F2 | CSV release readiness packets | Codex | queued |
+| S22-F2 | CSV release readiness packets | Codex | done |
+| S23-F1 | CSV dedupe candidate packets | Codex | queued |
+| S23-F2 | CSV dedupe review bundles | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
