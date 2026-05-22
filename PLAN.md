@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.9D |
+| Version | 2.10 |
 
 | Last updated | 2026-05-20 |
 
-| Active sprint | Documentation audit active by current prompt; Sprint 4B demo-hardening work is present in `main`; next feature sprint not selected. |
+| Active sprint | Roadmap canon update active by current prompt; Sprint 4B demo-hardening work is present in `main`; Sprint 5 is the recommended next sprint but not implementation-active until §4 promotes it. |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -92,12 +92,12 @@ Roster rules:
 
 
 
-\*\*Current prompt scope — Documentation Audit\*\*
+\*\*Current prompt scope — Roadmap Canon Update\*\*
 
-Status: active for this run. Scope is durable documentation alignment against
-repo-local evidence: implemented routes, package scripts, Prisma schema,
-seed anchors, QA docs, and coordination docs. This pass does not build product
-features or expand product scope.
+Status: active for this run. Scope is roadmap and planning documentation only:
+`docs/ROADMAP.md`, roadmap companion docs, PLAN backlog proposals, and Codex
+report files. This pass does not build product features, promote excluded
+routes, change feature flags, or expand the shipped product contract.
 
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
@@ -893,7 +893,7 @@ Track B chat LLMs reference repo state through their respective GitHub connector
 
 
 
-Backlog items are not active sprint work. Active sprint detail is in §4. IFT uses this section to debate scope, sequence, and feasibility before an item is promoted to active status in §4. Order in this table is not a commitment to sequence. Proposed roadmap source: `docs/ROADMAP.md`; this section remains the backlog input and does not authorize roadmap implementation by itself.
+Backlog items are not active sprint work. Active sprint detail is in §4. IFT uses this section to debate scope, sequence, and feasibility before an item is promoted to active status in §4. Order in this table is not a commitment to sequence. Proposed roadmap source: `docs/ROADMAP.md`; this section remains the backlog input and does not authorize roadmap implementation by itself. B-13+ entries are roadmap proposals unless §4 or the current prompt explicitly promotes them. Unlisted B-NN IDs remain unassigned.
 
 
 
@@ -924,6 +924,98 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 | B-11 | CI mirror of local gate | CI may mirror §9 but never replaces it. The local PowerShell gate stays authoritative. |
 
 | B-12 | Deployment configuration | No deployment target or hosting workflow is in current scope. Deferred. |
+
+| B-13 | Roadmap principle governance | Keep contract-first, deterministic-default, hermetic-gate, feature-flag, RBAC-before-agentic-writes, and eval-before-expansion rules visible in roadmap docs. |
+
+| B-14 | Tooling hygiene | Maintain passing `lint` and `typecheck` scripts and keep generated `*.tsbuildinfo` ignored. Present in `main`; audit during Sprint 5. |
+
+| B-15 | Roles, permissions, ownership, and sharing | Define object/action permission matrix, owner conventions, and share conventions after B-10 promotion. |
+
+| B-16 | Organization and tenant boundary | Add org/membership convention when multitenancy is promoted; keep single-org demo mode. |
+
+| B-17 | Products, price books, and line items | Product, PriceBook, PriceBookEntry, OpportunityLineItem; opportunity value becomes line-item rollup. |
+
+| B-18 | Quotes and quote export | Quote and QuoteLine, draft PDF/export, later email send through a promoted provider. |
+
+| B-19 | Events and calendar | Event model, `/calendar`, and meeting activity links. Calendar sync remains separate deferred integration work. |
+
+| B-20 | Validation and workflow rules | Deterministic rule AST, never `eval`; assignment/workflow rules trigger through `crmClient` and log side effects. |
+
+| B-21 | Approval processes and scheduled sweeps | Approval steps, pending approvals, stage-change gates, and hermetic catch-up jobs with injected clock. |
+
+| B-22 | CSV import UI | Wire existing CSV helpers into an import preview UI with validation before mutation. |
+
+| B-23 | CSV dedupe preview | Optional read-only duplicate preview before import mutation. |
+
+| B-24 | CSV export UI | Export list-page data through existing helpers without external dependencies. |
+
+| B-25 | AI deterministic scaffold and eval harness | Provider port, deterministic provider, recorded provider, prompt registry skeleton, and eval harness. No live external provider calls. |
+
+| B-26 | REST/Bulk API and webhooks | API keys, object endpoints over `crmClient`, bulk import/export, local webhook test sink, and replay fixtures. |
+
+| B-27 | Transactional email | Stub provider default, templates, and later send/log email after explicit provider promotion. |
+
+| B-28 | Report builder | Persist report definitions: object, fields, filters, grouping, and charts. |
+
+| B-29 | Dashboard builder | Persist dashboard cards from saved reports. |
+
+| B-34 | Retrieval/RAG foundation | Index allowed records only after identity/RBAC/tenant filters exist. |
+
+| B-37 | Observability and backups | Structured logs, request IDs, AI telemetry, backup/restore tests. |
+
+| B-38 | Responsive/mobile/accessibility | Mobile pass, accessibility checks, dashboard/table usability. |
+
+| B-39 | Custom field metadata | `FieldDefinition` plus `customFields` JSON; core fields immutable. |
+
+| B-40 | Record types and layout-lite | Admin-configurable field sections per object/type. |
+
+| B-41 | Service queue assignment | Queue assignment for cases with deterministic rules and audit. |
+
+| B-42 | Service SLA timers | SLA timers with injected clock and hermetic tests. |
+
+| B-43 | Knowledge article model | Knowledge Article model and service workflows. |
+
+| B-47 | Roadmap canon | Add and maintain roadmap, AI roadmap, architecture, eval, and security/privacy docs; keep PLAN updates proposal-only unless explicitly promoted. |
+
+| B-48 | QA/blocker reconciliation | Reconcile stale SUMMARY/BLOCKERS files and verify visual/test-id/demo-path blockers after recent app/component changes. |
+
+| B-49 | Audit event model | Audit taxonomy for user, record, AI, import, routing, and workflow actions. |
+
+| B-50 | Saved views | Saved filters, sorts, and columns per object and user/org. |
+
+| B-51 | Filter/query compiler | Shared filter AST compiled to Prisma and reused by lists, reports, exports, and natural-language filters. |
+
+| B-52 | Bulk actions | Assign owner, update status/stage, create tasks, export selected, and audit every action. |
+
+| B-53 | Routing simulator | Deterministic "what would route where?" simulator using hypothetical quotas, area coverage, and lead batches. |
+
+| B-54 | Routing fairness and explanation | Deterministic metrics for pace gap, saturation, lead quality proxy, and SLA risk; later AI narrative. |
+
+| B-55 | Dealer capacity windows | Dealer capacity calendars, blackout windows, and daily caps. |
+
+| B-56 | Lead disposition and SLA | Routed, accepted, contacted, won/lost, returned, stale; escalation tasks. |
+
+| B-57 | Pacing snapshots | Persist monthly/daily routing and pacing snapshots for trend reports. |
+
+| B-58 | Campaign members and influence | CampaignMember, campaign ROI, and opportunity influence-lite. |
+
+| B-59 | Prompt registry | Prompt ID, version, owner, input schema, output schema, and eval fixture IDs. |
+
+| B-60 | Structured AI outputs | Zod validation for every AI output; invalid output is recoverable UI error. |
+
+| B-61 | AI run log | User/org, prompt ID, provider/model, hashes, token/cost, result, and action outcome. |
+
+| B-62 | AI action registry | Explicit CRM tools such as create task, log activity, draft email, update stage, and assign lead. |
+
+| B-63 | RAG service | Tenant/RBAC-filtered retrieval over allowed records only. |
+
+| B-64 | AI eval suite | Golden tests for summaries, routing explanations, scoring, natural-language filters, RAG answers, and tool plans. |
+
+| B-65 | AI cost/privacy controls | Per-org limits, provider policy, redaction, and prompt-injection defenses. |
+
+| B-66 | Gmail/Graph/calendar sync | Mock-only gate; token and secrets design first. |
+
+| B-67 | Salesforce import | CSV mapping first, API sync later. |
 
 
 
@@ -970,6 +1062,20 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+
+
+\### 2026-05-20 — Run decision
+
+\*\*Decision:\*\* Adopt the expanded roadmap canon as proposal-only planning material and make Sprint 5 the recommended next sprint without activating feature implementation.
+
+\*\*Rationale:\*\* The roadmap consolidates contract-first rules, deterministic defaults, hermetic gate requirements, required promotion decisions, AI safety sequencing, and B-NN grounded backlog IDs while preserving `CRM-CONTRACT.md` as the shipped product contract.
+
+\*\*Alternatives rejected:\*\* Promoting Sprint 5 implementation immediately in §4, because the current prompt asks to add roadmap material and the roadmap's own B-47 scope says PLAN updates should remain proposal-only; changing `CRM-CONTRACT.md`, because no implemented entity, route, model, feature flag, adapter signature, schema, or seed behavior changed.
+
+\*\*Sections changed:\*\* §1, §4, §16, §17; `docs/ROADMAP.md`; `docs/AI-ROADMAP.md`; `docs/ARCHITECTURE.md`; `docs/EVALS.md`; `docs/SECURITY-PRIVACY.md`.
+
+\*\*Open questions handled:\*\* Sprint 5 recommended scope, required promotion decisions, AI safety sequencing, and roadmap companion-document ownership.
 
 
 

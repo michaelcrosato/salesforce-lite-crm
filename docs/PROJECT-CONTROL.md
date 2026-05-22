@@ -64,9 +64,10 @@ without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
 | S4-F3 Component polish | Grok | Present in `main` |
 | S4-F4 Demo smoke and gate hardening | Gemini | Present in `main` |
 
-No next feature sprint is selected by this file. Use a fresh prompt plus
-`PLAN.md`, `CRM-CONTRACT.md`, and `docs/FEATURE-BACKLOG.md` before starting new
-feature work.
+`docs/ROADMAP.md` recommends Sprint 5 as the next sprint, but this file does
+not activate implementation scope. Use a fresh prompt plus `PLAN.md`,
+`CRM-CONTRACT.md`, and `docs/FEATURE-BACKLOG.md` before starting new feature
+work.
 
 ## Branch And Worktree Topology
 
@@ -107,7 +108,15 @@ Do not paste raw chat history into repo files.
 ## Roadmap Sources
 
 - `docs/ROADMAP.md`: canonical product roadmap, deferred promotion
-  candidates, and roadmap-source artifact link.
+  candidates, recommended Sprint 5 scope, and roadmap-source artifact link.
+- `docs/AI-ROADMAP.md`: AI platform sequencing, non-goals, safety rules, and
+  persona feature order.
+- `docs/ARCHITECTURE.md`: current architecture boundaries and roadmap
+  sequencing constraints.
+- `docs/EVALS.md`: eval expectations for future deterministic and AI
+  capabilities.
+- `docs/SECURITY-PRIVACY.md`: roadmap security, privacy, AI, and integration
+  guardrails.
 - `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md`: roadmap review trace artifact.
 - `PLAN.md`, `CRM-CONTRACT.md`, and repo-local evidence remain higher authority
   for active execution scope and product contract details.

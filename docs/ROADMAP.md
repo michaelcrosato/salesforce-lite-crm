@@ -1,13 +1,19 @@
 # Roadmap
 
 `docs/ROADMAP.md` is the canonical product roadmap for this repository. It
-summarizes verified product direction, deferred work, and promotion rules. It
-does not authorize feature implementation by itself: active sprint work still
-lives in `PLAN.md` section 4, and shipped product contracts still live in
-`CRM-CONTRACT.md`.
+summarizes verified product direction, deferred work, promotion rules, and the
+recommended next sprint. It does not authorize feature implementation by
+itself: active sprint work still lives in `PLAN.md` section 4, and shipped
+product contracts still live in `CRM-CONTRACT.md`.
 
-The trace artifact for this roadmap is
+The trace artifact for the prior roadmap review is
 [`docs/roadmap/ROADMAP-IFT-R1-REVIEW.md`](roadmap/ROADMAP-IFT-R1-REVIEW.md).
+Companion planning documents:
+
+- [`docs/AI-ROADMAP.md`](AI-ROADMAP.md)
+- [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)
+- [`docs/EVALS.md`](EVALS.md)
+- [`docs/SECURITY-PRIVACY.md`](SECURITY-PRIVACY.md)
 
 ## Current Baseline
 
@@ -39,53 +45,210 @@ Current exclusions and defaults:
   There is no external AI provider integration.
 - There is no authentication, permissions model, multi-tenancy, deployment
   configuration, Salesforce integration, geocoding, territory polygons,
-  persistent forecast scenarios, CSV import/export, or B2B lead-conversion
-  flow in the current contract.
+  persistent forecast scenarios, CSV UI workflow, or B2B lead-conversion flow
+  in the current contract.
 
 ## Roadmap Principles
 
-- Harden the existing CRM workflow before expanding product scope.
-- Promote work through `PLAN.md` before implementation and update
-  `CRM-CONTRACT.md` when routes, entities, statuses, or adapter contracts
-  change.
-- Keep the local gate authoritative for pass/fail claims.
-- Keep deterministic local behavior as the default until a future promoted item
-  explicitly changes it.
-- Mark deferred items as future or promoted work. Do not imply that excluded
-  routes or integrations are already implemented.
+The roadmap is governed by seven rules:
 
-## Queued Work
+1. Contract first. Any entity, route, model, semantic, or feature-flag change
+   updates `CRM-CONTRACT.md`, the schema changelog when schema or seed data
+   changes, and the PLAN decision log before code lands.
+2. B-NN grounded. Extend the existing backlog numbering in `PLAN.md` instead
+   of inventing free-floating horizon work.
+3. Deterministic default. Routing, summaries, forecasts, analyst output, tests,
+   and local demo behavior remain deterministic by default.
+4. Hermetic gate. No live LLM, email, calendar, web, geocoding, payment, or
+   external CRM provider is allowed inside `test`, `build`, or `test:e2e`.
+5. Feature flags for promoted non-goals. Auth, external AI, deployment,
+   Postgres runtime, `/deals/[id]`, `/search`, dealer/area CRUD, and persistent
+   forecasts must be promoted intentionally.
+6. RBAC before agentic writes. AI can summarize and suggest early, but AI tool
+   actions must wait for identity, authorization, audit, and approval flows.
+7. Evals before expansion. Every AI capability gets golden fixtures, schema
+   validation, deterministic fallback, and replayable tests before broader
+   rollout.
 
-Sprint 4 is queued for focused hardening of the existing product surface. These
-items are coordination scope, not a broad product expansion:
+## Recommended Next Sprint
 
-| ID | Owner | Scope | Acceptance summary |
-|---|---|---|---|
-| S4-F1 | Codex | Demo seed tuning | Seed data supports the reference workflow, including Vancouver lead routing, behind-pace dealer orders, stale high-value opportunities, low-health dealer accounts, and deterministic analyst actions. |
-| S4-F2 | Claude | Route visual QA | Implemented CRM pages render coherently. Excluded routes remain placeholder-only or unavailable. |
-| S4-F3 | Grok | Component polish | Shared demo components have stable spacing, readable empty states, deterministic ordering, and no broken links or orphaned actions. |
-| S4-F4 | Gemini | Demo smoke and gate hardening | Vitest, Playwright, and local validation support the README demo path and route guardrails. |
+Sprint 5 should be `Roadmap Canon, QA Reconciliation, and Deterministic
+AI/Data Foundations`. This recommendation is not active implementation scope
+until `PLAN.md` section 4 promotes it.
 
-## Promotion Candidates
+Goal: make the repo safe for the next feature sprint without tripping any
+current non-goal.
 
-The following items are candidates for future promotion. They are not active
-work until `PLAN.md` promotes them into a sprint or the current prompt
-explicitly grants scope.
+Non-goals:
 
-| Candidate | Current status | Promotion notes |
+- No auth implementation.
+- No external AI provider.
+- No deployment.
+- No Postgres default.
+- No dealer or area CRUD.
+- No `/deals/[id]`.
+- No dedicated `/search`.
+- No geocoding.
+- No generic B2B lead conversion.
+
+| Item | Backlog ID | Owners | Scope | Acceptance |
+|---|---:|---|---|---|
+| Roadmap canon | `B-47` | Shared/manager, all agents review | Add roadmap, AI roadmap, architecture, eval, and security/privacy docs. Keep PLAN 16/17 updates proposal-only. | Docs cite contract constraints and rank work by dependency, owner, gate impact, and promotion requirement. |
+| QA/blocker reconciliation | `B-48` | Gemini primary; Claude/Grok support | Reconcile stale SUMMARY/BLOCKERS and verify visual/test-id/demo-path blockers after recent app/component changes. | Every root SUMMARY/BLOCKERS file is current; no stale active blocker conflicts remain. |
+| Tooling scripts | `B-03`, `B-14` | Gemini + shared | Maintain `lint` and `typecheck`; keep `*.tsbuildinfo` ignored. | Scripts exist and pass, or PLAN explicitly keeps a gap deferred; local gate remains authoritative. |
+| Gate/CI audit | `B-11` | Gemini | Audit `.github` workflow against `scripts/local-gate.ps1`; mark B-11 landed or tighten parity. | CI mirrors, not replaces, the PowerShell gate. |
+| AI scaffold, no live provider | `B-25` | Codex + Gemini; Claude/Grok UI later | Provider port, deterministic provider, recorded provider, prompt registry skeleton, eval harness. | No external provider call; tests use deterministic/recorded fixtures; AI feature flags default off. |
+| CSV import/export quick win | `B-22`, `B-24`; optional `B-23` | Claude + Grok + Codex + Gemini | Wire existing CSV helpers to import/export UI; dedupe preview can start read-only. | Import preview validates rows; export works on list pages; no external dependency. |
+
+## Phase 1: Identity, Tenant Boundary, Ownership, Audit
+
+Why now: this unlocks safe production work and safe AI write actions.
+
+| Item | Backlog ID | Contract impact |
+|---|---:|---|
+| Auth/session/dev identity shell | `B-10` | Requires promotion from current non-goal. Add Identity/Auth section. |
+| Roles, permissions, profile-lite model | `B-10`, `B-15` | Define object/action permission matrix. |
+| Record ownership and sharing | `B-15` | Add owner/share conventions to CRM contract. |
+| Organization/tenant boundary | `B-16` | Add `orgId`/membership convention; keep single-org demo mode. |
+| Audit event model | `B-49` | Add audit event taxonomy for user, record, AI, import, routing, and workflow actions. |
+
+Acceptance: protected routes work in flagged mode; permission service gates
+server actions and UI affordances; seed supports demo users; audit rows are
+created for mutations; local deterministic demo still works with auth flag off.
+
+Research first: Auth.js/NextAuth versus a local credentials shell; row-level
+`orgId` versus future schema-per-tenant; minimum viable sharing model;
+server-action authorization patterns.
+
+## Phase 2: CRM Productivity Platform
+
+Why: the repo has breadth, but real CRM usability needs search, saved views,
+filters, bulk actions, reports, and admin-grade list behavior.
+
+| Item | Backlog ID | Scope |
+|---|---:|---|
+| Saved views | `B-50` | Saved filters/sorts/columns per object and user/org. |
+| Filter/query compiler | `B-51` | Shared filter AST compiled to Prisma; reused by lists, reports, exports, and natural-language filter AI. |
+| Bulk actions | `B-52` | Assign owner, update status/stage, create tasks, export selected, audit every action. |
+| Dedicated `/search` | `B-06` | Promote `/search`; use existing `globalSearch()` as the base; enforce permissions/tenant filters. |
+| Report builder | `B-28` | Persist report definitions: object, fields, filters, grouping, charts. |
+| Dashboard builder | `B-29` | Persist dashboard cards from saved reports. |
+
+Contract note: `/search` is currently an excluded route, while command palette
+search is implemented. Promotion requires a PLAN decision and feature-flag
+change.
+
+## Phase 3: Dealer Revenue Command Center Expansion
+
+Why: dealer lead routing is the strongest vertical differentiator. Keep it
+separate from generic B2B sales leads.
+
+| Item | Backlog ID | Scope |
+|---|---:|---|
+| DealerOrder CRUD | `B-04` | Create/edit/pause/retire dealer orders with validation and audit. |
+| Area CRUD | `B-04` | Postal prefix editor, overlap/collision warnings, area coverage diagnostics. |
+| Routing simulator | `B-53` | "What would route where?" simulator using hypothetical quotas, area coverage, and lead batches. |
+| Routing fairness and explanation | `B-54` | Deterministic metrics: pace gap, saturation, lead quality proxy, SLA risk; later AI narrative. |
+| Dealer capacity windows | `B-55` | Dealer capacity calendars, blackout windows, daily caps. |
+| Lead disposition/SLA | `B-56` | Routed, accepted, contacted, won/lost, returned, stale; escalation tasks. |
+| Pacing snapshots | `B-57` | Persist monthly/daily routing and pacing snapshots for trend reports. |
+
+Contract note: dealer/area CRUD is currently deferred. Keep geocoding and
+polygons out until a later provider/data/license decision.
+
+## Phase 4: Revenue, Service, And Operations Depth
+
+| Area | Backlog IDs | Scope |
+|---|---:|---|
+| Opportunity detail route | `B-05` | Promote `/deals/[id]` only if full detail page is needed for line items; keep drawer canonical or define coexistence. |
+| Products/price books/line items | `B-17` | Product, PriceBook, PriceBookEntry, OpportunityLineItem; Deal value becomes line-item rollup. |
+| Quote/quote PDF | `B-18` | Quote and QuoteLine, draft PDF/export, later email send. |
+| Events/calendar | `B-19` | Event model, `/calendar`, meeting activity links. |
+| Forecast scenarios | `B-07` | Persist forecast assumptions/scenarios once identity/audit exists. |
+| Service queues/SLA/knowledge | `B-41`, `B-42`, `B-43` | Queue assignment, SLA timers with injected clock, Knowledge Article model. |
+| Campaign members/influence | `B-58` | CampaignMember, campaign ROI and opportunity influence-lite. |
+
+Contract note: `/deals/[id]` and persistent forecasts are current non-goals.
+Promote explicitly before coding.
+
+## Phase 5: Customization And Automation
+
+| Item | Backlog ID | Scope |
+|---|---:|---|
+| Custom field metadata | `B-39` | `FieldDefinition` plus `customFields` JSON; core fields immutable. |
+| Record types/layout-lite | `B-40` | Admin-configurable field sections per object/type. |
+| Validation rules | `B-20` | Deterministic rule AST, never `eval`. |
+| Assignment/workflow rules | `B-20` | Trigger on create/update through `crmClient`; side effects logged. |
+| Approval processes | `B-21` | Approval steps, pending approvals, stage-change gates. |
+| Scheduled job sweep | `B-21` | Hermetic catch-up jobs with injected clock; no background daemon dependency. |
+
+Research first: JSON metadata versus EAV versus generated schema; safe
+condition AST; performance on SQLite and Postgres; migration strategy for
+custom fields.
+
+## Phase 6: AI Platform Foundation
+
+External AI provider integration remains a non-goal until promoted. The
+scaffold can land with deterministic and recorded providers only.
+
+| Layer | Backlog ID | Scope |
+|---|---:|---|
+| AI provider port | `B-25` | `complete`, `embed`, `stream`, tool-call adapter; deterministic and recorded providers first. |
+| Prompt registry | `B-59` | Prompt ID, version, owner, input schema, output schema, eval fixture IDs. |
+| Structured outputs | `B-60` | Zod validation for every AI output; invalid output is a recoverable UI error. |
+| AI run log | `B-61` | User/org, prompt ID, provider/model, hashes, token/cost, result, action outcome. |
+| Action registry | `B-62` | Explicit CRM tools: create task, log activity, draft email, update stage, assign lead. |
+| Retrieval/RAG service | `B-34`, `B-63` | Index allowed records; RBAC and tenant filters before retrieval. |
+| Eval harness | `B-25`, `B-64` | Golden tests for summaries, routing explanations, scoring, natural-language filters, RAG answers, and tool plans. |
+| Cost/privacy controls | `B-65` | Per-org limits, provider policy, redaction, prompt-injection defenses. |
+
+## Phase 7: AI Features By Persona
+
+Ship AI in this order: read-only, draft/suggest, human-confirmed actions, then
+limited autonomy after strong audit and evals.
+
+| Persona | First features | Later features |
 |---|---|---|
-| Local gate and CI hardening | Partly supported by local docs and scripts | Keep the PowerShell local gate authoritative. CI may mirror it but must not replace it. |
-| Postgres runtime cutover readiness | Helper path exists; SQLite remains default | Requires adapter/runtime work and gate coverage before Postgres can become a default or production path. |
-| Dealer order create/edit flows | Deferred | Future CRUD must preserve seeded routing behavior and dealer-order pacing semantics. |
-| Area create/edit flows | Deferred | Future CRUD must preserve postal-prefix matching and avoid introducing geocoding or territory polygons unless separately promoted. |
-| `/deals/[id]` opportunity detail route | Deferred and excluded | Any future route must preserve the current board and drawer flow unless the contract changes. |
-| Global search expansion | Deferred and excluded | Current top search routes to contacts only. Future search must be scoped and tested before promotion. |
-| Persistent forecast scenarios | Deferred | Current scenarios are transparent and deterministic but do not persist. |
-| Authentication, permissions, and multi-tenancy | Deferred | Significant scope; requires explicit contract, route, data, and test planning. |
-| Deployment configuration | Deferred | No deployment target is current scope. |
-| Salesforce integration | Deferred | The app is Salesforce-style, not Salesforce-connected. |
-| External AI provider integration | Deferred | Deterministic local summarization and analyst output remain the default. |
-| CSV import/export | Deferred | README lists this as absent from the current product. |
+| Seller | Record summaries, next steps, meeting prep, follow-up drafting, deal-risk explanation. | Similar-won deals, best-time-to-contact, live-call prep/retrieval. |
+| Manager/RevOps | Pipeline inspection, forecast-gap explanation, report narration. | Anomaly detection, coaching insights, scenario recommendations. |
+| Dealer Ops | Routing explanation, coverage-gap finder, behind-pace brief. | Routing simulator assistant, fairness auditor, SLA escalation agent. |
+| Service | Case summary, suggested reply, classification. | KB answer, customer-health synthesis. |
+| Admin | Import-mapping assistant, data-quality assistant. | Workflow suggestion, report builder assistant, custom-field/layout assistant. |
+
+## Phase 8: Integration, Deployment, And Operations
+
+| Item | Backlog ID | Scope |
+|---|---:|---|
+| REST/Bulk API | `B-26` | API keys, object endpoints over `crmClient`, bulk import/export, audit. |
+| Webhooks | `B-26` | Local test sink and replay fixtures; no live provider in gate. |
+| Transactional email | `B-27` | Stub provider default; templates; send/log email later. |
+| Gmail/Graph/calendar sync | `B-66` | Mock-only gate; token/secrets design first. |
+| Salesforce import | `B-67` | CSV mapping first, API sync later. |
+| Postgres readiness | `B-08` | Keep SQLite default; add migration/adapter/CI readiness. |
+| Deployment | `B-12` | Vercel/Docker/Railway/Fly decision; env validation; secrets policy. |
+| Observability/backups | `B-37` | Structured logs, request IDs, AI telemetry, backup/restore tests. |
+| Responsive/mobile/accessibility | `B-38` | Mobile pass, accessibility checks, dashboard/table usability. |
+
+## Required Promotion Decisions
+
+These cannot slip into a normal sprint:
+
+- `B-04` dealer-order and area CRUD.
+- `B-05` `/deals/[id]`.
+- `B-06` dedicated `/search`.
+- `B-07` persistent forecast scenarios.
+- `B-08` Postgres runtime/default path.
+- `B-09` external AI provider.
+- `B-10` auth/permissions/multitenancy.
+- `B-12` deployment.
+- Geocoding/polygons.
+- Generic B2B lead conversion.
+
+For lead conversion, do not implement `Lead -> Account + Contact +
+Opportunity` against the current `Lead` model. The contract says current
+`Lead` is a consumer dealer-routed object. A future generic sales-lead feature
+should either introduce a new object such as `SalesLead` or `Prospect`, or
+explicitly rewrite Lead semantics through a contract decision.
 
 ## Promotion Requirements
 
@@ -96,19 +259,35 @@ Before a candidate becomes implementation work:
 - `CRM-CONTRACT.md` must change first or in the same commit when the work
   changes entity names, route contracts, status values, feature flags, or
   adapter signatures.
+- Schema or seed changes must update `docs/schema-changelog.md`.
 - The implementation prompt must name any one-run ownership exceptions.
 - Tests and local-gate expectations must match the risk of the change.
 - `docs/ROADMAP.md` should be updated when the change materially alters
   sequencing, defaults, or deferred scope.
 
-## Companion Documents
+## AI Safety Rules To Contract Later
 
-- `CRM-CONTRACT.md` - implemented entities, routes, statuses, registries, and
-  adapter signatures.
-- `PLAN.md` - active sprint scope, agent ownership, local gate, reports, and
-  backlog promotion.
-- [`docs/FEATURE-BACKLOG.md`](FEATURE-BACKLOG.md) - verified backlog facts and
-  deferred items.
-- [`docs/LOCAL-GATE.md`](LOCAL-GATE.md) - local setup and validation sequence.
-- [`docs/roadmap/ROADMAP-IFT-R1-REVIEW.md`](roadmap/ROADMAP-IFT-R1-REVIEW.md)
-  - source and review trace for this roadmap.
+These are roadmap requirements for future AI work and should become
+contractual when AI platform features are promoted:
+
+1. No silent writes; AI mutations require preview and approval.
+2. Every AI answer shows provenance over CRM records/activities/reports used.
+3. Deterministic fallback is mandatory.
+4. Prompt ID and version are mandatory.
+5. Zod schema validation is mandatory for outputs.
+6. AI runs and AI actions are audited.
+7. Tenant/RBAC filters apply before retrieval.
+8. CRM text is untrusted input; notes, emails, transcripts, imports, and web
+   text cannot override system/tool rules.
+9. Cost and latency telemetry are first-class.
+10. Eval fixtures are required before feature expansion.
+
+## Market Context
+
+External market direction supports the AI sequence, but it does not override
+repo guardrails. Salesforce, HubSpot, Zoho, and Microsoft all position AI
+features around summaries, predictions, scoring, workflow guidance, agents, and
+sales/service productivity. Treat that as design pressure only. Before
+implementation, re-check current vendor docs and translate any useful pattern
+through `CRM-CONTRACT.md`, `PLAN.md`, deterministic fallbacks, and hermetic
+tests.

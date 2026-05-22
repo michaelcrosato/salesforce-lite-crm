@@ -1,53 +1,53 @@
 Agent: Codex
 
-Sprint: 4
+Sprint: 5 candidate
 
-Feature: Roadmap documentation finalization
+Feature: Roadmap canon
 
-Branch: codex/sprint-4-demo-seed-tuning
+Branch: codex/sprint-5-roadmap-canon
 
 Status: done
 
-Commits this prompt: e579117 - [codex] docs: finalize canonical roadmap
+Commits this prompt: eace3bb - [codex] docs: expand roadmap canon
 
 Gate status: PASS
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-19T22:12:51-07:00
+Timestamp: 2026-05-20T00:12:55-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Created `docs/ROADMAP.md` as the canonical roadmap, grounded in repo-local
-  sources: `CRM-CONTRACT.md`, `README.md`, `PLAN.md`, `docs/FEATURE-BACKLOG.md`,
-  `lib/crm/registry.ts`, `lib/featureFlags.ts`, app route files, and active
-  Sprint 4 prompt artifacts.
-- Created `docs/roadmap/ROADMAP-IFT-R1-REVIEW.md` as the source/review trace
-  artifact and kept candidate-review detail out of the canonical roadmap.
-- Updated the README roadmap section to point at `docs/ROADMAP.md` instead of
-  carrying a competing roadmap summary.
-- Updated `PLAN.md` section 16 only to reference `docs/ROADMAP.md` as the
-  proposed roadmap source while preserving the backlog as non-authorizing input.
-- Updated `docs/PROJECT-CONTROL.md` to identify `docs/ROADMAP.md` as the
-  canonical roadmap and keep README as a roadmap pointer.
-- Did not create `docs/AI-ROADMAP.md` or `docs/ARCHITECTURE.md`; the roadmap
-  did not need a split AI plan or a new architecture overview.
-- Preserved guardrails in the roadmap: no auth, no external AI, no live
-  `/deals/[id]`, no `/search` expansion, no Postgres default, and no dealer or
-  area CRUD unless future work is explicitly promoted.
-- Verification: `git diff --check` passed, `git diff --cached --check` passed,
-  local roadmap link targets were verified with `Test-Path`, and `git status`
-  was reviewed before commit. Full runtime gate was not run because this was a
-  docs-only change with no runtime claims.
+- Created the expanded roadmap canon with `docs/ROADMAP.md` as the product
+  roadmap and new companion docs: `docs/AI-ROADMAP.md`,
+  `docs/ARCHITECTURE.md`, `docs/EVALS.md`, and
+  `docs/SECURITY-PRIVACY.md`.
+- Updated `PLAN.md` to record Sprint 5 as the recommended next sprint while
+  keeping the change proposal-only; §4 does not activate feature
+  implementation.
+- Extended PLAN §16 with B-NN grounded proposal entries through the roadmap
+  IDs requested in the prompt and added a §17 run decision for the roadmap
+  canon update.
+- Updated `README.md`, `docs/FEATURE-BACKLOG.md`, and
+  `docs/PROJECT-CONTROL.md` to point at the new roadmap and companion docs
+  without changing shipped product scope.
+- Left `CRM-CONTRACT.md` and `docs/schema-changelog.md` unchanged because no
+  implemented entity, route, model, feature flag, adapter signature, schema, or
+  seed behavior changed.
+- Verification: `scripts/local-gate.ps1` passed in full, including
+  `npm install`, Prisma generate/db push, seed, lint, typecheck, unit tests,
+  build, Chromium install, and Playwright e2e.
 
 ### Next action
 
-Idle / awaiting next prompt or PLAN-promoted scope.
+Review and merge the roadmap PR. Sprint 5 implementation still requires an
+explicit §4 promotion or follow-up implementation prompt.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO  (shared roadmap, PLAN, README, and project-control docs were explicitly in scope for this prompt; see BLOCKERS)
+Cross-zone edits: YES  (shared roadmap/PLAN/README/project-control docs were
+explicitly in scope for this prompt)
 
 CRM-CONTRACT.md honored:  YES

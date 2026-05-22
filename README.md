@@ -295,9 +295,11 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 ## Roadmap
 
 The canonical roadmap lives in [docs/ROADMAP.md](docs/ROADMAP.md). It records
-queued hardening work, deferred promotion candidates, and guardrails for future
-scope. Current product truth still comes from `CRM-CONTRACT.md`, `PLAN.md`,
-and repo-local evidence.
+recommended Sprint 5 scope, deferred promotion candidates, and guardrails for
+future scope. Companion docs cover [AI sequencing](docs/AI-ROADMAP.md),
+[architecture](docs/ARCHITECTURE.md), [evals](docs/EVALS.md), and
+[security/privacy](docs/SECURITY-PRIVACY.md). Current product truth still comes
+from `CRM-CONTRACT.md`, `PLAN.md`, and repo-local evidence.
 
 The current tree includes the Sprint 4B demo-hardening surface: seeded demo
 anchors, route-level QA hooks, shared component polish, task/case/campaign
