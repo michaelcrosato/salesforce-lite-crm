@@ -64,6 +64,8 @@ team:
 - Simulate forecast outcomes from pipeline value and lead-delivery assumptions.
 - Review built-in reports for pipeline, leads, activity volume, top accounts,
   stale opportunities, and overdue tasks.
+- Review and download bounded CSV exports from deterministic server-side
+  delivery packets.
 - Expose deterministic analyst recommendations without relying on an external
   AI provider.
 
@@ -150,7 +152,7 @@ explicitly promoted.
 | `/cases/new` | Case creation. |
 | `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
 | `/campaigns/new` | Campaign creation. |
-| `/reports` | Report index with KPI cards. |
+| `/reports` | Report index with KPI cards and CSV export review/download. |
 | `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
 
 Primary workflows:
@@ -166,7 +168,8 @@ Primary workflows:
   campaigns.
 - Create or update tasks, cases, and campaigns through their list, new-page,
   and drawer flows.
-- Open reports from `/reports` and drill into the supported report slugs.
+- Open reports from `/reports`, drill into the supported report slugs, and
+  review CSV export packets.
 
 Task, Case, and Campaign entities are now wired into the app-router pages
 listed above. Detail flows for those entities use the drawer pattern
@@ -292,8 +295,8 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - Postal-prefix matching is intentionally simple and does not use geocoding or
   territory polygons.
 - Forecast scenarios are transparent and deterministic, but they do not persist.
-- CSV import/export helpers exist in `lib/business`, but there is no shipped
-  CSV UI workflow.
+- CSV export review/download is surfaced on `/reports`; CSV import remains a
+  server-side preview-helper workflow with no import UI or database writes.
 - No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
   leads route to dealer orders instead.
 
@@ -312,5 +315,5 @@ workflows, reports, and local gate documentation.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
-CSV UI workflows, and any future live `/deals/[id]` detail behavior require
-explicit promotion before implementation.
+CSV import UI workflows, and any future live `/deals/[id]` detail behavior
+require explicit promotion before implementation.

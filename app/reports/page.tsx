@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REPORT_DEFINITIONS,
   type ReportDefinition
 } from "@/components/reports/report-registry";
+import {
+  getCsvExportDeliveryPacket,
+  isCsvExportDeliveryPacketEntity,
+  listCsvExportDeliveryPackets,
+  type CsvExportDeliveryPacketEntity
+} from "@/lib/server/csvExportDeliveryPackets";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +20,27 @@ export const metadata: Metadata = {
   title: "Reports"
 };
 
-export default function ReportsPage() {
+type ReportsSearchParams = {
+  csvExport?: string | string[];
+};
+
+const DEFAULT_CSV_EXPORT_ENTITY: CsvExportDeliveryPacketEntity = "accounts";
+const CSV_EXPORT_PREVIEW_LIMIT = 5;
+
+export default async function ReportsPage({
+  searchParams
+}: {
+  searchParams?: Promise<ReportsSearchParams>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const selectedCsvEntity = resolveCsvExportEntity(
+    resolvedSearchParams.csvExport
+  );
+  const [csvPackets, selectedCsvPacket] = await Promise.all([
+    listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
+    getCsvExportDeliveryPacket(selectedCsvEntity)
+  ]);
+
   return (
     <div className="crm-page">
       <PageHeader
@@ -26,6 +53,11 @@ export default function ReportsPage() {
           <ReportCard key={report.slug} report={report} />
         ))}
       </div>
+
+      <CsvExportOperator
+        packets={csvPackets}
+        selectedPacket={selectedCsvPacket}
+      />
     </div>
   );
 }
@@ -46,4 +78,16 @@ function ReportCard({ report }: { report: ReportDefinition }) {
       </Card>
     </Link>
   );
+}
+
+function resolveCsvExportEntity(
+  value: string | string[] | undefined
+): CsvExportDeliveryPacketEntity {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  if (candidate && isCsvExportDeliveryPacketEntity(candidate)) {
+    return candidate;
+  }
+
+  return DEFAULT_CSV_EXPORT_ENTITY;
 }
