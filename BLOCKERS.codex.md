@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 22 / repo coordination
 
-Feature: Worktree topology policy update
+Feature: Local gate typecheck repair
 
 Branch: main
 
-Timestamp: 2026-05-22T08:41:52.1613922-07:00
+Timestamp: 2026-05-22T08:54:43.3178289-07:00
 
 Escalation required: NO
 
@@ -17,6 +17,5 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blocker carried into this prompt.
-- The stale `C:\dev\salesforce-lite-crm-codex` path was repaired into a clean `codex/autonomy` worktree.
-- `npm audit fix` made no safe changes. Remaining moderate advisories require `npm audit fix --force`, which would apply breaking dependency changes before the root solo overnight test; left unforced because the local gate passes.
+- Resolved the local gate `npm run typecheck` failure by excluding ignored `agent-runs` and `status` runtime artifact directories from `tsconfig.json`.
+- Full local gate passed with `scripts/local-gate.ps1`.
