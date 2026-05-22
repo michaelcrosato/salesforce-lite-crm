@@ -65,25 +65,39 @@ The current `.gitignore` already ignores `agent-runs/`.
 
 ## Overnight mode
 
-Use a long run when the machine is isolated/trusted and human review will happen later:
+Use the watchdog launcher when the machine is isolated/trusted and human review
+will happen later. It is safe to invoke from any PowerShell working directory
+because all git, stop-file, and runner paths are rooted at `-RepoRoot`.
 
 ```powershell
-cd <repo-root>
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-powershell -ExecutionPolicy Bypass -File scripts\autonomy-loop.ps1 `
-  -MaxIterations 0 `
-  -RepairAttemptsPerIteration 3 `
-  -MaxConsecutiveFailedIterations 2 `
-  -FullYolo `
-  -KeepAwake `
-  -BaselineGate `
-  -InstallBrowsers `
-  -AutoRevertBroken `
-  -AllowSprintRollover `
-  -Push
+powershell -NoLogo -NoProfile -ExecutionPolicy Bypass `
+  -File C:\dev\salesforce-lite-crm\scripts\start-codex-overnight.ps1
 ```
 
-`-MaxIterations 0` means no artificial iteration cap. Stop conditions still apply.
+The launcher runs a Codex exec smoke test, creates/pushes a rollback tag, then
+starts `scripts\autonomy-loop.ps1` with full overnight defaults:
+`-MaxIterations 0`, `-FullYolo`, `-KeepAwake`, `-BaselineGate`,
+`-InstallBrowsers`, `-StartDockerServices`, `-AutoRevertBroken`,
+`-AllowSprintRollover`, and `-Push`. It restarts the inner loop after exit
+unless `STOP` or `AUTONOMY.STOP` exists under the repo root.
+
+If the inner loop exits non-zero, the watchdog stays in continuous mode by
+default: it logs the failure, re-runs the Codex invocation smoke, waits briefly,
+and starts the inner loop again. Because the inner loop runs with
+`-BaselineGate`, a red repo state enters the repair prompt path before new work.
+Use `-StopOnLoopFailure` or `-StopOnCodexSmokeFailure` only when deliberately
+debugging the launcher itself.
+
+`-MaxIterations 0` means no artificial iteration cap. Stop conditions still
+apply.
+
+If you need to reuse a specific rollback tag:
+
+```powershell
+powershell -NoLogo -NoProfile -ExecutionPolicy Bypass `
+  -File C:\dev\salesforce-lite-crm\scripts\start-codex-overnight.ps1 `
+  -RollbackTag safe-before-yolo-20260519-225620
+```
 
 ## Workday mode
 

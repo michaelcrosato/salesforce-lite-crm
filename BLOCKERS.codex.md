@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 5 candidate
+Sprint: 22
 
-Feature: Roadmap canon
+Feature: S22-F1 - CSV release disposition manifests
 
-Branch: codex/sprint-5-roadmap-canon
+Branch: codex/sprint-4-demo-seed-tuning
 
-Timestamp: 2026-05-20T00:12:55-07:00
+Timestamp: 2026-05-22T06:16:51.8777548-07:00
 
 Escalation required: NO
 
@@ -17,10 +17,5 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active blockers.
-- Shared coordination exception documented: `PLAN.md`, `README.md`,
-  `docs/FEATURE-BACKLOG.md`, `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`,
-  `docs/AI-ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/EVALS.md`, and
-  `docs/SECURITY-PRIVACY.md` were edited under the current prompt's explicit
-  roadmap-documentation scope.
-- Full local gate passed via `scripts/local-gate.ps1`.
+- No active Codex blocker carried into this prompt.
+- Ownership boundary handled: `tests/api/csv-release-disposition-manifests.test.ts` is in Gemini's test zone, but adding focused Vitest coverage was the smallest direct way to complete the Codex-owned S22-F1 server helper under PLAN.md §8. Full `scripts/local-gate.ps1` passed after the implementation.

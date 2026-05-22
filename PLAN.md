@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.10 |
+| Version | 2.27A |
 
-| Last updated | 2026-05-20 |
+| Last updated | 2026-05-22 |
 
-| Active sprint | Roadmap canon update active by current prompt; Sprint 4B demo-hardening work is present in `main`; Sprint 5 is the recommended next sprint but not implementation-active until §4 promotes it. |
+| Active sprint | Sprint 22 queued for Codex; Sprint 21 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -92,13 +92,6 @@ Roster rules:
 
 
 
-\*\*Current prompt scope — Roadmap Canon Update\*\*
-
-Status: active for this run. Scope is roadmap and planning documentation only:
-`docs/ROADMAP.md`, roadmap companion docs, PLAN backlog proposals, and Codex
-report files. This pass does not build product features, promote excluded
-routes, change feature flags, or expand the shipped product contract.
-
 \*\*Sprint 4 — Demo Data Tuning \& Visual QA\*\*
 
 
@@ -149,6 +142,684 @@ palette.
 
 Acceptance details live in `CRM-CONTRACT.md` and this section. Status updates are agent-reported in SUMMARY; only the local gate (§9) authorizes a status of `done`.
 
+\*\*Sprint 5 — Data Portability Foundation\*\*
+
+Goal: promote a narrow server-side CSV portability foundation while preserving current routes, deterministic local behavior, and excluded-route guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S5-F1 — Server CSV export contracts | Codex | done | Server-side CSV export mapping covers current CRM list data with deterministic RFC4180 output and later-UI-ready contracts. No routes, buttons, file storage, external services, or product UI are added. |
+| S5-F2 — CSV import preview validation | Codex | done | Server-side CSV import preview parses CSV text, normalizes headers, validates contact and consumer-lead rows with existing schemas/helpers, and returns row-level errors without database writes. No bulk create/update, mapping wizard, product UI, or background jobs are added. |
+
+\*\*Sprint 5 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import jobs.
+
+\- No database writes from CSV import preview.
+
+\- No Salesforce integration.
+
+
+\*\*Sprint 6 — CSV Readiness Contracts\*\*
+
+Goal: finish the server-side CSV readiness layer needed for later UI wiring without adding routes, persistence workflows, or external integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S6-F1 — CSV import template contracts | Codex | done | Server-side import templates are published for supported CSV preview entities with canonical header order, required-field metadata, aliases, and header-only CSV output suitable for later UI wiring. No routes, buttons, storage, external services, or database writes are added. |
+| S6-F2 — CSV import preflight diagnostics | Codex | done | CSV import preview can run database-backed preflight diagnostics for contact and consumer-lead rows, reporting duplicate/contactability and relationship warnings without mutating data. Diagnostics are row-level and deterministic, with no routing execution or import writes. |
+
+\*\*Sprint 6 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import preview or preflight diagnostics.
+
+\- No bulk create/update or import apply flow.
+
+\- No routing reassignment, external enrichment, or Salesforce integration.
+
+
+\*\*Sprint 7 — CSV Handoff Manifests\*\*
+
+Goal: make the server-side CSV readiness layer easier to consume from later UI work while preserving read-only local behavior and current route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S7-F1 — CSV capability catalog | Codex | done | Server-side CSV capability metadata lists supported export, import preview, template, and preflight entities with routes, filenames, content types, canonical headers, required import fields, and explicit read/write safety flags. No routes, UI, upload/download actions, file storage, external services, or database writes are added. |
+| S7-F2 — CSV preview issue summaries | Codex | done | CSV import preview/preflight exposes deterministic aggregate issue summaries for header, parse, row-validation, and diagnostic warnings so later UI can present counts and categories without reinterpreting row arrays. No import apply flow, routing execution, background jobs, external AI, or database writes are added. |
+
+\*\*Sprint 7 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import preview, preflight diagnostics, catalogs, or issue summaries.
+
+\- No bulk create/update or import apply flow.
+
+\- No routing reassignment, external enrichment, or Salesforce integration.
+
+
+\*\*Sprint 8 — CSV Consumer Readiness\*\*
+
+Goal: add the next read-only server-side CSV handoff contracts needed by later UI work while preserving current routes, local determinism, and no-write safety.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S8-F1 — CSV import example contracts | Codex | done | Import template contracts expose deterministic example row metadata and optional one-row example CSV for supported preview entities. Examples use existing validation fields and do not perform database writes, routing, file storage, or UI work. |
+| S8-F2 — CSV export preflight summaries | Codex | done | CSV export support exposes read-only preflight summaries per supported export entity, including filename/content type, canonical headers, default/max limits, and current row count for later UI confirmation. No routes, buttons, file storage, background jobs, or export writes are added. |
+
+\*\*Sprint 8 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import examples, export preflight summaries, import preview, preflight diagnostics, catalogs, or issue summaries.
+
+\- No bulk create/update or import apply flow.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+\*\*Sprint 9 — CSV Preview Readiness\*\*
+
+Goal: turn the server-side CSV handoff contracts into read-only operator previews without adding UI, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S9-F1 — CSV import readiness plans | Codex | done | CSV import preflight exposes deterministic row readiness classifications and aggregate counts for supported preview entities, derived from existing validation and diagnostics. No database writes, import apply flow, routing execution, product UI, file storage, or external services are added. |
+| S9-F2 — CSV export preview snippets | Codex | done | CSV export support exposes bounded read-only preview rows and optional CSV snippets for supported export entities, using existing column definitions, limits, and deterministic ordering. No routes, buttons, file storage, background jobs, or export writes are added. |
+
+\*\*Sprint 9 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import readiness plans, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update or import apply flow.
+
+\- No routing execution, routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+\*\*Sprint 10 — CSV Operator Handoff Contracts\*\*
+
+Goal: finish read-only server-side CSV handoff metadata so later UI work can present import actions and preview capabilities without reinterpreting lower-level arrays.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S10-F1 — CSV import action manifests | Codex | done | CSV import preflight exposes deterministic row action metadata and aggregate action counts for supported preview entities, derived from existing validation, readiness, and diagnostics. No database writes, import apply flow, create/update/upsert/merge logic, routing execution, product UI, file storage, or external services are added. |
+| S10-F2 — CSV preview capability metadata | Codex | done | The CSV capability catalog reflects the current read-only preview surface, including import readiness/preflight and export preview/snippet availability, default/max limits where applicable, content types, filenames, and explicit no-write safety flags for later UI consumption. No routes, buttons, file storage, background jobs, CSV writes, or integrations are added. |
+
+\*\*Sprint 10 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, download buttons, upload forms, mapping wizard, file storage, or background import/export jobs.
+
+\- No database writes from CSV import action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+\*\*Sprint 11 — CSV Review Bundles\*\*
+
+Goal: package the existing read-only CSV contracts into deterministic server-side review bundles for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S11-F1 — CSV import review bundles | Codex | done | Server-side import review bundles combine template metadata, preview/preflight output, issue summaries, readiness counts, action counts, and a bounded row sample for supported import preview entities. No database writes, import apply flow, product UI, routes, file storage, routing execution, or external services are added. |
+| S11-F2 — CSV export review bundles | Codex | done | Server-side export review bundles combine capability metadata, preflight row counts, limits, canonical headers, preview rows, optional CSV snippets, and deterministic empty/limit notes for supported export entities. No routes, buttons, file storage, background jobs, export writes, saved history, or integrations are added. |
+
+\*\*Sprint 11 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV import/export review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+
+\*\*Sprint 12 — CSV Transfer Packets\*\*
+
+Goal: turn the read-only CSV review layer into deterministic server-side transfer packets for later UI wiring without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S12-F1 — CSV export delivery packets | Codex | done | Server-side helpers produce deterministic export packets for supported export entities, combining filename, content type, generated CSV, row counts, applied limits, review notes, and explicit no-write flags. No routes, buttons, file storage, export history, scheduled delivery, background jobs, or integrations are added. |
+| S12-F2 — CSV import dry-run receipts | Codex | done | Server-side helpers produce deterministic import dry-run receipts for supported import preview entities, combining source metadata, review bundle output, issue/readiness/action summaries, bounded samples, and explicit no-write safety metadata. No database writes, import apply flow, product UI, routes, file storage, routing execution, or external services are added. |
+
+\*\*Sprint 12 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+
+\*\*Sprint 13 — CSV Handoff Assurance\*\*
+
+Goal: tighten the read-only CSV handoff layer with deterministic transfer manifests and compatibility reports for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S13-F1 — CSV transfer manifest catalog | Codex | done | Server-side helpers publish deterministic transfer manifests for supported CSV export delivery and import dry-run receipt surfaces, including entity ids, operations, content types, filenames, limits, source/input metadata, and explicit read/no-write flags. No routes, product UI, database writes, file storage, background jobs, export history, or integrations are added. |
+| S13-F2 — CSV compatibility reports | Codex | done | Server-side helpers publish deterministic read-only compatibility reports comparing export columns, import templates/examples, preview support, required fields, and transfer manifest coverage for overlapping entities, with warnings for one-way fields or unsupported directions. No supported-entity expansion, header remapping wizard, user-upload parsing, database writes, import apply flow, routing execution, or Salesforce sync is added. |
+
+\*\*Sprint 13 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+
+
+\*\*Sprint 14 — CSV Handoff Index\*\*
+
+Goal: consolidate the existing read-only CSV handoff contracts into deterministic server-side indexes and coverage summaries for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S14-F1 — CSV handoff index | Codex | done | Server-side helpers publish a deterministic handoff index tying existing CSV capabilities, transfer manifests, compatibility reports, templates/examples, packet surfaces, and explicit no-write flags into one later-UI-ready catalog. No routes, product UI, upload/download actions, file storage, background jobs, entity expansion, database writes, or integrations are added. |
+| S14-F2 — CSV field coverage summaries | Codex | done | Server-side helpers publish deterministic per-entity and per-operation coverage summaries showing export-only, import-only, shared, required, optional, unsupported, and warning counts from the existing CSV contracts. No header remapping wizard, user-upload parsing, import apply flow, database writes, routing execution, supported-entity expansion, or Salesforce sync is added. |
+
+\*\*Sprint 14 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, or routing execution.
+
+\- No routing reassignment, external enrichment, Salesforce integration, or CSV-connected sync.
+
+
+\*\*Sprint 15 — CSV Operator Assurance\*\*
+
+Goal: turn the existing read-only CSV handoff metadata into deterministic server-side readiness and QA signals for later UI consumption without adding routes, persistence workflows, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S15-F1 — CSV operator readiness scorecards | Codex | done | Server-side helpers publish deterministic readiness scorecards per existing CSV entity and operation by combining the handoff index and field coverage summaries into statuses, counts, warning codes, and explicit no-write flags for later UI. No CSV product UI, upload/download routes, file storage, background jobs, import apply flow, database writes, header remapping, supported-entity expansion, routing execution, or Salesforce sync is added. |
+| S15-F2 — CSV contract QA checks | Codex | done | Server-side helpers publish deterministic QA checks across existing CSV contracts, flagging inconsistent headers, missing handoff surfaces, unsupported operation gaps, and read/no-write flag drift without reinterpreting UI state. No routes, product UI, package/config changes, CI changes, file storage, background jobs, database writes, import apply flow, routing execution, or integrations are added. |
+
+\*\*Sprint 15 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV operator readiness scorecards, contract QA checks, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, or routing execution.
+
+\- No supported-entity expansion, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 16 — CSV Operator Runbooks\*\*
+
+Goal: package the read-only CSV assurance layer into deterministic operator guidance and snapshot metadata for later UI handoff without adding routes, writes, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S16-F1 — CSV operator remediation runbooks | Codex | done | Server-side helpers publish deterministic remediation runbooks from existing CSV operator readiness scorecards and contract QA checks, grouped by entity and operation with severity, explanation, next-action metadata, source content types, and explicit no-write flags. No CSV product UI, upload/download routes, file storage, background jobs, import apply flow, database writes, header remapping, supported-entity expansion, routing execution, persistent history, external AI, Salesforce sync, package/config changes, or CI changes are added. |
+| S16-F2 — CSV contract drift snapshots | Codex | done | Server-side helpers publish deterministic snapshot metadata over existing CSV contracts, including stable source fingerprints, status/issue/readiness rollups, source content types, and explicit read/no-write flags for later handoff review. No persistent baselines or comparison storage, routes, product UI, package/config changes, CI changes, file storage, background jobs, database writes, import apply flow, routing execution, or integrations are added. |
+
+\*\*Sprint 16 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV operator remediation runbooks, contract drift snapshots, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, or routing execution.
+
+\- No supported-entity expansion, persistent snapshot or baseline storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 17 — CSV Handoff Closure\*\*
+
+Goal: package the existing read-only CSV readiness surface into deterministic handoff packets and release digests for later UI or docs consumption without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S17-F1 — CSV operator handoff packets | Codex | done | Server-side helpers publish deterministic per-entity and per-operation handoff packets that combine current CSV capabilities, handoff index, readiness scorecards, remediation runbooks, drift snapshots, source content types, and explicit no-write flags. No routes, product UI, upload/download actions, file storage, database writes, entity expansion, persistent history, package/config changes, CI changes, or integrations are added. |
+| S17-F2 — CSV contract release digest | Codex | done | Server-side helpers publish a deterministic current-state digest over the CSV handoff surface, summarizing supported operations, stable/watch/blocked counts, source fingerprint rollups, warning codes, and release-note-ready metadata for later UI or docs consumption. No persistent baselines or comparison storage, routes, product UI, file storage, database writes, package/config changes, CI changes, or integrations are added. |
+
+\*\*Sprint 17 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, or routing execution.
+
+\- No supported-entity expansion, persistent CSV snapshot/baseline/history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 18 — CSV Handoff Verification\*\*
+
+Goal: add deterministic read-only verification and fixture metadata for the existing CSV handoff surface so later UI, docs, and tests can consume current import/export contracts without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S18-F1 — CSV release verification manifests | Codex | done | Server-side helpers publish deterministic verification manifests over the current CSV release digest and handoff packets, including source fingerprints, source content types, operation/entity coverage, warning/source-code rollups, and explicit no-write flags. No routes, product UI, upload/download actions, file storage, database writes, persistent baselines, package/config changes, CI changes, or integrations are added. |
+| S18-F2 — CSV operator fixture bundles | Codex | done | Server-side helpers publish deterministic bounded fixture bundles for later UI/docs/test consumption, combining existing export delivery packet snippets, import dry-run receipt samples, handoff packet summaries, and release digest metadata per supported entity/operation. No routes, product UI, upload/download actions, file storage, user-upload parsing, import apply flow, database writes, or integrations are added. |
+
+\*\*Sprint 18 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV verification/fixture/snapshot/baseline/history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 19 — CSV Handoff Publication\*\*
+
+Goal: package the existing read-only CSV handoff verification surface into deterministic publication and acceptance metadata for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S19-F1 — CSV handoff release notes packet | Codex | done | Server-side helpers publish a deterministic release-note packet from the current CSV release verification manifest, release digest, and operator fixture bundle, including status, source fingerprints, supported operation counts, fixture availability, warning/source-code rollups, and explicit no-write flags for later UI/docs consumption. No product UI, routes, upload/download actions, file storage, persistent history, package/config changes, CI changes, Salesforce sync, or external services are added. |
+| S19-F2 — CSV operator acceptance checklists | Codex | done | Server-side helpers publish deterministic operator acceptance checklists per CSV entity and operation by combining release verification manifests, fixture bundle availability, readiness/remediation status, and QA warnings into pass/watch/block checklist items with aggregate counts. No product UI, routes, upload/download actions, file storage, persistent baselines, database writes, import apply flow, header remapping, user-upload parsing, supported-entity expansion, or integrations are added. |
+
+\*\*Sprint 19 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV release-note/acceptance/verification/fixture/snapshot/baseline/history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 20 — CSV Operator Release Readiness\*\*
+
+Goal: turn the existing read-only CSV publication and acceptance metadata into deterministic operator workflow and closure summaries for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S20-F1 — CSV operator walkthrough manifests | Codex | done | Server-side helpers publish deterministic ordered walkthrough manifests for each supported CSV operation by composing existing capability, template/example, dry-run/export packet, fixture, release-note, and acceptance-checklist surfaces. The output includes source fingerprints, step labels, blocking/watch notes, and explicit no-write flags for later UI/docs/tests. No product UI, routes, upload/download actions, file storage, background jobs, import apply flow, user-upload parsing, header remapping, database writes, persistence, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
+| S20-F2 — CSV release closure scorecards | Codex | done | Server-side helpers aggregate S19 release notes and acceptance checklists into per-entity and per-operation closure statuses with ready/watch/block counts, release-note anchors, fixture coverage, and no-write safety metadata. The surface is deterministic and read-only. No product UI, routes, upload/download actions, file storage, persistent baselines/history, database writes, import apply flow, routing execution, supported-entity expansion, Salesforce sync, external services, package/config changes, or CI changes are added. |
+
+\*\*Sprint 20 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV operator walkthrough manifests, release closure scorecards, handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 21 — CSV Release Handoff\*\*
+
+Goal: package the existing read-only CSV release readiness surface into deterministic handoff and exception metadata for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S21-F1 — CSV release handoff catalog | Codex | done | Server-side helpers publish a deterministic release handoff catalog that indexes the existing S20 walkthrough manifests and release closure scorecards by entity and operation, with source fingerprints, status rollups, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes or runtime workflow behavior. |
+| S21-F2 — CSV release exception register | Codex | done | Server-side helpers publish deterministic read-only exception registers for watch/block CSV release items by composing closure scorecards, acceptance checklists, fixture coverage, and walkthrough notes into ordered remediation-ready entries. Output includes counts, severity, source anchors, and no-write safety metadata without changing import/export behavior. |
+
+\*\*Sprint 21 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload/download buttons, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV release handoff catalogs, release exception registers, operator walkthrough manifests, release closure scorecards, handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 22 — CSV Release Disposition\*\*
+
+Goal: convert the read-only CSV release handoff surface into deterministic disposition and readiness packets for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S22-F1 — CSV release disposition manifests | Codex | queued | Server-side helpers compose the S21 release handoff catalog and exception register into deterministic per-entity and per-operation dispositions with ready/watch/block counts, source fingerprints, trace anchors, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes, persistence, or runtime workflow behavior. |
+| S22-F2 — CSV release readiness packets | Codex | queued | Server-side helpers publish bounded release readiness packets that combine disposition manifests with the existing release digest, verification manifests, closure scorecards, and exception metadata into release-consumer summaries with pass/watch/block totals and remediation anchors. Output remains deterministic and read-only without adding approval workflows or CSV product UI. |
+
+\*\*Sprint 22 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload/download buttons, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV release disposition manifests, release readiness packets, release handoff catalogs, release exception registers, operator walkthrough manifests, release closure scorecards, handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV disposition/readiness/handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, approval workflow, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
@@ -421,25 +1092,26 @@ dev              -> next dev
 
 build            -> next build
 
-seed             -> tsx prisma/seed.ts
-
 lint             -> eslint . --max-warnings=0
 
 typecheck        -> tsc --noEmit --pretty false
 
-test             -> vitest run
+seed             -> tsx prisma/seed.ts
 
-test:e2e         -> npm run seed \&\& playwright test
+test             -> vitest run --maxWorkers=1 --minWorkers=1
+
+test:e2e         -> npm run seed && playwright test
 
 prisma:postgres  -> node scripts/prisma-postgres.mjs
 
 autonomy:overnight -> powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
 
+autonomy:watchdog -> powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
 ```
 
 
 
-There is no `format` package script unless `package.json` later adds one. Agents must not claim a check passed unless the exact script or command exists and was run.
+Agents may claim `lint` or `typecheck` only when the matching `package.json` scripts exist and the exact commands have run. There is no `format` script unless `package.json` later adds one.
 
 
 
@@ -515,7 +1187,7 @@ When in doubt, run the full gate. The change-type subset is a floor, not a cap �
 
 
 
-If the gate fails on `main` after a merge, handle it through a rollback, hotfix, or new IFT round as directed by the current prompt or repo workflow. Agents do not act on `main` without explicit scope. If new gate steps are added to the repo later (a lint script, a typecheck script, a secrets scan), they are added to this section before agents start running them.
+If the gate fails on `main` after a merge, handle it through a rollback, hotfix, or new IFT round as directed by the current prompt or repo workflow. Agents do not act on `main` without explicit scope. If new gate steps are added to the repo later, they are added to this section before agents start running them.
 
 
 
@@ -577,7 +1249,7 @@ No inter-agent merging or agent-to-agent pull requests without explicit current-
 
 \- Edits to `PLAN.md`, `CRM-CONTRACT.md`, or `docs/decisions.md` stay explicit, scoped, and documented.
 
-\- No claims of checks passing unless the exact command exists and was run. `lint` and `typecheck` exist in §9; `format` does not.
+\- No invented script claims. Claim `lint`, `typecheck`, `format`, or other checks only when the exact `package.json` script exists and the command was run.
 
 \- Cleanup is repo-local and conservative. Use `scripts/clean-local-artifacts.ps1` in dry-run mode first; remove only ignored/generated/local artifacts inside this repo. Leave unknown files in place and record them in BLOCKERS.
 
@@ -1065,7 +1737,7 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 
-\### 2026-05-20 — Run decision
+\### 2026-05-20 — Run decision (roadmap canon)
 
 \*\*Decision:\*\* Adopt the expanded roadmap canon as proposal-only planning material and make Sprint 5 the recommended next sprint without activating feature implementation.
 
@@ -1076,6 +1748,20 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 \*\*Sections changed:\*\* §1, §4, §16, §17; `docs/ROADMAP.md`; `docs/AI-ROADMAP.md`; `docs/ARCHITECTURE.md`; `docs/EVALS.md`; `docs/SECURITY-PRIVACY.md`.
 
 \*\*Open questions handled:\*\* Sprint 5 recommended scope, required promotion decisions, AI safety sequencing, and roadmap companion-document ownership.
+
+
+
+\### 2026-05-20 — Run decision (local-gate prose)
+
+\*\*Decision:\*\* Align PLAN local-gate prose with the current package validation scripts.
+
+\*\*Rationale:\*\* The current prompt, `package.json`, `docs/LOCAL-GATE.md`, and `scripts/local-gate.ps1` all include `npm run lint` and `npm run typecheck`, while PLAN §9 and §11 still contained older warnings that those scripts did not exist.
+
+\*\*Alternatives rejected:\*\* Leaving the stale warnings in place would keep future agents choosing between contradictory gate instructions; removing lint/typecheck from the actual gate would weaken current validation and conflict with higher-priority repo-local evidence.
+
+\*\*Sections changed:\*\* §1, §9, §11, §16, §17.
+
+\*\*Open questions handled:\*\* Whether agents may run and report `lint` and `typecheck` when the scripts exist in the current tree.
 
 
 

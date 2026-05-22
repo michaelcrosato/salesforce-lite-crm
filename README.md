@@ -206,6 +206,7 @@ test             vitest run --maxWorkers=1 --minWorkers=1
 test:e2e         npm run seed && playwright test
 prisma:postgres  node scripts/prisma-postgres.mjs
 autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
+autonomy:watchdog  powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
 ```
 
 There is no `format` script unless `package.json` later adds one.
