@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$BaseBranch = "main",
+    [string]$CodexBranch,
     [string]$ClaudeBranch,
     [string]$GrokBranch,
     [string]$GeminiBranch
@@ -12,6 +13,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 
 $targets = @(
+    @{ Name = "Codex"; Path = "C:\dev\salesforce-lite-crm-codex"; Branch = $CodexBranch },
     @{ Name = "Claude"; Path = "C:\dev\salesforce-lite-crm-claude"; Branch = $ClaudeBranch },
     @{ Name = "Grok"; Path = "C:\dev\salesforce-lite-crm-grok"; Branch = $GrokBranch },
     @{ Name = "Gemini"; Path = "C:\dev\salesforce-lite-crm-gemini"; Branch = $GeminiBranch }

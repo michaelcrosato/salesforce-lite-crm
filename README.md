@@ -38,10 +38,14 @@ Start with these files before changing code or documentation:
 - `docs/LOCAL-GATE.md` - authoritative local setup and validation commands.
 - `prompts/README.md` - policy for versioned prompt artifacts.
 
-Agents should work from repo-local evidence, keep changes scoped, record
-cross-zone exceptions in their own `SUMMARY.<agent>.md` and
-`BLOCKERS.<agent>.md`, and treat the PowerShell local gate as the pass/fail
-authority.
+Agents should work from repo-local evidence and treat the PowerShell local gate
+as the pass/fail authority. Worktree path decides collaboration mode:
+`C:\dev\salesforce-lite-crm` is single-agent full-repo mode, while
+agent-specific worktrees such as `C:\dev\salesforce-lite-crm-codex`,
+`C:\dev\salesforce-lite-crm-claude`, `C:\dev\salesforce-lite-crm-grok`, and
+`C:\dev\salesforce-lite-crm-gemini` are parallel mode and enforce ownership
+zones. Parallel-mode cross-zone exceptions are recorded in that agent's
+`SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md`.
 
 ## What The CRM Does
 
@@ -308,5 +312,5 @@ workflows, reports, and local gate documentation.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
-CSV UI workflows, and any future `/deals/[id]` route require explicit promotion
-before implementation.
+CSV UI workflows, and any future live `/deals/[id]` detail behavior require
+explicit promotion before implementation.

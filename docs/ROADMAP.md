@@ -62,8 +62,8 @@ The roadmap is governed by seven rules:
 4. Hermetic gate. No live LLM, email, calendar, web, geocoding, payment, or
    external CRM provider is allowed inside `test`, `build`, or `test:e2e`.
 5. Feature flags for promoted non-goals. Auth, external AI, deployment,
-   Postgres runtime, `/deals/[id]`, `/search`, dealer/area CRUD, and persistent
-   forecasts must be promoted intentionally.
+   Postgres runtime, live `/deals/[id]` detail behavior, `/search`,
+   dealer/area CRUD, and persistent forecasts must be promoted intentionally.
 6. RBAC before agentic writes. AI can summarize and suggest early, but AI tool
    actions must wait for identity, authorization, audit, and approval flows.
 7. Evals before expansion. Every AI capability gets golden fixtures, schema
@@ -86,7 +86,7 @@ Non-goals:
 - No deployment.
 - No Postgres default.
 - No dealer or area CRUD.
-- No `/deals/[id]`.
+- No live `/deals/[id]` detail route.
 - No dedicated `/search`.
 - No geocoding.
 - No generic B2B lead conversion.
@@ -234,7 +234,7 @@ limited autonomy after strong audit and evals.
 These cannot slip into a normal sprint:
 
 - `B-04` dealer-order and area CRUD.
-- `B-05` `/deals/[id]`.
+- `B-05` live `/deals/[id]` detail behavior.
 - `B-06` dedicated `/search`.
 - `B-07` persistent forecast scenarios.
 - `B-08` Postgres runtime/default path.

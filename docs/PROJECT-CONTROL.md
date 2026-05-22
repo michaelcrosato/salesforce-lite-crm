@@ -79,11 +79,15 @@ git worktree list
 scripts/check-worktrees.ps1
 ```
 
-Expected but missing locally:
+Topology rule:
 
 ```text
-none
+C:\dev\salesforce-lite-crm        single-agent root, full-repo access
+agent-specific worktrees          parallel mode, ownership zones enforced
 ```
+
+Codex's parallel worktree is `C:\dev\salesforce-lite-crm-codex`. The repo root
+is no longer used as Codex's parallel worktree.
 
 Use `docs/WORKTREE-SETUP.md` and `scripts/check-worktrees.ps1` before creating
 or repairing worktrees.

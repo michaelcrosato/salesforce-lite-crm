@@ -6,6 +6,7 @@
 - Sprint feature: S4-F3 - Component polish
 - Target branch: `grok/sprint-4-component-polish`
 - Worktree: `C:\dev\salesforce-lite-crm-grok`
+- Execution topology: parallel mode; ownership zones are mandatory.
 - Report files: `SUMMARY.grok.md`, `BLOCKERS.grok.md`
 
 ## Files And Zones In Scope

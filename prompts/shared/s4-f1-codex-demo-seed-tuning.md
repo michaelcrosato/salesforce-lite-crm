@@ -5,7 +5,8 @@
 - Agent: Codex
 - Sprint feature: S4-F1 - Demo seed tuning
 - Target branch: `codex/sprint-4-demo-seed-tuning`
-- Worktree: `C:\dev\salesforce-lite-crm`
+- Worktree: `C:\dev\salesforce-lite-crm-codex`
+- Execution topology: parallel mode; ownership zones are mandatory.
 - Report files: `SUMMARY.codex.md`, `BLOCKERS.codex.md`
 
 ## Files And Zones In Scope
@@ -53,7 +54,7 @@ Seeded data supports the README demo path: Vancouver lead routing (`V5K 0A1`), b
 - Current branch is not under the `codex/` prefix and cannot be corrected within the current prompt.
 - The required work needs a shared coordination file, another agent's zone, schema expansion, or new product scope without explicit current-prompt scope.
 - A gate command still fails after the same-command repair cap.
-- A missing dependency, worktree mismatch, or product-contract ambiguity prevents safe repo-local progress.
+- A missing dependency, parallel worktree mismatch, or product-contract ambiguity prevents safe repo-local progress.
 
 ## Continue Conditions
 

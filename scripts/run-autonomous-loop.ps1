@@ -21,7 +21,7 @@ if (-not $Launch -and -not $DryRun) { $DryRun = $true }
 $ErrorActionPreference = "Continue"
 
 $Agents = @(
-  @{ Name="codex";  Worktree="C:\dev\salesforce-lite-crm";        EnvVar="AUTONOMY_CODEX_CMD";  Prompt="prompts\shared\s4-f1-codex-demo-seed-tuning.md"; Feature="S4-F1" },
+  @{ Name="codex";  Worktree="C:\dev\salesforce-lite-crm-codex";  EnvVar="AUTONOMY_CODEX_CMD";  Prompt="prompts\shared\s4-f1-codex-demo-seed-tuning.md"; Feature="S4-F1" },
   @{ Name="claude"; Worktree="C:\dev\salesforce-lite-crm-claude"; EnvVar="AUTONOMY_CLAUDE_CMD"; Prompt="prompts\shared\s4-f2-claude-route-visual-qa.md"; Feature="S4-F2" },
   @{ Name="grok";   Worktree="C:\dev\salesforce-lite-crm-grok";   EnvVar="AUTONOMY_GROK_CMD";   Prompt="prompts\shared\s4-f3-grok-component-polish.md";  Feature="S4-F3" },
   @{ Name="gemini"; Worktree="C:\dev\salesforce-lite-crm-gemini"; EnvVar="AUTONOMY_GEMINI_CMD"; Prompt="prompts\shared\s4-f4-gemini-demo-smoke-gate.md";  Feature="S4-F4" }
@@ -208,7 +208,9 @@ do {
       continue
     }
     # Branch-prefix sanity: refuse to launch if branch is not on this agent's
-    # ownership prefix (codex/, claude/, grok/, gemini/).
+    # ownership prefix (codex/, claude/, grok/, gemini/). The repo root
+    # C:\dev\salesforce-lite-crm is reserved for single-agent full-repo runs
+    # and is intentionally not part of this parallel executor.
     if (-not $branch.StartsWith("$($a.Name)/")) {
       $cycleState += @{ Name=$a.Name; Worktree=$a.Worktree; Status="unsafe-branch-prefix:$branch"; BlockerCount=0 }
       continue

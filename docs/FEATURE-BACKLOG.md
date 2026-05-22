@@ -61,7 +61,7 @@ The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 - External AI provider integration.
 - Dedicated `/search` page. Cross-entity search currently exists through the
   global Ctrl/Cmd+K command palette.
-- `/deals/[id]` detail route.
+- Live `/deals/[id]` detail route.
 - Dealer order create/edit flows.
 - Area create/edit flows.
 - Postgres cutover as the default runtime.
@@ -94,5 +94,5 @@ These routes intentionally render placeholders or 404 responses:
 - Deployment.
 - External AI or Salesforce integration.
 - New dealer order or area CRUD.
-- New `/deals/[id]`.
+- New live `/deals/[id]` detail behavior.
 - Dedicated `/search` page.

@@ -6,6 +6,7 @@
 - Sprint feature: S4-F4 - Demo smoke and gate hardening
 - Target branch: `gemini/sprint-4-demo-smoke-gate-hardening`
 - Worktree: `C:\dev\salesforce-lite-crm-gemini`
+- Execution topology: parallel mode; ownership zones are mandatory.
 - Report files: `SUMMARY.gemini.md`, `BLOCKERS.gemini.md`
 
 ## Files And Zones In Scope

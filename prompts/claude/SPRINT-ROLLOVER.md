@@ -13,8 +13,8 @@ explicit scope.
 
 Per PLAN.md §4 permanent non-goals: a new sprint MUST NOT queue any of
 auth, deployment, external AI integration, geocoding, Postgres default,
-persistent forecast scenarios, dealer-order/area CRUD, /deals/[id]
-route, or global search expansion as features.
+persistent forecast scenarios, dealer-order/area CRUD, a live /deals/[id]
+detail route, or global search expansion as features.
 
 ============================================================
 PHASE 0 — PRE-FLIGHT
@@ -51,13 +51,15 @@ If NOT complete:
 PHASE 2 — DRAFT NEXT-SPRINT FEATURES (chat first)
 ============================================================
 
-Propose 1–4 features for {AGENT}'s §5 zone in the next sprint. Source
-candidates from:
+Propose 1–4 features for the next sprint. In single-agent root mode
+(`C:\dev\salesforce-lite-crm`), features may span the repo when that is the
+coherent way to prevent project drift. In parallel worktree mode, propose
+features for {AGENT}'s §5 zone. Source candidates from:
   - README.md "Known Limitations" graduating to scope (check that the
     item is NOT in the permanent non-goals list above)
-  - PLAN.md §16 backlog items in {AGENT}'s zone (note: B-04, B-05, B-06,
-    B-09, B-10, B-12 are explicitly deferred per non-goals — do not
-    promote without an IFT-led PLAN.md change)
+  - PLAN.md §16 backlog items, constrained to {AGENT}'s zone only in parallel
+    mode (note: B-04, B-05, B-06, B-09, B-10, B-12 are explicitly deferred per
+    non-goals — do not promote without an IFT-led PLAN.md change)
   - CRM-CONTRACT.md routes/statuses with degraded UI
   - BLOCKERS.*.md recurring technical debt
 
@@ -65,7 +67,7 @@ Each feature:
   ID:                S<N+1>-F<n>
   Title:             <short>
   Owner:             {AGENT}
-  Zone:              <PLAN.md §5 zone>
+  Zone:              <full repo in root mode | PLAN.md §5 zone in parallel mode>
   Acceptance:        <1–3 sentences>
   Dependencies:      <none | other agent deliverable | contract change>
   Estimated iters:   <1 | 2 | 3>
@@ -101,7 +103,7 @@ PHASE 3 — APPEND TO PLAN.md §4
    - No default switch from SQLite to Postgres.
    - No persistent forecast scenarios.
    - No dealer order or routing area create/edit flows.
-   - No new /deals/[id] route.
+   - No new live /deals/[id] detail route.
    - No global search expansion.
    - <plus any sprint-specific exclusions>
 

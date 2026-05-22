@@ -10,17 +10,35 @@ file is the short handoff.
 - Maximum YOLO mode: the current prompt can authorize a one-run exception.
 - Do not wait for human/manual approval as a hard blocker. Use repo-local
   evidence, the current prompt, SUMMARY/BLOCKERS, and the local gate.
-- Keep changes scoped. Document cross-zone or prompt-authorized exceptions.
+- Keep changes scoped. In parallel mode, document cross-zone or
+  prompt-authorized exceptions.
 - Do not paste raw chat history into repo docs.
 - Do not create product features during readiness or cleanup passes.
+
+## Execution Topology
+
+The worktree path decides whether ownership zones are mandatory.
+
+- `C:\dev\salesforce-lite-crm` is the single-agent root. If an agent is
+  working there, assume no other implementation agent is active. The agent may
+  edit any repo file needed for the current prompt, regardless of historical
+  owner assignment. Product guardrails, `CRM-CONTRACT.md`, and the local gate
+  still apply.
+- Agent-specific worktrees are parallel mode. If an agent is working from one
+  of the paths in the roster below, multiple agents may be active and the
+  ownership zones remain mandatory.
+- The root path should not be used as a parallel Codex worktree. Use
+  `C:\dev\salesforce-lite-crm-codex` for Codex when running a multi-agent
+  fleet.
 
 ## Agent Roster
 
 | Agent | Expected worktree | Branch ownership | Report files | Current local status |
 |---|---|---|---|---|
-| Codex | `C:\dev\salesforce-lite-crm` | `codex/` branches or current assigned branch | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | `main` observed 2026-05-19 |
+| Single-agent root | `C:\dev\salesforce-lite-crm` | current branch or prompt-specified branch | active agent's report files | full-repo mode |
+| Codex | `C:\dev\salesforce-lite-crm-codex` | `codex/` branches | `SUMMARY.codex.md`, `BLOCKERS.codex.md` | create when parallel Codex is needed |
 | Claude | `C:\dev\salesforce-lite-crm-claude` | `claude/` branches | `SUMMARY.claude.md`, `BLOCKERS.claude.md` | `claude/autonomy` observed 2026-05-19 |
-| Grok | `C:\dev\salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | `grok/autonomy` observed 2026-05-19 |
+| Grok | `C:\dev\salesforce-lite-crm-grok` or `/c/dev/salesforce-lite-crm-grok` | `grok/` branches | `SUMMARY.grok.md`, `BLOCKERS.grok.md` | `grok/autonomy` observed 2026-05-19 |
 | Gemini | `C:\dev\salesforce-lite-crm-gemini` | `gemini/` branches | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` | `gemini/autonomy` observed 2026-05-19 |
 
 Branch naming convention from `PLAN.md`: `<prefix>sprint-<id>-<feature-slug>`.
@@ -46,8 +64,10 @@ Agent zones from `PLAN.md`:
 - Gemini: `tests/**`, `e2e/**`, `scripts/**`, `playwright.config.ts`, `vitest.config.ts`
 - Each agent owns the contents of its own `SUMMARY` and `BLOCKERS` files.
 
-Cross-zone edits are allowed only when they are the smallest direct way to
-complete the current prompt. Record the reason in SUMMARY/BLOCKERS.
+In single-agent root mode, these ownership zones are advisory and do not block
+repo-wide fixes. In parallel mode, cross-zone edits are allowed only when they
+are the smallest direct way to complete the current prompt. Record the reason
+in SUMMARY/BLOCKERS.
 
 ## Standard Gate
 
@@ -86,8 +106,9 @@ action, and scope confirmation.
 
 ## Product Guardrails
 
-- No `/deals/[id]` route unless a later prompt explicitly promotes it.
-  Deal detail stays in the `/deals?deal=<id>` drawer flow.
+- No live `/deals/[id]` detail route unless a later prompt explicitly promotes
+  it. The excluded placeholder route may exist; deal detail stays in the
+  `/deals?deal=<id>` drawer flow.
 - `Lead` means consumer dealer-routed lead. Do not replace it with a generic
   B2B lead-conversion flow.
 - Deterministic AI-style summarization remains default. Do not add external AI

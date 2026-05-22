@@ -11,7 +11,8 @@ Rules:
 
 1. Every proposed task must cite an existing CRM-CONTRACT.md acceptance criterion, current PLAN.md item, or unresolved blocker.
 2. Do not propose CRM-CONTRACT.md changes as safe; flag them.
-3. Do not change ownership zones.
+3. Do not change execution topology or ownership zones unless the current
+   prompt explicitly asks for that policy update.
 4. Do not add Sprint non-goal scope.
 5. Do not propose auto-merge or local-gate bypass.
 6. If no safe next work exists, propose an empty queue and explain why.

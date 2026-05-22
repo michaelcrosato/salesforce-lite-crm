@@ -7,7 +7,7 @@
 
 You are Gemini CLI, working in YOLO mode (danger-full-access, never
 approval) on an EXISTING Salesforce Lite CRM POC at
-C:\dev\salesforce-lite-crm.
+C:\dev\salesforce-lite-crm-gemini.
 
 Use PowerShell-compatible commands. Do not use POSIX-only patterns
 such as `|| true`. Translate shell-sensitive lines to the active

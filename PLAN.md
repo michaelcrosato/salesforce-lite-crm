@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.27A |
+| Version | 2.28 |
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 22 queued for Codex; Sprint 21 Codex track done |
+| Active sprint | Sprint 22 S22-F2 queued; S22-F1 present in `main` |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -50,7 +50,19 @@ If the current prompt conflicts with file ownership or a durable rule in this pl
 
 
 
-\## 3. Agent Roster
+\## 3. Execution Topology And Agent Roster
+
+
+
+The current worktree path decides whether ownership zones are mandatory:
+
+
+
+\- `C:\\dev\\salesforce-lite-crm` is the single-agent root. If an agent is working there, assume no other implementation agent is active. The agent may edit any repo file needed for the current prompt, regardless of historical owner assignment. Product guardrails, `CRM-CONTRACT.md`, and the local gate still apply.
+
+\- Agent-specific worktrees are parallel mode. If an agent is working from `C:\\dev\\salesforce-lite-crm-codex`, `C:\\dev\\salesforce-lite-crm-claude`, `C:\\dev\\salesforce-lite-crm-gemini`, `C:\\dev\\salesforce-lite-crm-grok`, or Git Bash path `/c/dev/salesforce-lite-crm-grok`, multiple agents may be active and §5 ownership zones are mandatory.
+
+\- The root path is not the Codex parallel worktree. Use `C:\\dev\\salesforce-lite-crm-codex` when Codex participates in a multi-agent fleet.
 
 
 
@@ -58,15 +70,17 @@ This table records configured worktree paths. It is not proof that the directori
 
 
 
-| Agent | Model | Worktree | Branch prefix | Git identity | Report files |
+| Agent / mode | Model | Worktree | Branch prefix | Git identity | Report files |
 
 |---|---|---|---|---|---|
 
-| Codex | GPT-5.5 (Codex CLI) | `C:\\dev\\salesforce-lite-crm` | `codex/` | repo-configured | `SUMMARY.codex.md`, `BLOCKERS.codex.md` |
+| Single-agent root | active CLI agent | `C:\\dev\\salesforce-lite-crm` | current branch or prompt-specified branch | repo-configured | active agent's report files |
+
+| Codex | GPT-5.5 (Codex CLI) | `C:\\dev\\salesforce-lite-crm-codex` | `codex/` | repo-configured | `SUMMARY.codex.md`, `BLOCKERS.codex.md` |
 
 | Claude | Anthropic (Claude Code) | `C:\\dev\\salesforce-lite-crm-claude` | `claude/` | repo-configured | `SUMMARY.claude.md`, `BLOCKERS.claude.md` |
 
-| Grok | xAI (Grok CLI) | `C:\\dev\\salesforce-lite-crm-grok` | `grok/` | repo-configured | `SUMMARY.grok.md`, `BLOCKERS.grok.md` |
+| Grok | xAI (Grok CLI) | `C:\\dev\\salesforce-lite-crm-grok` (`/c/dev/salesforce-lite-crm-grok` in Git Bash) | `grok/` | repo-configured | `SUMMARY.grok.md`, `BLOCKERS.grok.md` |
 
 | Gemini | Google (Gemini CLI) | `C:\\dev\\salesforce-lite-crm-gemini` | `gemini/` | repo-configured | `SUMMARY.gemini.md`, `BLOCKERS.gemini.md` |
 
@@ -76,9 +90,11 @@ Roster rules:
 
 
 
-\- Each agent works in its own local worktree and pushes only to branches under its own prefix.
+\- In single-agent root mode, ownership zones are advisory only and the active agent may make repo-wide changes needed to keep the project coherent.
 
-\- If a listed worktree does not exist at the expected path, create it when feasible or file a `dependency` blocker per §10 with the exact missing path.
+\- In parallel mode, each agent works in its own local worktree and pushes only to branches under its own prefix.
+
+\- If a listed parallel worktree does not exist at the expected path, create it when feasible or file a `dependency` blocker per §10 with the exact missing path. Missing parallel worktrees are not blockers for a single-agent root run.
 
 \- No agent rebases `main`, force-pushes, amends pushed commits, or merges another agent's branch.
 
@@ -790,7 +806,7 @@ Goal: convert the read-only CSV release handoff surface into deterministic dispo
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S22-F1 — CSV release disposition manifests | Codex | queued | Server-side helpers compose the S21 release handoff catalog and exception register into deterministic per-entity and per-operation dispositions with ready/watch/block counts, source fingerprints, trace anchors, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes, persistence, or runtime workflow behavior. |
+| S22-F1 — CSV release disposition manifests | Codex | done | Server-side helpers compose the S21 release handoff catalog and exception register into deterministic per-entity and per-operation dispositions with ready/watch/block counts, source fingerprints, trace anchors, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes, persistence, or runtime workflow behavior. |
 | S22-F2 — CSV release readiness packets | Codex | queued | Server-side helpers publish bounded release readiness packets that combine disposition manifests with the existing release digest, verification manifests, closure scorecards, and exception metadata into release-consumer summaries with pass/watch/block totals and remediation anchors. Output remains deterministic and read-only without adding approval workflows or CSV product UI. |
 
 \*\*Sprint 22 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
@@ -823,6 +839,14 @@ Goal: convert the read-only CSV release handoff surface into deterministic dispo
 
 
 \## 5. File Ownership Matrix
+
+
+
+This matrix is mandatory only in parallel worktree mode (§3). In the
+single-agent root worktree `C:\\dev\\salesforce-lite-crm`, it is advisory: the
+active agent may make repo-wide changes needed to solve the current prompt
+coherently. Even in single-agent mode, durable product guardrails,
+`CRM-CONTRACT.md`, local-gate requirements, and report hygiene still apply.
 
 
 
@@ -888,11 +912,11 @@ If a listed framework config file does not actually exist in the repo, the zone 
 
 
 
-Cross-cutting feature work that requires edits in two agents' zones should be decomposed in the prompt or documented in the agent report. Agents coordinate through branches, reports, and contract files.
+In parallel mode, cross-cutting feature work that requires edits in two agents' zones should be decomposed in the prompt or documented in the agent report. Agents coordinate through branches, reports, and contract files.
 
 
 
-If an agent finds it cannot complete its feature without touching another zone, the correct action is: keep the edit minimal, document the cross-zone reason in SUMMARY/BLOCKERS, and proceed when the current prompt makes the need clear. See §10.
+In parallel mode, if an agent finds it cannot complete its feature without touching another zone, the correct action is: keep the edit minimal, document the cross-zone reason in SUMMARY/BLOCKERS, and proceed when the current prompt makes the need clear. See §10. In single-agent root mode, no cross-zone blocker is needed solely because files span historical owner zones.
 
 
 
@@ -904,33 +928,35 @@ Every CLI agent runs this on every prompt. No exceptions.
 
 
 
-0\. Check STOP gate. If a file named `STOP` exists at the worktree root, file or update a BLOCKERS entry of type `dependency` recording the STOP, rewrite SUMMARY with Status: blocked, commit report-only per §6 step 11, push if safe, and exit. The supervisor (if used) is responsible for polling `origin/main` for a remote STOP signal; agents only check the local worktree.
+0\. Check STOP gate. If a file named `STOP` exists at the worktree root, file or update a BLOCKERS entry of type `dependency` recording the STOP, rewrite SUMMARY with Status: blocked, commit report-only per §6 step 12, push if safe, and exit. The supervisor (if used) is responsible for polling `origin/main` for a remote STOP signal; agents only check the local worktree.
 
 1\. Read `PLAN.md` §§1–11 and `CRM-CONTRACT.md` (or its interim substitutes per §1) in full.
 
-2\. Identify your active feature in §4. If status is not `active` or `queued` for you, treat the current prompt as the run scope and note the mismatch in SUMMARY/BLOCKERS.
+2\. Determine execution topology from the current worktree path per §3. If the path is `C:\\dev\\salesforce-lite-crm`, run in single-agent root mode with full repo access. If the path is one of the agent-specific worktrees, run in parallel mode and enforce §5 ownership zones.
 
-3\. Confirm the local worktree exists and is the expected path from §3. If not, create or use the best available worktree when feasible; otherwise file a BLOCKERS entry per §10 (type: `dependency`).
+3\. Identify your active feature in §4. If status is not `active` or `queued` for you, treat the current prompt as the run scope and note the mismatch in SUMMARY/BLOCKERS.
 
-4\. Run `git status --short` in your worktree. If unexpected uncommitted files exist (anything not in `.gitignore` that you did not introduce in this prompt), record the listing, avoid overwriting those paths, and proceed around them when possible.
+4\. Confirm the local worktree exists and is an allowed path from §3 for the detected topology. If a required parallel worktree is missing, create or use the best available worktree when feasible; otherwise file a BLOCKERS entry per §10 (type: `dependency`). A missing parallel worktree does not block a single-agent root run.
 
-5\. Confirm every file you intend to touch is in your zone per §5. If any file is in another agent's zone or a shared coordination zone, keep the edit minimal, document the reason, and proceed when needed for the assigned work.
+5\. Run `git status --short` in your worktree. If unexpected uncommitted files exist (anything not in `.gitignore` that you did not introduce in this prompt), record the listing, avoid overwriting those paths, and proceed around them when possible.
 
-6\. Execute the assigned work.
+6\. In parallel mode, confirm every file you intend to touch is in your zone per §5. If any file is in another agent's zone or a shared coordination zone, keep the edit minimal, document the reason, and proceed when needed for the assigned work. In single-agent root mode, this check is advisory and should not block repo-wide fixes.
 
-7\. Run the local gate per §9 — full sequence or change-type subset as appropriate. If it fails, follow the gate-failure policy in §9 before deciding whether a `gate` blocker is needed.
+7\. Execute the assigned work.
 
-8\. If checks pass and implementation files changed, commit the implementation work per §7. Record the implementation commit SHA(s).
+8\. Run the local gate per §9 — full sequence or change-type subset as appropriate. If it fails, follow the gate-failure policy in §9 before deciding whether a `gate` blocker is needed.
 
-9\. Rewrite `SUMMARY.<agent>.md` per the schema in §13 (full overwrite, not append). `Commits this prompt` records the implementation commit(s) from step 8, or `none`.
+9\. If checks pass and implementation files changed, commit the implementation work per §7. Record the implementation commit SHA(s).
 
-10\. Rewrite `BLOCKERS.<agent>.md` per the schema in §13. If no active blockers, the file still exists with an empty `Active blockers` table.
+10\. Rewrite `SUMMARY.<agent>.md` per the schema in §13 (full overwrite, not append). `Commits this prompt` records the implementation commit(s) from step 9, or `none`.
 
-11\. Commit changed report files as a separate report-only commit per §7. This report-only commit must not list itself in `Commits this prompt`.
+11\. Rewrite `BLOCKERS.<agent>.md` per the schema in §13. If no active blockers, the file still exists with an empty `Active blockers` table.
 
-12\. Push to your branch.
+12\. Commit changed report files as a separate report-only commit per §7. This report-only commit must not list itself in `Commits this prompt`.
 
-13\. Stop after the assigned work unless the current prompt asks you to continue into the next feature.
+13\. Push to your branch.
+
+14\. Stop after the assigned work unless the current prompt asks you to continue into the next feature.
 
 
 
@@ -942,7 +968,7 @@ If a gate failure remains unresolved after the §9 repair-first policy and repor
 
 
 
-On the next prompt, the uncommitted implementation paths from a still-open `gate` blocker satisfy step 4's "not introduced in this prompt" check when those paths match the Evidence list of the open `gate` blocker or the current prompt otherwise makes them in scope. Do not file a duplicate `gate` blocker; keep the existing one open and note in `BLOCKERS.<agent>.md` whether the dirty state changed.
+On the next prompt, the uncommitted implementation paths from a still-open `gate` blocker satisfy step 5's "not introduced in this prompt" check when those paths match the Evidence list of the open `gate` blocker or the current prompt otherwise makes them in scope. Do not file a duplicate `gate` blocker; keep the existing one open and note in `BLOCKERS.<agent>.md` whether the dirty state changed.
 
 
 
@@ -972,7 +998,7 @@ Stop only on:
 
 When a stop condition is reached, write the reason to BLOCKERS/SUMMARY. If safe, set `Continuous: OFF`; otherwise create `AUTONOMY.STOP` with the reason.
 
-All ownership zones, CRM-CONTRACT.md invariants, report requirements, hook policies, and local-gate authority remain in force.
+Ownership zones remain in force only for parallel worktree mode. CRM-CONTRACT.md invariants, report requirements, hook policies, and local-gate authority remain in force in every topology.
 
 
 
@@ -1034,7 +1060,8 @@ A report-only commit may include only that agent's `SUMMARY.<agent>.md` and `BLO
 
 \- Amend a commit you have already pushed.
 
-\- Edit a file outside your zone (§5), even to fix a typo. File a blocker.
+\- In parallel mode, edit a file outside your zone (§5) without documenting the
+  §10 reason. In single-agent root mode, zones are advisory.
 
 \- Merge between agent branches or into `main` without explicit current-prompt scope.
 
@@ -1060,9 +1087,11 @@ Every feature must satisfy all of the following before an agent may mark it `don
 
 \- `BLOCKERS.<agent>.md` reflects current blocker state, even when empty.
 
-\- Both report files are committed via the §6 step 11 report-only commit, or `BLOCKERS.<agent>.md` explains why they could not be committed.
+\- Both report files are committed via the §6 step 12 report-only commit, or `BLOCKERS.<agent>.md` explains why they could not be committed.
 
-\- Cross-zone or shared coordination edits are minimal and documented.
+\- In parallel mode, cross-zone or shared coordination edits are minimal and
+  documented. In single-agent root mode, repo-wide scope is summarized in
+  `SUMMARY.<agent>.md`.
 
 \- `CRM-CONTRACT.md` invariants are honored (no schema drift, no removed types, no renamed exports without a contract update).
 
@@ -1195,7 +1224,7 @@ If the gate fails on `main` after a merge, handle it through a rollback, hotfix,
 
 
 
-An agent's work hits another agent's zone, the shared/contract zone, or the planning/decision zone; or a precondition from §3 or §6 fails; or the current prompt conflicts with a durable rule in this plan. The agent does this, in order:
+In parallel mode, an agent's work hits another agent's zone, the shared/contract zone, or the planning/decision zone; in any topology, a precondition from §3 or §6 fails, or the current prompt conflicts with a durable rule in this plan. The agent does this, in order:
 
 
 
@@ -1207,7 +1236,7 @@ An agent's work hits another agent's zone, the shared/contract zone, or the plan
 
 &#x20;  - the blocker type, picking exactly one of:
 
-&#x20;    - `ownership` — work requires editing another agent's zone or a shared coordination file (§5)
+&#x20;    - `ownership` — in parallel mode, work requires editing another agent's zone or a shared coordination file (§5)
 
 &#x20;    - `gate` — a local gate command or required check (§9) failed
 
@@ -1223,13 +1252,13 @@ An agent's work hits another agent's zone, the shared/contract zone, or the plan
 
 &#x20;  - what the agent will work on safely while blocked.
 
-3\. \*\*Keep work moving where safe.\*\* Do not silently reproduce a cross-zone change in your own zone; either make the needed edit directly with documentation or leave a blocker.
+3\. \*\*Keep work moving where safe.\*\* In parallel mode, do not silently reproduce a cross-zone change in your own zone; either make the needed edit directly with documentation or leave a blocker. In single-agent root mode, make the coherent repo-wide edit directly and document the scope in SUMMARY.
 
 4\. \*\*Resume or continue work when the current prompt, blocker evidence, or repo state provides a workable resolution.\*\*
 
 
 
-No inter-agent merging or agent-to-agent pull requests without explicit current-prompt scope. Cross-zone fixes are allowed when they are the smallest direct way to complete the assigned work and are documented.
+No inter-agent merging or agent-to-agent pull requests without explicit current-prompt scope. In parallel mode, cross-zone fixes are allowed when they are the smallest direct way to complete the assigned work and are documented. In single-agent root mode, cross-zone labels are advisory and should not split one coherent fix into artificial handoffs.
 
 
 
@@ -1269,7 +1298,7 @@ No inter-agent merging or agent-to-agent pull requests without explicit current-
 
 \---
 
-\*CLI agents: §§1–11 are your complete operational reference. Consult §13 when rewriting `SUMMARY` and `BLOCKERS` per §6 steps 9–11. §§12 and 14–17 are planning and maintenance context for chat LLMs and coordinating future work.\*
+\*CLI agents: §§1–11 are your complete operational reference. Consult §13 when rewriting `SUMMARY` and `BLOCKERS` per §6 steps 10–12. §§12 and 14–17 are planning and maintenance context for chat LLMs and coordinating future work.\*
 
 
 
@@ -1285,7 +1314,14 @@ This file is the bridge between two tracks.
 
 
 
-\*\*Track A — Execution.\*\* Four CLI agents (§3) run in parallel in their own worktrees. Each reads `PLAN.md` and `CRM-CONTRACT.md` on every prompt, executes per §§4–6, commits per §7, and writes `SUMMARY` and `BLOCKERS` per §13. Agents run unattended. They cannot see this chat or each other.
+\*\*Track A — Execution.\*\* CLI agents run under the §3 topology. In
+single-agent root mode, one active agent works from
+`C:\\dev\\salesforce-lite-crm` with full repo access. In parallel mode, Codex,
+Claude, Grok, and Gemini run in their agent-specific worktrees with ownership
+zones enforced. Each reads `PLAN.md` and `CRM-CONTRACT.md` on every prompt,
+executes per §§4–6, commits per §7, and writes `SUMMARY` and `BLOCKERS` per
+§13. Agents run unattended. In parallel mode, they cannot see this chat or each
+other.
 
 
 
@@ -1319,11 +1355,13 @@ The prompt may add a single line of inline context if a blocker resolution requi
 
 
 
-\*\*Cadence:\*\* rewrite both files in full every prompt. Snapshot of current state, not appended log. Historical state is preserved in git. Per §6 step 11, both files are then committed in a single report-only commit before push; the report-only commit must not list itself in its own `Commits this prompt` field.
+\*\*Cadence:\*\* rewrite both files in full every prompt. Snapshot of current state, not appended log. Historical state is preserved in git. Per §6 step 12, both files are then committed in a single report-only commit before push; the report-only commit must not list itself in its own `Commits this prompt` field.
 
 
 
-\*\*Location:\*\* root of each agent's worktree. Example: `C:\\dev\\salesforce-lite-crm-claude\\SUMMARY.claude.md`.
+\*\*Location:\*\* root of the active worktree. In single-agent root mode this
+is `C:\\dev\\salesforce-lite-crm`; in parallel mode it is the agent-specific
+worktree. Example: `C:\\dev\\salesforce-lite-crm-claude\\SUMMARY.claude.md`.
 
 
 
@@ -1381,7 +1419,7 @@ CRM-CONTRACT.md honored:  YES | NO  (if NO, see BLOCKERS)
 
 
 
-`Commits this prompt` records the implementation commit(s) from §6 step 8. The report-only commit from §6 step 11 is not listed; if no implementation commit was created (e.g. a blocker-only or report-only prompt), the field is `none`.
+`Commits this prompt` records the implementation commit(s) from §6 step 9. The report-only commit from §6 step 12 is not listed; if no implementation commit was created (e.g. a blocker-only or report-only prompt), the field is `none`.
 
 
 
@@ -1734,6 +1772,20 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+
+
+\### 2026-05-22 — Run decision (execution topology)
+
+\*\*Decision:\*\* Make worktree path the topology switch: `C:\\dev\\salesforce-lite-crm` is single-agent full-repo mode, while `C:\\dev\\salesforce-lite-crm-codex`, `C:\\dev\\salesforce-lite-crm-claude`, `C:\\dev\\salesforce-lite-crm-grok`, `/c/dev/salesforce-lite-crm-grok`, and `C:\\dev\\salesforce-lite-crm-gemini` are parallel multi-agent mode with ownership zones enforced.
+
+\*\*Rationale:\*\* Some fixes require moving across app, component, service, test, script, and documentation boundaries together. In the root worktree, serializing work through one active agent prevents parts of the same project from drifting too far ahead while preserving the existing multi-agent workflow when dedicated worktrees are used.
+
+\*\*Alternatives rejected:\*\* Keeping Codex on the repo root in parallel mode, because it makes path-based intent ambiguous; always enforcing ownership zones, because it blocks coherent repo-wide fixes during single-agent runs; removing the ownership matrix entirely, because it is still useful when multiple agent-specific worktrees run in parallel.
+
+\*\*Sections changed:\*\* §1, §3, §5, §6, §8, §13, §17; `AGENTS.md`; worktree, autonomy, prompt, and project-control docs/scripts.
+
+\*\*Open questions handled:\*\* How agents decide whether ownership zones are advisory or mandatory; where parallel Codex work should run; how to avoid cross-zone blocking during single-agent root work.
 
 
 

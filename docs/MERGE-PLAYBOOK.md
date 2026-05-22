@@ -4,7 +4,7 @@
 
 1. Confirm the source branch matches the assigned agent and feature.
 2. Read that agent's latest `SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md`.
-3. Confirm the branch does not touch unrelated ownership zones without a documented reason.
+3. For parallel-mode branches, confirm the branch does not touch unrelated ownership zones without a documented reason. For single-agent root branches, confirm repo-wide edits are coherent and tied to the prompt.
 4. Run or verify the local gate from `docs/LOCAL-GATE.md`.
 5. Run the route and drift scans:
 
@@ -16,7 +16,7 @@ rg -n "lint passed|typecheck passed|npm run lint|npm run typecheck|npm run forma
 
 ## Merge Order
 
-Use the order defined by the current project prompt or `PLAN.md`. When no order is defined, merge the least cross-cutting branch first and the branch with broadest tests last.
+Use the order defined by the current project prompt or `PLAN.md`. When no order is defined, merge the least cross-cutting parallel branch first and the branch with broadest tests last. Single-agent root work should already be internally reconciled before merge.
 
 The previous Sprint 4B branches are already represented in current `main`.
 For future handoffs, use the merge order defined by the fresh prompt or the
@@ -25,10 +25,10 @@ names.
 
 ## Conflict Ownership
 
-- App route conflicts: Claude-owned unless the current prompt says otherwise.
-- Component/style conflicts: Grok-owned unless the current prompt says otherwise.
-- Service, adapter, routing, forecast, and seed conflicts: Codex-owned unless the current prompt says otherwise.
-- Tests, e2e, helper scripts, and test config conflicts: Gemini-owned unless the current prompt says otherwise.
+- App route conflicts: Claude-owned in parallel mode unless the current prompt says otherwise.
+- Component/style conflicts: Grok-owned in parallel mode unless the current prompt says otherwise.
+- Service, adapter, routing, forecast, and seed conflicts: Codex-owned in parallel mode unless the current prompt says otherwise.
+- Tests, e2e, helper scripts, and test config conflicts: Gemini-owned in parallel mode unless the current prompt says otherwise.
 - Shared coordination files: resolve by `PLAN.md`, `CRM-CONTRACT.md`, current prompt, and local gate output.
 
 ## Red Feature Procedure
@@ -70,9 +70,10 @@ npm run test:e2e
 
 ## Route Scan For Deal Detail
 
-Docs may mention `/deals/[id]` only as deferred, excluded, or not implemented
-as a live detail route. Live route links or non-placeholder app-router behavior
-must not introduce `/deals/[id]` unless that feature is explicitly promoted.
+Docs may mention `/deals/[id]` only as deferred, excluded, or not promoted as
+live detail behavior. Live route links or non-placeholder app-router behavior
+must not introduce live `/deals/[id]` detail behavior unless that feature is
+explicitly promoted.
 
 ## Preserving Reports
 

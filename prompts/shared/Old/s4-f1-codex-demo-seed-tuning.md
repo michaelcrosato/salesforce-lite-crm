@@ -5,7 +5,8 @@
 - Agent: Codex
 - Sprint feature: S4-F1 - Demo seed tuning
 - Target branch: `codex/sprint-4-demo-seed-tuning`
-- Worktree: `C:\dev\salesforce-lite-crm`
+- Worktree: `C:\dev\salesforce-lite-crm-codex`
+- Execution topology: parallel mode; ownership zones are mandatory.
 - Report files: `SUMMARY.codex.md`, `BLOCKERS.codex.md`
 
 ## Files And Zones In Scope

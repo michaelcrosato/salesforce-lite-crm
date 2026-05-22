@@ -6,10 +6,11 @@ does not merge branches or approve IFT decisions.
 
 ## Purpose
 
-The executor walks the four configured agent worktrees, snapshots each scoped
-Sprint 4 prompt outside the repo, launches the operator-provided agent CLI
-command with bounded timeouts, and rewrites external status files for quick
-inspection.
+The executor walks the configured agent-specific parallel worktrees, snapshots
+each scoped Sprint 4 prompt outside the repo, launches the operator-provided
+agent CLI command with bounded timeouts, and rewrites external status files for
+quick inspection. It does not launch work from `C:\dev\salesforce-lite-crm`;
+that root path is reserved for single-agent full-repo runs.
 
 It defaults to dry-run behavior unless `-Launch` is passed.
 
@@ -116,8 +117,11 @@ If any queued prompt references a PLAN.md section 5 shared/contract or
 planning/decision file, the executor serializes the cycle and runs one agent.
 Default to serialization for ambiguous shared-zone work.
 
-Before launch, each worktree must be clean, must not be on `main`, and must use
-the expected branch prefix: `codex/`, `claude/`, `grok/`, or `gemini/`.
+Before launch, each parallel worktree must be clean, must not be on `main`, and
+must use the expected branch prefix: `codex/`, `claude/`, `grok/`, or
+`gemini/`. Codex's parallel worktree is
+`C:\dev\salesforce-lite-crm-codex`; `C:\dev\salesforce-lite-crm` is
+single-agent mode and is intentionally excluded from this fleet executor.
 
 ## Merge And IFT Policy
 

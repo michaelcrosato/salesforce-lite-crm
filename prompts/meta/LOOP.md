@@ -14,15 +14,19 @@ PLAN.md / CRM-CONTRACT.md > SUMMARY/BLOCKERS > docs/decisions.md.
 PHASE 0 — PRE-FLIGHT (no edits, no commits)
 ============================================================
 
-Confirm worktree per PLAN.md §3:
-  codex   → C:\dev\salesforce-lite-crm
-  claude  → C:\dev\salesforce-lite-crm-claude
-  grok    → C:\dev\salesforce-lite-crm-grok
-  gemini  → C:\dev\salesforce-lite-crm-gemini
+Determine execution topology per PLAN.md §3:
+  single-agent root → C:\dev\salesforce-lite-crm (full repo access)
+  codex parallel   → C:\dev\salesforce-lite-crm-codex
+  claude parallel  → C:\dev\salesforce-lite-crm-claude
+  grok parallel    → C:\dev\salesforce-lite-crm-grok or /c/dev/salesforce-lite-crm-grok
+  gemini parallel  → C:\dev\salesforce-lite-crm-gemini
 
-If the expected worktree is missing, file a `dependency` blocker per
-PLAN.md §10 and stop. Otherwise run from the worktree root, sequentially,
-halting on the first non-zero exit:
+If running from the single-agent root, ownership zones are advisory and branch
+prefix is not required. If running from an agent-specific worktree, enforce
+parallel-mode ownership zones and branch prefix. If the expected parallel
+worktree is missing, file a `dependency` blocker per PLAN.md §10 and stop.
+Otherwise run from the worktree root, sequentially, halting on the first
+non-zero exit:
 
   git status --short
   git rev-parse --abbrev-ref HEAD
@@ -37,7 +41,8 @@ halting on the first non-zero exit:
   npm run test
   npm run build
 
-Pass criteria: clean tree; branch matches `{AGENT}/` prefix; `npm run lint`,
+Pass criteria: clean tree; in parallel mode branch matches `{AGENT}/` prefix;
+in single-agent root mode the current branch is acceptable; `npm run lint`,
 `npm run typecheck`, `npm run test`, and `npm run build` exit 0.
 
 Recovery cases:
@@ -49,8 +54,9 @@ Recovery cases:
   - `npm run lint`, `npm run typecheck`, `npm run test`, or `npm run build` red on baseline: this iteration's
     work unit becomes "fix the red gate." Skip Phase 2 selection; go to
     Phase 4 with the failure as the target.
-  - Wrong active worktree / wrong branch prefix / recovery fails: STOP and
-    emit "STOPPED: pre-flight unrecoverable — human intervention required."
+  - Wrong active worktree / wrong branch prefix in parallel mode / recovery
+    fails: STOP and emit "STOPPED: pre-flight unrecoverable — human
+    intervention required."
 
 ============================================================
 PHASE 1 — ORIENT + RECONCILE (read in full; no edits)
@@ -96,15 +102,19 @@ PHASE 2 — SELECT (exactly one work unit)
 
 Priority order:
   1. Unresolved {AGENT}-owned blocker in BLOCKERS.{AGENT}.md.
-  2. Next queued {AGENT}-owned feature in PLAN.md §4 (check the Owner
-     column; skip features owned by other agents).
-  3. Contract drift (CRM-CONTRACT.md vs live code) where the fix lives in
-     your zone per §5.
+  2. In single-agent root mode, next queued feature in PLAN.md §4 that best
+     advances the current prompt; in parallel mode, next queued {AGENT}-owned
+     feature in PLAN.md §4 (check the Owner column; skip features owned by
+     other agents).
+  3. Contract drift (CRM-CONTRACT.md vs live code) where the fix is coherent
+     for the current topology: anywhere in single-agent root mode, or your
+     zone per §5 in parallel mode.
   4. Documentation or report-file consistency fix in your shared zone.
 
 Unit must:
-  - Touch only files in your §5 zone, or shared coordination zone with
-    documented §10 reason.
+  - In single-agent root mode, touch any repo file needed for one coherent fix.
+    In parallel mode, touch only files in your §5 zone, or shared coordination
+    zone with documented §10 reason.
   - Be completable this iteration (one focused change).
   - Have one-or-two-sentence acceptance criteria.
   - NOT require a CRM-CONTRACT.md change (file a `contract` blocker if
@@ -112,7 +122,7 @@ Unit must:
   - NOT require new dependencies, framework config changes, or any of the
     PLAN.md §4 permanent non-goals (auth, deployment, external AI, Postgres
     default, persistent forecast scenarios, dealer-order/area CRUD,
-    /deals/[id] route, global search expansion, geocoding).
+    live /deals/[id] detail route, global search expansion, geocoding).
 
 If no valid unit exists in priorities 1–4:
   STOP. Emit "STOPPED: sprint rollover needed for {AGENT} — paste
@@ -123,7 +133,7 @@ Write to chat:
     Title: <one line>
     Source: <PLAN.md §4 row | BLOCKERS.{AGENT}.md #N | contract-drift |
              doc-fix>
-    Zone: <your §5 zone path>
+    Zone: <full repo in root mode | your §5 zone path in parallel mode>
     Files in scope: <explicit list>
     Cross-zone files needed: <list with §10 justification, or "none">
     Acceptance: <one or two sentences>
@@ -136,10 +146,9 @@ PHASE 3 — DESIGN (micro-plan; no edits)
 
 For each file you will touch, write down:
   - Specific function / component / export to change.
-  - Whether a test covers the new behavior. If not, where the test
-    goes (your zone or another agent's — if another agent's, the work
-    unit may need to be a partial deliverable with a coordination
-    blocker filed for the test).
+  - Whether a test covers the new behavior. If not, where the test goes. In
+    single-agent root mode, add it directly when useful. In parallel mode,
+    another agent's zone may require a coordination blocker.
   - New `data-testid` attributes (catalog for Gemini): naming
     `<entity>-<element>-<purpose>`, kebab-case.
   - Rollback path: `git reset --soft HEAD~N` before commits, or
@@ -150,7 +159,7 @@ Plan commit messages: `[{AGENT}] <feature-id>: <subject, ≤72 chars,
 imperative>`.
 
 ============================================================
-PHASE 4 — IMPLEMENT (atomic commits in zone)
+PHASE 4 — IMPLEMENT (atomic commits)
 ============================================================
 
 For each logical change:
@@ -160,7 +169,8 @@ For each logical change:
 
 Constraints per PLAN.md §§7, 8, 11:
   - One logical change per commit.
-  - No edits outside your zone unless documented per §10.
+  - In parallel mode, no edits outside your zone unless documented per §10.
+    In single-agent root mode, ownership zones are advisory.
   - No new dependencies; no new package.json scripts.
   - No `any`, `@ts-ignore`, `@ts-expect-error`, or `as unknown as` bypasses
     in files you author or edit.
@@ -168,9 +178,10 @@ Constraints per PLAN.md §§7, 8, 11:
   - Do not commit generated DB files, build artifacts, logs, or
     screenshots.
 
-If cross-zone edit is unavoidable: keep it minimal, document the §10
-reason in SUMMARY's "Completed this prompt" entry and in BLOCKERS if
-material.
+If a cross-zone edit is unavoidable in parallel mode: keep it minimal, document
+the §10 reason in SUMMARY's "Completed this prompt" entry and in BLOCKERS if
+material. In single-agent root mode, summarize repo-wide scope but do not file a
+blocker solely for crossing historical zones.
 
 ============================================================
 PHASE 5 — VERIFY (gate + bounded fix loop)
@@ -195,8 +206,8 @@ Full §9 sequence (from worktree root):
 If green: go to Phase 6.
 
 If red, bounded fix loop:
-  - Attempt 1: smallest focused fix in your zone. Re-run the failing
-    command; if green there, re-run the full subset.
+  - Attempt 1: smallest focused fix allowed by the current topology. Re-run the
+    failing command; if green there, re-run the full subset.
   - Attempt 2: one more focused fix. Re-run.
   - After Attempt 2 fails: STOP fixing. Choose one path:
       (a) Revert this iteration's implementation commits

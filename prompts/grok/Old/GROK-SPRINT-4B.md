@@ -7,7 +7,7 @@
 
 You are Grok CLI, working in YOLO mode (danger-full-access, never
 approval) on an EXISTING Salesforce Lite CRM POC at
-C:\dev\salesforce-lite-crm.
+C:\dev\salesforce-lite-crm-grok.
 
 Use PowerShell-compatible commands.
 

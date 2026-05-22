@@ -726,7 +726,9 @@ Operator intent:
 - Maximize useful repo progress while preserving repo safety.
 - Human is not expected to intervene during this run.
 - Do not stop for token/cost conservation. Unused expiring capacity has no value.
-- Make the largest coherent safe slice permitted by PLAN.md, CRM-CONTRACT.md, ownership zones, and the current active queue.
+- Make the largest coherent safe slice permitted by PLAN.md, CRM-CONTRACT.md, the current worktree topology, and the current active queue.
+- If Worktree is C:\dev\salesforce-lite-crm, run as single-agent full-repo mode: ownership zones are advisory and should not split one coherent fix into artificial handoffs.
+- If Worktree is an agent-specific worktree, run as parallel mode: ownership zones are mandatory.
 - If no valid work remains, report the exact stop condition rather than inventing scope.
 
 Current runner state:
@@ -809,7 +811,7 @@ READ FIRST:
 DO:
 - Inspect git status and the failing command.
 - Fix the smallest necessary scope.
-- Preserve repo contract invariants and ownership-zone discipline.
+- Preserve repo contract invariants and the worktree topology rules from PLAN.md §3.
 - Re-run the smallest failing command first when useful.
 - Re-run scripts/local-gate.ps1 before claiming repaired.
 - Commit only if green, with scoped paths and report-only commit separation.
@@ -1014,9 +1016,51 @@ function Reset-ToLastGreenIfRequested {
     $script:LastGreenHead = Get-HeadFull
   }
 
+  Save-BrokenAttemptBeforeRevert
+
   Write-Host ("AutoRevertBroken enabled. Resetting to last green HEAD {0}." -f $script:LastGreenHead)
   Invoke-Git @("reset", "--hard", $script:LastGreenHead)
   Invoke-Git @("clean", "-fd")
+}
+
+function Save-BrokenAttemptBeforeRevert {
+  $status = Get-StatusText
+  if ([string]::IsNullOrWhiteSpace($status)) {
+    return
+  }
+
+  $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+  $artifactDir = Join-Path $script:RunDir ("auto-revert-{0}" -f $stamp)
+  $untrackedRoot = Join-Path $artifactDir "untracked"
+  New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+
+  Write-TextFile -Path (Join-Path $artifactDir "status.txt") -Text ($status + [Environment]::NewLine)
+
+  $trackedDiff = Get-GitText @("diff", "--binary")
+  Write-TextFile -Path (Join-Path $artifactDir "tracked.patch") -Text ($trackedDiff + [Environment]::NewLine)
+
+  $stagedDiff = Get-GitText @("diff", "--cached", "--binary")
+  Write-TextFile -Path (Join-Path $artifactDir "staged.patch") -Text ($stagedDiff + [Environment]::NewLine)
+
+  $untracked = Get-GitText @("ls-files", "--others", "--exclude-standard")
+  Write-TextFile -Path (Join-Path $artifactDir "untracked-files.txt") -Text ($untracked + [Environment]::NewLine)
+
+  if (-not [string]::IsNullOrWhiteSpace($untracked)) {
+    foreach ($relativePath in ($untracked -split "\r?\n")) {
+      if ([string]::IsNullOrWhiteSpace($relativePath)) { continue }
+
+      $repoPath = Join-Path $script:RunRoot $relativePath
+      if (-not (Test-Path -LiteralPath $repoPath -PathType Leaf)) { continue }
+
+      $targetPath = Join-Path $untrackedRoot $relativePath
+      $targetParent = Split-Path -Parent $targetPath
+      if ($targetParent) { New-Item -ItemType Directory -Force -Path $targetParent | Out-Null }
+      Copy-Item -LiteralPath $repoPath -Destination $targetPath -Force
+    }
+  }
+
+  Write-Host ("Saved auto-revert artifact: {0}" -f $artifactDir)
+  Write-MasterLog ("auto-revert artifact saved: {0}" -f $artifactDir)
 }
 
 function Push-GreenBranchIfRequested {

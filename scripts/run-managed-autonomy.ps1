@@ -48,7 +48,7 @@ $ReviewEnv = @{
 }
 
 $AgentWorktrees = @{
-  codex  = "C:\dev\salesforce-lite-crm"
+  codex  = "C:\dev\salesforce-lite-crm-codex"
   claude = "C:\dev\salesforce-lite-crm-claude"
   grok   = "C:\dev\salesforce-lite-crm-grok"
   gemini = "C:\dev\salesforce-lite-crm-gemini"

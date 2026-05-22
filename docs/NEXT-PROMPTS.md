@@ -23,11 +23,17 @@ New prompts should be generated from:
 New prompt files should include:
 
 - target branch and worktree path
+- execution topology: single-agent root mode or parallel worktree mode
 - files or zones in scope
 - exact package or gate commands to run
 - report files to update
 - explicit one-run exceptions, if any
 - deferred scope that must not be bundled
+
+Use `C:\dev\salesforce-lite-crm` when one agent should solve a coherent
+repo-wide problem without ownership-zone handoffs. Use agent-specific worktrees
+only when the work is intentionally parallel and ownership zones should be
+enforced.
 
 ## Deferred Scope To Keep Out Unless Re-Promoted
 

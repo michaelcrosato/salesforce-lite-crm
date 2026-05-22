@@ -1,42 +1,48 @@
 Agent: Codex
 
-Sprint: 22
+Sprint: 22 / repo coordination
 
-Feature: S22-F1 - CSV release disposition manifests
+Feature: Worktree topology policy update
 
-Branch: codex/sprint-4-demo-seed-tuning
+Branch: main
 
 Status: done
 
-Commits this prompt: 9bb0486 - [codex] S22-F1: add CSV release disposition manifests
+Commits this prompt: none
 
-Gate status: PASS - Phase 0 baseline through `npm run build` exited 0; Phase 5 `scripts/local-gate.ps1` exited 0 with 51 Vitest files / 287 tests and 19 Playwright tests.
+Gate status: NOT RUN - full local gate not run for this docs/scripts-only policy update. Validation run: `git diff --check`; PowerShell parser check for changed scripts; `scripts/check-worktrees.ps1`; `scripts/create-worktrees.ps1` with no branch arguments.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T06:16:51.8777548-07:00
+Timestamp: 2026-05-22T08:41:52.1613922-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`; expected worktrees existed, the Codex worktree was clean, and the branch matched the `codex/` prefix.
-- Added `lib/server/csvReleaseDispositionManifests.ts` for deterministic root, entity, and operation disposition manifests composed from the S21 release handoff catalog and exception register.
-- Added disposition rollups for ready/watch/block counts, exception counts, source fingerprints, trace anchors, read flags, and explicit no-write flags without adding routes, persistence, or runtime workflow behavior.
-- Added `tests/api/csv-release-disposition-manifests.test.ts` to cover deterministic metadata, entity/operation rollups, no-write behavior, and unknown-key rejection. Cross-zone reason: this Gemini-owned test path is the smallest direct way to satisfy PLAN.md §8 test coverage for a new Codex server helper.
-- Verified with `npm run lint`, `npm run typecheck`, targeted Vitest for the new file, full `npm run test`, `npm run build`, and full `scripts/local-gate.ps1`.
+- Updated `AGENTS.md`, `PLAN.md`, `README.md`, and coordination docs so `C:\dev\salesforce-lite-crm` is single-agent root mode with full repo access, while agent-specific worktrees remain parallel mode with mandatory ownership zones.
+- Moved parallel Codex references to `C:\dev\salesforce-lite-crm-codex` across worktree setup docs, autonomy docs, prompt templates, manager prompts, and shared Sprint 4 prompts.
+- Updated autonomy scripts so parallel executors target only agent-specific worktrees and exclude the repo root from worker dispatch.
+- Updated `scripts/create-worktrees.ps1` to create a Codex parallel worktree when a Codex branch is supplied.
+- Updated and hardened `scripts/check-worktrees.ps1` to classify root vs parallel modes, warn on parallel branch-prefix drift, and report an existing non-Git parallel path without throwing.
+- Completed a coherence pass over docs/prompts/scripts, including Track A operating-model wording and active plus archived Sprint 4 prompt topology labels.
+- Updated `scripts/start-codex-overnight.ps1` so the default watchdog command passes `-AllowMain` into both the Codex smoke and real autonomy loop for the root solo-agent run.
+- Updated `scripts/autonomy-loop.ps1` to save tracked/staged diffs and untracked file copies under ignored `agent-runs/` before `-AutoRevertBroken` resets a failed attempt.
+- Clarified active guardrails so existing excluded placeholder routes such as `/deals/[id]` are not mistaken for promoted live product pages during the overnight run.
+- Repaired `C:\dev\salesforce-lite-crm-codex` into a clean `codex/autonomy` worktree and cleaned stale generated/parallel dirty files from Claude and Gemini worktrees, preserving Gemini's untracked test variant under ignored `agent-runs/`.
+- Ran `npm audit fix`; npm made no safe changes and reported remaining advisories require `--force` with breaking dependency changes, so no dependency churn was introduced before the root solo overnight test.
 
 ### Discovered this prompt
 
-- Claude, Grok, and Gemini root summaries still reference historical Sprint 4B work, which is not a current PLAN.md §4 sprint id. Their blocker files do not list active blockers that affect S22-F1.
-- The first `npm run test` run used a 180s shell timeout and exited 124 due to duration; rerunning with a 360s timeout passed, and the full local gate later passed.
+- `C:\dev\salesforce-lite-crm-codex` exists locally but is not currently a Git worktree. This does not block single-agent root work; repair or recreate it only before launching Codex as part of a parallel fleet.
+- Existing Claude and Gemini worktrees have local dirty files reported by `scripts/check-worktrees.ps1`; they were not modified from the root run.
 
 ### Next action
 
-Run LOOP.md to begin S22-F2 - CSV release readiness packets.
+Commit the topology-policy update to `main`. The exact overnight command now dry-runs to root solo mode on `main` with `-AllowMain`.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO - `tests/api/csv-release-disposition-manifests.test.ts` was added under the documented PLAN.md §10 test-coverage exception.
+No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was a single-agent root-mode policy/docs/scripts update with full repo access.
 
 CRM-CONTRACT.md honored: YES

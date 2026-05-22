@@ -7,7 +7,7 @@
 
 You are Claude Code, working in YOLO mode (danger-full-access,
 never approval) on an EXISTING Salesforce Lite CRM POC at
-C:\dev\salesforce-lite-crm.
+C:\dev\salesforce-lite-crm-claude.
 
 Use PowerShell-compatible commands.
 

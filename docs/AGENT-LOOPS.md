@@ -6,6 +6,25 @@ Long-running agent loops should maximize useful progress while preserving the re
 
 The runner is the control system. The implementation brain is the repo-local prompt (`prompts/<agent>/LOOP.md`) plus the current worktree state.
 
+## Topology
+
+`C:\dev\salesforce-lite-crm` is single-agent full-repo mode. Use it when one
+agent is active and the work is likely to span app, component, service, test,
+script, or documentation boundaries.
+
+Agent-specific worktrees are parallel mode:
+
+```text
+C:\dev\salesforce-lite-crm-codex
+C:\dev\salesforce-lite-crm-claude
+C:\dev\salesforce-lite-crm-grok
+/c/dev/salesforce-lite-crm-grok
+C:\dev\salesforce-lite-crm-gemini
+```
+
+Parallel mode enforces ownership zones and branch prefixes. Root mode keeps
+product guardrails and the local gate, but ownership zones are advisory.
+
 ## Source of truth
 
 When sources disagree, use this order:
@@ -23,14 +42,16 @@ Do not invent `npm run validate`. The current full gate is `scripts/local-gate.p
 ## Standard unattended loop
 
 1. Confirm correct worktree, branch, and STOP/AUTONOMY.STOP state.
-2. Refuse main-branch feature work unless explicit control/merge mode is supplied.
-3. Create an agent-owned branch automatically when started on `main` and branch creation is allowed.
+2. In parallel mode, refuse main-branch feature work unless explicit control/merge mode is supplied.
+3. In parallel mode, create an agent-owned branch automatically when started on `main` and branch creation is allowed.
 4. Capture git status, HEAD, recent commits, package scripts, and worktree coordination output.
 5. Feed `prompts/<agent>/LOOP.md` to the agent with full-autonomy runner context.
 6. Run `scripts/local-gate.ps1` after each iteration.
 7. If red, launch bounded repair prompts with the gate tail and dirty state.
 8. If green but dirty, launch cleanup/commit prompt; do not let the runner blindly commit files.
-9. Push only clean green non-main branches when `-Push` is supplied.
+9. Push only after a clean green gate when `-Push` is supplied. In root solo
+   mode, `-AllowMain` permits pushing `main`; in parallel mode, push only
+   non-main agent branches.
 10. Stop on unrepaired red gate, unresolved dirty tree, STOP/AUTONOMY.STOP, merge-ready state, sprint rollover without rollover authorization, wrong branch/worktree, or contract/safety boundary.
 
 ## Validation
@@ -78,8 +99,10 @@ The launcher runs a Codex exec smoke test, creates/pushes a rollback tag, then
 starts `scripts\autonomy-loop.ps1` with full overnight defaults:
 `-MaxIterations 0`, `-FullYolo`, `-KeepAwake`, `-BaselineGate`,
 `-InstallBrowsers`, `-StartDockerServices`, `-AutoRevertBroken`,
-`-AllowSprintRollover`, and `-Push`. It restarts the inner loop after exit
-unless `STOP` or `AUTONOMY.STOP` exists under the repo root.
+`-AllowSprintRollover`, `-AllowMain`, and `-Push`. It restarts the inner loop
+after exit unless `STOP` or `AUTONOMY.STOP` exists under the repo root.
+`-AllowMain` is intentional for the single-agent root run; use
+`-NoAllowMain` only when deliberately testing the older branch-based behavior.
 
 If the inner loop exits non-zero, the watchdog stays in continuous mode by
 default: it logs the failure, re-runs the Codex invocation smoke, waits briefly,
@@ -109,6 +132,7 @@ powershell -ExecutionPolicy Bypass -File scripts\autonomy-loop.ps1 `
   -MaxIterations 3 `
   -RepairAttemptsPerIteration 2 `
   -FullYolo `
+  -AllowMain `
   -KeepAwake
 ```
 
@@ -139,7 +163,8 @@ npm run test:e2e
 git status / log / diff
 git add scoped files
 git commit
-git push origin HEAD on non-main branches
+git push origin HEAD after a clean green gate; main pushes are allowed only in
+single-agent root mode
 ```
 
 Still blocked unless explicitly requested for the current run:
@@ -147,7 +172,7 @@ Still blocked unless explicitly requested for the current run:
 ```text
 force push
 history rewrite
-main-branch feature work
+main-branch feature work in parallel mode
 deleting worktrees
 generic recursive deletion of source paths
 destructive production database operations
@@ -155,6 +180,6 @@ secrets exposure
 production operations
 live external integrations
 bypassing CRM-CONTRACT.md
-creating /deals/[id]
+creating live /deals/[id] detail behavior
 adding auth, deployment, Salesforce integration, external AI, or deferred product routes without PLAN promotion
 ```

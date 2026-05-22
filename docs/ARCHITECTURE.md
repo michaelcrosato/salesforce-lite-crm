@@ -52,7 +52,7 @@ updates:
 - External AI provider integration.
 - Salesforce integration.
 - Dedicated `/search`.
-- `/deals/[id]`.
+- Live `/deals/[id]` detail route.
 - Dealer-order and area CRUD.
 - Postgres as the default runtime.
 - Geocoding or territory polygons.

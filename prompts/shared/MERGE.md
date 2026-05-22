@@ -12,8 +12,8 @@ PLAN.md / CRM-CONTRACT.md > SUMMARY/BLOCKERS > docs/decisions.md.
 PHASE 0 — INVENTORY
 ============================================================
 
-From a worktree with main checked out (typically codex's worktree at
-C:\dev\salesforce-lite-crm):
+From the single-agent root worktree with main checked out
+(`C:\dev\salesforce-lite-crm`):
 
   git fetch --all
   git worktree list
@@ -29,14 +29,16 @@ A branch is merge-eligible only when ALL of the following hold:
   - It is the latest commit on the agent's branch (no newer work pending).
   - Its latest SUMMARY shows Gate status: PASS and DoD self-check: PASS.
   - Its BLOCKERS has no active `gate` or `contract` blocker.
-  - Its diff against main respects PLAN.md §5 ownership: it does not
-    touch zones outside the owning agent's zone except for documented
-    §10 cross-zone exceptions visible in its SUMMARY.
+  - For parallel-mode agent branches, its diff against main respects PLAN.md
+    §5 ownership: it does not touch zones outside the owning agent's zone
+    except for documented §10 cross-zone exceptions visible in its SUMMARY.
+    For single-agent root branches, repo-wide edits are coherent and tied to
+    the prompt.
   - It does not introduce permanent §4 non-goals as features.
 
 Reject (do NOT merge) branches with:
   - Red gates or active `gate` blockers.
-  - Ownership violations not documented per §10.
+  - Parallel-mode ownership violations not documented per §10.
   - Behind main by >5 commits (agent must rebase first via their LOOP.md).
 
 ============================================================

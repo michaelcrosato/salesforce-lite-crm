@@ -2,6 +2,12 @@
 
 Follow `AGENTS.md`, `PLAN.md`, and `CRM-CONTRACT.md` as the source of truth for autonomous work in this repository.
 
+Worktree path controls collaboration mode. `C:\dev\salesforce-lite-crm` means
+single-agent full-repo access. Agent-specific worktrees such as
+`C:\dev\salesforce-lite-crm-codex`, `C:\dev\salesforce-lite-crm-claude`,
+`C:\dev\salesforce-lite-crm-grok`, and
+`C:\dev\salesforce-lite-crm-gemini` mean parallel mode with ownership zones.
+
 This repository is configured for max-YOLO repo-local execution. Do not ask for manual approval before running ordinary local setup, test, build, e2e, cleanup, or git workflow commands that are already authorized by the repo instructions.
 
 The standard local gate is:

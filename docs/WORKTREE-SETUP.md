@@ -5,11 +5,18 @@
 Defined by `PLAN.md`:
 
 ```text
-C:\dev\salesforce-lite-crm
-C:\dev\salesforce-lite-crm-claude
-C:\dev\salesforce-lite-crm-grok
-C:\dev\salesforce-lite-crm-gemini
+C:\dev\salesforce-lite-crm          single-agent root, full-repo access
+C:\dev\salesforce-lite-crm-codex    parallel Codex worktree
+C:\dev\salesforce-lite-crm-claude   parallel Claude worktree
+C:\dev\salesforce-lite-crm-grok     parallel Grok worktree
+/c/dev/salesforce-lite-crm-grok     Git Bash spelling for the Grok worktree
+C:\dev\salesforce-lite-crm-gemini   parallel Gemini worktree
 ```
+
+When work starts from `C:\dev\salesforce-lite-crm`, only one implementation
+agent is active and ownership zones are advisory. When work starts from an
+agent-specific worktree, multiple agents may be active and ownership zones are
+mandatory.
 
 Do not rely on frozen commit SHAs in this document. Use `git worktree list` and
 `scripts/check-worktrees.ps1` for the current branch, commit, and dirty state at
@@ -33,6 +40,7 @@ Example:
 ```powershell
 scripts/create-worktrees.ps1 `
   -BaseBranch main `
+  -CodexBranch codex/sprint-22-release-readiness-packets `
   -GeminiBranch gemini/sprint-4-demo-smoke-gate-hardening
 ```
 

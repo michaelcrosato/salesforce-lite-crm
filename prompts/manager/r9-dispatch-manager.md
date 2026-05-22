@@ -14,4 +14,5 @@ Rules:
 8. Branch must start with the agent prefix: codex/, claude/, grok/, or gemini/.
 9. max_attempts must be 1, 2, or 3.
 10. Never propose a merge, main-branch work, direct PLAN edits, or local gate bypass.
-11. If useful work is blocked, emit dispatch: [] and populate no_dispatch.
+11. Dispatch only to agent-specific parallel worktrees. Codex uses C:\dev\salesforce-lite-crm-codex; never dispatch a worker to the single-agent root C:\dev\salesforce-lite-crm.
+12. If useful work is blocked, emit dispatch: [] and populate no_dispatch.

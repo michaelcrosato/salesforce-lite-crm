@@ -12,6 +12,8 @@ repo-local evidence before treating any prompt file as active.
 Prompt files should include:
 
 - target branch and worktree path
+- execution topology: `C:\dev\salesforce-lite-crm` single-agent full-repo mode
+  or agent-specific parallel mode
 - files or zones in scope
 - gate commands to run
 - report files to update

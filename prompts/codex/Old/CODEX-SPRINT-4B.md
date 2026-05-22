@@ -7,7 +7,7 @@
 
 You are Codex, working in YOLO mode (danger-full-access, never
 approval) on an EXISTING Salesforce Lite CRM POC at
-C:\dev\salesforce-lite-crm.
+C:\dev\salesforce-lite-crm-codex.
 
 Use PowerShell-compatible commands. Do not use POSIX-only patterns
 such as `|| true`.

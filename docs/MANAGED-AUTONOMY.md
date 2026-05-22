@@ -92,7 +92,7 @@ The manager model emits JSON only. PowerShell validates that dispatch against:
 - mode concurrency limits
 - allowed preferred, fallback, or review agents
 - unavailable model state
-- expected worktree paths
+- expected parallel worktree paths
 - branch prefixes
 - prompt existence
 - allowed zones and gate commands from the queue
@@ -102,6 +102,14 @@ After a worker exits, the manager computes changed files from the pre-run commit
 to the post-run HEAD plus uncommitted status. Changed files must stay inside the
 task `allowed_zones`; violations create handoffs and block or requeue the task
 instead of trusting the worker output.
+
+Managed autonomy is parallel mode only. It must dispatch Codex to
+`C:\dev\salesforce-lite-crm-codex`, Claude to
+`C:\dev\salesforce-lite-crm-claude`, Grok to
+`C:\dev\salesforce-lite-crm-grok`, and Gemini to
+`C:\dev\salesforce-lite-crm-gemini`. The repo root
+`C:\dev\salesforce-lite-crm` is single-agent full-repo mode and is not a worker
+target for R9 dispatch.
 
 ## Notifications
 

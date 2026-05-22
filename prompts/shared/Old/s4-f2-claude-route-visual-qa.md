@@ -6,6 +6,7 @@
 - Sprint feature: S4-F2 - Route visual QA
 - Target branch: `claude/sprint-4-route-visual-qa`
 - Worktree: `C:\dev\salesforce-lite-crm-claude`
+- Execution topology: parallel mode; ownership zones are mandatory.
 - Report files: `SUMMARY.claude.md`, `BLOCKERS.claude.md`
 
 ## Files And Zones In Scope
