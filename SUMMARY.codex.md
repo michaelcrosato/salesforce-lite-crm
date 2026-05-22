@@ -6,28 +6,31 @@ Feature: S23-F1 - CSV dedupe candidate packets
 
 Branch: main
 
-Status: queued
+Status: done
 
-Commits this prompt: daae502 - [codex] sprint 23: plan codex track; ee02070 - [codex] sprint 23: backlog refresh
+Commits this prompt: de6ab80 - [codex] S23-F1: add CSV dedupe candidate packets
 
-Gate status: PASS - Phase 0 baseline passed `npm install`, Prisma generate/db push, seed, lint, typecheck, test, and build; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (57 files / 317 tests), and `npm run build`.
+Gate status: PASS - Phase 0 baseline passed `npm install`, Prisma generate/db push, seed, lint, typecheck, test, and build; post-implementation full gate passed `scripts/local-gate.ps1` including lint, typecheck, 58 Vitest files / 321 tests, build, Playwright chromium install, and 19 e2e tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T12:12:11.1295133-07:00
+Timestamp: 2026-05-22T12:47:04.1551506-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Marked S22-F2 complete in `PLAN.md` from Codex SUMMARY evidence and a green local baseline.
-- Added Sprint 23 to `PLAN.md` with S23-F1 CSV dedupe candidate packets and S23-F2 CSV dedupe review bundles queued for Codex.
-- Synced `docs/FEATURE-BACKLOG.md` so S22-F2 is done and S23-F1/S23-F2 are queued.
-- Verified planning changes with lint, typecheck, Vitest, and build after the commits.
+- Added `lib/server/csvDedupeCandidatePackets.ts` with read-only duplicate-candidate packet definitions, entity guards, single-packet and list helpers, row anchors, matched record anchors, reason/severity rollups, preflight summary context, and explicit no-write flags.
+- Added `tests/api/csv-dedupe-candidate-packets.test.ts` covering supported entities, deterministic contact duplicate packet output, lead no-write/no-routing behavior, and bounded list output across supported import preview entities.
+- Verified the implementation with focused `npm run test -- tests/api/csv-dedupe-candidate-packets.test.ts`, `npm run build`, and the full `scripts/local-gate.ps1` sequence.
+
+### Discovered this prompt
+
+- Other-agent SUMMARY/BLOCKERS files still contain historical branch-local Sprint 4/Sprint 5 references, but `PLAN.md` §4, `docs/FEATURE-BACKLOG.md`, and the current green local gate establish Sprint 23 as the active Codex queue.
 
 ### Next action
 
-Run LOOP.md to begin S23-F1.
+Run LOOP.md for S23-F2 - CSV dedupe review bundles.
 
 ### Scope confirmation
 
