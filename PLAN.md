@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.23A |
+| Version | 2.24A |
 
 | Last updated | 2026-05-21 |
 
-| Active sprint | Sprint 18 queued for Codex; Sprint 17 Codex track done |
+| Active sprint | Sprint 19 queued for Codex; Sprint 18 Codex track done |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -640,8 +640,8 @@ Goal: add deterministic read-only verification and fixture metadata for the exis
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S18-F1 — CSV release verification manifests | Codex | queued | Server-side helpers publish deterministic verification manifests over the current CSV release digest and handoff packets, including source fingerprints, source content types, operation/entity coverage, warning/source-code rollups, and explicit no-write flags. No routes, product UI, upload/download actions, file storage, database writes, persistent baselines, package/config changes, CI changes, or integrations are added. |
-| S18-F2 — CSV operator fixture bundles | Codex | queued | Server-side helpers publish deterministic bounded fixture bundles for later UI/docs/test consumption, combining existing export delivery packet snippets, import dry-run receipt samples, handoff packet summaries, and release digest metadata per supported entity/operation. No routes, product UI, upload/download actions, file storage, user-upload parsing, import apply flow, database writes, or integrations are added. |
+| S18-F1 — CSV release verification manifests | Codex | done | Server-side helpers publish deterministic verification manifests over the current CSV release digest and handoff packets, including source fingerprints, source content types, operation/entity coverage, warning/source-code rollups, and explicit no-write flags. No routes, product UI, upload/download actions, file storage, database writes, persistent baselines, package/config changes, CI changes, or integrations are added. |
+| S18-F2 — CSV operator fixture bundles | Codex | done | Server-side helpers publish deterministic bounded fixture bundles for later UI/docs/test consumption, combining existing export delivery packet snippets, import dry-run receipt samples, handoff packet summaries, and release digest metadata per supported entity/operation. No routes, product UI, upload/download actions, file storage, user-upload parsing, import apply flow, database writes, or integrations are added. |
 
 \*\*Sprint 18 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -670,6 +670,44 @@ Goal: add deterministic read-only verification and fixture metadata for the exis
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
 
 \- No supported-entity expansion, persistent CSV verification/fixture/snapshot/baseline/history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 19 — CSV Handoff Publication\*\*
+
+Goal: package the existing read-only CSV handoff verification surface into deterministic publication and acceptance metadata for later UI, docs, and tests without adding routes, writes, storage, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S19-F1 — CSV handoff release notes packet | Codex | queued | Server-side helpers publish a deterministic release-note packet from the current CSV release verification manifest, release digest, and operator fixture bundle, including status, source fingerprints, supported operation counts, fixture availability, warning/source-code rollups, and explicit no-write flags for later UI/docs consumption. No product UI, routes, upload/download actions, file storage, persistent history, package/config changes, CI changes, Salesforce sync, or external services are added. |
+| S19-F2 — CSV operator acceptance checklists | Codex | queued | Server-side helpers publish deterministic operator acceptance checklists per CSV entity and operation by combining release verification manifests, fixture bundle availability, readiness/remediation status, and QA warnings into pass/watch/block checklist items with aggregate counts. No product UI, routes, upload/download actions, file storage, persistent baselines, database writes, import apply flow, header remapping, user-upload parsing, supported-entity expansion, or integrations are added. |
+
+\*\*Sprint 19 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new `/deals/\[id]` route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload forms, download buttons, mapping wizard, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV handoff release notes packets, operator acceptance checklists, release verification manifests, operator fixture bundles, operator handoff packets, contract release digests, contract drift snapshots, operator remediation runbooks, contract QA checks, operator readiness scorecards, handoff indexes, field coverage summaries, transfer manifests, compatibility reports, import dry-run receipts, export delivery packets, review bundles, action manifests, preview capability metadata, export preview snippets, import preview, preflight diagnostics, catalogs, issue summaries, examples, or preflight summaries.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
+
+\- No supported-entity expansion, persistent CSV release-note/acceptance/verification/fixture/snapshot/baseline/history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
