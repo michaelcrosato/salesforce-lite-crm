@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.28 |
+| Version | 2.29 |
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 22 S22-F2 queued; S22-F1 present in `main` |
+| Active sprint | Sprint 23 S23-F1 queued; Sprint 22 complete in `main` |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -807,7 +807,7 @@ Goal: convert the read-only CSV release handoff surface into deterministic dispo
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
 | S22-F1 — CSV release disposition manifests | Codex | done | Server-side helpers compose the S21 release handoff catalog and exception register into deterministic per-entity and per-operation dispositions with ready/watch/block counts, source fingerprints, trace anchors, and explicit read/no-write flags. The surface is later-UI/docs/test ready but does not add routes, persistence, or runtime workflow behavior. |
-| S22-F2 — CSV release readiness packets | Codex | queued | Server-side helpers publish bounded release readiness packets that combine disposition manifests with the existing release digest, verification manifests, closure scorecards, and exception metadata into release-consumer summaries with pass/watch/block totals and remediation anchors. Output remains deterministic and read-only without adding approval workflows or CSV product UI. |
+| S22-F2 — CSV release readiness packets | Codex | done | Server-side helpers publish bounded release readiness packets that combine disposition manifests with the existing release digest, verification manifests, closure scorecards, and exception metadata into release-consumer summaries with pass/watch/block totals and remediation anchors. Output remains deterministic and read-only without adding approval workflows or CSV product UI. |
 
 \*\*Sprint 22 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -836,6 +836,44 @@ Goal: convert the read-only CSV release handoff surface into deterministic dispo
 \- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, export write history, scheduled export delivery, header remapping, user-upload parsing, or routing execution.
 
 \- No supported-entity expansion, persistent CSV disposition/readiness/handoff/exception/release-note/acceptance/verification/fixture/snapshot/baseline/history/walkthrough/scorecard storage, approval workflow, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 23 — CSV Duplicate Readiness\*\*
+
+Goal: add read-only CSV duplicate review contracts so later import UI can explain duplicate risk without adding writes, storage, routes, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S23-F1 — CSV dedupe candidate packets | Codex | queued | Server-side helpers publish deterministic duplicate-candidate packets for supported CSV import preview entities with row anchors, matched record anchors, reason codes, severity, aggregate counts, and explicit read/no-write flags. The surface does not add routes, UI, merge/upsert behavior, or database writes. |
+| S23-F2 — CSV dedupe review bundles | Codex | queued | Server-side helpers combine dedupe candidate packets with existing import review, dry-run, readiness, and action metadata into bounded operator review bundles with safe/watch/block summaries. Output remains deterministic and read-only without adding import apply flows, duplicate merge, file storage, or CSV product UI. |
+
+\*\*Sprint 23 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No CSV product UI, upload/download buttons, route handlers, file storage, or background import/export jobs.
+
+\- No database writes from CSV dedupe candidate packets, CSV dedupe review bundles, or existing CSV import/export/release helpers.
+
+\- No bulk create/update, import apply flow, contact or lead upsert, duplicate merge, header remapping, user-upload parsing, routing execution, or approval workflow.
+
+\- No supported-entity expansion, persistent CSV dedupe/release/import/export history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
 
 
 \## 5. File Ownership Matrix
