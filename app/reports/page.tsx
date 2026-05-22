@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
+import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REPORT_DEFINITIONS,
@@ -13,6 +14,7 @@ import {
   listCsvExportDeliveryPackets,
   type CsvExportDeliveryPacketEntity
 } from "@/lib/server/csvExportDeliveryPackets";
+import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +42,7 @@ export default async function ReportsPage({
     listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
     getCsvExportDeliveryPacket(selectedCsvEntity)
   ]);
+  const csvImportTemplates = listCsvImportTemplates();
 
   return (
     <div className="crm-page">
@@ -58,6 +61,8 @@ export default async function ReportsPage({
         packets={csvPackets}
         selectedPacket={selectedCsvPacket}
       />
+
+      <CsvImportPreviewOperator templates={csvImportTemplates} />
     </div>
   );
 }

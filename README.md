@@ -66,6 +66,8 @@ team:
   stale opportunities, and overdue tasks.
 - Review and download bounded CSV exports from deterministic server-side
   delivery packets.
+- Preview CSV imports with deterministic validation, preflight, readiness,
+  action, and dedupe review output before any write workflow exists.
 - Expose deterministic analyst recommendations without relying on an external
   AI provider.
 
@@ -152,7 +154,7 @@ explicitly promoted.
 | `/cases/new` | Case creation. |
 | `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
 | `/campaigns/new` | Campaign creation. |
-| `/reports` | Report index with KPI cards and CSV export review/download. |
+| `/reports` | Report index with KPI cards, CSV export review/download, and read-only CSV import preview. |
 | `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
 
 Primary workflows:
@@ -168,8 +170,8 @@ Primary workflows:
   campaigns.
 - Create or update tasks, cases, and campaigns through their list, new-page,
   and drawer flows.
-- Open reports from `/reports`, drill into the supported report slugs, and
-  review CSV export packets.
+- Open reports from `/reports`, drill into the supported report slugs, review
+  CSV export packets, and preview contact or lead CSV imports without writes.
 
 Task, Case, and Campaign entities are now wired into the app-router pages
 listed above. Detail flows for those entities use the drawer pattern
@@ -295,8 +297,9 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - Postal-prefix matching is intentionally simple and does not use geocoding or
   territory polygons.
 - Forecast scenarios are transparent and deterministic, but they do not persist.
-- CSV export review/download is surfaced on `/reports`; CSV import remains a
-  server-side preview-helper workflow with no import UI or database writes.
+- CSV export review/download and CSV import preview are surfaced on `/reports`.
+  CSV import remains read-only: there is no apply flow, bulk create/update,
+  routing execution, duplicate merge, file storage, or database write.
 - No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
   leads route to dealer orders instead.
 
@@ -315,5 +318,5 @@ workflows, reports, and local gate documentation.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
-CSV import UI workflows, and any future live `/deals/[id]` detail behavior
+CSV import apply workflows, and any future live `/deals/[id]` detail behavior
 require explicit promotion before implementation.

@@ -41,4 +41,39 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   expect(decodeURIComponent(href ?? "")).toContain(
     "Contact ID,First Name,Last Name"
   );
+
+  await expect(page.getByTestId("csv-import-preview-operator")).toBeVisible();
+  await expect(page.getByTestId("csv-import-summary-supported")).toContainText(
+    "2"
+  );
+
+  await page.getByTestId("csv-import-input").fill(
+    [
+      "First Name,Last Name,Email,Status,Phone",
+      "Csv,Safe,csv.safe.e2e@example.test,active,604-555-0201",
+      "Maya,Singh,MAYA.SINGH@NORTHSTARFREIGHT.EXAMPLE,active,303-555-0101",
+      ",Broken,csv.broken.e2e@example.test,active,604-555-0203"
+    ].join("\n")
+  );
+  await page.getByTestId("csv-import-submit").click();
+
+  await expect(page.getByTestId("csv-import-result-panel")).toBeVisible();
+  await expect(page.getByTestId("csv-import-summary-safe")).toContainText("1");
+  await expect(page.getByTestId("csv-import-summary-watch")).toContainText("1");
+  await expect(page.getByTestId("csv-import-summary-block")).toContainText("1");
+  await expect(page.getByTestId("csv-import-row-results")).toContainText(
+    "Maya Singh"
+  );
+  await expect(page.getByTestId("csv-import-row-results")).toContainText(
+    "watch"
+  );
+  await expect(page.getByTestId("csv-import-row-results")).toContainText(
+    "block"
+  );
+  await expect(page.getByTestId("csv-import-write-flags")).toContainText(
+    "Database off"
+  );
+  await expect(page.getByTestId("csv-import-write-flags")).toContainText(
+    "Import apply off"
+  );
 });
