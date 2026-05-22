@@ -1,35 +1,36 @@
 Agent: Codex
 
-Sprint: 22 / repo coordination
+Sprint: 22
 
-Feature: Local gate typecheck repair
+Feature: S22-F2 — CSV release readiness packets
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 51cb521 - [codex] repair: exclude run artifacts from typecheck
+Commits this prompt: de719fb - [codex] S22-F2: add CSV release readiness packets
 
-Gate status: PASS - `npm run typecheck` and `scripts/local-gate.ps1` completed successfully.
+Gate status: PASS - `scripts/local-gate.ps1` completed successfully.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T08:54:43.3178289-07:00
+Timestamp: 2026-05-22T09:36:53.8874250-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Reproduced the local gate failure with `npm run typecheck`; TypeScript was compiling an ignored saved test copy under `agent-runs/parallel-worktree-cleanup-20260522-084050/`.
-- Updated `tsconfig.json` to exclude ignored `agent-runs` and `status` runtime artifact directories from project-wide TypeScript compilation while leaving tracked app and test sources in scope.
-- Re-ran `npm run typecheck` and the full `scripts/local-gate.ps1`; both passed.
+- Added `lib/server/csvReleaseReadinessPackets.ts`, a deterministic read-only S22-F2 server helper that composes release disposition, digest, verification, closure, and exception surfaces into root/entity/operation readiness packets with pass/watch/block totals, remediation anchors, source fingerprints, and explicit no-write flags.
+- Added `tests/api/csv-release-readiness-packets.test.ts` covering deterministic root metadata, representative entity and operation packets, remediation anchors, no-write behavior, and invalid entity/operation rejection.
+- Reconciled stale non-Codex report context against current `PLAN.md`, `CRM-CONTRACT.md`, `docs/PROJECT-CONTROL.md`, and a green local gate; historical Claude/Grok/Gemini report drift did not affect this root-mode Codex work unit.
+- Ran the full local gate through `scripts/local-gate.ps1`; install, Prisma generate/db push, seed, lint, typecheck, 57 Vitest files / 317 tests, build, Playwright Chromium install, and 19 e2e tests all passed.
 
 ### Next action
 
-Continue from green `main` with the next prompt-selected repair or sprint work.
+Run `SPRINT-ROLLOVER.md` for Codex to mark S22-F2 complete in `PLAN.md` and queue the next valid Codex work, or stop if no sprint scope should be added.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was a single-agent root-mode shared config repair with full repo access.
+No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode with full repo access.
 
 CRM-CONTRACT.md honored: YES
