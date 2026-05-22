@@ -48,8 +48,10 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S21-F2 | CSV release exception register | Codex | done |
 | S22-F1 | CSV release disposition manifests | Codex | done |
 | S22-F2 | CSV release readiness packets | Codex | done |
-| S23-F1 | CSV dedupe candidate packets | Codex | queued |
-| S23-F2 | CSV dedupe review bundles | Codex | queued |
+| S23-F1 | CSV dedupe candidate packets | Codex | done |
+| S23-F2 | CSV dedupe review bundles | Codex | done |
+| S24-F1 | CSV export operator UI | Codex | queued |
+| S24-F2 | CSV import preview UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
@@ -69,8 +71,8 @@ The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 - Postgres cutover as the default runtime.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
-- CSV product UI, bulk import writes, file storage, mapping wizard, persistent
-  CSV release-note/acceptance/verification/fixture/snapshot/walkthrough/scorecard/
+- CSV bulk import writes, file storage, mapping wizard, persistent CSV
+  release-note/acceptance/verification/fixture/snapshot/walkthrough/scorecard/
   handoff/exception/disposition/readiness history, and Salesforce-connected
   import/export remain deferred; server helpers exist under `lib/server` and
   `lib/business`.
