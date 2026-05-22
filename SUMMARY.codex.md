@@ -1,43 +1,38 @@
 Agent: Codex
 
-Sprint: 19
+Sprint: 20
 
-Feature: S19-F2 - CSV operator acceptance checklists
+Feature: Sprint rollover planning
 
 Branch: codex/sprint-4-demo-seed-tuning
 
 Status: done
 
-Commits this prompt: b47832c - [codex] S19-F2: add CSV operator acceptance checklists
+Commits this prompt: 88d864d - [codex] sprint 20: plan codex track; 1e94a80 - [codex] sprint 20: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0; 46 Vitest files / 267 tests and 19 Playwright tests passed.
+Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0 with 46 Vitest files / 267 tests and 19 Playwright tests passing; post-plan `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-21T18:26:24.3023327-07:00
+Timestamp: 2026-05-21T20:05:55.6456929-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from `C:\dev\salesforce-lite-crm`; expected worktrees existed, branch was `codex/sprint-4-demo-seed-tuning`, worktree was clean, and baseline `scripts/local-gate.ps1` passed.
-- Read `PLAN.md`, `CRM-CONTRACT.md`, README, all agent SUMMARY/BLOCKERS files, `docs/decisions.md`, referenced docs/prompts, and recent git history before selection.
-- Implemented `lib/server/csvOperatorAcceptanceChecklists.ts`, a deterministic read-only acceptance checklist surface composed from release verification manifests, operator fixture bundles, remediation runbooks, and contract QA checks.
-- Added focused Vitest coverage in `tests/api/csv-operator-acceptance-checklists.test.ts` for root, entity, and operation checklists; pass/watch/block aggregate counts; fixture availability; QA/remediation evidence; no-write guarantees; and unknown-key rejection.
-- Cross-zone note: touched `tests/api/**` because PLAN §8 requires feature coverage before claiming done; no runtime UI, route, schema, package, config, storage, import-apply, header-remapping, supported-entity expansion, or integration scope was added.
-- Verified with focused Vitest, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and the full `scripts/local-gate.ps1`.
-
-### Discovered this prompt
-
-- PLAN §4 still marks S19-F1 and S19-F2 as `queued`, while recent Codex implementation commits and green local gates show both are complete on this branch. Treated current prompt plus local gate evidence as authoritative for this iteration.
-- Claude/Grok/Gemini reports still reference historical Sprint 4B work and some stale blocker text. Treated those as historical and non-blocking for Codex S19 server work because this branch's full local gate is green.
+- Ran the full Phase 0 baseline from `C:\dev\salesforce-lite-crm`; the local gate completed successfully before planning edits and left the worktree clean.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, `docs/ROADMAP.md`, and recent `git log --since="30 days ago"` evidence.
+- Confirmed Sprint 19 Codex work is complete from implementation commits `d62fd41` and `b47832c`, report commit `ffdf169`, green gate evidence, and zero active Codex blockers.
+- Updated `PLAN.md` to mark S19-F1 and S19-F2 done, bump document version to 2.25A, set Sprint 20 as active for Codex, and queue S20-F1 and S20-F2 with permanent non-goals carried forward.
+- Synced `docs/FEATURE-BACKLOG.md` so S19 is done and S20 is queued.
+- Verified planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 ### Next action
 
-Sprint rollover is needed for Codex; S19-F2 is complete and no further Codex-owned Sprint 19 work remains in PLAN §4.
+Run LOOP.md to begin S20-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: NO - added Vitest coverage in `tests/api/**` under the current prompt's documented §10 reason.
+No cross-ownership edits: YES (only prompt-authorized planning/report files were edited)
 
 CRM-CONTRACT.md honored: YES
