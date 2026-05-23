@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { AuditCoverageOperator } from "@/components/reports/audit-coverage-operator";
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
+import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REPORT_DEFINITIONS,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/server/csvExportDeliveryPackets";
 import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
 import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
+import { getListFilterSupportCatalog } from "@/lib/server/listFilterSupportCatalog";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +48,7 @@ export default async function ReportsPage({
   ]);
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
+  const listFilterSupportCatalog = getListFilterSupportCatalog();
 
   return (
     <div className="crm-page">
@@ -61,6 +64,8 @@ export default async function ReportsPage({
       </div>
 
       <AuditCoverageOperator manifest={auditCoverageManifest} />
+
+      <ListFilterSupportExplorer catalog={listFilterSupportCatalog} />
 
       <CsvExportOperator
         packets={csvPackets}

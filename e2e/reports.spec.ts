@@ -48,6 +48,44 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     "External telemetry off"
   );
 
+  await expect(page.getByTestId("list-filter-support-explorer")).toBeVisible();
+  await expect(
+    page.getByTestId("list-filter-support-summary-entities")
+  ).toContainText("10");
+  await expect(
+    page.getByTestId("list-filter-support-summary-filters")
+  ).toContainText("37");
+  await expect(
+    page.getByTestId("list-filter-support-summary-sorts")
+  ).toContainText("42");
+  await expect(
+    page.getByTestId("list-filter-support-summary-date-ranges")
+  ).toContainText("4");
+  await expect(
+    page.getByTestId("list-filter-support-entity-accounts")
+  ).toContainText("listAccounts");
+  await expect(
+    page.getByTestId("list-filter-support-entity-tasks")
+  ).toContainText("skip/take");
+  await expect(
+    page.getByTestId("list-filter-support-entity-table")
+  ).toContainText("lib/crm/crmClient.ts#listAccounts");
+  await expect(
+    page.getByTestId("list-filter-support-filter-table")
+  ).toContainText("Due date from");
+  await expect(
+    page.getByTestId("list-filter-support-filter-table")
+  ).toContainText("or contains");
+  await expect(
+    page.getByTestId("list-filter-support-sort-table")
+  ).toContainText("Health score");
+  await expect(
+    page.getByTestId("list-filter-support-write-flags")
+  ).toContainText("Database off");
+  await expect(
+    page.getByTestId("list-filter-support-write-flags")
+  ).toContainText("Routes off");
+
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
     "10"
