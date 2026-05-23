@@ -60,9 +60,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S27-F1 | Bulk action dry-run review packets | Codex | done |
 | S27-F2 | Audit coverage manifests | Codex | done |
 | S27-F3 | List filter support catalog | Codex | done |
-| S28-F1 | Audit coverage operator panel | Codex | queued |
-| S28-F2 | List filter support explorer | Codex | queued |
-| S28-F3 | Bulk dry-run review operator UI | Codex | queued |
+| S28-F1 | Audit coverage operator panel | Codex | done |
+| S28-F2 | List filter support explorer | Codex | done |
+| S28-F3 | Bulk dry-run review operator UI | Codex | done |
+| S29-F1 | Audit event explorer | Codex | queued |
+| S29-F2 | Saved list views foundation | Codex | queued |
+| S29-F3 | Saved list views operator UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
