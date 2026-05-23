@@ -1,41 +1,42 @@
 Agent: Codex
 
-Sprint: 28
+Sprint: 29
 
-Feature: S28-F3 - Bulk dry-run review operator UI
+Feature: Sprint 29 rollover planning
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 6672816 - [codex] S28-F3: add bulk dry-run review UI
+Commits this prompt:
+- ceaeb70 - [codex] sprint 29: plan codex track
+- 1a5e704 - [codex] sprint 29: backlog refresh
 
-Gate status: PASS - Phase 0 baseline full local gate passed via `scripts/local-gate.ps1`; Phase 4 quick `npm run typecheck` passed before commit; Phase 5 full local gate passed via `scripts/local-gate.ps1`, including `npm run test` (65 files / 353 tests) and `npm run test:e2e` (19 passed).
+Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`, including `npm run test` (65 files / 353 tests) and `npm run test:e2e` (19 passed). Phase 4 planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (65 files / 353 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T13:17:25.4701179-07:00
+Timestamp: 2026-05-23T15:16:18.9670022-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added a no-write Bulk Dry-Run Review panel to `/reports` using the existing bulk action dry-run review packet definitions and server helper.
-- Added a reports server action that parses entity/action/record selection inputs, validates supported dry-run entities/actions, and returns review packets without applying mutations, approvals, audit events, file writes, routes, or schema changes.
-- Surfaced supported entities/actions, max selection size, sample record IDs from existing export previews, target inputs, eligible/blocked/missing/duplicate rollups, representative reason summaries, audit-planning metadata, and explicit write-off flags.
-- Extended `e2e/reports.spec.ts` to build a dry-run packet from seeded sample account IDs plus a missing ID and verify rollups, reasons, audit metadata, and no-write flags.
+- Verified the Sprint 28 Codex track is complete from current SUMMARY evidence and recent commits for S28-F1, S28-F2, and S28-F3.
+- Updated `PLAN.md` document control to Sprint 29, marked Sprint 28 Codex features done, and queued three Sprint 29 Codex features: audit event explorer, saved list views foundation, and saved list views operator UI.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 28 is done and Sprint 29 is queued.
+- Kept the Sprint 29 plan inside the permanent non-goals: no auth, deployment, external AI, geocoding, Postgres default switch, persistent forecast scenarios, dealer-order/area CRUD, live `/deals/[id]` detail route, or global search expansion.
 
 ### Discovered this prompt
 
-- PLAN.md §4 still marks S28-F1, S28-F2, and S28-F3 as queued even though S28-F1/S28-F2 have prior green-gated implementation commits and S28-F3 is now green on `main`.
-- `SUMMARY.gemini.md` still references a Sprint 5 visual snapshot feature that does not match PLAN.md §4's Sprint 5 CSV feature rows; treated as stale historical context.
+- The first Phase 4 `npm run test` attempt left a repo-local Vitest process alive and produced SQLite lock/fixture residue. After stopping only that stale test process and reseeding, focused checks and the full Phase 4 gate passed cleanly; no blocker remains.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md or an explicit planning/status reconciliation prompt before starting new Codex feature work.
+Run LOOP.md to begin S29-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; reports page, reports component, server action, and e2e edits were one coherent S28-F3 slice)
+No cross-ownership edits: YES (single-agent root mode; planning scope explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
 
 CRM-CONTRACT.md honored: YES

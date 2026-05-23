@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 28
+Sprint: 29
 
-Feature: S28-F3 - Bulk dry-run review operator UI
+Feature: Sprint 29 rollover planning
 
 Branch: main
 
-Timestamp: 2026-05-23T13:17:25.4701179-07:00
+Timestamp: 2026-05-23T15:16:18.9670022-07:00
 
 Escalation required: NO
 
@@ -18,3 +18,4 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
+- A transient repo-local Vitest/SQLite lock condition during Phase 4 was cleared by stopping the stale test process and rerunning focused checks plus the full required gate. The rerun passed, so no `gate` blocker is open.
