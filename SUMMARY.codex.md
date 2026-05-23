@@ -1,43 +1,43 @@
 Agent: Codex
 
-Sprint: 25
+Sprint: 26
 
-Feature: S25-F2 — Filter/query compiler foundation
+Feature: Sprint rollover planning — S26 codex track
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 090f9a6 — [codex] S25-F2: add filter query compiler
+Commits this prompt: fce652e — [codex] sprint 26: plan codex track; ac3fa04 — [codex] sprint 26: backlog refresh
 
-Gate status: PASS — `scripts/local-gate.ps1` completed successfully; included npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (61 files / 334 tests), build, Playwright chromium install, and e2e (19 passed).
+Gate status: PASS — Phase 0 full baseline `scripts/local-gate.ps1` completed successfully, including npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (61 files / 334 tests), build, Playwright chromium install, and e2e (19 passed). Phase 4 post-planning verification also passed: `npm run lint`, `npm run typecheck`, `npm run test` (61 files / 334 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T20:03:48.5400235-07:00
+Timestamp: 2026-05-22T21:37:14.6066376-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Verified the Phase 0 baseline in single-agent root mode; the baseline gate subset through `npm run build` passed.
-- Added `lib/services/filterCompiler.ts` with a typed filter AST, scalar/list/range/logical helpers, expression detection, and deterministic Prisma-style `where` compilation.
-- Updated `buildListQuery` so list filter maps can return either legacy raw Prisma clauses or compiled filter AST expressions.
-- Migrated current list filters for accounts, contacts, opportunities, leads, activities, dealer orders, areas, tasks, cases, and campaigns to the shared AST helpers without changing sort or pagination behavior.
-- Added `tests/helpers/filterCompiler.test.ts` covering equals, contains, set membership, empty-set omission, OR search filters, account-linked filters, and date ranges through `buildListQuery`.
-- Ran the full local gate through `scripts/local-gate.ps1` after the implementation commit; the gate completed green.
+- Ran the Phase 0 full local gate from the single-agent root worktree; baseline was green before planning edits.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations/roadmap notes, `docs/decisions.md`, all root SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Confirmed Sprint 25 Codex work is complete by `SUMMARY.codex.md`, implementation commits, zero active Codex blockers, and green local-gate evidence.
+- Updated `PLAN.md` to mark S25-F1 and S25-F2 done, bump the document version to 2.32A, set Sprint 26 active, and queue S26-F1 through S26-F3.
+- Synced `docs/FEATURE-BACKLOG.md` so S25 is done and S26-F1 through S26-F3 are queued.
+- Verified planning-only changes with lint, typecheck, unit tests, and build after the planning commits.
 
 ### Discovered this prompt
 
-- PLAN.md §4 still lists S25-F1 and S25-F2 as `queued`, but recent Codex commits plus green local gate evidence show both S25-F1 and S25-F2 are now complete.
-- `SUMMARY.gemini.md` references a historical Sprint 5 visual snapshot baseline that does not match current PLAN.md §4 Sprint 5 scope; treated as stale cross-agent context only.
+- `LOOP.md` is not present in this checkout; the runner prompt and `scripts/local-gate.ps1` supplied the operative validation path for this rollover.
+- Older Claude, Grok, and Gemini report files still contain historical branch/session context, but none created an active Codex blocker for the Sprint 26 planning decision.
 
 ### Next action
 
-Run sprint rollover or backlog refresh before the next Codex feature; the current Sprint 25 Codex queue is complete by local evidence.
+Run LOOP.md to begin S26-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES — current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode with full-repo scope.
+No cross-ownership edits: YES — current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode. Writes were limited to `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md` as requested.
 
 CRM-CONTRACT.md honored: YES
