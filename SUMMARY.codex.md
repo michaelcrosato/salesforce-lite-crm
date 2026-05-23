@@ -2,41 +2,40 @@ Agent: Codex
 
 Sprint: 29
 
-Feature: Sprint 29 rollover planning
+Feature: S29-F1 - Audit event explorer
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- ceaeb70 - [codex] sprint 29: plan codex track
-- 1a5e704 - [codex] sprint 29: backlog refresh
+- adb51cc - [codex] S29-F1: add audit explorer service
+- bca7304 - [codex] S29-F1: add audit explorer report UI
 
-Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`, including `npm run test` (65 files / 353 tests) and `npm run test:e2e` (19 passed). Phase 4 planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (65 files / 353 tests), and `npm run build`.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0; `npm run test` passed 65 files / 354 tests and `npm run test:e2e` passed 19 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T15:16:18.9670022-07:00
+Timestamp: 2026-05-23T15:50:45.5543373-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Verified the Sprint 28 Codex track is complete from current SUMMARY evidence and recent commits for S28-F1, S28-F2, and S28-F3.
-- Updated `PLAN.md` document control to Sprint 29, marked Sprint 28 Codex features done, and queued three Sprint 29 Codex features: audit event explorer, saved list views foundation, and saved list views operator UI.
-- Synced `docs/FEATURE-BACKLOG.md` so Sprint 28 is done and Sprint 29 is queued.
-- Kept the Sprint 29 plan inside the permanent non-goals: no auth, deployment, external AI, geocoding, Postgres default switch, persistent forecast scenarios, dealer-order/area CRUD, live `/deals/[id]` detail route, or global search expansion.
+- Added `getAuditEventExplorer()` over the existing `AuditEvent` model with source/action/entity filters, rollup counts, recent rows, and known CRM record links.
+- Added a read-only Audit Event Explorer panel to `/reports` with URL-backed filters, summary cards, grouped counts, and recent event rows.
+- Added Vitest coverage for the explorer snapshot and Playwright coverage that creates a real audited task, filters to task creation events, and verifies the record link.
 
 ### Discovered this prompt
 
-- The first Phase 4 `npm run test` attempt left a repo-local Vitest process alive and produced SQLite lock/fixture residue. After stopping only that stale test process and reseeding, focused checks and the full Phase 4 gate passed cleanly; no blocker remains.
+- Other agents' root SUMMARY/BLOCKERS files remain historical parallel-branch context; no active blocker in those files changes the current Sprint 29 Codex queue on `main`.
 
 ### Next action
 
-Run LOOP.md to begin S29-F1.
+Run LOOP.md for S29-F2 - Saved list views foundation.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; planning scope explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
+No cross-ownership edits: YES (single-agent root mode; full-repo files were touched only for the S29-F1 service, `/reports` UI, and test coverage)
 
 CRM-CONTRACT.md honored: YES
