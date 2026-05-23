@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.34A |
+| Version | 2.35A |
 
 | Last updated | 2026-05-23 |
 
-| Active sprint | Sprint 28 S28-F1/S28-F2/S28-F3 queued |
+| Active sprint | Sprint 29 S29-F1/S29-F2/S29-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1040,9 +1040,9 @@ Goal: surface the current productivity handoff contracts in read-only operator w
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S28-F1 — Audit coverage operator panel | Codex | queued | Add a read-only `/reports` panel that summarizes audit coverage manifests by entity, category, and source surface, including known gaps and safe next actions. It must use existing manifests, preserve current routes and mutation behavior, and avoid request logging, external telemetry, auth permissions, or background processing. |
-| S28-F2 — List filter support explorer | Codex | queued | Add a read-only `/reports` panel that exposes supported list filters and sort keys by entity from the support catalog so operators can inspect current query capabilities. It must avoid saved-view persistence, natural-language filters, search changes, schema changes, route changes, and report-builder scope. |
-| S28-F3 — Bulk dry-run review operator UI | Codex | queued | Add a no-write operator UI on `/reports` for building bulk action dry-run review packets from supported entity/action/record selections and target inputs. It must display eligible/blocked rollups, representative reasons, and audit-planning metadata while avoiding actual bulk mutations, approvals, import apply, routing execution, file storage, or new routes. |
+| S28-F1 — Audit coverage operator panel | Codex | done | Add a read-only `/reports` panel that summarizes audit coverage manifests by entity, category, and source surface, including known gaps and safe next actions. It must use existing manifests, preserve current routes and mutation behavior, and avoid request logging, external telemetry, auth permissions, or background processing. |
+| S28-F2 — List filter support explorer | Codex | done | Add a read-only `/reports` panel that exposes supported list filters and sort keys by entity from the support catalog so operators can inspect current query capabilities. It must avoid saved-view persistence, natural-language filters, search changes, schema changes, route changes, and report-builder scope. |
+| S28-F3 — Bulk dry-run review operator UI | Codex | done | Add a no-write operator UI on `/reports` for building bulk action dry-run review packets from supported entity/action/record selections and target inputs. It must display eligible/blocked rollups, representative reasons, and audit-planning metadata while avoiding actual bulk mutations, approvals, import apply, routing execution, file storage, or new routes. |
 
 \*\*Sprint 28 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1073,6 +1073,47 @@ Goal: surface the current productivity handoff contracts in read-only operator w
 \- No request-log pipeline, external telemetry sink, background audit processing, auth-backed audit permissions, or audit event backfills.
 
 \- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, dealer capacity rules, lead disposition state expansion, or SLA timers.
+
+
+\*\*Sprint 29 — Saved Views And Audit Operations\*\*
+
+Goal: turn the completed productivity handoff surfaces into bounded local operator workflows while preserving current route guardrails and deterministic local behavior.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S29-F1 — Audit event explorer | Codex | queued | Add a read-only `/reports` surface over existing audit events with entity/action/source filters, recent-event rows, counts, and record links where available. It must reuse the current audit model and avoid request logging, external telemetry, background processing, auth permissions, or audit backfills. |
+| S29-F2 — Saved list views foundation | Codex | queued | Add a local saved-view model and server helpers for supported CRM list pages, preserving current list behavior when no saved view is selected and documenting the contract/schema change. It must support existing filters and sorts without natural-language filters, sharing, tenant scoping, or report-builder scope. |
+| S29-F3 — Saved list views operator UI | Codex | queued | Add save/apply/update/delete controls for saved views on supported CRM list pages using existing filters and sorts, with deterministic feedback and tests. It depends on S29-F2 and must avoid column layout builders, cross-user sharing, permissions, saved-view import/export, or search changes. |
+
+\*\*Sprint 29 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No request-log pipeline, external telemetry sink, background audit processing, auth-backed audit permissions, or audit event backfills.
+
+\- No saved-view sharing, user/tenant scoping, permissions model, natural-language filters, report builder, dashboard builder, or saved-view import/export.
+
+\- No column layout builder, custom-field metadata, or schema changes outside the saved-view foundation.
+
+\- No new product routes; S29 surfaces stay on existing `/reports` and supported CRM list routes.
+
+\- No bulk mutation execution, approval workflow, CSV import apply flow, CSV bulk create/update, duplicate merge, routing execution, file storage, or Salesforce integration.
 
 
 \## 5. File Ownership Matrix
