@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 25
 
-Feature: S25-F1 — Audit event model foundation
+Feature: S25-F2 — Filter/query compiler foundation
 
 Branch: main
 
-Timestamp: 2026-05-22T18:51:22.0112540-07:00
+Timestamp: 2026-05-22T20:03:48.5400235-07:00
 
 Escalation required: NO
 
@@ -18,4 +18,4 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
-- Initial `npm run test` command timeouts were not repo failures; the same command completed green when run with a sufficient timeout, and the later full `scripts/local-gate.ps1` run completed successfully.
+- A transient TypeScript narrowing error in `lib/services/filterCompiler.ts` was resolved before commit; `npm run typecheck` and the later full local gate passed.

@@ -2,33 +2,39 @@ Agent: Codex
 
 Sprint: 25
 
-Feature: S25-F1 — Audit event model foundation
+Feature: S25-F2 — Filter/query compiler foundation
 
 Branch: main
 
 Status: done
 
-Commits this prompt: a70708b — [codex] S25-F1: add audit event foundation
+Commits this prompt: 090f9a6 — [codex] S25-F2: add filter query compiler
 
-Gate status: PASS — `scripts/local-gate.ps1` completed successfully; included npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (60 files / 330 tests), build, Playwright chromium install, and e2e (19 passed).
+Gate status: PASS — `scripts/local-gate.ps1` completed successfully; included npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (61 files / 334 tests), build, Playwright chromium install, and e2e (19 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T18:51:22.0112540-07:00
+Timestamp: 2026-05-22T20:03:48.5400235-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Verified the Phase 0 baseline in single-agent root mode; initial short tool timeouts were resolved by rerunning Vitest with sufficient timeout, and the baseline gate subset passed.
-- Added a first-class `AuditEvent` Prisma model to the SQLite and Postgres schemas with actor user, category/action, entity target, summary, metadata, occurrence timestamps, and query indexes.
-- Added `lib/services/auditEvents.ts` with typed audit category/action taxonomy for user, record, AI, import, routing, and workflow actions, deterministic metadata serialization, category/action validation, and record/list helpers.
-- Added `tests/api/auditEvents.test.ts` covering taxonomy buckets, category/action rejection, deterministic metadata storage, entity filtering, and newest-first ordering.
+- Verified the Phase 0 baseline in single-agent root mode; the baseline gate subset through `npm run build` passed.
+- Added `lib/services/filterCompiler.ts` with a typed filter AST, scalar/list/range/logical helpers, expression detection, and deterministic Prisma-style `where` compilation.
+- Updated `buildListQuery` so list filter maps can return either legacy raw Prisma clauses or compiled filter AST expressions.
+- Migrated current list filters for accounts, contacts, opportunities, leads, activities, dealer orders, areas, tasks, cases, and campaigns to the shared AST helpers without changing sort or pagination behavior.
+- Added `tests/helpers/filterCompiler.test.ts` covering equals, contains, set membership, empty-set omission, OR search filters, account-linked filters, and date ranges through `buildListQuery`.
 - Ran the full local gate through `scripts/local-gate.ps1` after the implementation commit; the gate completed green.
+
+### Discovered this prompt
+
+- PLAN.md §4 still lists S25-F1 and S25-F2 as `queued`, but recent Codex commits plus green local gate evidence show both S25-F1 and S25-F2 are now complete.
+- `SUMMARY.gemini.md` references a historical Sprint 5 visual snapshot baseline that does not match current PLAN.md §4 Sprint 5 scope; treated as stale cross-agent context only.
 
 ### Next action
 
-Run LOOP.md to begin S25-F2 — Filter/query compiler foundation.
+Run sprint rollover or backlog refresh before the next Codex feature; the current Sprint 25 Codex queue is complete by local evidence.
 
 ### Scope confirmation
 
