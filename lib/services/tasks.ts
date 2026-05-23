@@ -2,6 +2,7 @@ import type { Prisma, Task } from "@prisma/client";
 import { z } from "zod";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import { fieldEquals, fieldGte, fieldLte } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { idSchema, taskCreateSchema, taskUpdateSchema } from "@/lib/validation";
 
@@ -122,18 +123,10 @@ function taskListQuery(input: ParsedTaskListInput) {
       priority: (order) => [{ priority: order }, { createdAt: "desc" }]
     },
     filterMap: {
-      status: (status) => ({ status }),
-      ownerId: (ownerId) => ({ ownerId }),
-      dueDateFrom: (dueDateFrom) => ({
-        dueDate: {
-          gte: dueDateFrom
-        }
-      }),
-      dueDateTo: (dueDateTo) => ({
-        dueDate: {
-          lte: dueDateTo
-        }
-      })
+      status: (status) => fieldEquals(["status"], status),
+      ownerId: (ownerId) => fieldEquals(["ownerId"], ownerId),
+      dueDateFrom: (dueDateFrom) => fieldGte(["dueDate"], dueDateFrom),
+      dueDateTo: (dueDateTo) => fieldLte(["dueDate"], dueDateTo)
     }
   });
 }

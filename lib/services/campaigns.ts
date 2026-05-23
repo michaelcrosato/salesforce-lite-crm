@@ -2,6 +2,7 @@ import type { Campaign, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import { fieldEquals, fieldGte, fieldLte } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import {
   campaignCreateSchema,
@@ -144,18 +145,10 @@ function campaignListQuery(input: ParsedCampaignListInput) {
       budget: (order) => [{ budget: order }, { createdAt: "desc" }]
     },
     filterMap: {
-      status: (status) => ({ status }),
-      ownerId: (ownerId) => ({ ownerId }),
-      startDateFrom: (startDateFrom) => ({
-        startDate: {
-          gte: startDateFrom
-        }
-      }),
-      startDateTo: (startDateTo) => ({
-        startDate: {
-          lte: startDateTo
-        }
-      })
+      status: (status) => fieldEquals(["status"], status),
+      ownerId: (ownerId) => fieldEquals(["ownerId"], ownerId),
+      startDateFrom: (startDateFrom) => fieldGte(["startDate"], startDateFrom),
+      startDateTo: (startDateTo) => fieldLte(["startDate"], startDateTo)
     }
   });
 }

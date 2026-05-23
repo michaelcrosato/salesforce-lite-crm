@@ -49,6 +49,11 @@ import {
   listTasks as listTasksService,
   updateTask as updateTaskService
 } from "@/lib/services/tasks";
+import {
+  fieldContains,
+  fieldEquals,
+  orFilters
+} from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import {
   getRoutingDecisionForLead as getRoutingDecisionForLeadService,
@@ -182,12 +187,6 @@ function parseId(id: string): string {
   return idSchema.parse(id);
 }
 
-function contains(value: string): Prisma.StringFilter {
-  return {
-    contains: value
-  };
-}
-
 function accountListQuery(opts: AccountListOptions) {
   return buildListQuery<
     AccountSortBy,
@@ -206,17 +205,16 @@ function accountListQuery(opts: AccountListOptions) {
       healthScore: (order) => ({ healthScore: order })
     },
     filterMap: {
-      status: (status) => ({ status }),
-      ownerId: (ownerId) => ({ ownerId }),
-      search: (search) => ({
-        OR: [
-          { name: contains(search) },
-          { domain: contains(search) },
-          { industry: contains(search) },
-          { city: contains(search) },
-          { region: contains(search) }
-        ]
-      })
+      status: (status) => fieldEquals(["status"], status),
+      ownerId: (ownerId) => fieldEquals(["ownerId"], ownerId),
+      search: (search) =>
+        orFilters([
+          fieldContains(["name"], search),
+          fieldContains(["domain"], search),
+          fieldContains(["industry"], search),
+          fieldContains(["city"], search),
+          fieldContains(["region"], search)
+        ])
     }
   });
 }
@@ -239,16 +237,15 @@ function contactListQuery(opts: ContactListOptions) {
       updatedAt: (order) => ({ updatedAt: order })
     },
     filterMap: {
-      status: (status) => ({ status }),
-      accountId: (accountId) => ({ accountId }),
-      search: (search) => ({
-        OR: [
-          { firstName: contains(search) },
-          { lastName: contains(search) },
-          { email: contains(search) },
-          { title: contains(search) }
-        ]
-      })
+      status: (status) => fieldEquals(["status"], status),
+      accountId: (accountId) => fieldEquals(["accountId"], accountId),
+      search: (search) =>
+        orFilters([
+          fieldContains(["firstName"], search),
+          fieldContains(["lastName"], search),
+          fieldContains(["email"], search),
+          fieldContains(["title"], search)
+        ])
     }
   });
 }
@@ -272,10 +269,10 @@ function opportunityListQuery(opts: OpportunityListOptions) {
       updatedAt: (order) => ({ updatedAt: order })
     },
     filterMap: {
-      stage: (stage) => ({ stage }),
-      accountId: (accountId) => ({ accountId }),
-      ownerId: (ownerId) => ({ ownerId }),
-      search: (search) => ({ name: contains(search) })
+      stage: (stage) => fieldEquals(["stage"], stage),
+      accountId: (accountId) => fieldEquals(["accountId"], accountId),
+      ownerId: (ownerId) => fieldEquals(["ownerId"], ownerId),
+      search: (search) => fieldContains(["name"], search)
     }
   });
 }
@@ -298,19 +295,19 @@ function leadListQuery(opts: LeadListOptions) {
       updatedAt: (order) => ({ updatedAt: order })
     },
     filterMap: {
-      status: (status) => ({ status }),
-      assignedOrderId: (assignedOrderId) => ({ assignedOrderId }),
-      areaId: (areaId) => ({ areaId }),
-      search: (search) => ({
-        OR: [
-          { firstName: contains(search) },
-          { lastName: contains(search) },
-          { email: contains(search) },
-          { phone: contains(search) },
-          { postalCode: contains(search) },
-          { source: contains(search) }
-        ]
-      })
+      status: (status) => fieldEquals(["status"], status),
+      assignedOrderId: (assignedOrderId) =>
+        fieldEquals(["assignedOrderId"], assignedOrderId),
+      areaId: (areaId) => fieldEquals(["areaId"], areaId),
+      search: (search) =>
+        orFilters([
+          fieldContains(["firstName"], search),
+          fieldContains(["lastName"], search),
+          fieldContains(["email"], search),
+          fieldContains(["phone"], search),
+          fieldContains(["postalCode"], search),
+          fieldContains(["source"], search)
+        ])
     }
   });
 }
@@ -332,13 +329,13 @@ function activityListQuery(opts: ActivityListOptions) {
       title: (order) => ({ title: order })
     },
     filterMap: {
-      type: (type) => ({ type }),
-      accountId: (accountId) => ({ accountId }),
-      contactId: (contactId) => ({ contactId }),
-      dealId: (dealId) => ({ dealId }),
-      leadId: (leadId) => ({ leadId }),
-      taskId: (taskId) => ({ taskId }),
-      caseId: (caseId) => ({ caseId })
+      type: (type) => fieldEquals(["type"], type),
+      accountId: (accountId) => fieldEquals(["accountId"], accountId),
+      contactId: (contactId) => fieldEquals(["contactId"], contactId),
+      dealId: (dealId) => fieldEquals(["dealId"], dealId),
+      leadId: (leadId) => fieldEquals(["leadId"], leadId),
+      taskId: (taskId) => fieldEquals(["taskId"], taskId),
+      caseId: (caseId) => fieldEquals(["caseId"], caseId)
     }
   });
 }
@@ -361,8 +358,8 @@ function dealerOrderListQuery(opts: DealerOrderListOptions) {
       createdAt: (order) => ({ createdAt: order })
     },
     filterMap: {
-      status: (status) => ({ status }),
-      accountId: (accountId) => ({ accountId })
+      status: (status) => fieldEquals(["status"], status),
+      accountId: (accountId) => fieldEquals(["accountId"], accountId)
     }
   });
 }
@@ -384,15 +381,14 @@ function areaListQuery(opts: AreaListOptions) {
       createdAt: (order) => ({ createdAt: order })
     },
     filterMap: {
-      province: (province) => ({ province }),
-      search: (search) => ({
-        OR: [
-          { name: contains(search) },
-          { province: contains(search) },
-          { region: contains(search) },
-          { postalPrefixes: contains(search) }
-        ]
-      })
+      province: (province) => fieldEquals(["province"], province),
+      search: (search) =>
+        orFilters([
+          fieldContains(["name"], search),
+          fieldContains(["province"], search),
+          fieldContains(["region"], search),
+          fieldContains(["postalPrefixes"], search)
+        ])
     }
   });
 }

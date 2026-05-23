@@ -1,3 +1,9 @@
+import {
+  compileFilterExpression,
+  isFilterExpression,
+  type FilterExpression
+} from "@/lib/services/filterCompiler";
+
 export type SortOrder = "asc" | "desc";
 
 export type ListQueryInput<
@@ -18,6 +24,8 @@ export type ListQueryClauses<Where, OrderBy> = {
   take: number;
 };
 
+export type ListFilterOutput<Where> = Where | FilterExpression | undefined;
+
 export type ListQueryConfig<
   SortBy extends string,
   Filters extends Record<string, unknown>,
@@ -34,7 +42,7 @@ export type ListQueryConfig<
   filterMap: {
     [Key in keyof Filters]?: (
       value: NonNullable<Filters[Key]>
-    ) => Where | undefined;
+    ) => ListFilterOutput<Where>;
   };
 };
 
@@ -82,7 +90,10 @@ export function buildListQuery<
       continue;
     }
 
-    const clause = mapFilter(value as NonNullable<Filters[typeof key]>);
+    const mappedFilter = mapFilter(value as NonNullable<Filters[typeof key]>);
+    const clause = isFilterExpression(mappedFilter)
+      ? compileFilterExpression<Where>(mappedFilter)
+      : mappedFilter;
 
     if (clause) {
       whereClauses.push(clause);

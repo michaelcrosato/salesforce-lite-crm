@@ -2,6 +2,7 @@ import type { Case, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { CASE_STATUSES, type CaseStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import { fieldEquals } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { caseCreateSchema, caseUpdateSchema, idSchema } from "@/lib/validation";
 
@@ -100,10 +101,10 @@ function caseListQuery(input: ParsedCaseListInput) {
       subject: (order) => [{ subject: order }]
     },
     filterMap: {
-      status: (status) => ({ status }),
-      ownerId: (ownerId) => ({ ownerId }),
-      accountId: (accountId) => ({ accountId }),
-      contactId: (contactId) => ({ contactId })
+      status: (status) => fieldEquals(["status"], status),
+      ownerId: (ownerId) => fieldEquals(["ownerId"], ownerId),
+      accountId: (accountId) => fieldEquals(["accountId"], accountId),
+      contactId: (contactId) => fieldEquals(["contactId"], contactId)
     }
   });
 }
