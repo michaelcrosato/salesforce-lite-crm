@@ -6,7 +6,7 @@ Feature: S26-F3 - Saved list views foundation
 
 Branch: main
 
-Timestamp: 2026-05-23T00:50:39.7241499-07:00
+Timestamp: 2026-05-23T01:36:34.0059140-07:00
 
 Escalation required: YES
 
@@ -14,14 +14,13 @@ Escalation required: YES
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|--------------|------|-------------|----------|---------|-----------------|
-| 1 | `PLAN.md` §4 S26-F3 / `CRM-CONTRACT.md` | contract | S26-F3 cannot be selected under the current LOOP rule because its acceptance requires contract/schema documentation updates. | PLAN §4 S26-F3 says implementation must update contract/schema documentation when the saved-view model is added. The current LOOP selection rule says a selected unit must not require a `CRM-CONTRACT.md` change and to file a `contract` blocker if it does. | Fresh prompt or sprint rollover decision that either permits the required `CRM-CONTRACT.md` and schema-documentation update for S26-F3, or replaces/defers S26-F3 with a valid non-contract work unit. | Do not implement S26-F3 in this loop. Keep S26-F1/S26-F2 marked done from green-gated evidence and stop until valid scope is supplied. |
+| 1 | `PLAN.md` §4 S26-F3 / `CRM-CONTRACT.md` / `docs/schema-changelog.md` | contract | S26-F3 cannot be selected by the current LOOP because its acceptance requires contract and schema-documentation updates. | PLAN §4 S26-F3 says the saved-view model implementation must update contract/schema documentation. LOOP Phase 2 says selected units must not require a `CRM-CONTRACT.md` change and to file a `contract` blocker if they do. Phase 0 baseline was green through `npm run build`, so this is a scope blocker rather than a gate failure. | Sprint rollover or fresh prompt that either replaces/defers S26-F3 with valid non-contract scope or explicitly permits the required `CRM-CONTRACT.md` and schema-documentation update. | Do not implement S26-F3 under the current LOOP rule. Run `prompts/codex/SPRINT-ROLLOVER.md` next because Codex has no safe queued implementation unit. |
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
-- Resolved Sprint 26 status drift by marking S26-F1 and S26-F2 done in `PLAN.md` and `docs/FEATURE-BACKLOG.md`.
+- No implementation blocker was resolved; this prompt refreshed the report handoff so the autonomy runner can proceed to sprint rollover.
 
 ### Notes
 
-- Phase 0 baseline full local gate passed before edits.
-- Post-edit documentation subset passed with `git diff --check HEAD~1..HEAD` and clean `git status --short`.
+- Other-agent active blocker impact: none for this single-agent root iteration.
+- Report-only subset for this prompt: Markdown review, `git diff --check`, and `git status --short`.
