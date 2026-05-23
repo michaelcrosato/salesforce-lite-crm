@@ -1,41 +1,37 @@
 Agent: Codex
 
-Sprint: 27
+Sprint: 28
 
-Feature: S27-F3 - List filter support catalog
+Feature: Sprint 28 planning - Productivity Operator Surfaces
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 6165d5d - [codex] S27-F3: add list filter support catalog
+Commits this prompt: 61d6a4f - [codex] sprint 28: plan codex track; 9fe1ec5 - [codex] sprint 28: backlog refresh
 
-Gate status: PASS - Phase 0 baseline setup plus lint, typecheck, unit tests, and build exited 0. Phase 5 full local gate passed via `scripts/local-gate.ps1`: npm install, env check, Prisma generate/db push, seed, lint, typecheck, unit tests (65 files / 353 tests), build, Playwright Chromium install, and e2e (19 tests) all exited 0.
+Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`; Phase 4 planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (65 files / 353 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T08:30:09.5165149-07:00
+Timestamp: 2026-05-23T10:08:38.0851273-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from the single-agent root on `main`; the tree was clean and the baseline gate subset was green before implementation.
-- Added `lib/server/listFilterSupportCatalog.ts`, a read-only handoff catalog for the current CRM list filter and sort surface across accounts, contacts, opportunities, leads, activities, dealer orders, areas, tasks, cases, and campaigns.
-- Added `tests/api/list-filter-support-catalog.test.ts` covering deterministic catalog rollups, adapter-backed filters/sorts, service-backed task/case/campaign metadata, strict unknown-key rejection, unknown entity handling, and no database writes.
-- Verified focused typecheck, lint, catalog tests, and build before the implementation commit, then verified the full local gate after the commit.
-
-### Discovered this prompt
-
-- PLAN.md §4 still lists S27-F1, S27-F2, and S27-F3 as queued, while recent Codex commits and green local gate evidence now show all three Sprint 27 items are implemented on `main`; sprint rollover/status reconciliation is needed before selecting new feature scope.
-- Gemini's historical `SUMMARY.gemini.md` references Sprint 5 S5-F1 as "E2E Visual Snapshot Baseline", while current PLAN.md §4 defines S5-F1 as "Server CSV export contracts"; treated as stale historical report context because PLAN.md, CRM-CONTRACT.md, current `main`, and the green local gate are higher authority.
+- Ran pre-flight from the single-agent root on `main`; the worktree was clean and the full local gate passed before planning edits.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations, decision history, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Confirmed Sprint 27 Codex work was complete: S27-F1, S27-F2, and S27-F3 all have recent implementation commits, green gate evidence, and no active Codex blockers.
+- Updated `PLAN.md` to mark Sprint 27 Codex features done, bump document control to 2.34A, and queue Sprint 28 features S28-F1 through S28-F3.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 27 is done and Sprint 28 is queued.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md to reconcile Sprint 27 status and select the next active scope.
+Run LOOP.md to begin S28-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode; implementation touched `lib/server/**` plus focused `tests/**` coverage.
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES
