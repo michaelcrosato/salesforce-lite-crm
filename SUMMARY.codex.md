@@ -1,43 +1,37 @@
 Agent: Codex
 
-Sprint: 24
+Sprint: 25
 
-Feature: S24-F2 - CSV import preview UI
+Feature: Sprint rollover planning - S25
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 7370e67 - [codex] S24-F2: add CSV import preview UI
+Commits this prompt: b7c3268 - [codex] sprint 25: plan codex track; 8373b33 - [codex] sprint 25: backlog refresh
 
-Gate status: PASS - Pre-flight and post-implementation full gates passed `scripts/local-gate.ps1`; final gate included npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (59 files / 325 tests), build, Playwright Chromium install, and e2e (19 tests). Focused checks also passed: `npm run lint`, `npm run typecheck`, `npm run build`, `npx playwright test e2e/reports.spec.ts`, and a browser sanity pass on `/reports`.
+Gate status: PASS - Phase 0 baseline passed `scripts/local-gate.ps1`; post-plan verification passed `npm run lint`, `npm run typecheck`, `npm run test` (59 files / 325 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T16:12:29.0086663-07:00
+Timestamp: 2026-05-22T17:58:43.1296249-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added a read-only CSV import preview surface to `/reports` for supported contact and lead imports.
-- Added a server action that calls the existing dedupe review bundle path, which composes import preview, preflight diagnostics, readiness summaries, action metadata, dry-run receipt data, and dedupe review output without database writes.
-- Added paste/file-select input, entity selection, template example filling, safe/watch/block summary cards, row-level readiness/action output, dedupe/diagnostic rollups, and no-write flag display.
-- Extended `e2e/reports.spec.ts` to cover the CSV import preview surface with one safe row, one duplicate watch row, one validation block row, and no-write assertions.
-- Updated `README.md` to describe the `/reports` CSV import preview UI while keeping import apply, bulk writes, routing execution, duplicate merge, file storage, and background jobs deferred.
-
-### Discovered this prompt
-
-- PLAN §4 still marks `S24-F1` and `S24-F2` as queued, but recent Codex implementation commits and green local gates show both Sprint 24 work units are now done in `main`.
-- Other-agent report files remain historical/stale against current PLAN and `main`: Claude and Grok describe Sprint 4 branch work, and Gemini describes an older Sprint 5 visual snapshot queue that does not match PLAN §4 Sprint 5 CSV scope.
-- The first post-implementation full gate reached e2e and failed because the temporary browser sanity-check dev server was still running. After stopping that local server, `npm run test:e2e` passed and the full `scripts/local-gate.ps1` rerun passed end to end.
+- Verified the Sprint 24 baseline with the full local gate before planning changes.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Marked S24-F1 and S24-F2 complete in `PLAN.md` based on Codex implementation/report evidence and zero active Codex blockers.
+- Planned Sprint 25 for Codex with S25-F1 Audit event model foundation and S25-F2 Filter/query compiler foundation, preserving all permanent non-goals and sprint-specific exclusions.
+- Synced `docs/FEATURE-BACKLOG.md` so S24 is done and S25 is queued.
 
 ### Next action
 
-Sprint rollover needed for the next Codex work unit.
+Run LOOP.md to begin S25-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode with full-repo access.
+No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode with explicit planning scope.
 
 CRM-CONTRACT.md honored: YES

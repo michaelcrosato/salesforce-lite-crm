@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 24
+Sprint: 25
 
-Feature: S24-F2 - CSV import preview UI
+Feature: Sprint rollover planning - S25
 
 Branch: main
 
-Timestamp: 2026-05-22T16:12:29.0086663-07:00
+Timestamp: 2026-05-22T17:58:43.1296249-07:00
 
 Escalation required: NO
 
@@ -18,4 +18,4 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
-- A transient post-implementation e2e failure was caused by a temporary browser sanity-check dev server left running before the full gate. Stopping that local server resolved the issue; `npm run test:e2e` and the full `scripts/local-gate.ps1` rerun passed.
+- Sprint 24 rollover evidence was sufficient: S24-F1 and S24-F2 implementation/report commits are present on `main`, `SUMMARY.codex.md` reported S24-F2 done, historical `SUMMARY.codex.md` at `f728efa` reported S24-F1 done, and the Phase 0 baseline gate passed.
