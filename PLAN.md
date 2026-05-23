@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.31A |
+| Version | 2.32A |
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 25 S25-F1 queued; Sprint 24 complete in `main` |
+| Active sprint | Sprint 26 S26-F1 queued; Sprint 25 complete in `main` |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -918,8 +918,8 @@ Goal: add narrow deterministic foundations for auditability and shared filtering
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S25-F1 — Audit event model foundation | Codex | queued | Add a first-class audit event model and TypeScript taxonomy for user, record, AI, import, routing, and workflow actions. Provide deterministic record/query helpers with focused tests while avoiding auth, permissions, external telemetry, background processing, and broad mutation rewiring. |
-| S25-F2 — Filter/query compiler foundation | Codex | queued | Add a shared filter AST and Prisma compiler for the current supported list-filter surface, with parity tests proving representative list/query behavior remains stable. The foundation must be reusable by lists, reports, and exports without adding natural-language filters, saved views, report-builder UI, or search expansion. |
+| S25-F1 — Audit event model foundation | Codex | done | Add a first-class audit event model and TypeScript taxonomy for user, record, AI, import, routing, and workflow actions. Provide deterministic record/query helpers with focused tests while avoiding auth, permissions, external telemetry, background processing, and broad mutation rewiring. |
+| S25-F2 — Filter/query compiler foundation | Codex | done | Add a shared filter AST and Prisma compiler for the current supported list-filter surface, with parity tests proving representative list/query behavior remains stable. The foundation must be reusable by lists, reports, and exports without adding natural-language filters, saved views, report-builder UI, or search expansion. |
 
 \*\*Sprint 25 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -948,6 +948,49 @@ Goal: add narrow deterministic foundations for auditability and shared filtering
 \- No natural-language filter generation, saved views, report builder, dashboard builder, bulk actions, or dedicated `/search` page.
 
 \- No CSV import apply flow, bulk create/update, contact or lead upsert, duplicate merge, routing execution, file storage, or Salesforce integration.
+
+
+\*\*Sprint 26 — CRM Productivity Foundations\*\*
+
+Goal: build on the audit and filter foundations with bounded operator productivity contracts while preserving current route, auth, search, and routing guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S26-F1 — Bulk action dry-run contracts | Codex | queued | Add deterministic server-side dry-run planning for selected-record actions such as status/stage updates, assignment eligibility, task creation eligibility, and selected export eligibility. It must return eligible/blocked counts and audit metadata without mutating records, adding routes, or creating an approval workflow. |
+| S26-F2 — Audit adoption for core mutations | Codex | queued | Use the Sprint 25 audit helpers in a bounded set of existing core CRM mutations such as create/update/status/stage/complete/resolve flows. Tests must prove deterministic audit rows are written without changing user-facing behavior, request logging, routing behavior, or external telemetry. |
+| S26-F3 — Saved list views foundation | Codex | queued | Add a local saved-view model and helpers for supported CRM list pages, persisting filters, sort, and column metadata for the single-user local workflow. Current lists must keep working without saved views, and implementation must update the contract/schema documentation when the model is added. |
+
+\*\*Sprint 26 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No CSV import apply flow, CSV bulk create/update, contact or lead upsert, duplicate merge, file storage, or Salesforce integration.
+
+\- No actual bulk mutation execution; S26-F1 is dry-run/planning only until a later prompt explicitly promotes apply behavior.
+
+\- No auth-backed user/tenant permission model or sharing layer for saved views; saved-view scope remains single-user local.
+
+\- No natural-language filters, report builder, dashboard builder, dedicated `/search` page, or command-palette expansion.
+
+\- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, or dealer capacity rules.
+
+\- No audit UI, audit reporting dashboard, external telemetry sink, request-log pipeline, or background audit processing.
 
 
 \## 5. File Ownership Matrix
