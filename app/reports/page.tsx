@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { AuditCoverageOperator } from "@/components/reports/audit-coverage-operator";
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import {
   type CsvExportDeliveryPacketEntity
 } from "@/lib/server/csvExportDeliveryPackets";
 import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
+import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +45,7 @@ export default async function ReportsPage({
     getCsvExportDeliveryPacket(selectedCsvEntity)
   ]);
   const csvImportTemplates = listCsvImportTemplates();
+  const auditCoverageManifest = getAuditCoverageManifest();
 
   return (
     <div className="crm-page">
@@ -56,6 +59,8 @@ export default async function ReportsPage({
           <ReportCard key={report.slug} report={report} />
         ))}
       </div>
+
+      <AuditCoverageOperator manifest={auditCoverageManifest} />
 
       <CsvExportOperator
         packets={csvPackets}

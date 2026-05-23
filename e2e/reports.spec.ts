@@ -19,6 +19,35 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   await page.getByRole("link", { name: "All reports" }).click();
   await expect(page.getByRole("heading", { name: "Reports" })).toBeVisible();
 
+  await expect(page.getByTestId("audit-coverage-operator")).toBeVisible();
+  await expect(page.getByTestId("audit-coverage-summary-entities")).toContainText(
+    "3"
+  );
+  await expect(page.getByTestId("audit-coverage-summary-surfaces")).toContainText(
+    "12"
+  );
+  await expect(page.getByTestId("audit-coverage-summary-gaps")).toContainText(
+    "3"
+  );
+  await expect(page.getByTestId("audit-coverage-category-table")).toContainText(
+    "record"
+  );
+  await expect(page.getByTestId("audit-coverage-source-table")).toContainText(
+    "lib/services/tasks.ts#completeTask"
+  );
+  await expect(page.getByTestId("audit-coverage-known-gaps")).toContainText(
+    "deleteCase"
+  );
+  await expect(page.getByTestId("audit-coverage-known-gaps")).toContainText(
+    "Promote audited delete semantics"
+  );
+  await expect(page.getByTestId("audit-coverage-write-flags")).toContainText(
+    "Request logs off"
+  );
+  await expect(page.getByTestId("audit-coverage-write-flags")).toContainText(
+    "External telemetry off"
+  );
+
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
     "10"
