@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   AUDIT_EVENT_ACTIONS,
+  getAuditEventExplorer,
   isAuditActionForCategory,
   listAuditEvents,
   listAuditEventsForEntity,
@@ -12,6 +13,8 @@ import {
 const actorUserId = "test-audit-user";
 const accountEntityId = "test-audit-account";
 const leadEntityId = "test-audit-lead";
+const taskEntityId = "test-audit-task";
+const campaignEntityId = "test-audit-campaign";
 
 describe("audit event service", () => {
   beforeEach(async () => {
@@ -121,6 +124,89 @@ describe("audit event service", () => {
     expect(routingEvents[0]?.entityId).toBe(leadEntityId);
   });
 
+  it("builds a read-only explorer snapshot with filters, counts, and links", async () => {
+    await recordAuditEvent({
+      category: "record",
+      action: "created",
+      actorUserId,
+      entityType: "task",
+      entityId: taskEntityId,
+      summary: "Task created for explorer.",
+      occurredAt: new Date("2099-05-22T10:00:00Z")
+    });
+    await recordAuditEvent({
+      category: "workflow",
+      action: "campaign_completed",
+      actorUserId,
+      entityType: "campaign",
+      entityId: campaignEntityId,
+      summary: "Campaign completed for explorer.",
+      occurredAt: new Date("2099-05-23T10:00:00Z")
+    });
+    const countBefore = await prisma.auditEvent.count({
+      where: { actorUserId }
+    });
+
+    const snapshot = await getAuditEventExplorer({
+      category: "record",
+      action: "created",
+      entityType: "task",
+      pageSize: 5
+    });
+    const countAfter = await prisma.auditEvent.count({
+      where: { actorUserId }
+    });
+
+    expect(countAfter).toBe(countBefore);
+    expect(snapshot.filters).toEqual({
+      category: "record",
+      action: "created",
+      entityType: "task"
+    });
+    expect(snapshot.totalEventCount).toBeGreaterThanOrEqual(2);
+    expect(snapshot.matchingEventCount).toBeGreaterThanOrEqual(1);
+    expect(snapshot.availableCategories).toContain("record");
+    expect(snapshot.availableEntityTypes).toContain("task");
+    expect(snapshot.availableActions).toContainEqual({
+      category: "record",
+      action: "created",
+      label: "record / created"
+    });
+    expect(snapshot.categoryCounts).toEqual([
+      {
+        value: "record",
+        label: "record",
+        count: snapshot.matchingEventCount
+      }
+    ]);
+    expect(snapshot.actionCounts).toEqual([
+      {
+        value: "created",
+        label: "created",
+        count: snapshot.matchingEventCount
+      }
+    ]);
+    expect(snapshot.entityCounts).toEqual([
+      {
+        value: "task",
+        label: "task",
+        count: snapshot.matchingEventCount
+      }
+    ]);
+    expect(snapshot.events.length).toBeGreaterThanOrEqual(1);
+    expect(snapshot.events[0]).toMatchObject({
+      category: "record",
+      action: "created",
+      entityType: "task",
+      entityId: taskEntityId,
+      summary: "Task created for explorer.",
+      recordLink: {
+        href: `/tasks?task=${taskEntityId}`,
+        label: "Open task"
+      }
+    });
+  });
+
   it("rejects action values outside the selected category", async () => {
     await expect(
       recordAuditEvent({
@@ -143,9 +229,19 @@ describe("audit event service", () => {
 async function cleanupAuditEvents() {
   await prisma.auditEvent.deleteMany({
     where: {
-      entityId: {
-        in: [accountEntityId, leadEntityId]
-      }
+      OR: [
+        { actorUserId },
+        {
+          entityId: {
+            in: [
+              accountEntityId,
+              leadEntityId,
+              taskEntityId,
+              campaignEntityId
+            ]
+          }
+        }
+      ]
     }
   });
   await prisma.user.deleteMany({
