@@ -244,6 +244,7 @@ export function ListFilterSupportExplorer({
             className="rounded-md border bg-muted/20 px-3 py-2 text-sm"
           >
             <span className="font-medium">{flag.label}</span>
+            {" "}
             <span className="ml-2 text-muted-foreground">
               {catalog.write[flag.key] ? "on" : "off"}
             </span>
