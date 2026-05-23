@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 27
 
-Feature: S27-F1 - Bulk action dry-run review packets
+Feature: S27-F2 - Audit coverage manifests
 
 Branch: main
 
-Timestamp: 2026-05-23T05:20:14.5510317-07:00
+Timestamp: 2026-05-23T06:39:35.5393594-07:00
 
 Escalation required: NO
 
