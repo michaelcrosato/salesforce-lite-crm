@@ -50,8 +50,10 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S22-F2 | CSV release readiness packets | Codex | done |
 | S23-F1 | CSV dedupe candidate packets | Codex | done |
 | S23-F2 | CSV dedupe review bundles | Codex | done |
-| S24-F1 | CSV export operator UI | Codex | queued |
-| S24-F2 | CSV import preview UI | Codex | queued |
+| S24-F1 | CSV export operator UI | Codex | done |
+| S24-F2 | CSV import preview UI | Codex | done |
+| S25-F1 | Audit event model foundation | Codex | queued |
+| S25-F2 | Filter/query compiler foundation | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
