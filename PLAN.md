@@ -14,7 +14,7 @@
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 26 S26-F1 queued; Sprint 25 complete in `main` |
+| Active sprint | Sprint 26 S26-F3 queued; S26-F1/S26-F2 complete in `main` |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -956,8 +956,8 @@ Goal: build on the audit and filter foundations with bounded operator productivi
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S26-F1 — Bulk action dry-run contracts | Codex | queued | Add deterministic server-side dry-run planning for selected-record actions such as status/stage updates, assignment eligibility, task creation eligibility, and selected export eligibility. It must return eligible/blocked counts and audit metadata without mutating records, adding routes, or creating an approval workflow. |
-| S26-F2 — Audit adoption for core mutations | Codex | queued | Use the Sprint 25 audit helpers in a bounded set of existing core CRM mutations such as create/update/status/stage/complete/resolve flows. Tests must prove deterministic audit rows are written without changing user-facing behavior, request logging, routing behavior, or external telemetry. |
+| S26-F1 — Bulk action dry-run contracts | Codex | done | Add deterministic server-side dry-run planning for selected-record actions such as status/stage updates, assignment eligibility, task creation eligibility, and selected export eligibility. It must return eligible/blocked counts and audit metadata without mutating records, adding routes, or creating an approval workflow. |
+| S26-F2 — Audit adoption for core mutations | Codex | done | Use the Sprint 25 audit helpers in a bounded set of existing core CRM mutations such as create/update/status/stage/complete/resolve flows. Tests must prove deterministic audit rows are written without changing user-facing behavior, request logging, routing behavior, or external telemetry. |
 | S26-F3 — Saved list views foundation | Codex | queued | Add a local saved-view model and helpers for supported CRM list pages, persisting filters, sort, and column metadata for the single-user local workflow. Current lists must keep working without saved views, and implementation must update the contract/schema documentation when the model is added. |
 
 \*\*Sprint 26 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):

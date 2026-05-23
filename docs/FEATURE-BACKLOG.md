@@ -54,8 +54,8 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S24-F2 | CSV import preview UI | Codex | done |
 | S25-F1 | Audit event model foundation | Codex | done |
 | S25-F2 | Filter/query compiler foundation | Codex | done |
-| S26-F1 | Bulk action dry-run contracts | Codex | queued |
-| S26-F2 | Audit adoption for core mutations | Codex | queued |
+| S26-F1 | Bulk action dry-run contracts | Codex | done |
+| S26-F2 | Audit adoption for core mutations | Codex | done |
 | S26-F3 | Saved list views foundation | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
