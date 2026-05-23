@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.30A |
+| Version | 2.31A |
 
 | Last updated | 2026-05-22 |
 
-| Active sprint | Sprint 24 S24-F1 queued; Sprint 23 complete in `main` |
+| Active sprint | Sprint 25 S25-F1 queued; Sprint 24 complete in `main` |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -882,8 +882,8 @@ Goal: graduate the existing read-only CSV helper contracts into narrow operator 
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S24-F1 — CSV export operator UI | Codex | queued | Add a read-only export review/download surface that consumes existing server CSV export packets for supported entities. It must use deterministic helper output, current route/layout patterns, and no background delivery or history storage. |
-| S24-F2 — CSV import preview UI | Codex | queued | Add an upload/paste preview surface that calls existing import preview, preflight, readiness, action, and dedupe review helpers and displays row-level safe/watch/block results without mutating the database. |
+| S24-F1 — CSV export operator UI | Codex | done | Add a read-only export review/download surface that consumes existing server CSV export packets for supported entities. It must use deterministic helper output, current route/layout patterns, and no background delivery or history storage. |
+| S24-F2 — CSV import preview UI | Codex | done | Add an upload/paste preview surface that calls existing import preview, preflight, readiness, action, and dedupe review helpers and displays row-level safe/watch/block results without mutating the database. |
 
 \*\*Sprint 24 non-goals\*\* (carry forward permanent scope boundaries plus CSV-specific exclusions):
 
@@ -910,6 +910,44 @@ Goal: graduate the existing read-only CSV helper contracts into narrow operator 
 \- No scheduled export delivery, export write history, user-upload persistence, file storage, mapping wizard, or background import/export jobs.
 
 \- No supported-entity expansion, persistent CSV release/import/export history storage, routing reassignment, external enrichment, Salesforce integration, CSV-connected sync, package/config changes, or CI changes.
+
+
+\*\*Sprint 25 — CRM Safety Foundations\*\*
+
+Goal: add narrow deterministic foundations for auditability and shared filtering so later CRM productivity work can remain testable and contract-aligned.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S25-F1 — Audit event model foundation | Codex | queued | Add a first-class audit event model and TypeScript taxonomy for user, record, AI, import, routing, and workflow actions. Provide deterministic record/query helpers with focused tests while avoiding auth, permissions, external telemetry, background processing, and broad mutation rewiring. |
+| S25-F2 — Filter/query compiler foundation | Codex | queued | Add a shared filter AST and Prisma compiler for the current supported list-filter surface, with parity tests proving representative list/query behavior remains stable. The foundation must be reusable by lists, reports, and exports without adding natural-language filters, saved views, report-builder UI, or search expansion. |
+
+\*\*Sprint 25 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No audit UI, audit reporting dashboard, external telemetry sink, request-log pipeline, or background audit processing.
+
+\- No attempt to retrofit every existing server mutation in one pass; audit helper adoption must stay bounded to the feature acceptance.
+
+\- No natural-language filter generation, saved views, report builder, dashboard builder, bulk actions, or dedicated `/search` page.
+
+\- No CSV import apply flow, bulk create/update, contact or lead upsert, duplicate merge, routing execution, file storage, or Salesforce integration.
 
 
 \## 5. File Ownership Matrix
