@@ -2,6 +2,10 @@ import type { Prisma, Task } from "@prisma/client";
 import { z } from "zod";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import {
+  buildAuditEventCreateData,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
 import { fieldEquals, fieldGte, fieldLte } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { idSchema, taskCreateSchema, taskUpdateSchema } from "@/lib/validation";
@@ -76,8 +80,24 @@ export type TaskCreateInput = z.input<typeof taskCreateSchema>;
 export type TaskUpdateInput = z.input<typeof taskUpdateSchema>;
 
 export async function createTask(input: unknown): Promise<Task> {
-  const data: Prisma.TaskUncheckedCreateInput = taskCreateSchema.parse(input);
-  return prisma.task.create({ data });
+  const data = taskCreateSchema.parse(input);
+
+  return prisma.$transaction(async (tx) => {
+    const task = await tx.task.create({ data });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "created",
+        entityType: "task",
+        entityId: task.id,
+        summary: `Task created: ${task.title}.`,
+        metadata: taskAuditMetadata(task)
+      })
+    });
+
+    return task;
+  });
 }
 
 export async function listTasks(input: unknown = {}): Promise<Task[]> {
@@ -136,8 +156,43 @@ export async function getTask(id: string): Promise<Task | null> {
 }
 
 export async function updateTask(id: string, input: unknown): Promise<Task> {
-  const data: Prisma.TaskUncheckedUpdateInput = taskUpdateSchema.parse(input);
-  return prisma.task.update({ where: { id: idSchema.parse(id) }, data });
+  const taskId = idSchema.parse(id);
+  const data = taskUpdateSchema.parse(input);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.task.findUniqueOrThrow({
+      where: {
+        id: taskId
+      }
+    });
+    const task = await tx.task.update({
+      where: {
+        id: taskId
+      },
+      data
+    });
+    const statusChanged =
+      data.status !== undefined && existing.status !== task.status;
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: statusChanged ? "status_changed" : "updated",
+        entityType: "task",
+        entityId: task.id,
+        summary: statusChanged
+          ? `Task status changed from ${existing.status} to ${task.status}.`
+          : `Task updated: ${task.title}.`,
+        metadata: {
+          ...taskAuditMetadata(task),
+          changedFields: auditChangedFields(data),
+          previousStatus: statusChanged ? existing.status : null
+        }
+      })
+    });
+
+    return task;
+  });
 }
 
 export async function completeTask(id: string): Promise<Task> {
@@ -145,6 +200,11 @@ export async function completeTask(id: string): Promise<Task> {
   const now = new Date();
 
   return prisma.$transaction(async (tx) => {
+    const existing = await tx.task.findUniqueOrThrow({
+      where: {
+        id: taskId
+      }
+    });
     const task = await tx.task.update({
       where: { id: taskId },
       data: {
@@ -167,10 +227,43 @@ export async function completeTask(id: string): Promise<Task> {
       }
     });
 
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "workflow",
+        action: "task_completed",
+        entityType: "task",
+        entityId: task.id,
+        summary: `Task completed: ${task.title}.`,
+        metadata: {
+          ...taskAuditMetadata(task),
+          previousStatus: existing.status,
+          activityCreated: true
+        }
+      })
+    });
+
     return task;
   });
 }
 
 export async function deleteTask(id: string): Promise<Task> {
   return prisma.task.delete({ where: { id: idSchema.parse(id) } });
+}
+
+function taskAuditMetadata(task: Task): Record<string, AuditMetadataValue> {
+  return {
+    accountId: task.accountId,
+    contactId: task.contactId,
+    dealId: task.dealId,
+    dueDate: task.dueDate ? task.dueDate.toISOString() : null,
+    leadId: task.leadId,
+    ownerId: task.ownerId,
+    priority: task.priority,
+    status: task.status,
+    title: task.title
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }

@@ -2,6 +2,10 @@ import type { Campaign, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import {
+  buildAuditEventCreateData,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
 import { fieldEquals, fieldGte, fieldLte } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import {
@@ -97,7 +101,26 @@ export async function createCampaign(input: unknown): Promise<Campaign> {
       : undefined
   };
 
-  return prisma.campaign.create({ data });
+  return prisma.$transaction(async (tx) => {
+    const campaign = await tx.campaign.create({ data });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "created",
+        entityType: "campaign",
+        entityId: campaign.id,
+        summary: `Campaign created: ${campaign.name}.`,
+        metadata: {
+          ...campaignAuditMetadata(campaign),
+          contactIds: contactIds ?? [],
+          leadIds: leadIds ?? []
+        }
+      })
+    });
+
+    return campaign;
+  });
 }
 
 export async function listCampaigns(input: unknown = {}): Promise<Campaign[]> {
@@ -161,8 +184,9 @@ export async function updateCampaign(
   id: string,
   input: unknown
 ): Promise<Campaign> {
-  const { contactIds, leadIds, ownerId, ...parsed } =
-    campaignUpdateSchema.parse(input);
+  const campaignId = idSchema.parse(id);
+  const parsedInput = campaignUpdateSchema.parse(input);
+  const { contactIds, leadIds, ownerId, ...parsed } = parsedInput;
   const data: Prisma.CampaignUpdateInput = {
     ...parsed,
     owner: ownerId ? { connect: { id: ownerId } } : undefined,
@@ -174,18 +198,96 @@ export async function updateCampaign(
       : undefined
   };
 
-  return prisma.campaign.update({ where: { id: idSchema.parse(id) }, data });
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.campaign.findUniqueOrThrow({
+      where: {
+        id: campaignId
+      }
+    });
+    const campaign = await tx.campaign.update({
+      where: {
+        id: campaignId
+      },
+      data
+    });
+    const statusChanged =
+      parsedInput.status !== undefined &&
+      existing.status !== campaign.status;
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: statusChanged ? "status_changed" : "updated",
+        entityType: "campaign",
+        entityId: campaign.id,
+        summary: statusChanged
+          ? `Campaign status changed from ${existing.status} to ${campaign.status}.`
+          : `Campaign updated: ${campaign.name}.`,
+        metadata: {
+          ...campaignAuditMetadata(campaign),
+          changedFields: auditChangedFields(parsedInput),
+          contactIds: contactIds ?? [],
+          leadIds: leadIds ?? [],
+          previousStatus: statusChanged ? existing.status : null
+        }
+      })
+    });
+
+    return campaign;
+  });
 }
 
 export async function completeCampaign(id: string): Promise<Campaign> {
-  return prisma.campaign.update({
-    where: { id: idSchema.parse(id) },
-    data: {
-      status: "completed"
-    }
+  const campaignId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.campaign.findUniqueOrThrow({
+      where: {
+        id: campaignId
+      }
+    });
+    const campaign = await tx.campaign.update({
+      where: { id: campaignId },
+      data: {
+        status: "completed"
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "workflow",
+        action: "campaign_completed",
+        entityType: "campaign",
+        entityId: campaign.id,
+        summary: `Campaign completed: ${campaign.name}.`,
+        metadata: {
+          ...campaignAuditMetadata(campaign),
+          previousStatus: existing.status
+        }
+      })
+    });
+
+    return campaign;
   });
 }
 
 export async function deleteCampaign(id: string): Promise<Campaign> {
   return prisma.campaign.delete({ where: { id: idSchema.parse(id) } });
+}
+
+function campaignAuditMetadata(
+  campaign: Campaign
+): Record<string, AuditMetadataValue> {
+  return {
+    budget: campaign.budget,
+    endDate: campaign.endDate ? campaign.endDate.toISOString() : null,
+    name: campaign.name,
+    ownerId: campaign.ownerId,
+    startDate: campaign.startDate ? campaign.startDate.toISOString() : null,
+    status: campaign.status
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }

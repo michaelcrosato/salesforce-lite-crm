@@ -38,6 +38,24 @@ describe("cases service", () => {
     expect(crmCase.status).toBe("new");
     expect(crmCase.priority).toBe("normal");
     expect(crmCase.accountId).toBe(accountId);
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "created",
+        entityId: crmCase.id,
+        entityType: "case"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.actorUserId).toBeNull();
+    expect(audit.summary).toBe("Case created: Case service create.");
+    expect(auditMetadata(audit)).toMatchObject({
+      accountId,
+      ownerId,
+      priority: "normal",
+      status: "new",
+      subject: "Case service create"
+    });
   });
 
   it("lists cases with status, owner, and account filters", async () => {
@@ -92,6 +110,22 @@ describe("cases service", () => {
     expect(updated.subject).toBe("Case service updated");
     expect(updated.priority).toBe("urgent");
     expect(fetched?.status).toBe("waiting");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "status_changed",
+        entityId: crmCase.id,
+        entityType: "case"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.summary).toBe("Case status changed from new to waiting.");
+    expect(auditMetadata(audit)).toMatchObject({
+      changedFields: ["priority", "status", "subject"],
+      previousStatus: "new",
+      status: "waiting",
+      subject: "Case service updated"
+    });
   });
 
   it("resolves a case through the crmClient adapter", async () => {
@@ -105,6 +139,20 @@ describe("cases service", () => {
     const resolved = await resolveCaseViaClient(crmCase.id);
 
     expect(resolved.status).toBe("resolved");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "case_resolved",
+        entityId: crmCase.id,
+        entityType: "case"
+      }
+    });
+    expect(audit.category).toBe("workflow");
+    expect(audit.summary).toBe("Case resolved: Case service resolve.");
+    expect(auditMetadata(audit)).toMatchObject({
+      previousStatus: "in_progress",
+      status: "resolved"
+    });
   });
 
   it("deletes a case", async () => {
@@ -161,6 +209,24 @@ async function createAccount(id: string, name: string) {
 }
 
 async function cleanupCases() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      OR: [
+        {
+          entityType: "case",
+          summary: {
+            contains: "Case service"
+          }
+        },
+        {
+          entityType: "case",
+          metadata: {
+            contains: "Case service"
+          }
+        }
+      ]
+    }
+  });
   await prisma.case.deleteMany({
     where: {
       OR: [
@@ -196,4 +262,10 @@ async function cleanupCases() {
       }
     }
   });
+}
+
+function auditMetadata(event: {
+  metadata: string | null;
+}): Record<string, unknown> {
+  return JSON.parse(event.metadata ?? "{}") as Record<string, unknown>;
 }

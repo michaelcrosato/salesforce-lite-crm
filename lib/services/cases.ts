@@ -2,6 +2,10 @@ import type { Case, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { CASE_STATUSES, type CaseStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
+import {
+  buildAuditEventCreateData,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
 import { fieldEquals } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { caseCreateSchema, caseUpdateSchema, idSchema } from "@/lib/validation";
@@ -54,8 +58,24 @@ export type CaseCreateInput = z.input<typeof caseCreateSchema>;
 export type CaseUpdateInput = z.input<typeof caseUpdateSchema>;
 
 export async function createCase(input: unknown): Promise<Case> {
-  const data: Prisma.CaseUncheckedCreateInput = caseCreateSchema.parse(input);
-  return prisma.case.create({ data });
+  const data = caseCreateSchema.parse(input);
+
+  return prisma.$transaction(async (tx) => {
+    const crmCase = await tx.case.create({ data });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "created",
+        entityType: "case",
+        entityId: crmCase.id,
+        summary: `Case created: ${crmCase.subject}.`,
+        metadata: caseAuditMetadata(crmCase)
+      })
+    });
+
+    return crmCase;
+  });
 }
 
 export async function listCases(input: unknown = {}): Promise<Case[]> {
@@ -114,19 +134,94 @@ export async function getCase(id: string): Promise<Case | null> {
 }
 
 export async function updateCase(id: string, input: unknown): Promise<Case> {
-  const data: Prisma.CaseUncheckedUpdateInput = caseUpdateSchema.parse(input);
-  return prisma.case.update({ where: { id: idSchema.parse(id) }, data });
+  const caseId = idSchema.parse(id);
+  const data = caseUpdateSchema.parse(input);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.case.findUniqueOrThrow({
+      where: {
+        id: caseId
+      }
+    });
+    const crmCase = await tx.case.update({
+      where: {
+        id: caseId
+      },
+      data
+    });
+    const statusChanged =
+      data.status !== undefined && existing.status !== crmCase.status;
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: statusChanged ? "status_changed" : "updated",
+        entityType: "case",
+        entityId: crmCase.id,
+        summary: statusChanged
+          ? `Case status changed from ${existing.status} to ${crmCase.status}.`
+          : `Case updated: ${crmCase.subject}.`,
+        metadata: {
+          ...caseAuditMetadata(crmCase),
+          changedFields: auditChangedFields(data),
+          previousStatus: statusChanged ? existing.status : null
+        }
+      })
+    });
+
+    return crmCase;
+  });
 }
 
 export async function resolveCase(id: string): Promise<Case> {
-  return prisma.case.update({
-    where: { id: idSchema.parse(id) },
-    data: {
-      status: "resolved"
-    }
+  const caseId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.case.findUniqueOrThrow({
+      where: {
+        id: caseId
+      }
+    });
+    const crmCase = await tx.case.update({
+      where: { id: caseId },
+      data: {
+        status: "resolved"
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "workflow",
+        action: "case_resolved",
+        entityType: "case",
+        entityId: crmCase.id,
+        summary: `Case resolved: ${crmCase.subject}.`,
+        metadata: {
+          ...caseAuditMetadata(crmCase),
+          previousStatus: existing.status
+        }
+      })
+    });
+
+    return crmCase;
   });
 }
 
 export async function deleteCase(id: string): Promise<Case> {
   return prisma.case.delete({ where: { id: idSchema.parse(id) } });
+}
+
+function caseAuditMetadata(crmCase: Case): Record<string, AuditMetadataValue> {
+  return {
+    accountId: crmCase.accountId,
+    contactId: crmCase.contactId,
+    ownerId: crmCase.ownerId,
+    priority: crmCase.priority,
+    status: crmCase.status,
+    subject: crmCase.subject
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }

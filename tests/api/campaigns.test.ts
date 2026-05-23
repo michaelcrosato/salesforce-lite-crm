@@ -49,6 +49,24 @@ describe("campaigns service", () => {
     expect(withRelations.contacts.map((contact) => contact.id)).toEqual([
       contactId
     ]);
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "created",
+        entityId: campaign.id,
+        entityType: "campaign"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.actorUserId).toBeNull();
+    expect(audit.summary).toBe("Campaign created: Campaign service create.");
+    expect(auditMetadata(audit)).toMatchObject({
+      contactIds: [contactId],
+      leadIds: [leadId],
+      name: "Campaign service create",
+      ownerId,
+      status: "planned"
+    });
   });
 
   it("lists campaigns with status, owner, and start date filters", async () => {
@@ -103,6 +121,24 @@ describe("campaigns service", () => {
     expect(updated.name).toBe("Campaign service updated");
     expect(updated.budget).toBe(125000);
     expect(fetched?.status).toBe("active");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "status_changed",
+        entityId: campaign.id,
+        entityType: "campaign"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.summary).toBe(
+      "Campaign status changed from planned to active."
+    );
+    expect(auditMetadata(audit)).toMatchObject({
+      budget: 125000,
+      changedFields: ["budget", "name", "status"],
+      previousStatus: "planned",
+      status: "active"
+    });
   });
 
   it("completes a campaign through the crmClient adapter", async () => {
@@ -115,6 +151,22 @@ describe("campaigns service", () => {
     const completed = await completeCampaignViaClient(campaign.id);
 
     expect(completed.status).toBe("completed");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "campaign_completed",
+        entityId: campaign.id,
+        entityType: "campaign"
+      }
+    });
+    expect(audit.category).toBe("workflow");
+    expect(audit.summary).toBe(
+      "Campaign completed: Campaign service complete."
+    );
+    expect(auditMetadata(audit)).toMatchObject({
+      previousStatus: "active",
+      status: "completed"
+    });
   });
 
   it("deletes a campaign", async () => {
@@ -183,6 +235,24 @@ async function createContact(id: string) {
 }
 
 async function cleanupCampaigns() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      OR: [
+        {
+          entityType: "campaign",
+          summary: {
+            contains: "Campaign service"
+          }
+        },
+        {
+          entityType: "campaign",
+          metadata: {
+            contains: "Campaign service"
+          }
+        }
+      ]
+    }
+  });
   await prisma.campaign.deleteMany({
     where: {
       OR: [
@@ -216,4 +286,10 @@ async function cleanupCampaigns() {
       }
     }
   });
+}
+
+function auditMetadata(event: {
+  metadata: string | null;
+}): Record<string, unknown> {
+  return JSON.parse(event.metadata ?? "{}") as Record<string, unknown>;
 }

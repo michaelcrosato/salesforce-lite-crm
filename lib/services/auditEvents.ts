@@ -148,11 +148,11 @@ export function serializeAuditMetadata(
   return JSON.stringify(sortAuditMetadata(metadata));
 }
 
-export function recordAuditEventOperation(
+export function buildAuditEventCreateData(
   input: unknown
-): Prisma.PrismaPromise<AuditEvent> {
+): Prisma.AuditEventUncheckedCreateInput {
   const parsed = auditEventCreateSchema.parse(input);
-  const data: Prisma.AuditEventUncheckedCreateInput = {
+  return {
     category: parsed.category,
     action: parsed.action,
     actorUserId: parsed.actorUserId ?? null,
@@ -162,8 +162,12 @@ export function recordAuditEventOperation(
     metadata: serializeAuditMetadata(parsed.metadata),
     occurredAt: parsed.occurredAt
   };
+}
 
-  return prisma.auditEvent.create({ data });
+export function recordAuditEventOperation(
+  input: unknown
+): Prisma.PrismaPromise<AuditEvent> {
+  return prisma.auditEvent.create({ data: buildAuditEventCreateData(input) });
 }
 
 export async function recordAuditEvent(input: unknown): Promise<AuditEvent> {

@@ -33,6 +33,23 @@ describe("tasks service", () => {
     expect(task.status).toBe("open");
     expect(task.priority).toBe("normal");
     expect(task.ownerId).toBe(ownerId);
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "created",
+        entityId: task.id,
+        entityType: "task"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.actorUserId).toBeNull();
+    expect(audit.summary).toBe("Task created: Task service create.");
+    expect(auditMetadata(audit)).toMatchObject({
+      ownerId,
+      priority: "normal",
+      status: "open",
+      title: "Task service create"
+    });
   });
 
   it("lists tasks with status, owner, and due date filters", async () => {
@@ -87,6 +104,24 @@ describe("tasks service", () => {
     expect(updated.title).toBe("Task service updated");
     expect(updated.priority).toBe("urgent");
     expect(fetched?.status).toBe("in_progress");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "status_changed",
+        entityId: task.id,
+        entityType: "task"
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(audit.summary).toBe(
+      "Task status changed from open to in_progress."
+    );
+    expect(auditMetadata(audit)).toMatchObject({
+      changedFields: ["priority", "status", "title"],
+      previousStatus: "open",
+      status: "in_progress",
+      title: "Task service updated"
+    });
   });
 
   it("completes a task through the crmClient adapter", async () => {
@@ -99,6 +134,21 @@ describe("tasks service", () => {
     const completed = await completeTaskViaClient(task.id);
 
     expect(completed.status).toBe("done");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "task_completed",
+        entityId: task.id,
+        entityType: "task"
+      }
+    });
+    expect(audit.category).toBe("workflow");
+    expect(audit.summary).toBe("Task completed: Task service complete.");
+    expect(auditMetadata(audit)).toMatchObject({
+      activityCreated: true,
+      previousStatus: "in_progress",
+      status: "done"
+    });
   });
 
   it("deletes a task", async () => {
@@ -143,6 +193,24 @@ async function createOwner(id: string, name: string) {
 }
 
 async function cleanupTasks() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      OR: [
+        {
+          entityType: "task",
+          summary: {
+            contains: "Task service"
+          }
+        },
+        {
+          entityType: "task",
+          metadata: {
+            contains: "Task service"
+          }
+        }
+      ]
+    }
+  });
   await prisma.activity.deleteMany({
     where: {
       OR: [
@@ -182,4 +250,10 @@ async function cleanupTasks() {
       }
     }
   });
+}
+
+function auditMetadata(event: {
+  metadata: string | null;
+}): Record<string, unknown> {
+  return JSON.parse(event.metadata ?? "{}") as Record<string, unknown>;
 }
