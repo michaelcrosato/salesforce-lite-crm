@@ -86,6 +86,51 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     page.getByTestId("list-filter-support-write-flags")
   ).toContainText("Routes off");
 
+  await expect(page.getByTestId("bulk-dry-run-review-operator")).toBeVisible();
+  await expect(
+    page.getByTestId("bulk-dry-run-summary-entities")
+  ).toContainText("10");
+  await expect(page.getByTestId("bulk-dry-run-summary-actions")).toContainText(
+    "5"
+  );
+  await expect(
+    page.getByTestId("bulk-dry-run-summary-max-records")
+  ).toContainText("200");
+  await page.getByTestId("bulk-dry-run-target-select").selectOption("paused");
+  await page.getByTestId("bulk-dry-run-use-sample-records").click();
+  const bulkRecordInput = page.getByTestId("bulk-dry-run-record-input");
+  const sampleRecordIds = await bulkRecordInput.inputValue();
+  expect(sampleRecordIds).toContain("acct-");
+  await bulkRecordInput.fill(
+    `${sampleRecordIds}\nmissing-bulk-dry-run-record`
+  );
+  await page.getByTestId("bulk-dry-run-submit").click();
+  await expect(page.getByTestId("bulk-dry-run-result-panel")).toBeVisible();
+  await expect(page.getByTestId("bulk-dry-run-rollup-eligible")).toContainText(
+    /[1-9]/
+  );
+  await expect(page.getByTestId("bulk-dry-run-rollup-missing")).toContainText(
+    "1"
+  );
+  await expect(page.getByTestId("bulk-dry-run-reason-table")).toContainText(
+    "eligible"
+  );
+  await expect(page.getByTestId("bulk-dry-run-reason-table")).toContainText(
+    "not found"
+  );
+  await expect(page.getByTestId("bulk-dry-run-audit-plan")).toContainText(
+    "bulk_action_dry_run"
+  );
+  await expect(page.getByTestId("bulk-dry-run-audit-plan")).toContainText(
+    "status_update dry run for accounts"
+  );
+  await expect(page.getByTestId("bulk-dry-run-write-flags")).toContainText(
+    "Database off"
+  );
+  await expect(page.getByTestId("bulk-dry-run-write-flags")).toContainText(
+    "Audit events off"
+  );
+
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
     "10"

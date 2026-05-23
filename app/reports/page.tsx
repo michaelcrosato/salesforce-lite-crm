@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { AuditCoverageOperator } from "@/components/reports/audit-coverage-operator";
+import { BulkDryRunReviewOperator } from "@/components/reports/bulk-dry-run-review-operator";
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
@@ -19,6 +20,7 @@ import {
 import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
 import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
 import { getListFilterSupportCatalog } from "@/lib/server/listFilterSupportCatalog";
+import { listBulkActionDryRunReviewPacketDefinitions } from "@/lib/server/bulkActionDryRunReviewPackets";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,15 @@ export default async function ReportsPage({
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();
+  const bulkDryRunDefinitions = listBulkActionDryRunReviewPacketDefinitions();
+  const bulkDryRunSampleRecordIds = csvPackets.map((packet) => ({
+    entity: packet.entity,
+    ids: packet.review.preview.rows.flatMap((row) => {
+      const value = row.id;
+
+      return typeof value === "string" ? [value] : [];
+    })
+  }));
 
   return (
     <div className="crm-page">
@@ -66,6 +77,11 @@ export default async function ReportsPage({
       <AuditCoverageOperator manifest={auditCoverageManifest} />
 
       <ListFilterSupportExplorer catalog={listFilterSupportCatalog} />
+
+      <BulkDryRunReviewOperator
+        definitions={bulkDryRunDefinitions}
+        sampleRecordIds={bulkDryRunSampleRecordIds}
+      />
 
       <CsvExportOperator
         packets={csvPackets}
