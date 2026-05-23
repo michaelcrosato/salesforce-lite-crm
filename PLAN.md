@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.32A |
+| Version | 2.33A |
 
-| Last updated | 2026-05-22 |
+| Last updated | 2026-05-23 |
 
-| Active sprint | Sprint 26 S26-F3 queued; S26-F1/S26-F2 complete in `main` |
+| Active sprint | Sprint 27 S27-F1/S27-F2/S27-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -958,7 +958,7 @@ Goal: build on the audit and filter foundations with bounded operator productivi
 |---|---|---|---|
 | S26-F1 — Bulk action dry-run contracts | Codex | done | Add deterministic server-side dry-run planning for selected-record actions such as status/stage updates, assignment eligibility, task creation eligibility, and selected export eligibility. It must return eligible/blocked counts and audit metadata without mutating records, adding routes, or creating an approval workflow. |
 | S26-F2 — Audit adoption for core mutations | Codex | done | Use the Sprint 25 audit helpers in a bounded set of existing core CRM mutations such as create/update/status/stage/complete/resolve flows. Tests must prove deterministic audit rows are written without changing user-facing behavior, request logging, routing behavior, or external telemetry. |
-| S26-F3 — Saved list views foundation | Codex | queued | Add a local saved-view model and helpers for supported CRM list pages, persisting filters, sort, and column metadata for the single-user local workflow. Current lists must keep working without saved views, and implementation must update the contract/schema documentation when the model is added. |
+| S26-F3 — Saved list views foundation | Codex | deferred | Add a local saved-view model and helpers for supported CRM list pages, persisting filters, sort, and column metadata for the single-user local workflow. Current lists must keep working without saved views, and implementation must update the contract/schema documentation when the model is added. Deferred during Sprint 27 rollover because current LOOP selection forbids the required contract/schema-documentation change. |
 
 \*\*Sprint 26 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -991,6 +991,47 @@ Goal: build on the audit and filter foundations with bounded operator productivi
 \- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, or dealer capacity rules.
 
 \- No audit UI, audit reporting dashboard, external telemetry sink, request-log pipeline, or background audit processing.
+
+
+\*\*Sprint 27 — Productivity Handoff Contracts\*\*
+
+Goal: package the Sprint 25 and Sprint 26 productivity foundations into read-only handoff contracts without adding persistence workflows, routes, UI, or contract-changing schema.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S27-F1 — Bulk action dry-run review packets | Codex | queued | Build deterministic server-side review packets around the existing bulk action dry-run output, including action/entity metadata, eligible and blocked rollups, representative reasons, and audit-planning metadata for later UI consumption. The packets must not execute mutations, add routes, create approval workflows, or alter existing dry-run behavior. |
+| S27-F2 — Audit coverage manifests | Codex | queued | Publish deterministic read-only manifests over the existing audit event taxonomy and audited core CRM mutations, grouping coverage by entity, action, source surface, and known gaps. Tests must prove the manifests are stable and no-write while avoiding audit UI, request logging, external telemetry, or background processing. |
+| S27-F3 — List filter support catalog | Codex | queued | Publish deterministic metadata for the current supported list filter and sort surface across CRM list entities so future saved-view or report-builder work can consume filter capabilities without re-reading adapter internals. The catalog must preserve current list behavior and avoid saved-view persistence, natural-language filters, search expansion, route changes, or schema changes. |
+
+\*\*Sprint 27 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No saved-view persistence, saved-view model, saved-view UI, user/tenant sharing layer, or contract/schema-documentation changes for saved views.
+
+\- No actual bulk mutation execution, apply workflow, approval workflow, import apply flow, CSV bulk create/update, contact or lead upsert, duplicate merge, file storage, routing execution, or Salesforce integration.
+
+\- No audit UI, audit reporting dashboard, external telemetry sink, request-log pipeline, background audit processing, or auth-backed audit permissions.
+
+\- No natural-language filters, report builder, dashboard builder, dedicated `/search` page, command-palette expansion, or query behavior rewrites.
+
+\- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, dealer capacity rules, lead disposition state expansion, or SLA timers.
 
 
 \## 5. File Ownership Matrix
