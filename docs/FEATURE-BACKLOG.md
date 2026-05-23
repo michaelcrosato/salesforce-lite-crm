@@ -52,8 +52,11 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S23-F2 | CSV dedupe review bundles | Codex | done |
 | S24-F1 | CSV export operator UI | Codex | done |
 | S24-F2 | CSV import preview UI | Codex | done |
-| S25-F1 | Audit event model foundation | Codex | queued |
-| S25-F2 | Filter/query compiler foundation | Codex | queued |
+| S25-F1 | Audit event model foundation | Codex | done |
+| S25-F2 | Filter/query compiler foundation | Codex | done |
+| S26-F1 | Bulk action dry-run contracts | Codex | queued |
+| S26-F2 | Audit adoption for core mutations | Codex | queued |
+| S26-F3 | Saved list views foundation | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
