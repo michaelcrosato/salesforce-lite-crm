@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { AuditCoverageOperator } from "@/components/reports/audit-coverage-operator";
+import { AuditEventExplorer } from "@/components/reports/audit-event-explorer";
 import { BulkDryRunReviewOperator } from "@/components/reports/bulk-dry-run-review-operator";
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
@@ -21,6 +22,15 @@ import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
 import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
 import { getListFilterSupportCatalog } from "@/lib/server/listFilterSupportCatalog";
 import { listBulkActionDryRunReviewPacketDefinitions } from "@/lib/server/bulkActionDryRunReviewPackets";
+import {
+  AUDIT_ENTITY_TYPES,
+  AUDIT_EVENT_CATEGORIES,
+  getAuditEventExplorer,
+  isAuditActionForCategory,
+  type AuditEntityType,
+  type AuditEventCategory,
+  type AuditEventExplorerInput
+} from "@/lib/services/auditEvents";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +40,9 @@ export const metadata: Metadata = {
 
 type ReportsSearchParams = {
   csvExport?: string | string[];
+  auditCategory?: string | string[];
+  auditAction?: string | string[];
+  auditEntity?: string | string[];
 };
 
 const DEFAULT_CSV_EXPORT_ENTITY: CsvExportDeliveryPacketEntity = "accounts";
@@ -44,9 +57,11 @@ export default async function ReportsPage({
   const selectedCsvEntity = resolveCsvExportEntity(
     resolvedSearchParams.csvExport
   );
-  const [csvPackets, selectedCsvPacket] = await Promise.all([
+  const auditFilters = resolveAuditFilters(resolvedSearchParams);
+  const [csvPackets, selectedCsvPacket, auditEventExplorer] = await Promise.all([
     listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
-    getCsvExportDeliveryPacket(selectedCsvEntity)
+    getCsvExportDeliveryPacket(selectedCsvEntity),
+    getAuditEventExplorer(auditFilters)
   ]);
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
@@ -75,6 +90,8 @@ export default async function ReportsPage({
       </div>
 
       <AuditCoverageOperator manifest={auditCoverageManifest} />
+
+      <AuditEventExplorer snapshot={auditEventExplorer} />
 
       <ListFilterSupportExplorer catalog={listFilterSupportCatalog} />
 
@@ -121,4 +138,65 @@ function resolveCsvExportEntity(
   }
 
   return DEFAULT_CSV_EXPORT_ENTITY;
+}
+
+function resolveAuditFilters(
+  searchParams: ReportsSearchParams
+): AuditEventExplorerInput {
+  const category = resolveAuditCategory(searchParams.auditCategory);
+  const action = resolveAuditAction(searchParams.auditAction, category);
+  const entityType = resolveAuditEntityType(searchParams.auditEntity);
+
+  return {
+    category,
+    action,
+    entityType
+  };
+}
+
+function resolveAuditCategory(
+  value: string | string[] | undefined
+): AuditEventCategory | undefined {
+  const candidate = firstSearchParam(value);
+
+  if (!candidate) {
+    return undefined;
+  }
+
+  return AUDIT_EVENT_CATEGORIES.find((category) => category === candidate);
+}
+
+function resolveAuditAction(
+  value: string | string[] | undefined,
+  category: AuditEventCategory | undefined
+): string | undefined {
+  const candidate = firstSearchParam(value);
+
+  if (!candidate) {
+    return undefined;
+  }
+
+  if (category && !isAuditActionForCategory(category, candidate)) {
+    return undefined;
+  }
+
+  return candidate;
+}
+
+function resolveAuditEntityType(
+  value: string | string[] | undefined
+): AuditEntityType | undefined {
+  const candidate = firstSearchParam(value);
+
+  if (!candidate) {
+    return undefined;
+  }
+
+  return AUDIT_ENTITY_TYPES.find((entityType) => entityType === candidate);
+}
+
+function firstSearchParam(value: string | string[] | undefined): string {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  return candidate?.trim() ?? "";
 }

@@ -1,6 +1,18 @@
 import { expect, test } from "@playwright/test";
 
 test("reports index lists reports and a report renders", async ({ page }) => {
+  const auditTaskTitle = `Reports Audit Task ${Date.now()}`;
+
+  await page.goto("/tasks/new");
+  await expect(page.getByRole("heading", { name: "New Task" })).toBeVisible();
+  await page.getByLabel("Title").fill(auditTaskTitle);
+  await page
+    .getByLabel("Description")
+    .fill("Created from the reports audit explorer spec.");
+  await page.getByLabel("Priority").selectOption("normal");
+  await page.getByRole("button", { name: "Create task" }).click();
+  await expect(page.getByText("Task created.", { exact: true })).toBeVisible();
+
   await page.goto("/reports");
   await expect(page.getByRole("heading", { name: "Reports" })).toBeVisible();
 
@@ -46,6 +58,46 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   );
   await expect(page.getByTestId("audit-coverage-write-flags")).toContainText(
     "External telemetry off"
+  );
+
+  await expect(page.getByTestId("audit-event-explorer")).toBeVisible();
+  await expect(page.getByTestId("audit-event-summary-total")).toContainText(
+    /[1-9]/
+  );
+  await expect(page.getByTestId("audit-event-summary-matching")).toContainText(
+    /[1-9]/
+  );
+  await expect(page.getByTestId("audit-event-recent-table")).toContainText(
+    auditTaskTitle
+  );
+  await expect(page.getByTestId("audit-event-recent-table")).toContainText(
+    "created"
+  );
+  await expect(
+    page
+      .getByTestId("audit-event-recent-table")
+      .getByRole("link", { name: "Open task" })
+      .first()
+  ).toHaveAttribute("href", /\/tasks\?task=/);
+
+  await page.getByTestId("audit-event-filter-category").selectOption("record");
+  await page.getByTestId("audit-event-filter-action").selectOption("created");
+  await page.getByTestId("audit-event-filter-entity").selectOption("task");
+  await page.getByTestId("audit-event-filter-submit").click();
+  await expect(page).toHaveURL(/auditCategory=record/);
+  await expect(page).toHaveURL(/auditAction=created/);
+  await expect(page).toHaveURL(/auditEntity=task/);
+  await expect(page.getByTestId("audit-event-recent-table")).toContainText(
+    auditTaskTitle
+  );
+  await expect(page.getByTestId("audit-event-category-counts")).toContainText(
+    "record"
+  );
+  await expect(page.getByTestId("audit-event-action-counts")).toContainText(
+    "created"
+  );
+  await expect(page.getByTestId("audit-event-entity-counts")).toContainText(
+    "task"
   );
 
   await expect(page.getByTestId("list-filter-support-explorer")).toBeVisible();
