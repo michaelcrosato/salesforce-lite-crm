@@ -20,6 +20,7 @@ model User {
   cases      Case[]
   campaigns  Campaign[]
   opportunityStageChanges OpportunityStageHistory[]
+  auditEvents AuditEvent[]
 }
 
 model Account {
@@ -278,4 +279,24 @@ model OpportunityStageHistory {
   @@index([dealId])
   @@index([changedAt])
   @@index([changedByUserId])
+}
+
+model AuditEvent {
+  id          String   @id @default(cuid())
+  category    String
+  action      String
+  actorUserId String?
+  actorUser   User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  entityType  String?
+  entityId    String?
+  summary     String
+  metadata    String?
+  occurredAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([action])
+  @@index([actorUserId])
+  @@index([entityType, entityId])
+  @@index([occurredAt])
 }
