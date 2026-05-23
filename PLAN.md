@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.33A |
+| Version | 2.34A |
 
 | Last updated | 2026-05-23 |
 
-| Active sprint | Sprint 27 S27-F1/S27-F2/S27-F3 queued |
+| Active sprint | Sprint 28 S28-F1/S28-F2/S28-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -999,9 +999,9 @@ Goal: package the Sprint 25 and Sprint 26 productivity foundations into read-onl
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S27-F1 — Bulk action dry-run review packets | Codex | queued | Build deterministic server-side review packets around the existing bulk action dry-run output, including action/entity metadata, eligible and blocked rollups, representative reasons, and audit-planning metadata for later UI consumption. The packets must not execute mutations, add routes, create approval workflows, or alter existing dry-run behavior. |
-| S27-F2 — Audit coverage manifests | Codex | queued | Publish deterministic read-only manifests over the existing audit event taxonomy and audited core CRM mutations, grouping coverage by entity, action, source surface, and known gaps. Tests must prove the manifests are stable and no-write while avoiding audit UI, request logging, external telemetry, or background processing. |
-| S27-F3 — List filter support catalog | Codex | queued | Publish deterministic metadata for the current supported list filter and sort surface across CRM list entities so future saved-view or report-builder work can consume filter capabilities without re-reading adapter internals. The catalog must preserve current list behavior and avoid saved-view persistence, natural-language filters, search expansion, route changes, or schema changes. |
+| S27-F1 — Bulk action dry-run review packets | Codex | done | Build deterministic server-side review packets around the existing bulk action dry-run output, including action/entity metadata, eligible and blocked rollups, representative reasons, and audit-planning metadata for later UI consumption. The packets must not execute mutations, add routes, create approval workflows, or alter existing dry-run behavior. |
+| S27-F2 — Audit coverage manifests | Codex | done | Publish deterministic read-only manifests over the existing audit event taxonomy and audited core CRM mutations, grouping coverage by entity, action, source surface, and known gaps. Tests must prove the manifests are stable and no-write while avoiding audit UI, request logging, external telemetry, or background processing. |
+| S27-F3 — List filter support catalog | Codex | done | Publish deterministic metadata for the current supported list filter and sort surface across CRM list entities so future saved-view or report-builder work can consume filter capabilities without re-reading adapter internals. The catalog must preserve current list behavior and avoid saved-view persistence, natural-language filters, search expansion, route changes, or schema changes. |
 
 \*\*Sprint 27 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1030,6 +1030,47 @@ Goal: package the Sprint 25 and Sprint 26 productivity foundations into read-onl
 \- No audit UI, audit reporting dashboard, external telemetry sink, request-log pipeline, background audit processing, or auth-backed audit permissions.
 
 \- No natural-language filters, report builder, dashboard builder, dedicated `/search` page, command-palette expansion, or query behavior rewrites.
+
+\- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, dealer capacity rules, lead disposition state expansion, or SLA timers.
+
+
+\*\*Sprint 28 — Productivity Operator Surfaces\*\*
+
+Goal: surface the current productivity handoff contracts in read-only operator workflows without adding mutation execution, routes, schema changes, or permanent non-goal scope.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S28-F1 — Audit coverage operator panel | Codex | queued | Add a read-only `/reports` panel that summarizes audit coverage manifests by entity, category, and source surface, including known gaps and safe next actions. It must use existing manifests, preserve current routes and mutation behavior, and avoid request logging, external telemetry, auth permissions, or background processing. |
+| S28-F2 — List filter support explorer | Codex | queued | Add a read-only `/reports` panel that exposes supported list filters and sort keys by entity from the support catalog so operators can inspect current query capabilities. It must avoid saved-view persistence, natural-language filters, search changes, schema changes, route changes, and report-builder scope. |
+| S28-F3 — Bulk dry-run review operator UI | Codex | queued | Add a no-write operator UI on `/reports` for building bulk action dry-run review packets from supported entity/action/record selections and target inputs. It must display eligible/blocked rollups, representative reasons, and audit-planning metadata while avoiding actual bulk mutations, approvals, import apply, routing execution, file storage, or new routes. |
+
+\*\*Sprint 28 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No actual bulk mutation execution, approval workflow, CSV import apply flow, CSV bulk create/update, contact or lead upsert, duplicate merge, routing execution, file storage, or Salesforce integration.
+
+\- No saved-view persistence, saved-view model, saved-view UI, user/tenant sharing layer, natural-language filters, report builder, dashboard builder, dedicated `/search` page, command-palette expansion, or schema/contract changes for saved views.
+
+\- No new report detail slug or product route; S28 surfaces stay on existing `/reports`.
+
+\- No request-log pipeline, external telemetry sink, background audit processing, auth-backed audit permissions, or audit event backfills.
 
 \- No routing engine changes, pacing-engine changes, routing simulator, routing reassignment, dealer capacity rules, lead disposition state expansion, or SLA timers.
 
