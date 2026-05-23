@@ -6,33 +6,35 @@ Feature: S27-F1 - Bulk action dry-run review packets
 
 Branch: main
 
-Status: queued
+Status: done
 
-Commits this prompt: 49dbc4c - [codex] sprint 27: plan codex track; 474cb8f - [codex] sprint 27: backlog refresh
+Commits this prompt: 474ab34 - [codex] S27-F1: add bulk dry-run review packets
 
-Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`: npm install, env check, Prisma generate/db push, seed, lint, typecheck, unit tests, build, Playwright Chromium install, and e2e all exited 0. Phase 4 planning gate passed: `npm run lint`, `npm run typecheck`, `npm run test` (62 files / 341 tests), and `npm run build` all exited 0.
+Gate status: PASS - Phase 0 baseline setup plus lint, typecheck, unit tests, and build exited 0. Phase 5 full local gate passed via `scripts/local-gate.ps1`: npm install, env check, Prisma generate/db push, seed, lint, typecheck, unit tests (63 files / 345 tests), build, Playwright Chromium install, and e2e (19 tests) all exited 0.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T04:48:03.4436568-07:00
+Timestamp: 2026-05-23T05:20:14.5510317-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the Phase 0 full local gate from the single-agent root on `main`; baseline was green before planning edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README known limitations, `docs/decisions.md`, all root SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the recent 30-day git log.
-- Applied the runner-authorized rollover exception for S26-F3: deferred the saved list views foundation instead of falsely marking it done, because the existing blocker showed it requires contract/schema-documentation work outside normal LOOP selection.
-- Planned Sprint 27 in `PLAN.md` with three queued Codex features: S27-F1 bulk action dry-run review packets, S27-F2 audit coverage manifests, and S27-F3 list filter support catalog.
-- Synced `docs/FEATURE-BACKLOG.md` so S26-F3 is deferred and the three Sprint 27 features are queued.
-- Re-ran the Phase 4 planning gate; lint, typecheck, unit tests, and build remained green.
+- Ran Phase 0 from the single-agent root on `main`; the tree was clean and the baseline gate subset was green before implementation.
+- Added `lib/server/bulkActionDryRunReviewPackets.ts`, a read-only packet wrapper around the existing bulk action dry-run contract with entity/action metadata, eligible/blocked rollups, deterministic reason summaries, bounded representative records, audit-plan metadata, and explicit no-write flags.
+- Added `tests/api/bulk-action-review-packets.test.ts` covering deterministic packet definitions, status-update rollups/reasons/audit plans, selected-export metadata reuse, strict unknown-key rejection, and no account/task/audit writes.
+- Verified the focused packet test before commit and the full local gate after commit.
+
+### Discovered this prompt
+
+- Gemini's historical `SUMMARY.gemini.md` references Sprint 5 S5-F1 as "E2E Visual Snapshot Baseline", while current PLAN.md §4 defines S5-F1 as "Server CSV export contracts"; treated as stale historical report context because PLAN.md, CRM-CONTRACT.md, current `main`, and the green local gate are higher authority.
 
 ### Next action
 
-Run LOOP.md to begin S27-F1.
+Run LOOP.md to begin S27-F2 - Audit coverage manifests.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode; edits were limited to prompt-authorized planning/report files.
+No cross-ownership edits: YES - current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode; implementation touched `lib/server/**` plus focused `tests/**` coverage.
 
 CRM-CONTRACT.md honored: YES
