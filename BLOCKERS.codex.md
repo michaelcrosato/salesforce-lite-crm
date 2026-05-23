@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 27
 
-Feature: S27-F2 - Audit coverage manifests
+Feature: S27-F3 - List filter support catalog
 
 Branch: main
 
-Timestamp: 2026-05-23T06:39:35.5393594-07:00
+Timestamp: 2026-05-23T08:30:09.5165149-07:00
 
 Escalation required: NO
 
