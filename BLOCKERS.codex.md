@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 26
 
-Feature: S26-F1 — Bulk action dry-run contracts
+Feature: S26-F2 — Audit adoption for core mutations
 
 Branch: main
 
-Timestamp: 2026-05-22T22:15:12.8013032-07:00
+Timestamp: 2026-05-22T23:53:36.2739654-07:00
 
 Escalation required: NO
 
@@ -22,4 +22,4 @@ Escalation required: NO
 
 ### Notes
 
-- `S26-F2 — Audit adoption for core mutations` is the next queued Codex work item in PLAN §4.
+- `S26-F3 — Saved list views foundation` is the next queued Sprint 26 item, but it should be reconciled against the current LOOP rule forbidding selected units that require a `CRM-CONTRACT.md` change.
