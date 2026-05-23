@@ -2,42 +2,42 @@ Agent: Codex
 
 Sprint: 26
 
-Feature: Sprint rollover planning — S26 codex track
+Feature: S26-F1 — Bulk action dry-run contracts
 
 Branch: main
 
 Status: done
 
-Commits this prompt: fce652e — [codex] sprint 26: plan codex track; ac3fa04 — [codex] sprint 26: backlog refresh
+Commits this prompt: ff9b449 — [codex] S26-F1: add bulk action dry-run contracts
 
-Gate status: PASS — Phase 0 full baseline `scripts/local-gate.ps1` completed successfully, including npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (61 files / 334 tests), build, Playwright chromium install, and e2e (19 passed). Phase 4 post-planning verification also passed: `npm run lint`, `npm run typecheck`, `npm run test` (61 files / 334 tests), and `npm run build`.
+Gate status: PASS — Phase 0 baseline `scripts/local-gate.ps1` passed fully before edits. Post-implementation full local gate also passed: npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (62 files / 341 tests), build, Playwright chromium install, and e2e (19 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-22T21:37:14.6066376-07:00
+Timestamp: 2026-05-22T22:15:12.8013032-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the Phase 0 full local gate from the single-agent root worktree; baseline was green before planning edits.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, README limitations/roadmap notes, `docs/decisions.md`, all root SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
-- Confirmed Sprint 25 Codex work is complete by `SUMMARY.codex.md`, implementation commits, zero active Codex blockers, and green local-gate evidence.
-- Updated `PLAN.md` to mark S25-F1 and S25-F2 done, bump the document version to 2.32A, set Sprint 26 active, and queue S26-F1 through S26-F3.
-- Synced `docs/FEATURE-BACKLOG.md` so S25 is done and S26-F1 through S26-F3 are queued.
-- Verified planning-only changes with lint, typecheck, unit tests, and build after the planning commits.
+- Ran the Phase 0 full local gate from the single-agent root worktree; baseline was green before implementation.
+- Read `PLAN.md`, `CRM-CONTRACT.md`, README, root agent SUMMARY/BLOCKERS files, `docs/decisions.md`, and the referenced control, gate, backlog, roadmap, architecture, eval, security/privacy, worktree, merge, and prompt docs.
+- Selected `S26-F1 — Bulk action dry-run contracts` as the first queued Sprint 26 Codex work unit.
+- Added `lib/server/bulkActionDryRun.ts` with read-only server-side dry-run planning for status updates, opportunity stage updates, owner assignment, task creation eligibility, and selected export eligibility.
+- Added `tests/api/bulk-action-dry-run.test.ts` covering deterministic catalogs, missing/no-change/duplicate counts, invalid targets, unsupported action/entity combinations, selected export metadata, strict input rejection, and no-write behavior.
+- Verified the implementation with focused Vitest, lint, typecheck, full Vitest, build, and the full local gate after commit.
 
 ### Discovered this prompt
 
-- `LOOP.md` is not present in this checkout; the runner prompt and `scripts/local-gate.ps1` supplied the operative validation path for this rollover.
-- Older Claude, Grok, and Gemini report files still contain historical branch/session context, but none created an active Codex blocker for the Sprint 26 planning decision.
+- Other-agent SUMMARY/BLOCKERS files are historical and reference Sprint 4 or Sprint 5 branches, but none contains an active blocker that affects this single-agent root iteration.
+- PLAN §4 still lists `S26-F1` as queued; this report records local completion evidence. Sprint status promotion remains a planning/reporting update for a later rollover or coordination pass.
 
 ### Next action
 
-Run LOOP.md to begin S26-F1.
+Run LOOP.md for `S26-F2 — Audit adoption for core mutations`.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES — current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode. Writes were limited to `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md` as requested.
+No cross-ownership edits: YES — current path is `C:\dev\salesforce-lite-crm`, so this was single-agent root mode. Implementation touched `lib/server/` and `tests/api/`; report updates touched Codex report files only.
 
 CRM-CONTRACT.md honored: YES
