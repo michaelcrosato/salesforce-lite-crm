@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.38A |
+| Version | 2.39A |
 
 | Last updated | 2026-05-24 |
 
-| Active sprint | Sprint 32 S32-F1/S32-F2/S32-F3 queued |
+| Active sprint | Sprint 33 S33-F1/S33-F2/S33-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1198,9 +1198,9 @@ Goal: add deterministic case queue and SLA foundations to the existing service w
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S32-F1 — Case queue assignment foundation | codex | queued | Add deterministic service-queue assignment for Cases using repo-local data, validation, seed coverage, and audit evidence. Existing case create/update flows can assign or preserve queue state without changing Case status semantics. |
-| S32-F2 — Case SLA timer contracts | codex | queued | Add deterministic SLA target/due/overdue calculations for Cases with an injected clock, seeded examples, and test coverage. SLA state is computed locally and does not require scheduled jobs or external services. |
-| S32-F3 — Service operations case UI | codex | queued | Existing `/cases` list and drawer surfaces show queue/SLA context and support bounded queue assignment/status workflows with deterministic feedback and e2e coverage. The app keeps the existing `/cases?case=<id>` drawer pattern. |
+| S32-F1 — Case queue assignment foundation | codex | done | Add deterministic service-queue assignment for Cases using repo-local data, validation, seed coverage, and audit evidence. Existing case create/update flows can assign or preserve queue state without changing Case status semantics. |
+| S32-F2 — Case SLA timer contracts | codex | done | Add deterministic SLA target/due/overdue calculations for Cases with an injected clock, seeded examples, and test coverage. SLA state is computed locally and does not require scheduled jobs or external services. |
+| S32-F3 — Service operations case UI | codex | done | Existing `/cases` list and drawer surfaces show queue/SLA context and support bounded queue assignment/status workflows with deterministic feedback and e2e coverage. The app keeps the existing `/cases?case=<id>` drawer pattern. |
 
 \*\*Sprint 32 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1227,6 +1227,42 @@ Goal: add deterministic case queue and SLA foundations to the existing service w
 \- No background scheduler, notification delivery, external telemetry sink, SLA escalation automation, auth-backed entitlements, or multi-tenant queue rules.
 
 \- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, CSV import apply flow, duplicate merge, file storage, Salesforce integration, or external CRM sync.
+
+\*\*Sprint 33 — Case Knowledge Assist\*\*
+
+Goal: add local knowledge article foundations to the case service workflow without adding new routes, external providers, or search expansion.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S33-F1 — Knowledge article foundation | codex | queued | Add a local Knowledge Article foundation for service workflows: schema, seed data, validation/service helpers, CRM contract/registry updates, audit evidence, and tests. Existing case, task, campaign, dealer, lead, and opportunity semantics stay unchanged. |
+| S33-F2 — Case knowledge suggestion contracts | codex | queued | Add deterministic case-to-article suggestion helpers using repo-local case fields and article metadata. Suggestions are read-only, hermetic, and avoid external AI/RAG/provider calls or case/article mutations. |
+| S33-F3 — Case knowledge assist UI | codex | queued | Existing `/cases` list and drawer surfaces show bounded knowledge suggestions with clear empty/loading states and e2e coverage. No new route is added; `/cases?case=<id>` remains the service operations detail flow. |
+
+\*\*Sprint 33 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No service portal, external knowledge sync, RAG/vector search, AI-generated article content, or external knowledge provider.
+
+\- No new product routes, article CRUD admin pages, article import/export, file storage, or search index expansion.
+
+\- No case status, queue, SLA, routing, lead disposition, pacing-engine, forecast, CSV import apply, duplicate merge, Salesforce integration, or external CRM sync changes.
 
 
 \## 5. File Ownership Matrix
