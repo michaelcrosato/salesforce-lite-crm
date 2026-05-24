@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 32
 
-Feature: S32-F2 - Case SLA timer contracts
+Feature: S32-F3 - Service operations case UI
 
 Branch: main
 
-Timestamp: 2026-05-24T13:11:34.6126201-07:00
+Timestamp: 2026-05-24T14:20:13.2225382-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open; S32-F2 completed with the full local gate green.
+- No active Codex blockers were open; S32-F3 completed with the full local gate green.

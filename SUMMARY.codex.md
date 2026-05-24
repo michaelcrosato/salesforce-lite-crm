@@ -2,34 +2,34 @@ Agent: Codex
 
 Sprint: 32
 
-Feature: S32-F2 - Case SLA timer contracts
+Feature: S32-F3 - Service operations case UI
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 7d3f7e9 - [codex] S32-F2: add case SLA timer contracts
+- 3444067 - [codex] S32-F3: add service operations case UI
 
 Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation. It ran npm install, Prisma generate/db push, seed, lint, typecheck, 72 Vitest files / 387 tests, build, Playwright chromium install, and 22 Playwright e2e tests successfully.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T13:11:34.6126201-07:00
+Timestamp: 2026-05-24T14:20:13.2225382-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added deterministic Case SLA policies and snapshots with injected-clock evaluation for target, due-soon, overdue, stopped-on-time, and stopped-overdue state.
-- Added read-only Case service wrappers for single-case and list SLA snapshots without changing routes, schema fields, `crmClient` adapter signatures, or background infrastructure.
-- Updated seeded Cases with controlled relative timestamps that produce stable SLA examples, and recorded the seed-only update in `docs/schema-changelog.md`.
-- Added SLA calculation and seed coverage tests, including service wrapper coverage and seeded state diversity.
-- Reconciled prompt context: local gate and commits support S32-F1 as done even though PLAN §4 still lists the row as queued; Gemini's historical Sprint 5 visual-snapshot summary does not match current PLAN §4 and was treated as stale.
+- Added service operations context to `/cases` by showing deterministic queue assignment and SLA state on case rows and the case detail drawer.
+- Added a bounded queue assignment server action and drawer control using existing `CASE_QUEUE_KEYS`, while preserving the existing status update flow and `/cases?case=<id>` drawer route.
+- Added queue selection to the case create/edit form without changing Case status semantics, schema fields, or `crmClient` adapter signatures.
+- Extended `e2e/cases.spec.ts` to verify queue/SLA visibility and queue reassignment feedback.
+- Reconciled prompt context: PLAN §4 still lists S32-F1/S32-F2/S32-F3 as queued, but local commits and green gates now support S32-F1, S32-F2, and S32-F3 as done.
 
 ### Next action
 
-Run LOOP.md to begin S32-F3 - Service operations case UI.
+Run SPRINT-ROLLOVER.md or equivalent planning scope to reconcile Sprint 32 status and queue the next valid work unit.
 
 ### Scope confirmation
 
