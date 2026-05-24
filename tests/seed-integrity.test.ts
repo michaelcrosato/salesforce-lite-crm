@@ -5,6 +5,7 @@ import {
   TASK_PRIORITIES,
   CASE_STATUSES,
   CASE_PRIORITIES,
+  CASE_QUEUE_KEYS,
   CAMPAIGN_STATUSES
 } from "@/lib/crm/registry";
 
@@ -59,7 +60,7 @@ describe("seed integrity (post-seed invariants)", () => {
     }
   });
 
-  it("Task/Case/Campaign status and priority fields contain valid enum values", async () => {
+  it("Task/Case/Campaign status, priority, and queue fields contain valid values", async () => {
     const tasks = await prisma.task.findMany({
       select: { status: true, priority: true }
     });
@@ -69,12 +70,16 @@ describe("seed integrity (post-seed invariants)", () => {
     }
 
     const cases = await prisma.case.findMany({
-      select: { status: true, priority: true }
+      select: { status: true, priority: true, queueKey: true, queueReason: true }
     });
     for (const c of cases) {
       expect(CASE_STATUSES).toContain(c.status);
       expect(CASE_PRIORITIES).toContain(c.priority);
+      expect(CASE_QUEUE_KEYS).toContain(c.queueKey);
+      expect(c.queueReason).toBeTruthy();
     }
+
+    expect(new Set(cases.map((c) => c.queueKey)).size).toBeGreaterThanOrEqual(4);
 
     const campaigns = await prisma.campaign.findMany({
       select: { status: true }

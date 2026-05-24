@@ -14,3 +14,4 @@ Backfilled current baseline:
 - `2026-05-19 | codex | [DOC AUDIT] | Current seed creates deterministic demo anchors for dashboard KPIs, Vancouver lead routing, dealer order pacing, tasks, cases, campaigns, reports, and routing decision payloads.`
 - `2026-05-20 | codex | [S4-F1] | add structured routing payloads to seeded routing events`
 - `2026-05-23 | codex | [S29-F2] | add SavedListView for local saved CRM list filters and sort metadata`
+- `2026-05-24 | codex | [S32-F1] | add deterministic case queue fields and seeded queue assignments`

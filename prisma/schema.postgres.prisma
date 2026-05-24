@@ -251,6 +251,8 @@ model Case {
   description String?   @db.Text
   status      String    @default("new") @db.VarChar(50)
   priority    String    @default("normal") @db.VarChar(50)
+  queueKey    String    @default("general_support") @db.VarChar(50)
+  queueReason String?   @db.Text
   accountId   String?   @db.Text
   account     Account?  @relation(fields: [accountId], references: [id], onDelete: SetNull)
   contactId   String?   @db.Text
@@ -262,6 +264,7 @@ model Case {
   updatedAt   DateTime  @updatedAt @db.Timestamp(3)
 
   @@index([status])
+  @@index([queueKey])
   @@index([accountId])
 }
 

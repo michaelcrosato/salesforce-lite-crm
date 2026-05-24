@@ -5,6 +5,7 @@ import {
   normalizePostalCode as normalizeDisplayPostalCode
 } from "../lib/postal";
 import { prisma } from "../lib/prisma";
+import { assignCaseQueue } from "../lib/services/caseQueues";
 
 function daysFromNow(days: number) {
   const date = new Date();
@@ -837,13 +838,25 @@ async function main() {
     const mod = i % 7;
     const status = caseStatuses[mod % caseStatuses.length];
     const priority = casePriorities[i % casePriorities.length];
+    const subject = `${caseTemplates[i % caseTemplates.length]} #${i + 1}`;
+    const description =
+      "Seeded support case for case management and priority queue demo.";
+    const queueAssignment = assignCaseQueue({
+      subject,
+      description,
+      priority,
+      accountId,
+      contactId
+    });
 
     return {
       id: `case-${String(i + 1).padStart(3, "0")}`,
-      subject: `${caseTemplates[i % caseTemplates.length]} #${i + 1}`,
-      description: "Seeded support case for case management and priority queue demo.",
+      subject,
+      description,
       status,
       priority,
+      queueKey: queueAssignment.queueKey,
+      queueReason: queueAssignment.reason,
       accountId,
       contactId,
       ownerId

@@ -38,6 +38,8 @@ describe("cases service", () => {
     expect(crmCase.status).toBe("new");
     expect(crmCase.priority).toBe("normal");
     expect(crmCase.accountId).toBe(accountId);
+    expect(crmCase.queueKey).toBe("customer_success");
+    expect(crmCase.queueReason).toBe("linked_customer_record");
 
     const audit = await prisma.auditEvent.findFirstOrThrow({
       where: {
@@ -53,9 +55,34 @@ describe("cases service", () => {
       accountId,
       ownerId,
       priority: "normal",
+      queueKey: "customer_success",
+      queueReason: "linked_customer_record",
       status: "new",
       subject: "Case service create"
     });
+  });
+
+  it("assigns deterministic queues and preserves explicit queues", async () => {
+    const billingCase = await createCase({
+      subject: "Case service billing invoice",
+      priority: "normal"
+    });
+    const explicitCase = await createCase({
+      subject: "Case service explicit queue",
+      queueKey: "data_quality"
+    });
+
+    expect(billingCase.queueKey).toBe("billing_support");
+    expect(billingCase.queueReason).toBe("matched_billing_language");
+    expect(explicitCase.queueKey).toBe("data_quality");
+    expect(explicitCase.queueReason).toBe("explicit_queue");
+
+    const updatedExplicitCase = await updateCase(explicitCase.id, {
+      subject: "Case service urgent invoice",
+      priority: "urgent"
+    });
+    expect(updatedExplicitCase.queueKey).toBe("data_quality");
+    expect(updatedExplicitCase.queueReason).toBe("explicit_queue");
   });
 
   it("lists cases with status, owner, and account filters", async () => {
@@ -109,6 +136,8 @@ describe("cases service", () => {
 
     expect(updated.subject).toBe("Case service updated");
     expect(updated.priority).toBe("urgent");
+    expect(updated.queueKey).toBe("critical_support");
+    expect(updated.queueReason).toBe("urgent_priority");
     expect(fetched?.status).toBe("waiting");
 
     const audit = await prisma.auditEvent.findFirstOrThrow({
@@ -121,10 +150,48 @@ describe("cases service", () => {
     expect(audit.category).toBe("record");
     expect(audit.summary).toBe("Case status changed from new to waiting.");
     expect(auditMetadata(audit)).toMatchObject({
-      changedFields: ["priority", "status", "subject"],
+      changedFields: [
+        "priority",
+        "queueKey",
+        "queueReason",
+        "status",
+        "subject"
+      ],
+      previousQueueKey: "customer_success",
       previousStatus: "new",
+      queueKey: "critical_support",
+      queueReason: "urgent_priority",
       status: "waiting",
       subject: "Case service updated"
+    });
+  });
+
+  it("preserves queue assignment for status-only updates", async () => {
+    const crmCase = await createCase({
+      subject: "Case service status only",
+      queueKey: "billing_support"
+    });
+
+    const updated = await updateCase(crmCase.id, {
+      status: "waiting"
+    });
+
+    expect(updated.queueKey).toBe("billing_support");
+    expect(updated.queueReason).toBe("explicit_queue");
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "status_changed",
+        entityId: crmCase.id,
+        entityType: "case"
+      }
+    });
+    expect(auditMetadata(audit)).toMatchObject({
+      changedFields: ["status"],
+      previousQueueKey: null,
+      previousStatus: "new",
+      queueKey: "billing_support",
+      queueReason: "explicit_queue"
     });
   });
 

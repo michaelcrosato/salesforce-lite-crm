@@ -79,6 +79,16 @@ export type CaseStatus = (typeof CASE_STATUSES)[number];
 export const CASE_PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 export type CasePriority = (typeof CASE_PRIORITIES)[number];
 
+export const CASE_QUEUE_KEYS = [
+  "critical_support",
+  "billing_support",
+  "dealer_operations",
+  "data_quality",
+  "customer_success",
+  "general_support"
+] as const;
+export type CaseQueueKey = (typeof CASE_QUEUE_KEYS)[number];
+
 export const CAMPAIGN_STATUSES = [
   "planned",
   "active",

@@ -10,6 +10,7 @@ import {
 import {
   CAMPAIGN_STATUSES,
   CASE_PRIORITIES,
+  CASE_QUEUE_KEYS,
   CASE_STATUSES,
   TASK_PRIORITIES,
   TASK_STATUSES
@@ -71,6 +72,7 @@ export const taskStatusSchema = z.enum(TASK_STATUSES);
 export const taskPrioritySchema = z.enum(TASK_PRIORITIES);
 export const caseStatusSchema = z.enum(CASE_STATUSES);
 export const casePrioritySchema = z.enum(CASE_PRIORITIES);
+export const caseQueueKeySchema = z.enum(CASE_QUEUE_KEYS);
 export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
 
 const blankStringToUndefined = (value: unknown) =>
@@ -79,6 +81,11 @@ const blankStringToUndefined = (value: unknown) =>
 const optionalPostalCode = z.preprocess(
   blankStringToUndefined,
   postalCodeSchema.optional()
+);
+
+const optionalCaseQueueKey = z.preprocess(
+  blankStringToUndefined,
+  caseQueueKeySchema.optional()
 );
 
 const requiredInteger = (
@@ -283,6 +290,7 @@ export const caseCreateSchema = z.object({
   description: optionalText,
   status: caseStatusSchema.default("new"),
   priority: casePrioritySchema.default("normal"),
+  queueKey: optionalCaseQueueKey,
   accountId: optionalText,
   contactId: optionalText,
   ownerId: optionalText

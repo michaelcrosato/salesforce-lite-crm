@@ -1,11 +1,19 @@
 import type { Case, Prisma } from "@prisma/client";
 import { z } from "zod";
-import { CASE_STATUSES, type CaseStatus } from "@/lib/crm/registry";
+import {
+  CASE_STATUSES,
+  type CaseQueueKey,
+  type CaseStatus
+} from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
 import {
   buildAuditEventCreateData,
   type AuditMetadataValue
 } from "@/lib/services/auditEvents";
+import {
+  assignCaseQueue,
+  type CaseQueueAssignment
+} from "@/lib/services/caseQueues";
 import { fieldEquals } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { caseCreateSchema, caseUpdateSchema, idSchema } from "@/lib/validation";
@@ -58,7 +66,13 @@ export type CaseCreateInput = z.input<typeof caseCreateSchema>;
 export type CaseUpdateInput = z.input<typeof caseUpdateSchema>;
 
 export async function createCase(input: unknown): Promise<Case> {
-  const data = caseCreateSchema.parse(input);
+  const parsed = caseCreateSchema.parse(input);
+  const assignment = assignCaseQueue(parsed);
+  const data = {
+    ...parsed,
+    queueKey: assignment.queueKey,
+    queueReason: assignment.reason
+  };
 
   return prisma.$transaction(async (tx) => {
     const crmCase = await tx.case.create({ data });
@@ -143,14 +157,22 @@ export async function updateCase(id: string, input: unknown): Promise<Case> {
         id: caseId
       }
     });
+    const queueUpdate = caseQueueUpdateData(data, existing);
+    const writeData = {
+      ...data,
+      ...queueUpdate
+    };
     const crmCase = await tx.case.update({
       where: {
         id: caseId
       },
-      data
+      data: writeData
     });
     const statusChanged =
       data.status !== undefined && existing.status !== crmCase.status;
+    const queueChanged =
+      queueUpdate.queueKey !== undefined &&
+      existing.queueKey !== crmCase.queueKey;
 
     await tx.auditEvent.create({
       data: buildAuditEventCreateData({
@@ -163,8 +185,9 @@ export async function updateCase(id: string, input: unknown): Promise<Case> {
           : `Case updated: ${crmCase.subject}.`,
         metadata: {
           ...caseAuditMetadata(crmCase),
-          changedFields: auditChangedFields(data),
-          previousStatus: statusChanged ? existing.status : null
+          changedFields: auditChangedFields(writeData),
+          previousStatus: statusChanged ? existing.status : null,
+          previousQueueKey: queueChanged ? existing.queueKey : null
         }
       })
     });
@@ -217,6 +240,8 @@ function caseAuditMetadata(crmCase: Case): Record<string, AuditMetadataValue> {
     contactId: crmCase.contactId,
     ownerId: crmCase.ownerId,
     priority: crmCase.priority,
+    queueKey: crmCase.queueKey,
+    queueReason: crmCase.queueReason,
     status: crmCase.status,
     subject: crmCase.subject
   };
@@ -224,4 +249,58 @@ function caseAuditMetadata(crmCase: Case): Record<string, AuditMetadataValue> {
 
 function auditChangedFields(input: object): string[] {
   return Object.keys(input).sort();
+}
+
+function caseQueueUpdateData(
+  data: ReturnType<typeof caseUpdateSchema.parse>,
+  existing: Case
+): { queueKey?: CaseQueueKey; queueReason?: string } {
+  if (!isQueueRelevantUpdate(data)) {
+    return {};
+  }
+
+  if (existing.queueReason === "explicit_queue" && data.queueKey === undefined) {
+    return {};
+  }
+
+  const assignment = assignCaseQueue({
+    subject: data.subject ?? existing.subject,
+    description: data.description ?? existing.description,
+    priority: data.priority ?? existing.priority,
+    accountId: data.accountId ?? existing.accountId,
+    contactId: data.contactId ?? existing.contactId,
+    queueKey: data.queueKey ?? null
+  });
+
+  if (!assignmentChanged(assignment, existing)) {
+    return {};
+  }
+
+  return {
+    queueKey: assignment.queueKey,
+    queueReason: assignment.reason
+  };
+}
+
+function isQueueRelevantUpdate(
+  data: ReturnType<typeof caseUpdateSchema.parse>
+): boolean {
+  return (
+    data.queueKey !== undefined ||
+    data.subject !== undefined ||
+    data.description !== undefined ||
+    data.priority !== undefined ||
+    data.accountId !== undefined ||
+    data.contactId !== undefined
+  );
+}
+
+function assignmentChanged(
+  assignment: CaseQueueAssignment,
+  existing: Case
+): boolean {
+  return (
+    assignment.queueKey !== existing.queueKey ||
+    assignment.reason !== existing.queueReason
+  );
 }

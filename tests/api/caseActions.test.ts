@@ -40,6 +40,8 @@ describe("Case Actions", () => {
     });
     expect(created).not.toBeNull();
     expect(created?.status).toBe("new");
+    expect(created?.queueKey).toBe("general_support");
+    expect(created?.queueReason).toBe("default_general_support");
   });
 
   it("validates required fields for case creation", async () => {
