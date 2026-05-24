@@ -66,9 +66,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S29-F1 | Audit event explorer | Codex | done |
 | S29-F2 | Saved list views foundation | Codex | done |
 | S29-F3 | Saved list views operator UI | Codex | done |
-| S30-F1 | Selected export action packets | Codex | queued |
-| S30-F2 | Bulk action execution foundation | Codex | queued |
-| S30-F3 | Bulk action execution operator UI | Codex | queued |
+| S30-F1 | Selected export action packets | Codex | done |
+| S30-F2 | Bulk action execution foundation | Codex | done |
+| S30-F3 | Bulk action execution operator UI | Codex | done |
+| S31-F1 | Bulk list selection contracts | Codex | queued |
+| S31-F2 | List-page selected export actions | Codex | queued |
+| S31-F3 | List-page bulk execution actions | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
