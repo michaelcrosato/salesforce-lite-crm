@@ -47,6 +47,7 @@ import {
 import {
   type CsvOperatorRemediationSourceCode
 } from "@/lib/server/csvOperatorRemediationRunbooks";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_OPERATOR_FIXTURE_BUNDLE_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -284,6 +285,11 @@ export type CsvOperatorFixtureBundle = {
   read: CsvOperatorFixtureReadFlags;
   write: CsvOperatorFixtureWriteFlags;
 };
+
+const fixtureBundleCache = new Map<
+  string,
+  Promise<CsvOperatorFixtureBundle>
+>();
 
 type ReadFlagInput = {
   metadata: true;
@@ -985,60 +991,63 @@ export async function listCsvOperatorFixtureOperationBundles(
 export async function getCsvOperatorFixtureBundle(
   options: CsvOperatorFixtureBundleOptions = {}
 ): Promise<CsvOperatorFixtureBundle> {
-  const digest = getCsvContractReleaseDigest();
-  const handoff = getCsvOperatorHandoffPackets();
-  const entities = await Promise.all(
-    handoff.entries.map((packet) => buildEntityBundle(packet, digest, options))
-  );
-  const operations = handoff.operations.map((packet) =>
-    buildOperationBundle({
-      packet,
-      digest,
-      entityBundles: entities
-    })
-  );
-  const sourceContentTypes = uniqueStrings([
-    CSV_OPERATOR_FIXTURE_BUNDLE_CONTENT_TYPE,
-    digest.contentType,
-    handoff.contentType,
-    ...handoff.sourceContentTypes,
-    ...entities.flatMap((entity) => entity.handoff.sourceContentTypes),
-    ...operations.flatMap((operation) => operation.handoff.sourceContentTypes)
-  ]);
-  const fingerprint = buildBundleFingerprint({
-    releaseFingerprint: digest.fingerprint,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(fixtureBundleCache, options, async () => {
+    const digest = getCsvContractReleaseDigest();
+    const handoff = getCsvOperatorHandoffPackets();
+    const entities = await Promise.all(
+      handoff.entries.map((packet) => buildEntityBundle(packet, digest, options))
+    );
+    const operations = handoff.operations.map((packet) =>
+      buildOperationBundle({
+        packet,
+        digest,
+        entityBundles: entities
+      })
+    );
+    const sourceContentTypes = uniqueStrings([
+      CSV_OPERATOR_FIXTURE_BUNDLE_CONTENT_TYPE,
+      digest.contentType,
+      handoff.contentType,
+      ...handoff.sourceContentTypes,
+      ...entities.flatMap((entity) => entity.handoff.sourceContentTypes),
+      ...operations.flatMap((operation) => operation.handoff.sourceContentTypes)
+    ]);
+    const fingerprint = buildBundleFingerprint({
+      releaseFingerprint: digest.fingerprint,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_OPERATOR_FIXTURE_BUNDLE_CONTENT_TYPE,
-    bundleVersion: 1,
-    status: digest.status,
-    fingerprint,
-    entityCount: digest.entityCount,
-    operationCount: digest.operationCount,
-    capabilityCount: digest.capabilityCount,
-    supportedEntityOperationCount: digest.supportedEntityOperationCount,
-    fixtureOperationCount: entities.reduce(
-      (count, entity) => count + entity.fixtureOperationCount,
-      0
-    ),
-    exportFixtureCount: entities.filter((entity) => entity.exportFixture !== null)
-      .length,
-    importFixtureCount: entities.filter(
-      (entity) => entity.importDryRunFixture !== null
-    ).length,
-    release: buildReleaseSummary(digest),
-    entities,
-    operations,
-    sourceContentTypes,
-    source: buildSource(digest),
-    read: combineReads([
-      handoff.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_OPERATOR_FIXTURE_BUNDLE_CONTENT_TYPE,
+      bundleVersion: 1,
+      status: digest.status,
+      fingerprint,
+      entityCount: digest.entityCount,
+      operationCount: digest.operationCount,
+      capabilityCount: digest.capabilityCount,
+      supportedEntityOperationCount: digest.supportedEntityOperationCount,
+      fixtureOperationCount: entities.reduce(
+        (count, entity) => count + entity.fixtureOperationCount,
+        0
+      ),
+      exportFixtureCount: entities.filter(
+        (entity) => entity.exportFixture !== null
+      ).length,
+      importFixtureCount: entities.filter(
+        (entity) => entity.importDryRunFixture !== null
+      ).length,
+      release: buildReleaseSummary(digest),
+      entities,
+      operations,
+      sourceContentTypes,
+      source: buildSource(digest),
+      read: combineReads([
+        handoff.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }

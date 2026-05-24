@@ -45,6 +45,7 @@ import {
   type CsvOperatorFixtureEntityOperation,
   type CsvOperatorFixtureOperationBundle
 } from "@/lib/server/csvOperatorFixtureBundles";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_OPERATOR_WALKTHROUGH_MANIFEST_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -57,6 +58,11 @@ export type CsvOperatorWalkthroughStatus =
   CsvOperatorAcceptanceChecklistStatus;
 export type CsvOperatorWalkthroughStatusCounts =
   CsvOperatorAcceptanceChecklistStatusCounts;
+
+const walkthroughManifestCache = new Map<
+  string,
+  Promise<CsvOperatorWalkthroughManifest>
+>();
 
 export type CsvOperatorWalkthroughReadFlags = {
   metadata: true;
@@ -1157,92 +1163,98 @@ export function isCsvOperatorWalkthroughOperation(
 export async function getCsvOperatorWalkthroughManifest(
   options: CsvOperatorWalkthroughOptions = {}
 ): Promise<CsvOperatorWalkthroughManifest> {
-  const [fixture, releaseNotes, acceptance] = await Promise.all([
-    getCsvOperatorFixtureBundle(options),
-    getCsvHandoffReleaseNotesPacket(options),
-    getCsvOperatorAcceptanceChecklist(options)
-  ]);
-  const source = buildSource({ fixture, releaseNotes, acceptance });
-  const entities = acceptance.entities.map((checklist) =>
-    buildEntityManifest({
-      checklist,
-      fixture,
-      releaseNotes,
-      source
-    })
-  );
-  const operations = acceptance.operations.map((checklist) =>
-    buildOperationManifest({
-      checklist,
-      fixture,
-      releaseNotes,
-      entityManifests: entities,
-      source
-    })
-  );
-  const allItems = entities.flatMap((entity) => entity.items);
-  const statusCounts = countStatuses(allItems);
-  const status = statusFromCounts(statusCounts);
-  const stepCount = allItems.reduce((count, item) => count + item.stepCount, 0);
-  const watchNoteCount = allItems.reduce(
-    (count, item) => count + item.watchNoteCount,
-    0
-  );
-  const blockingNoteCount = allItems.reduce(
-    (count, item) => count + item.blockingNoteCount,
-    0
-  );
-  const fingerprint = buildManifestFingerprint({
-    source,
-    status,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(walkthroughManifestCache, options, async () => {
+    const [fixture, releaseNotes, acceptance] = await Promise.all([
+      getCsvOperatorFixtureBundle(options),
+      getCsvHandoffReleaseNotesPacket(options),
+      getCsvOperatorAcceptanceChecklist(options)
+    ]);
+    const source = buildSource({ fixture, releaseNotes, acceptance });
+    const entities = acceptance.entities.map((checklist) =>
+      buildEntityManifest({
+        checklist,
+        fixture,
+        releaseNotes,
+        source
+      })
+    );
+    const operations = acceptance.operations.map((checklist) =>
+      buildOperationManifest({
+        checklist,
+        fixture,
+        releaseNotes,
+        entityManifests: entities,
+        source
+      })
+    );
+    const allItems = entities.flatMap((entity) => entity.items);
+    const statusCounts = countStatuses(allItems);
+    const status = statusFromCounts(statusCounts);
+    const stepCount = allItems.reduce(
+      (count, item) => count + item.stepCount,
+      0
+    );
+    const watchNoteCount = allItems.reduce(
+      (count, item) => count + item.watchNoteCount,
+      0
+    );
+    const blockingNoteCount = allItems.reduce(
+      (count, item) => count + item.blockingNoteCount,
+      0
+    );
+    const fingerprint = buildManifestFingerprint({
+      source,
+      status,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_OPERATOR_WALKTHROUGH_MANIFEST_CONTENT_TYPE,
-    manifestVersion: 1,
-    status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    walkthroughCount: allItems.length,
-    supportedWalkthroughCount: allItems.filter((item) => item.supported).length,
-    unsupportedWalkthroughCount: allItems.filter((item) => !item.supported)
-      .length,
-    fixtureWalkthroughCount: allItems.filter((item) => item.fixture.available)
-      .length,
-    stepCount,
-    watchNoteCount,
-    blockingNoteCount,
-    statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    sourceFingerprints: source.sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_OPERATOR_WALKTHROUGH_MANIFEST_CONTENT_TYPE,
-      fixture.contentType,
-      releaseNotes.contentType,
-      acceptance.contentType,
-      CSV_IMPORT_TEMPLATE_CONTENT_TYPE,
-      ...fixture.sourceContentTypes,
-      ...releaseNotes.sourceContentTypes,
-      ...acceptance.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    entities,
-    operations,
-    source,
-    read: combineReads([
-      fixture.read,
-      releaseNotes.read,
-      acceptance.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_OPERATOR_WALKTHROUGH_MANIFEST_CONTENT_TYPE,
+      manifestVersion: 1,
+      status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      walkthroughCount: allItems.length,
+      supportedWalkthroughCount: allItems.filter((item) => item.supported)
+        .length,
+      unsupportedWalkthroughCount: allItems.filter((item) => !item.supported)
+        .length,
+      fixtureWalkthroughCount: allItems.filter((item) => item.fixture.available)
+        .length,
+      stepCount,
+      watchNoteCount,
+      blockingNoteCount,
+      statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      sourceFingerprints: source.sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_OPERATOR_WALKTHROUGH_MANIFEST_CONTENT_TYPE,
+        fixture.contentType,
+        releaseNotes.contentType,
+        acceptance.contentType,
+        CSV_IMPORT_TEMPLATE_CONTENT_TYPE,
+        ...fixture.sourceContentTypes,
+        ...releaseNotes.sourceContentTypes,
+        ...acceptance.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      entities,
+      operations,
+      source,
+      read: combineReads([
+        fixture.read,
+        releaseNotes.read,
+        acceptance.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvOperatorWalkthroughEntityManifests(

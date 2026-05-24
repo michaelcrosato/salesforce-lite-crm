@@ -30,6 +30,7 @@ import {
   type CsvOperatorFixtureEntityOperation,
   type CsvOperatorFixtureOperationBundle
 } from "@/lib/server/csvOperatorFixtureBundles";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_RELEASE_CLOSURE_SCORECARD_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -232,6 +233,11 @@ export type CsvReleaseClosureScorecard = {
   read: CsvReleaseClosureReadFlags;
   write: CsvReleaseClosureWriteFlags;
 };
+
+const closureScorecardCache = new Map<
+  string,
+  Promise<CsvReleaseClosureScorecard>
+>();
 
 type ReadFlagInput = {
   metadata: true;
@@ -1017,95 +1023,97 @@ export function isCsvReleaseClosureOperation(
 export async function getCsvReleaseClosureScorecard(
   options: CsvReleaseClosureOptions = {}
 ): Promise<CsvReleaseClosureScorecard> {
-  const [releaseNotes, acceptance, fixture] = await Promise.all([
-    getCsvHandoffReleaseNotesPacket(options),
-    getCsvOperatorAcceptanceChecklist(options),
-    getCsvOperatorFixtureBundle(options)
-  ]);
-  const source = buildSource({ releaseNotes, acceptance, fixture });
-  const entities = acceptance.entities.map((checklist) =>
-    buildEntityScorecard({
-      checklist,
-      fixture,
-      releaseNotes,
-      source
-    })
-  );
-  const operations = acceptance.operations.map((checklist) =>
-    buildOperationScorecard({
-      checklist,
-      fixture,
-      releaseNotes,
-      entityScorecards: entities,
-      source
-    })
-  );
-  const allItems = entities.flatMap((entity) => entity.items);
-  const statusCounts = countStatuses(allItems);
-  const checkStatusCounts = combineStatusCounts(
-    allItems.map((item) => item.checkStatusCounts)
-  );
-  const status = statusFromCounts(statusCounts);
-  const fingerprint = buildScorecardFingerprint({
-    source,
-    status,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(closureScorecardCache, options, async () => {
+    const [releaseNotes, acceptance, fixture] = await Promise.all([
+      getCsvHandoffReleaseNotesPacket(options),
+      getCsvOperatorAcceptanceChecklist(options),
+      getCsvOperatorFixtureBundle(options)
+    ]);
+    const source = buildSource({ releaseNotes, acceptance, fixture });
+    const entities = acceptance.entities.map((checklist) =>
+      buildEntityScorecard({
+        checklist,
+        fixture,
+        releaseNotes,
+        source
+      })
+    );
+    const operations = acceptance.operations.map((checklist) =>
+      buildOperationScorecard({
+        checklist,
+        fixture,
+        releaseNotes,
+        entityScorecards: entities,
+        source
+      })
+    );
+    const allItems = entities.flatMap((entity) => entity.items);
+    const statusCounts = countStatuses(allItems);
+    const checkStatusCounts = combineStatusCounts(
+      allItems.map((item) => item.checkStatusCounts)
+    );
+    const status = statusFromCounts(statusCounts);
+    const fingerprint = buildScorecardFingerprint({
+      source,
+      status,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_RELEASE_CLOSURE_SCORECARD_CONTENT_TYPE,
-    scorecardVersion: 1,
-    status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    closureItemCount: allItems.length,
-    supportedItemCount: allItems.filter((item) => item.supported).length,
-    unsupportedItemCount: allItems.filter((item) => !item.supported).length,
-    fixtureItemCount: allItems.filter((item) => item.fixture.available).length,
-    statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    checkStatusCounts,
-    releaseNoteAnchor: buildReleaseNoteAnchor({
-      releaseNotes,
-      fingerprint: releaseNotes.fingerprint,
-      warningCodes: releaseNotes.warningCodeRollup.warningCodes,
-      sourceCodes: releaseNotes.sourceCodeRollup.sourceCodes
-    }),
-    fixtureCoverage: {
-      fixtureItemCount: releaseNotes.fixtureRollup.fixtureOperationCount,
-      exportFixtureCount: releaseNotes.fixtureRollup.exportFixtureCount,
-      importFixtureCount: releaseNotes.fixtureRollup.importFixtureCount,
-      missingFixtureItemCount:
-        allItems.length - releaseNotes.fixtureRollup.fixtureOperationCount,
-      operationCoverage: releaseNotes.fixtureRollup.operationAvailability
-    },
-    sourceFingerprints: source.sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_RELEASE_CLOSURE_SCORECARD_CONTENT_TYPE,
-      releaseNotes.contentType,
-      acceptance.contentType,
-      fixture.contentType,
-      ...releaseNotes.sourceContentTypes,
-      ...acceptance.sourceContentTypes,
-      ...fixture.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    entities,
-    operations,
-    source,
-    read: combineReads([
-      releaseNotes.read,
-      acceptance.read,
-      fixture.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_RELEASE_CLOSURE_SCORECARD_CONTENT_TYPE,
+      scorecardVersion: 1,
+      status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      closureItemCount: allItems.length,
+      supportedItemCount: allItems.filter((item) => item.supported).length,
+      unsupportedItemCount: allItems.filter((item) => !item.supported).length,
+      fixtureItemCount: allItems.filter((item) => item.fixture.available).length,
+      statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      checkStatusCounts,
+      releaseNoteAnchor: buildReleaseNoteAnchor({
+        releaseNotes,
+        fingerprint: releaseNotes.fingerprint,
+        warningCodes: releaseNotes.warningCodeRollup.warningCodes,
+        sourceCodes: releaseNotes.sourceCodeRollup.sourceCodes
+      }),
+      fixtureCoverage: {
+        fixtureItemCount: releaseNotes.fixtureRollup.fixtureOperationCount,
+        exportFixtureCount: releaseNotes.fixtureRollup.exportFixtureCount,
+        importFixtureCount: releaseNotes.fixtureRollup.importFixtureCount,
+        missingFixtureItemCount:
+          allItems.length - releaseNotes.fixtureRollup.fixtureOperationCount,
+        operationCoverage: releaseNotes.fixtureRollup.operationAvailability
+      },
+      sourceFingerprints: source.sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_RELEASE_CLOSURE_SCORECARD_CONTENT_TYPE,
+        releaseNotes.contentType,
+        acceptance.contentType,
+        fixture.contentType,
+        ...releaseNotes.sourceContentTypes,
+        ...acceptance.sourceContentTypes,
+        ...fixture.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      entities,
+      operations,
+      source,
+      read: combineReads([
+        releaseNotes.read,
+        acceptance.read,
+        fixture.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvReleaseClosureEntityScorecards(

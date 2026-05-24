@@ -53,6 +53,7 @@ import {
   type CsvReleaseClosureStatus,
   type CsvReleaseClosureStatusCounts
 } from "@/lib/server/csvReleaseClosureScorecards";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_RELEASE_EXCEPTION_REGISTER_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -62,6 +63,11 @@ export type CsvReleaseExceptionEntity = CsvReleaseClosureEntity;
 export type CsvReleaseExceptionOperation = CsvReleaseClosureOperation;
 export type CsvReleaseExceptionSeverity = "watch" | "block";
 export type CsvReleaseExceptionStatus = CsvReleaseClosureStatus;
+
+const exceptionRegisterCache = new Map<
+  string,
+  Promise<CsvReleaseExceptionRegister>
+>();
 
 export type CsvReleaseExceptionSeverityCounts = {
   watch: number;
@@ -1209,111 +1215,115 @@ export function isCsvReleaseExceptionOperation(
 export async function getCsvReleaseExceptionRegister(
   options: CsvReleaseExceptionRegisterOptions = {}
 ): Promise<CsvReleaseExceptionRegister> {
-  const [closure, acceptance, fixture, walkthrough] = await Promise.all([
-    getCsvReleaseClosureScorecard(options),
-    getCsvOperatorAcceptanceChecklist(options),
-    getCsvOperatorFixtureBundle(options),
-    getCsvOperatorWalkthroughManifest(options)
-  ]);
-  const source = buildSource({ closure, acceptance, fixture, walkthrough });
-  const entities = closure.entities.map((closureEntity) =>
-    buildEntityRegister({
-      closureEntity,
-      closure,
-      acceptance,
-      fixture,
-      walkthrough,
-      source
-    })
-  );
-  const operations = closure.operations.map((closureOperation) =>
-    buildOperationRegister({
-      closureOperation,
-      acceptance,
-      fixture,
-      walkthrough,
-      entityRegisters: entities,
-      source
-    })
-  );
-  const entries = sortEntries(entities.flatMap((entity) => entity.entries));
-  const severityCounts = countSeverities(entries);
-  const status = statusFromSeverityCounts(severityCounts);
-  const sourceFingerprints = source.sourceFingerprints;
-  const fingerprint = buildRegisterFingerprint({
-    sourceFingerprints,
-    status,
-    entities,
-    operations
-  });
-
-  return {
-    contentType: CSV_RELEASE_EXCEPTION_REGISTER_CONTENT_TYPE,
-    registerVersion: 1,
-    status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    exceptionCount: entries.length,
-    watchExceptionCount: severityCounts.watch,
-    blockExceptionCount: severityCounts.block,
-    supportedExceptionCount: entries.filter((entry) => entry.supported).length,
-    unsupportedExceptionCount: entries.filter((entry) => !entry.supported).length,
-    missingFixtureExceptionCount: entries.filter(
-      (entry) => !entry.fixtureAvailable
-    ).length,
-    severityCounts,
-    entitySeverityCounts: countSeverities(
-      entities
-        .filter((entity) => entity.status !== "ready")
-        .map((entity) => ({
-          severity: entity.status === "block" ? "block" : "watch"
-        }))
-    ),
-    operationSeverityCounts: countSeverities(
+  return getInFlightCsvPacket(exceptionRegisterCache, options, async () => {
+    const [closure, acceptance, fixture, walkthrough] = await Promise.all([
+      getCsvReleaseClosureScorecard(options),
+      getCsvOperatorAcceptanceChecklist(options),
+      getCsvOperatorFixtureBundle(options),
+      getCsvOperatorWalkthroughManifest(options)
+    ]);
+    const source = buildSource({ closure, acceptance, fixture, walkthrough });
+    const entities = closure.entities.map((closureEntity) =>
+      buildEntityRegister({
+        closureEntity,
+        closure,
+        acceptance,
+        fixture,
+        walkthrough,
+        source
+      })
+    );
+    const operations = closure.operations.map((closureOperation) =>
+      buildOperationRegister({
+        closureOperation,
+        acceptance,
+        fixture,
+        walkthrough,
+        entityRegisters: entities,
+        source
+      })
+    );
+    const entries = sortEntries(entities.flatMap((entity) => entity.entries));
+    const severityCounts = countSeverities(entries);
+    const status = statusFromSeverityCounts(severityCounts);
+    const sourceFingerprints = source.sourceFingerprints;
+    const fingerprint = buildRegisterFingerprint({
+      sourceFingerprints,
+      status,
+      entities,
       operations
-        .filter((operation) => operation.status !== "ready")
-        .map((operation) => ({
-          severity: operation.status === "block" ? "block" : "watch"
-        }))
-    ),
-    closureStatusCounts: exceptionStatusCounts(entries),
-    acceptanceStatusCounts: acceptanceExceptionStatusCounts(entries),
-    walkthroughStatusCounts: walkthroughExceptionStatusCounts(entries),
-    warningCodes: uniqueStrings(
-      entries.flatMap((entry) => entry.remediation.warningCodes)
-    ),
-    sourceCodes: uniqueStrings(
-      entries.flatMap((entry) => entry.remediation.sourceCodes)
-    ),
-    entries,
-    entities,
-    operations,
-    sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_RELEASE_EXCEPTION_REGISTER_CONTENT_TYPE,
-      closure.contentType,
-      acceptance.contentType,
-      fixture.contentType,
-      walkthrough.contentType,
-      ...closure.sourceContentTypes,
-      ...acceptance.sourceContentTypes,
-      ...fixture.sourceContentTypes,
-      ...walkthrough.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    source,
-    read: combineReads([
-      closure.read,
-      acceptance.read,
-      fixture.read,
-      walkthrough.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    });
+
+    return {
+      contentType: CSV_RELEASE_EXCEPTION_REGISTER_CONTENT_TYPE,
+      registerVersion: 1,
+      status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      exceptionCount: entries.length,
+      watchExceptionCount: severityCounts.watch,
+      blockExceptionCount: severityCounts.block,
+      supportedExceptionCount: entries.filter((entry) => entry.supported)
+        .length,
+      unsupportedExceptionCount: entries.filter((entry) => !entry.supported)
+        .length,
+      missingFixtureExceptionCount: entries.filter(
+        (entry) => !entry.fixtureAvailable
+      ).length,
+      severityCounts,
+      entitySeverityCounts: countSeverities(
+        entities
+          .filter((entity) => entity.status !== "ready")
+          .map((entity) => ({
+            severity: entity.status === "block" ? "block" : "watch"
+          }))
+      ),
+      operationSeverityCounts: countSeverities(
+        operations
+          .filter((operation) => operation.status !== "ready")
+          .map((operation) => ({
+            severity: operation.status === "block" ? "block" : "watch"
+          }))
+      ),
+      closureStatusCounts: exceptionStatusCounts(entries),
+      acceptanceStatusCounts: acceptanceExceptionStatusCounts(entries),
+      walkthroughStatusCounts: walkthroughExceptionStatusCounts(entries),
+      warningCodes: uniqueStrings(
+        entries.flatMap((entry) => entry.remediation.warningCodes)
+      ),
+      sourceCodes: uniqueStrings(
+        entries.flatMap((entry) => entry.remediation.sourceCodes)
+      ),
+      entries,
+      entities,
+      operations,
+      sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_RELEASE_EXCEPTION_REGISTER_CONTENT_TYPE,
+        closure.contentType,
+        acceptance.contentType,
+        fixture.contentType,
+        walkthrough.contentType,
+        ...closure.sourceContentTypes,
+        ...acceptance.sourceContentTypes,
+        ...fixture.sourceContentTypes,
+        ...walkthrough.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      source,
+      read: combineReads([
+        closure.read,
+        acceptance.read,
+        fixture.read,
+        walkthrough.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvReleaseExceptionEntityRegisters(

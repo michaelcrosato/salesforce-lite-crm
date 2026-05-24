@@ -27,6 +27,7 @@ import {
   type CsvReleaseClosureStatus,
   type CsvReleaseClosureStatusCounts
 } from "@/lib/server/csvReleaseClosureScorecards";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_RELEASE_HANDOFF_CATALOG_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -62,6 +63,11 @@ export type CsvReleaseHandoffWriteFlags = {
   headerRemapping: false;
   salesforceSync: false;
 };
+
+const handoffCatalogCache = new Map<
+  string,
+  Promise<CsvReleaseHandoffCatalog>
+>();
 
 export type CsvReleaseHandoffSourceName =
   | "operator-walkthrough-manifest"
@@ -867,81 +873,83 @@ export function isCsvReleaseHandoffOperation(
 export async function getCsvReleaseHandoffCatalog(
   options: CsvReleaseHandoffCatalogOptions = {}
 ): Promise<CsvReleaseHandoffCatalog> {
-  const [walkthrough, closure] = await Promise.all([
-    getCsvOperatorWalkthroughManifest(options),
-    getCsvReleaseClosureScorecard(options)
-  ]);
-  const source = buildSource({ walkthrough, closure });
-  const entities = closure.entities.map((closureEntity) =>
-    buildEntityCatalog({
-      closureEntity,
-      closure,
-      walkthrough,
-      source
-    })
-  );
-  const operations = closure.operations.map((closureOperation) =>
-    buildOperationCatalog({
-      closureOperation,
-      entityCatalogs: entities,
-      walkthrough,
-      source
-    })
-  );
-  const allItems = entities.flatMap((entity) => entity.items);
-  const statusCounts = countStatuses(allItems);
-  const status = statusFromCounts(statusCounts);
-  const sourceFingerprints = source.sourceFingerprints;
-  const fingerprint = buildCatalogFingerprint({
-    sourceFingerprints,
-    status,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(handoffCatalogCache, options, async () => {
+    const [walkthrough, closure] = await Promise.all([
+      getCsvOperatorWalkthroughManifest(options),
+      getCsvReleaseClosureScorecard(options)
+    ]);
+    const source = buildSource({ walkthrough, closure });
+    const entities = closure.entities.map((closureEntity) =>
+      buildEntityCatalog({
+        closureEntity,
+        closure,
+        walkthrough,
+        source
+      })
+    );
+    const operations = closure.operations.map((closureOperation) =>
+      buildOperationCatalog({
+        closureOperation,
+        entityCatalogs: entities,
+        walkthrough,
+        source
+      })
+    );
+    const allItems = entities.flatMap((entity) => entity.items);
+    const statusCounts = countStatuses(allItems);
+    const status = statusFromCounts(statusCounts);
+    const sourceFingerprints = source.sourceFingerprints;
+    const fingerprint = buildCatalogFingerprint({
+      sourceFingerprints,
+      status,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_RELEASE_HANDOFF_CATALOG_CONTENT_TYPE,
-    catalogVersion: 1,
-    status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    catalogItemCount: allItems.length,
-    supportedItemCount: allItems.filter((item) => item.supported).length,
-    unsupportedItemCount: allItems.filter((item) => !item.supported).length,
-    fixtureItemCount: allItems.filter((item) => item.fixtureAvailable).length,
-    statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    walkthroughStatusCounts: countWalkthroughStatuses(
-      walkthrough.entities.flatMap((entity) => entity.items)
-    ),
-    closureStatusCounts: closure.statusCounts,
-    walkthroughStepStatusCounts: combineStatusCounts(
-      allItems.map((item) => item.walkthrough.stepStatusCounts)
-    ),
-    closureCheckStatusCounts: closure.checkStatusCounts,
-    sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_RELEASE_HANDOFF_CATALOG_CONTENT_TYPE,
-      walkthrough.contentType,
-      closure.contentType,
-      ...walkthrough.sourceContentTypes,
-      ...closure.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    entities,
-    operations,
-    source,
-    read: combineReads([
-      walkthrough.read,
-      closure.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_RELEASE_HANDOFF_CATALOG_CONTENT_TYPE,
+      catalogVersion: 1,
+      status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      catalogItemCount: allItems.length,
+      supportedItemCount: allItems.filter((item) => item.supported).length,
+      unsupportedItemCount: allItems.filter((item) => !item.supported).length,
+      fixtureItemCount: allItems.filter((item) => item.fixtureAvailable).length,
+      statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      walkthroughStatusCounts: countWalkthroughStatuses(
+        walkthrough.entities.flatMap((entity) => entity.items)
+      ),
+      closureStatusCounts: closure.statusCounts,
+      walkthroughStepStatusCounts: combineStatusCounts(
+        allItems.map((item) => item.walkthrough.stepStatusCounts)
+      ),
+      closureCheckStatusCounts: closure.checkStatusCounts,
+      sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_RELEASE_HANDOFF_CATALOG_CONTENT_TYPE,
+        walkthrough.contentType,
+        closure.contentType,
+        ...walkthrough.sourceContentTypes,
+        ...closure.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      entities,
+      operations,
+      source,
+      read: combineReads([
+        walkthrough.read,
+        closure.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvReleaseHandoffEntityCatalogs(

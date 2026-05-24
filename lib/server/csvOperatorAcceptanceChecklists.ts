@@ -50,6 +50,7 @@ import {
   type CsvReleaseVerificationReadFlags,
   type CsvReleaseVerificationWriteFlags
 } from "@/lib/server/csvReleaseVerificationManifests";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_OPERATOR_ACCEPTANCE_CHECKLIST_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -65,6 +66,11 @@ export type CsvOperatorAcceptanceChecklistReadFlags =
   CsvReleaseVerificationReadFlags;
 export type CsvOperatorAcceptanceChecklistWriteFlags =
   CsvReleaseVerificationWriteFlags;
+
+const acceptanceChecklistCache = new Map<
+  string,
+  Promise<CsvOperatorAcceptanceChecklist>
+>();
 
 export type CsvOperatorAcceptanceChecklistStatusCounts = {
   pass: number;
@@ -955,87 +961,96 @@ export function isCsvOperatorAcceptanceChecklistOperation(
 export async function getCsvOperatorAcceptanceChecklist(
   options: CsvOperatorAcceptanceChecklistOptions = {}
 ): Promise<CsvOperatorAcceptanceChecklist> {
-  const [fixture, manifest] = await Promise.all([
-    getCsvOperatorFixtureBundle(options),
-    Promise.resolve(getCsvReleaseVerificationManifest())
-  ]);
-  const remediation = getCsvOperatorRemediationRunbooks();
-  const qa = getCsvContractQaChecks();
-  const source = buildSource({ manifest, fixture });
-  const entities = manifest.coverage.entities.map((entity) =>
-    buildEntityChecklist({
-      entity,
-      fixture,
-      remediationEntities: remediation.entries,
-      qaEntities: qa.entries,
-      source
-    })
-  );
-  const operations = fixture.operations.map((operation) =>
-    buildOperationChecklist({
-      operation,
-      entityChecklists: entities,
-      source
-    })
-  );
-  const allItems = entities.flatMap((entity) => entity.items);
-  const statusCounts = countStatuses(allItems);
-  const status = statusFromCounts(statusCounts);
-  const sourceContentTypes = uniqueStrings([
-    CSV_OPERATOR_ACCEPTANCE_CHECKLIST_CONTENT_TYPE,
-    manifest.contentType,
-    fixture.contentType,
-    remediation.contentType,
-    qa.contentType,
-    remediation.source.operatorReadinessContentType,
-    qa.source.fieldCoverageContentType,
-    qa.source.handoffIndexContentType,
-    ...manifest.sourceContentTypes,
-    ...fixture.sourceContentTypes,
-    ...allItems.flatMap((item) => item.sourceContentTypes)
-  ]);
-  const fingerprint = buildChecklistFingerprint({
-    source,
-    status,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(acceptanceChecklistCache, options, async () => {
+    const [fixture, manifest] = await Promise.all([
+      getCsvOperatorFixtureBundle(options),
+      Promise.resolve(getCsvReleaseVerificationManifest())
+    ]);
+    const remediation = getCsvOperatorRemediationRunbooks();
+    const qa = getCsvContractQaChecks();
+    const source = buildSource({ manifest, fixture });
+    const entities = manifest.coverage.entities.map((entity) =>
+      buildEntityChecklist({
+        entity,
+        fixture,
+        remediationEntities: remediation.entries,
+        qaEntities: qa.entries,
+        source
+      })
+    );
+    const operations = fixture.operations.map((operation) =>
+      buildOperationChecklist({
+        operation,
+        entityChecklists: entities,
+        source
+      })
+    );
+    const allItems = entities.flatMap((entity) => entity.items);
+    const statusCounts = countStatuses(allItems);
+    const status = statusFromCounts(statusCounts);
+    const sourceContentTypes = uniqueStrings([
+      CSV_OPERATOR_ACCEPTANCE_CHECKLIST_CONTENT_TYPE,
+      manifest.contentType,
+      fixture.contentType,
+      remediation.contentType,
+      qa.contentType,
+      remediation.source.operatorReadinessContentType,
+      qa.source.fieldCoverageContentType,
+      qa.source.handoffIndexContentType,
+      ...manifest.sourceContentTypes,
+      ...fixture.sourceContentTypes,
+      ...allItems.flatMap((item) => item.sourceContentTypes)
+    ]);
+    const fingerprint = buildChecklistFingerprint({
+      source,
+      status,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_OPERATOR_ACCEPTANCE_CHECKLIST_CONTENT_TYPE,
-    checklistVersion: 1,
-    status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    checklistItemCount: allItems.length,
-    supportedItemCount: allItems.filter((item) => item.supported).length,
-    unsupportedItemCount: allItems.filter((item) => !item.supported).length,
-    fixtureItemCount: allItems.filter((item) => item.fixture.available).length,
-    issueCount: allItems.reduce((current, item) => current + item.issueCount, 0),
-    remediationCount: allItems.reduce(
-      (current, item) => current + item.remediationCount,
-      0
-    ),
-    statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    warningCodes: uniqueWarnings(allItems.flatMap((item) => item.warningCodes)),
-    sourceCodes: uniqueSourceCodes(allItems.flatMap((item) => item.sourceCodes)),
-    sourceFingerprintRollup: manifest.sourceFingerprintRollup,
-    sourceContentTypes,
-    entities,
-    operations,
-    source,
-    read: combineReads([
-      manifest.read,
-      fixture.read,
-      remediation.read,
-      qa.read,
-      ...allItems.map((item) => item.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_OPERATOR_ACCEPTANCE_CHECKLIST_CONTENT_TYPE,
+      checklistVersion: 1,
+      status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      checklistItemCount: allItems.length,
+      supportedItemCount: allItems.filter((item) => item.supported).length,
+      unsupportedItemCount: allItems.filter((item) => !item.supported).length,
+      fixtureItemCount: allItems.filter((item) => item.fixture.available).length,
+      issueCount: allItems.reduce(
+        (current, item) => current + item.issueCount,
+        0
+      ),
+      remediationCount: allItems.reduce(
+        (current, item) => current + item.remediationCount,
+        0
+      ),
+      statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      warningCodes: uniqueWarnings(
+        allItems.flatMap((item) => item.warningCodes)
+      ),
+      sourceCodes: uniqueSourceCodes(
+        allItems.flatMap((item) => item.sourceCodes)
+      ),
+      sourceFingerprintRollup: manifest.sourceFingerprintRollup,
+      sourceContentTypes,
+      entities,
+      operations,
+      source,
+      read: combineReads([
+        manifest.read,
+        fixture.read,
+        remediation.read,
+        qa.read,
+        ...allItems.map((item) => item.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvOperatorAcceptanceEntityChecklists(

@@ -28,6 +28,7 @@ import {
   type CsvReleaseHandoffReadFlags,
   type CsvReleaseHandoffStatus
 } from "@/lib/server/csvReleaseHandoffCatalog";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_RELEASE_DISPOSITION_MANIFEST_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -37,6 +38,11 @@ export type CsvReleaseDispositionManifestOptions =
 export type CsvReleaseDispositionEntity = CsvReleaseHandoffEntity;
 export type CsvReleaseDispositionOperation = CsvReleaseHandoffOperation;
 export type CsvReleaseDispositionStatus = CsvReleaseHandoffStatus;
+
+const dispositionManifestCache = new Map<
+  string,
+  Promise<CsvReleaseDispositionManifest>
+>();
 
 export type CsvReleaseDispositionStatusCounts = {
   ready: number;
@@ -910,85 +916,87 @@ export function isCsvReleaseDispositionOperation(
 export async function getCsvReleaseDispositionManifest(
   options: CsvReleaseDispositionManifestOptions = {}
 ): Promise<CsvReleaseDispositionManifest> {
-  const [handoff, exception] = await Promise.all([
-    getCsvReleaseHandoffCatalog(options),
-    getCsvReleaseExceptionRegister(options)
-  ]);
-  const source = buildSource({ handoff, exception });
-  const entities = handoff.entities.map((handoffEntity) =>
-    buildEntityManifest({
-      handoffEntity,
-      exceptionEntity: findExceptionEntity(exception, handoffEntity.entity),
-      source
-    })
-  );
-  const operations = handoff.operations.map((handoffOperation) =>
-    buildOperationManifest({
-      handoffOperation,
-      exceptionOperation: findExceptionOperation(
-        exception,
-        handoffOperation.operation
-      ),
-      entityManifests: entities,
-      source
-    })
-  );
-  const dispositions = entities.flatMap((entity) => entity.dispositions);
-  const rollup = dispositionRollup(dispositions);
-  const sourceFingerprints = source.sourceFingerprints;
-  const fingerprint = buildManifestFingerprint({
-    sourceFingerprints,
-    status: rollup.status,
-    entities,
-    operations
-  });
+  return getInFlightCsvPacket(dispositionManifestCache, options, async () => {
+    const [handoff, exception] = await Promise.all([
+      getCsvReleaseHandoffCatalog(options),
+      getCsvReleaseExceptionRegister(options)
+    ]);
+    const source = buildSource({ handoff, exception });
+    const entities = handoff.entities.map((handoffEntity) =>
+      buildEntityManifest({
+        handoffEntity,
+        exceptionEntity: findExceptionEntity(exception, handoffEntity.entity),
+        source
+      })
+    );
+    const operations = handoff.operations.map((handoffOperation) =>
+      buildOperationManifest({
+        handoffOperation,
+        exceptionOperation: findExceptionOperation(
+          exception,
+          handoffOperation.operation
+        ),
+        entityManifests: entities,
+        source
+      })
+    );
+    const dispositions = entities.flatMap((entity) => entity.dispositions);
+    const rollup = dispositionRollup(dispositions);
+    const sourceFingerprints = source.sourceFingerprints;
+    const fingerprint = buildManifestFingerprint({
+      sourceFingerprints,
+      status: rollup.status,
+      entities,
+      operations
+    });
 
-  return {
-    contentType: CSV_RELEASE_DISPOSITION_MANIFEST_CONTENT_TYPE,
-    manifestVersion: 1,
-    status: rollup.status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    dispositionCount: dispositions.length,
-    readyDispositionCount: rollup.readyDispositionCount,
-    watchDispositionCount: rollup.watchDispositionCount,
-    blockDispositionCount: rollup.blockDispositionCount,
-    exceptionCount: exception.exceptionCount,
-    watchExceptionCount: exception.watchExceptionCount,
-    blockExceptionCount: exception.blockExceptionCount,
-    supportedDispositionCount: rollup.supportedDispositionCount,
-    unsupportedDispositionCount: rollup.unsupportedDispositionCount,
-    missingFixtureDispositionCount: rollup.missingFixtureDispositionCount,
-    statusCounts: rollup.statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    handoffStatusCounts: handoff.statusCounts,
-    exceptionSeverityCounts: rollup.exceptionSeverityCounts,
-    warningCodes: exception.warningCodes,
-    sourceCodes: exception.sourceCodes,
-    dispositions,
-    entities,
-    operations,
-    sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_RELEASE_DISPOSITION_MANIFEST_CONTENT_TYPE,
-      handoff.contentType,
-      exception.contentType,
-      ...handoff.sourceContentTypes,
-      ...exception.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    source,
-    read: combineReads([
-      handoff.read,
-      exception.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_RELEASE_DISPOSITION_MANIFEST_CONTENT_TYPE,
+      manifestVersion: 1,
+      status: rollup.status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      dispositionCount: dispositions.length,
+      readyDispositionCount: rollup.readyDispositionCount,
+      watchDispositionCount: rollup.watchDispositionCount,
+      blockDispositionCount: rollup.blockDispositionCount,
+      exceptionCount: exception.exceptionCount,
+      watchExceptionCount: exception.watchExceptionCount,
+      blockExceptionCount: exception.blockExceptionCount,
+      supportedDispositionCount: rollup.supportedDispositionCount,
+      unsupportedDispositionCount: rollup.unsupportedDispositionCount,
+      missingFixtureDispositionCount: rollup.missingFixtureDispositionCount,
+      statusCounts: rollup.statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      handoffStatusCounts: handoff.statusCounts,
+      exceptionSeverityCounts: rollup.exceptionSeverityCounts,
+      warningCodes: exception.warningCodes,
+      sourceCodes: exception.sourceCodes,
+      dispositions,
+      entities,
+      operations,
+      sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_RELEASE_DISPOSITION_MANIFEST_CONTENT_TYPE,
+        handoff.contentType,
+        exception.contentType,
+        ...handoff.sourceContentTypes,
+        ...exception.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      source,
+      read: combineReads([
+        handoff.read,
+        exception.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvReleaseDispositionEntityManifests(

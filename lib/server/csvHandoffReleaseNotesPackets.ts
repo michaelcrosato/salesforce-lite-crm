@@ -35,6 +35,7 @@ import {
   type CsvReleaseVerificationReadFlags,
   type CsvReleaseVerificationWriteFlags
 } from "@/lib/server/csvReleaseVerificationManifests";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_HANDOFF_RELEASE_NOTES_PACKET_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -52,6 +53,11 @@ export type CsvHandoffReleaseNotesReadFlags =
   CsvReleaseVerificationReadFlags;
 export type CsvHandoffReleaseNotesWriteFlags =
   CsvReleaseVerificationWriteFlags;
+
+const releaseNotesPacketCache = new Map<
+  string,
+  Promise<CsvHandoffReleaseNotesPacket>
+>();
 
 export type CsvHandoffReleaseNotesSource = {
   releaseVerificationContentType:
@@ -547,70 +553,73 @@ export function isCsvHandoffReleaseNotesOperation(
 export async function getCsvHandoffReleaseNotesPacket(
   options: CsvHandoffReleaseNotesOptions = {}
 ): Promise<CsvHandoffReleaseNotesPacket> {
-  const [manifest, digest, fixture] = await Promise.all([
-    Promise.resolve(getCsvReleaseVerificationManifest()),
-    Promise.resolve(getCsvContractReleaseDigest()),
-    getCsvOperatorFixtureBundle(options)
-  ]);
-  const source = buildSource({ manifest, digest, fixture });
-  const entities = manifest.coverage.entities.map((entity) =>
-    buildEntityPacket({
-      entity,
-      fixture,
-      source
-    })
-  );
-  const operations = manifest.coverage.operations.map((operation) =>
-    buildOperationPacket({
-      operation,
-      fixtureOperation: findFixtureOperation(fixture, operation.operation),
-      source
-    })
-  );
-  const fixtureRollup = buildFixtureRollup(fixture);
-  const fingerprint = buildPacketFingerprint({
-    source,
-    status: manifest.status,
-    supportedEntityOperationCount: manifest.supportedEntityOperationCount,
-    unsupportedEntityOperationCount: manifest.unsupportedEntityOperationCount,
-    fixtureRollup,
-    entities,
-    operations
-  });
-  const sourceContentTypes = uniqueStrings([
-    CSV_HANDOFF_RELEASE_NOTES_PACKET_CONTENT_TYPE,
-    manifest.contentType,
-    digest.contentType,
-    fixture.contentType,
-    ...manifest.sourceContentTypes,
-    ...fixture.sourceContentTypes
-  ]);
+  return getInFlightCsvPacket(releaseNotesPacketCache, options, async () => {
+    const [manifest, digest, fixture] = await Promise.all([
+      Promise.resolve(getCsvReleaseVerificationManifest()),
+      Promise.resolve(getCsvContractReleaseDigest()),
+      getCsvOperatorFixtureBundle(options)
+    ]);
+    const source = buildSource({ manifest, digest, fixture });
+    const entities = manifest.coverage.entities.map((entity) =>
+      buildEntityPacket({
+        entity,
+        fixture,
+        source
+      })
+    );
+    const operations = manifest.coverage.operations.map((operation) =>
+      buildOperationPacket({
+        operation,
+        fixtureOperation: findFixtureOperation(fixture, operation.operation),
+        source
+      })
+    );
+    const fixtureRollup = buildFixtureRollup(fixture);
+    const fingerprint = buildPacketFingerprint({
+      source,
+      status: manifest.status,
+      supportedEntityOperationCount: manifest.supportedEntityOperationCount,
+      unsupportedEntityOperationCount: manifest.unsupportedEntityOperationCount,
+      fixtureRollup,
+      entities,
+      operations
+    });
+    const sourceContentTypes = uniqueStrings([
+      CSV_HANDOFF_RELEASE_NOTES_PACKET_CONTENT_TYPE,
+      manifest.contentType,
+      digest.contentType,
+      fixture.contentType,
+      ...manifest.sourceContentTypes,
+      ...fixture.sourceContentTypes
+    ]);
 
-  return {
-    contentType: CSV_HANDOFF_RELEASE_NOTES_PACKET_CONTENT_TYPE,
-    packetVersion: 1,
-    status: manifest.status,
-    fingerprint,
-    releaseNote: digest.releaseNote,
-    entityCount: manifest.entityCount,
-    operationCount: manifest.operationCount,
-    capabilityCount: manifest.capabilityCount,
-    supportedEntityOperationCount: manifest.supportedEntityOperationCount,
-    unsupportedEntityOperationCount: manifest.unsupportedEntityOperationCount,
-    statusCounts: manifest.statusCounts,
-    operationStatusCounts: manifest.operationStatusCounts,
-    entityOperationStatusCounts: manifest.entityOperationStatusCounts,
-    sourceFingerprintRollup: manifest.sourceFingerprintRollup,
-    warningCodeRollup: manifest.warningCodeRollup,
-    sourceCodeRollup: manifest.sourceCodeRollup,
-    fixtureRollup,
-    entities,
-    operations,
-    sourceContentTypes,
-    source,
-    read: combineReads([manifest.read, digest.read, fixture.read]),
-    write: noWrites()
-  };
+    return {
+      contentType: CSV_HANDOFF_RELEASE_NOTES_PACKET_CONTENT_TYPE,
+      packetVersion: 1,
+      status: manifest.status,
+      fingerprint,
+      releaseNote: digest.releaseNote,
+      entityCount: manifest.entityCount,
+      operationCount: manifest.operationCount,
+      capabilityCount: manifest.capabilityCount,
+      supportedEntityOperationCount: manifest.supportedEntityOperationCount,
+      unsupportedEntityOperationCount:
+        manifest.unsupportedEntityOperationCount,
+      statusCounts: manifest.statusCounts,
+      operationStatusCounts: manifest.operationStatusCounts,
+      entityOperationStatusCounts: manifest.entityOperationStatusCounts,
+      sourceFingerprintRollup: manifest.sourceFingerprintRollup,
+      warningCodeRollup: manifest.warningCodeRollup,
+      sourceCodeRollup: manifest.sourceCodeRollup,
+      fixtureRollup,
+      entities,
+      operations,
+      sourceContentTypes,
+      source,
+      read: combineReads([manifest.read, digest.read, fixture.read]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvHandoffReleaseNotesEntityPackets(
