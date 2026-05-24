@@ -2,36 +2,37 @@ Agent: Codex
 
 Sprint: 30
 
-Feature: S30-F1 - Selected export action packets
+Feature: S30-F2 - Bulk action execution foundation
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- ccb17ef - [codex] S30-F1: add selected export packets
+- db7b8bc - [codex] S30-F2: add bulk action executor
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0. Unit tests passed 67 files / 362 tests; Playwright e2e passed 20 tests.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0. Unit tests passed 68 files / 369 tests; Playwright e2e passed 20 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T01:04:58.7159338-07:00
+Timestamp: 2026-05-24T02:42:49.5656686-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added server-side selected export CSV helpers that reuse existing CSV export definitions and preserve unique selected-ID order.
-- Added `bulkActionSelectedExportPackets` to wrap the existing bulk selected-export dry-run, emit CSV only for eligible selected records, and expose no-write packet/audit metadata.
-- Added Vitest coverage for packet definitions, duplicate/missing selected IDs, stable CSV ordering, strict key rejection, and no database/audit/task writes.
-- Discovered this prompt: `SUMMARY.gemini.md` references Sprint 5 S5-F1 "E2E Visual Snapshot Baseline", which does not match PLAN.md §4's Sprint 5 S5-F1 "Server CSV export contracts"; PLAN.md/main/local gate remain authoritative.
+- Added `executeBulkAction` server helpers for bounded local execution of eligible dry-run status updates, opportunity stage updates, owner assignments, and task creation.
+- Added executor definitions, per-record execution results, rollups for executed/skipped/blocked/failed records, write-safety flags, and executor-specific audit events.
+- Preserved current non-goals by excluding `selected_export`, activities, areas, and dealer-order writes from the executable action surface.
+- Added Vitest coverage for definitions, status execution, stage-history mutation reuse, owner assignment, task creation, unsupported dealer-order execution, strict key rejection, and audit metadata.
+- Discovered this prompt: PLAN.md §4 still lists S30-F1 and S30-F2 as `queued` even though both now have implementation commits and green gate evidence; current local gate and commit history remain authoritative for this iteration.
 
 ### Next action
 
-Run LOOP.md to begin S30-F2 - Bulk action execution foundation.
+Run LOOP.md to begin S30-F3 - Bulk action execution operator UI.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation touched server and tests for one coherent S30-F1 slice)
+No cross-ownership edits: YES (single-agent root mode; implementation touched server and tests for one coherent S30-F2 slice)
 
 CRM-CONTRACT.md honored: YES
