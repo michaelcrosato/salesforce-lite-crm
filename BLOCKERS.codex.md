@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: gate / Sprint 31
+Sprint: Sprint 31
 
-Feature: Fix red Playwright e2e local gate
+Feature: S31-F2 - List-page selected export actions
 
 Branch: main
 
-Timestamp: 2026-05-24T06:26:36.5465005-07:00
+Timestamp: 2026-05-24T07:00:09.9201817-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Resolved baseline gate failure: `scripts/local-gate.ps1` initially failed at `npm run test:e2e` exit 1 with Playwright connection-refused cascades after concurrent workers started; `playwright.config.ts` now sets `workers: 1`, and final `scripts/local-gate.ps1` exited 0.
+- No active Codex blockers were open at the start of this prompt.
