@@ -23,6 +23,23 @@ model User {
   auditEvents AuditEvent[]
 }
 
+model SavedListView {
+  id          String   @id @default(cuid()) @db.Text
+  entity      String   @db.VarChar(80)
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  filters     String   @default("{}") @db.Text
+  sortBy      String   @db.VarChar(80)
+  sortOrder   String   @default("asc") @db.VarChar(10)
+  pageSize    Int?     @db.Integer
+  createdAt   DateTime @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime @updatedAt @db.Timestamp(3)
+
+  @@unique([entity, name])
+  @@index([entity])
+  @@index([updatedAt])
+}
+
 model Account {
   id          String     @id @default(cuid()) @db.Text
   name        String     @db.VarChar(255)
