@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.35A |
+| Version | 2.36A |
 
 | Last updated | 2026-05-23 |
 
-| Active sprint | Sprint 29 S29-F1/S29-F2/S29-F3 queued |
+| Active sprint | Sprint 30 S30-F1/S30-F2/S30-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1081,9 +1081,9 @@ Goal: turn the completed productivity handoff surfaces into bounded local operat
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S29-F1 — Audit event explorer | Codex | queued | Add a read-only `/reports` surface over existing audit events with entity/action/source filters, recent-event rows, counts, and record links where available. It must reuse the current audit model and avoid request logging, external telemetry, background processing, auth permissions, or audit backfills. |
-| S29-F2 — Saved list views foundation | Codex | queued | Add a local saved-view model and server helpers for supported CRM list pages, preserving current list behavior when no saved view is selected and documenting the contract/schema change. It must support existing filters and sorts without natural-language filters, sharing, tenant scoping, or report-builder scope. |
-| S29-F3 — Saved list views operator UI | Codex | queued | Add save/apply/update/delete controls for saved views on supported CRM list pages using existing filters and sorts, with deterministic feedback and tests. It depends on S29-F2 and must avoid column layout builders, cross-user sharing, permissions, saved-view import/export, or search changes. |
+| S29-F1 — Audit event explorer | Codex | done | Add a read-only `/reports` surface over existing audit events with entity/action/source filters, recent-event rows, counts, and record links where available. It must reuse the current audit model and avoid request logging, external telemetry, background processing, auth permissions, or audit backfills. |
+| S29-F2 — Saved list views foundation | Codex | done | Add a local saved-view model and server helpers for supported CRM list pages, preserving current list behavior when no saved view is selected and documenting the contract/schema change. It must support existing filters and sorts without natural-language filters, sharing, tenant scoping, or report-builder scope. |
+| S29-F3 — Saved list views operator UI | Codex | done | Add save/apply/update/delete controls for saved views on supported CRM list pages using existing filters and sorts, with deterministic feedback and tests. It depends on S29-F2 and must avoid column layout builders, cross-user sharing, permissions, saved-view import/export, or search changes. |
 
 \*\*Sprint 29 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1114,6 +1114,45 @@ Goal: turn the completed productivity handoff surfaces into bounded local operat
 \- No new product routes; S29 surfaces stay on existing `/reports` and supported CRM list routes.
 
 \- No bulk mutation execution, approval workflow, CSV import apply flow, CSV bulk create/update, duplicate merge, routing execution, file storage, or Salesforce integration.
+
+
+\*\*Sprint 30 — Bulk Action Execution\*\*
+
+Goal: promote the existing dry-run bulk action surface into bounded local execution workflows with auditability and explicit operator confirmation.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S30-F1 — Selected export action packets | codex | queued | Generate deterministic selected-record export packets from the existing bulk selected-export dry-run path and CSV export definitions, with bounded IDs, stable ordering, and no database writes. It must preserve current export contracts and avoid new routes, file storage, background jobs, Salesforce integration, or import apply behavior. |
+| S30-F2 — Bulk action execution foundation | codex | queued | Add a bounded server-side executor for eligible dry-run records covering status update, stage update, owner assignment, and task creation, with per-record results, skipped/blocked counts, and audit events. It must reuse existing validation and mutation services while avoiding approvals, async jobs, routing execution, duplicate merge, CSV import writes, or auth/permission scope. |
+| S30-F3 — Bulk action execution operator UI | codex | queued | Extend the existing `/reports` bulk dry-run operator with explicit confirmation, execution feedback, and tests while preserving dry-run-first behavior. It depends on S30-F2 and must avoid new product routes, list-page selection builders, approval workflows, background processing, saved-view changes, or search changes. |
+
+\*\*Sprint 30 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No approval workflow, pending approvals queue, scheduled sweep, async/background job, request-log pipeline, or external telemetry sink.
+
+\- No CSV import apply flow, CSV bulk create/update from imported rows, duplicate merge, file storage, Salesforce integration, or external CRM sync.
+
+\- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or SLA timers.
+
+\- No new product routes, list-page selection builder, report builder, dashboard builder, saved-view changes, natural-language filters, or command-palette expansion.
 
 
 \## 5. File Ownership Matrix
