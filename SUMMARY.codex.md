@@ -1,30 +1,30 @@
 Agent: Codex
 
-Sprint: 31
+Sprint: gate / Sprint 31
 
-Feature: S31-F1 - Bulk list selection contracts
+Feature: Fix red Playwright e2e local gate
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 6e24c21 - [codex] S31-F1: add bulk list selection contracts
+- f765864 - [codex] gate: stabilize e2e local gate
 
-Gate status: PASS - baseline `scripts/local-gate.ps1` exited 0 before selection; focused Vitest, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and final `scripts/local-gate.ps1` all exited 0. Final unit run passed 69 files / 373 tests and e2e passed 20 tests.
+Gate status: PASS - baseline `scripts/local-gate.ps1` failed at `npm run test:e2e` before selection; diagnostic `npm run test:e2e -- --workers=1` exited 0; post-change `npm run test:e2e` exited 0; final `scripts/local-gate.ps1` exited 0 with 69 Vitest files / 373 tests and 20 Playwright tests passing.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T05:37:45.2095863-07:00
+Timestamp: 2026-05-24T06:26:36.5465005-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed single-agent root topology on `main` with a clean baseline and green full local gate.
-- Added server-side bulk list selection contracts for current CRM list entities, including visible-row `recordIds` semantics, list-state preservation metadata, and downstream dry-run, selected-export, and execution support.
-- Added API tests for deterministic contract metadata, supported execution action discovery, strict input rejection, and no-write catalog construction.
-- Verified S31-F1 with focused Vitest, lint, typecheck, full unit suite, build, and full local gate/e2e.
+- Reconciled the root worktree as single-agent full-repo mode on `main`; PLAN §4 still lists S31-F1/S31-F2/S31-F3 as queued while `SUMMARY.codex.md` from the prior prompt recorded S31-F1 as done.
+- Treated the red repo-local gate as the selected work unit because `scripts/local-gate.ps1` failed at `npm run test:e2e` on baseline.
+- Stabilized Playwright by configuring one e2e worker, matching the diagnostic run that eliminated the connection-refused cascade and preserved existing visual snapshots.
+- Verified the package e2e script and the full local gate are green after the change.
 
 ### Next action
 
@@ -32,6 +32,6 @@ Run LOOP.md to begin S31-F2 - List-page selected export actions.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation touched `lib/server/` and `tests/api/`, plus Codex report files)
+No cross-ownership edits: YES (single-agent root mode; implementation touched `playwright.config.ts` plus Codex report files)
 
 CRM-CONTRACT.md honored: YES
