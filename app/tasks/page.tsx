@@ -4,6 +4,10 @@ import { TasksView } from "@/components/tasks/tasks-view";
 import { type TaskOptionItem } from "@/components/tasks/task-form";
 import { type DrawerTask } from "@/components/tasks/task-detail-drawer";
 import { type TaskLinkedRecord, type TaskRow } from "@/components/tasks/tasks-table";
+import {
+  SavedListViewControls,
+  savedListViewStatus
+} from "@/components/saved-list-view-controls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,7 +29,19 @@ import {
   type TaskStatus
 } from "@/lib/crm/registry";
 import type { TaskListOptions } from "@/lib/crm/crmClient";
-import { dateQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
+import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
+import {
+  buildSavedListViewQuery,
+  listSavedListViews,
+  type SavedListViewListQuery,
+  type SavedListViewResolvedQuery
+} from "@/lib/services/savedListViews";
+import type { SortOrder } from "@/lib/services/listQuery";
+import {
+  boundedNumberQueryParam,
+  dateQueryParam,
+  nonEmptyQueryParam
+} from "@/lib/queryParams";
 
 export const dynamic = "force-dynamic";
 
@@ -46,13 +62,97 @@ type TasksSearchParams = {
   ownerId?: string;
   dueFrom?: string;
   dueTo?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  pageSize?: string;
+  view?: string;
+  savedViewStatus?: string;
 };
+
+const TASK_SORT_KEYS = [
+  "dueDate",
+  "createdAt",
+  "updatedAt",
+  "status",
+  "priority"
+] as const;
+
+type TaskSortBy = (typeof TASK_SORT_KEYS)[number];
+const DEFAULT_TASK_SORT_BY: TaskSortBy = "dueDate";
 
 function isTaskStatus(value: string | undefined): value is TaskStatus {
   if (!value) {
     return false;
   }
   return (TASK_STATUSES as readonly string[]).includes(value);
+}
+
+function isTaskSortBy(value: string | undefined): value is TaskSortBy {
+  if (!value) {
+    return false;
+  }
+  return (TASK_SORT_KEYS as readonly string[]).includes(value);
+}
+
+function sortOrderParam(value: string | undefined): SortOrder | undefined {
+  return value === "asc" || value === "desc" ? value : undefined;
+}
+
+function stringFilter(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : undefined;
+}
+
+function dateFilterValue(value: unknown): string | undefined {
+  const text = stringFilter(value);
+
+  if (!text) {
+    return undefined;
+  }
+
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime())
+    ? undefined
+    : parsed.toISOString().slice(0, 10);
+}
+
+async function resolveTaskSavedViewQuery(
+  savedViewId: string | undefined,
+  query: SavedListViewListQuery
+): Promise<{ resolved: SavedListViewResolvedQuery; invalidView: boolean }> {
+  if (!savedViewId) {
+    return {
+      invalidView: false,
+      resolved: {
+        entity: "tasks",
+        selectedView: null,
+        source: "current-query",
+        query
+      }
+    };
+  }
+
+  try {
+    return {
+      invalidView: false,
+      resolved: await buildSavedListViewQuery({
+        entity: "tasks",
+        savedViewId,
+        query
+      })
+    };
+  } catch {
+    return {
+      invalidView: true,
+      resolved: {
+        entity: "tasks",
+        selectedView: null,
+        source: "current-query",
+        query
+      }
+    };
+  }
 }
 
 function toTaskOption(items: Array<{ id: string; label: string }>): TaskOptionItem[] {
@@ -65,13 +165,46 @@ export default async function TasksPage({
   searchParams: Promise<TasksSearchParams>;
 }) {
   const params = await searchParams;
-  const statusFilter = isTaskStatus(params.status) ? params.status : undefined;
-  const ownerFilter = nonEmptyQueryParam(params.ownerId);
-  const dueDateFrom = dateQueryParam(params.dueFrom);
-  const dueDateTo = dateQueryParam(params.dueTo);
+  const taskCatalog = getListFilterSupportEntityCatalog("tasks");
+
+  if (!taskCatalog) {
+    throw new Error("Task saved view support catalog is missing.");
+  }
+
+  const currentQuery: SavedListViewListQuery = {
+    pageSize: boundedNumberQueryParam(params.pageSize, { min: 1, max: 100 }) ?? 100,
+    sortBy: isTaskSortBy(params.sortBy) ? params.sortBy : DEFAULT_TASK_SORT_BY,
+    sortOrder: sortOrderParam(params.sortOrder) ?? taskCatalog.defaultSortOrder,
+    filters: {
+      status: isTaskStatus(params.status) ? params.status : undefined,
+      ownerId: nonEmptyQueryParam(params.ownerId),
+      dueDateFrom: dateQueryParam(params.dueFrom),
+      dueDateTo: dateQueryParam(params.dueTo)
+    }
+  };
+  const [savedViews, savedViewState] = await Promise.all([
+    listSavedListViews({ entity: "tasks" }),
+    resolveTaskSavedViewQuery(nonEmptyQueryParam(params.view), currentQuery)
+  ]);
+  const effectiveFilters = savedViewState.resolved.query.filters ?? {};
+  const effectiveStatus = stringFilter(effectiveFilters.status);
+  const statusFilter = isTaskStatus(effectiveStatus)
+    ? effectiveStatus
+    : undefined;
+  const ownerFilter = stringFilter(effectiveFilters.ownerId);
+  const dueDateFrom = dateFilterValue(effectiveFilters.dueDateFrom);
+  const dueDateTo = dateFilterValue(effectiveFilters.dueDateTo);
+  const sortBy = isTaskSortBy(savedViewState.resolved.query.sortBy)
+    ? savedViewState.resolved.query.sortBy
+    : DEFAULT_TASK_SORT_BY;
+  const sortOrder =
+    savedViewState.resolved.query.sortOrder ?? taskCatalog.defaultSortOrder;
+  const pageSize = savedViewState.resolved.query.pageSize ?? 100;
 
   const listOptions: TaskListOptions = {
-    pageSize: 100,
+    pageSize,
+    sortBy,
+    sortOrder,
     filters: {
       status: statusFilter,
       ownerId: ownerFilter,
@@ -215,7 +348,7 @@ export default async function TasksPage({
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action="/tasks" className="grid gap-4 md:grid-cols-4">
+          <form action="/tasks" className="grid gap-4 lg:grid-cols-6">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select id="status" name="status" defaultValue={statusFilter ?? ""}>
@@ -246,13 +379,54 @@ export default async function TasksPage({
               <Label htmlFor="dueTo">Due to</Label>
               <Input id="dueTo" name="dueTo" type="date" defaultValue={dueDateTo ?? ""} />
             </div>
-            <div className="flex items-end gap-3 md:col-span-4">
+            <div className="space-y-2">
+              <Label htmlFor="sortBy">Sort by</Label>
+              <Select id="sortBy" name="sortBy" defaultValue={sortBy}>
+                {taskCatalog.sortKeys.map((sortKey) => (
+                  <option key={sortKey.key} value={sortKey.key}>
+                    {sortKey.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sortOrder">Order</Label>
+              <Select id="sortOrder" name="sortOrder" defaultValue={sortOrder}>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </Select>
+            </div>
+            <div className="flex items-end gap-3 lg:col-span-6">
               <Button type="submit">Apply filters</Button>
               <Button asChild variant="outline">
                 <Link href="/tasks">Reset</Link>
               </Button>
             </div>
           </form>
+          <div className="mt-5 border-t pt-5">
+            <SavedListViewControls
+              entity="tasks"
+              route="/tasks"
+              savedViews={savedViews}
+              selectedView={savedViewState.resolved.selectedView}
+              status={
+                savedViewState.invalidView
+                  ? "error"
+                  : savedListViewStatus(params.savedViewStatus)
+              }
+              current={{
+                filters: {
+                  status: statusFilter,
+                  ownerId: ownerFilter,
+                  dueDateFrom,
+                  dueDateTo
+                },
+                pageSize,
+                sortBy,
+                sortOrder
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 

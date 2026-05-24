@@ -13,6 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/page-header";
+import {
+  SavedListViewControls,
+  savedListViewStatus
+} from "@/components/saved-list-view-controls";
 import { Select } from "@/components/ui/select";
 import {
   getCase,
@@ -28,6 +32,14 @@ import {
   type CaseStatus
 } from "@/lib/crm/registry";
 import { nonEmptyQueryParam } from "@/lib/queryParams";
+import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
+import {
+  buildSavedListViewQuery,
+  listSavedListViews,
+  type SavedListViewListQuery,
+  type SavedListViewResolvedQuery
+} from "@/lib/services/savedListViews";
+import type { SortOrder } from "@/lib/services/listQuery";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +60,24 @@ type CasesSearchParams = {
   status?: string;
   ownerId?: string;
   accountId?: string;
+  contactId?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  pageSize?: string;
+  view?: string;
+  savedViewStatus?: string;
 };
+
+const CASE_SORT_KEYS = [
+  "updatedAt",
+  "createdAt",
+  "status",
+  "priority",
+  "subject"
+] as const;
+
+type CaseSortBy = (typeof CASE_SORT_KEYS)[number];
+const DEFAULT_CASE_SORT_BY: CaseSortBy = "updatedAt";
 
 function isCaseStatus(value: string | undefined): value is CaseStatus {
   if (!value) {
@@ -57,22 +86,114 @@ function isCaseStatus(value: string | undefined): value is CaseStatus {
   return (CASE_STATUSES as readonly string[]).includes(value);
 }
 
+function isCaseSortBy(value: string | undefined): value is CaseSortBy {
+  if (!value) {
+    return false;
+  }
+  return (CASE_SORT_KEYS as readonly string[]).includes(value);
+}
+
+function sortOrderParam(value: string | undefined): SortOrder | undefined {
+  return value === "asc" || value === "desc" ? value : undefined;
+}
+
+function stringFilter(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : undefined;
+}
+
+async function resolveCaseSavedViewQuery(
+  savedViewId: string | undefined,
+  query: SavedListViewListQuery
+): Promise<{ resolved: SavedListViewResolvedQuery; invalidView: boolean }> {
+  if (!savedViewId) {
+    return {
+      invalidView: false,
+      resolved: {
+        entity: "cases",
+        selectedView: null,
+        source: "current-query",
+        query
+      }
+    };
+  }
+
+  try {
+    return {
+      invalidView: false,
+      resolved: await buildSavedListViewQuery({
+        entity: "cases",
+        savedViewId,
+        query
+      })
+    };
+  } catch {
+    return {
+      invalidView: true,
+      resolved: {
+        entity: "cases",
+        selectedView: null,
+        source: "current-query",
+        query
+      }
+    };
+  }
+}
+
 export default async function CasesPage({
   searchParams
 }: {
   searchParams: Promise<CasesSearchParams>;
 }) {
   const params = await searchParams;
-  const statusFilter = isCaseStatus(params.status) ? params.status : undefined;
-  const ownerFilter = nonEmptyQueryParam(params.ownerId);
-  const accountFilter = nonEmptyQueryParam(params.accountId);
+  const caseCatalog = getListFilterSupportEntityCatalog("cases");
+
+  if (!caseCatalog) {
+    throw new Error("Case saved view support catalog is missing.");
+  }
+
+  const currentQuery: SavedListViewListQuery = {
+    pageSize: 100,
+    sortBy: isCaseSortBy(params.sortBy)
+      ? params.sortBy
+      : DEFAULT_CASE_SORT_BY,
+    sortOrder: sortOrderParam(params.sortOrder) ?? caseCatalog.defaultSortOrder,
+    filters: {
+      status: isCaseStatus(params.status) ? params.status : undefined,
+      ownerId: nonEmptyQueryParam(params.ownerId),
+      accountId: nonEmptyQueryParam(params.accountId),
+      contactId: nonEmptyQueryParam(params.contactId)
+    }
+  };
+  const [savedViews, savedViewState] = await Promise.all([
+    listSavedListViews({ entity: "cases" }),
+    resolveCaseSavedViewQuery(nonEmptyQueryParam(params.view), currentQuery)
+  ]);
+  const effectiveFilters = savedViewState.resolved.query.filters ?? {};
+  const effectiveStatus = stringFilter(effectiveFilters.status);
+  const statusFilter = isCaseStatus(effectiveStatus)
+    ? effectiveStatus
+    : undefined;
+  const ownerFilter = stringFilter(effectiveFilters.ownerId);
+  const accountFilter = stringFilter(effectiveFilters.accountId);
+  const contactFilter = stringFilter(effectiveFilters.contactId);
+  const sortBy = isCaseSortBy(savedViewState.resolved.query.sortBy)
+    ? savedViewState.resolved.query.sortBy
+    : DEFAULT_CASE_SORT_BY;
+  const sortOrder =
+    savedViewState.resolved.query.sortOrder ?? caseCatalog.defaultSortOrder;
+  const pageSize = savedViewState.resolved.query.pageSize ?? 100;
 
   const listOptions: CaseListOptions = {
-    pageSize: 100,
+    pageSize,
+    sortBy,
+    sortOrder,
     filters: {
       status: statusFilter,
       ownerId: ownerFilter,
-      accountId: accountFilter
+      accountId: accountFilter,
+      contactId: contactFilter
     }
   };
 
@@ -178,7 +299,7 @@ export default async function CasesPage({
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action="/cases" className="grid gap-4 md:grid-cols-3">
+          <form action="/cases" className="grid gap-4 lg:grid-cols-6">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select id="status" name="status" defaultValue={statusFilter ?? ""}>
@@ -202,6 +323,17 @@ export default async function CasesPage({
               </Select>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="contactId">Contact</Label>
+              <Select id="contactId" name="contactId" defaultValue={contactFilter ?? ""}>
+                <option value="">Any contact</option>
+                {contactsList.map((contact) => (
+                  <option key={contact.id} value={contact.id}>
+                    {contact.firstName} {contact.lastName}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="ownerId">Owner</Label>
               <Select id="ownerId" name="ownerId" defaultValue={ownerFilter ?? ""}>
                 <option value="">Any owner</option>
@@ -212,13 +344,54 @@ export default async function CasesPage({
                 ))}
               </Select>
             </div>
-            <div className="flex items-end gap-3 md:col-span-3">
+            <div className="space-y-2">
+              <Label htmlFor="sortBy">Sort by</Label>
+              <Select id="sortBy" name="sortBy" defaultValue={sortBy}>
+                {caseCatalog.sortKeys.map((sortKey) => (
+                  <option key={sortKey.key} value={sortKey.key}>
+                    {sortKey.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sortOrder">Order</Label>
+              <Select id="sortOrder" name="sortOrder" defaultValue={sortOrder}>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </Select>
+            </div>
+            <div className="flex items-end gap-3 lg:col-span-6">
               <Button type="submit">Apply filters</Button>
               <Button asChild variant="outline">
                 <Link href="/cases">Reset</Link>
               </Button>
             </div>
           </form>
+          <div className="mt-5 border-t pt-5">
+            <SavedListViewControls
+              entity="cases"
+              route="/cases"
+              savedViews={savedViews}
+              selectedView={savedViewState.resolved.selectedView}
+              status={
+                savedViewState.invalidView
+                  ? "error"
+                  : savedListViewStatus(params.savedViewStatus)
+              }
+              current={{
+                filters: {
+                  status: statusFilter,
+                  ownerId: ownerFilter,
+                  accountId: accountFilter,
+                  contactId: contactFilter
+                },
+                pageSize,
+                sortBy,
+                sortOrder
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
 
