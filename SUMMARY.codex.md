@@ -1,44 +1,40 @@
 Agent: Codex
 
-Sprint: Sprint 31
+Sprint: 32
 
-Feature: S31-F3 - List-page bulk execution actions
+Feature: S32-F1 - Case queue assignment foundation
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- 8f60970 - [codex] S31-F3: add list bulk execution actions
+- 28e0020 - [codex] sprint 32: plan codex track
+- 176b244 - [codex] sprint 32: backlog refresh
 
-Gate status: PASS - Phase 0 baseline `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0; targeted `npx vitest run tests/api/list-bulk-execution-action.test.ts --maxWorkers=1 --minWorkers=1` exited 0; targeted `npx playwright test e2e/list-bulk-execution.spec.ts` exited 0; selected-export regression checks exited 0; first full `scripts/local-gate.ps1` attempt exposed an e2e label collision, fixed in scope; final `scripts/local-gate.ps1` exited 0 with 71 Vitest files / 379 tests and 22 Playwright tests passing.
+Gate status: PASS - baseline `scripts/local-gate.ps1` exited 0 before planning with 71 Vitest files / 379 tests and 22 Playwright tests passing; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0. Unit tests passed 71 files / 379 tests in the post-planning run.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T09:10:56.5261382-07:00
+Timestamp: 2026-05-24T11:39:10.2866169-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Reconciled the root worktree as single-agent full-repo mode on `main`; historical owner zones were advisory and the baseline validation was green.
-- Added list-specific bulk execution server actions that validate supported entities/actions, require confirmation before execution, reuse S30 dry-run review and execution services, and return per-record execution/audit feedback.
-- Extended the existing visible-record selection panel so supported CRM lists can export selected rows or dry-run and execute confirmed eligible bulk actions from the same visible selection.
-- Added Vitest coverage for list bulk execution preview, confirmation enforcement, successful contact status execution with audit evidence, and unsupported executor action rejection.
-- Added Playwright coverage for the contacts list dry-run-first bulk execution flow and fixed the e2e label collision found by the first full gate attempt.
-
-### Discovered this prompt
-
-- PLAN §4 still lists S31-F1, S31-F2, and S31-F3 as `queued`, while recent green-gated Codex commits support S31-F1, S31-F2, and this prompt's S31-F3 as complete.
-- Gemini's historical SUMMARY still references an S5-F1 visual snapshot scope that is not the Sprint 5 row currently present in PLAN §4; treated as stale cross-agent context, not active scope.
-- A root `SPRINT-ROLLOVER.md` file remains absent, while per-agent rollover prompts exist under `prompts/<agent>/SPRINT-ROLLOVER.md`; no blocker filed because current LOOP scope did not require rollover during this completed work unit.
+- Confirmed the Sprint 31 baseline was green with the full local gate before editing planning files.
+- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the 30-day git log.
+- Confirmed Codex-owned Sprint 31 work was complete based on S31-F1/S31-F2/S31-F3 commits, report evidence, and green gate output.
+- Marked S31-F1, S31-F2, and S31-F3 done in PLAN.md.
+- Planned Sprint 32 for Codex with S32-F1 case queue assignment foundation, S32-F2 case SLA timer contracts, and S32-F3 service operations case UI.
+- Synced docs/FEATURE-BACKLOG.md with Sprint 31 done status and Sprint 32 queued status.
 
 ### Next action
 
-Run the Codex sprint rollover prompt to reconcile Sprint 31 status and promote the next active Codex scope.
+Run LOOP.md to begin S32-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; S31-F3 coherently spanned app, component, API test, and e2e surfaces)
+No cross-ownership edits: YES (single-agent root mode; writes were limited to authorized planning and report files)
 
 CRM-CONTRACT.md honored: YES
