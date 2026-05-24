@@ -1,38 +1,39 @@
 Agent: Codex
 
-Sprint: 30
+Sprint: 31
 
-Feature: S30-F3 - Bulk action execution operator UI
+Feature: S31-F1 - Bulk list selection contracts
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- 811ec87 - [codex] S30-F3: add bulk execution operator UI
+- 56fa32e - [codex] sprint 31: plan codex track
+- 33922a9 - [codex] sprint 31: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0. Unit tests passed 68 files / 369 tests; Playwright e2e passed 20 tests.
+Gate status: PASS - baseline `scripts/local-gate.ps1` exited 0 before planning; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0. Unit tests passed 68 files / 369 tests in the post-planning run.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T04:25:28.9274945-07:00
+Timestamp: 2026-05-24T05:18:52.3147007-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Extended the `/reports` bulk dry-run operator with a dry-run-first execution path that requires an explicit confirmation checkbox before invoking the S30-F2 executor.
-- Added a server action wrapper for `executeBulkAction` with confirmation, entity/action, record selection, and target validation for the operator flow.
-- Added execution feedback for executed/skipped/blocked/failed rollups, per-record execution status, affected records, audit event IDs, and write flags.
-- Extended `e2e/reports.spec.ts` to verify the confirmation gate and execution feedback after the existing dry-run review.
-- Discovered this prompt: PLAN.md §4 and `docs/FEATURE-BACKLOG.md` still list S30-F1, S30-F2, and S30-F3 as `queued`, but S30-F1/S30-F2/S30-F3 now all have implementation commits and green local-gate evidence on `main`.
+- Confirmed the Sprint 30 baseline was green with the full local gate before editing planning files.
+- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the 30-day git log.
+- Marked S30-F1, S30-F2, and S30-F3 done in PLAN.md based on implementation commits, report evidence, and green gate output.
+- Planned Sprint 31 for codex with S31-F1 bulk list selection contracts, S31-F2 list-page selected export actions, and S31-F3 list-page bulk execution actions.
+- Synced docs/FEATURE-BACKLOG.md with Sprint 30 done status and Sprint 31 queued status.
 
 ### Next action
 
-Sprint rollover is needed to close Sprint 30 and queue the next valid work unit.
+Run LOOP.md to begin S31-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation touched app, component, and e2e files for one coherent S30-F3 slice)
+No cross-ownership edits: YES (single-agent root mode; writes were limited to authorized planning and report files)
 
 CRM-CONTRACT.md honored: YES

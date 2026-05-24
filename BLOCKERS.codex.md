@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 30
+Sprint: 31
 
-Feature: S30-F3 - Bulk action execution operator UI
+Feature: S31-F1 - Bulk list selection contracts
 
 Branch: main
 
-Timestamp: 2026-05-24T04:25:28.9274945-07:00
+Timestamp: 2026-05-24T05:18:52.3147007-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open; full local gate remained green after S30-F3.
+- No active Codex blockers were open; Sprint 31 rollover completed with baseline and post-planning gates green.
