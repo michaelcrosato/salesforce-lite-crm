@@ -8,16 +8,20 @@ import {
 } from "react";
 import {
   AlertTriangle,
+  CheckCircle2,
   ClipboardCheck,
   FileText,
   ListChecks,
+  Play,
   ShieldCheck,
   Table2,
   type LucideIcon
 } from "lucide-react";
 import Link from "next/link";
 import {
+  executeBulkActionOperatorAction,
   previewBulkActionDryRunReviewAction,
+  type BulkActionExecutionActionResult,
   type BulkActionDryRunReviewActionResult
 } from "@/app/reports/actions";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +50,11 @@ import type {
   BulkActionDryRunReviewReasonSummary,
   BulkActionDryRunReviewWriteFlags
 } from "@/lib/server/bulkActionDryRunReviewPackets";
+import type {
+  BulkActionExecutionResult,
+  BulkActionExecutionStatus,
+  BulkActionExecutionWriteFlags
+} from "@/lib/server/bulkActionExecution";
 
 type BulkDryRunReviewSampleRecordIds = {
   entity: BulkActionDryRunReviewPacketEntity;
@@ -70,12 +79,26 @@ const writeFlagLabels = [
   label: string;
 }>;
 
+const executionWriteFlagLabels = [
+  { key: "database", label: "Database" },
+  { key: "mutations", label: "Mutations" },
+  { key: "auditEvents", label: "Audit events" },
+  { key: "approvals", label: "Approvals" },
+  { key: "files", label: "Files" },
+  { key: "externalServices", label: "External services" },
+  { key: "backgroundJobs", label: "Background jobs" }
+] satisfies ReadonlyArray<{
+  key: keyof BulkActionExecutionWriteFlags;
+  label: string;
+}>;
+
 export function BulkDryRunReviewOperator({
   definitions,
   sampleRecordIds
 }: BulkDryRunReviewOperatorProps) {
   const { showToast } = useToast();
-  const [isPending, startTransition] = useTransition();
+  const [isReviewPending, startReviewTransition] = useTransition();
+  const [isExecutePending, startExecuteTransition] = useTransition();
   const firstDefinition = definitions[0] ?? null;
   const firstAction = firstDefinition?.actions[0] ?? null;
   const [selectedEntity, setSelectedEntity] =
@@ -95,6 +118,9 @@ export function BulkDryRunReviewOperator({
   const [taskTitle, setTaskTitle] = useState("Follow up selected records");
   const [result, setResult] =
     useState<BulkActionDryRunReviewActionResult | null>(null);
+  const [executionConfirmed, setExecutionConfirmed] = useState(false);
+  const [executionResult, setExecutionResult] =
+    useState<BulkActionExecutionActionResult | null>(null);
 
   const selectedDefinition = useMemo(
     () =>
@@ -119,6 +145,12 @@ export function BulkDryRunReviewOperator({
   const packet = result?.ok ? result.packet : null;
   const fieldErrors = result && !result.ok ? result.fieldErrors : null;
 
+  function clearRunState() {
+    setResult(null);
+    setExecutionResult(null);
+    setExecutionConfirmed(false);
+  }
+
   function handleEntityChange(nextEntity: BulkActionDryRunReviewPacketEntity) {
     const nextDefinition =
       definitions.find(
@@ -131,7 +163,7 @@ export function BulkDryRunReviewOperator({
       setSelectedAction(nextAction.action);
       applyTargetDefaults(nextAction);
     }
-    setResult(null);
+    clearRunState();
   }
 
   function handleActionChange(nextAction: BulkActionDryRunReviewPacketAction) {
@@ -141,7 +173,7 @@ export function BulkDryRunReviewOperator({
 
     setSelectedAction(nextAction);
     applyTargetDefaults(nextActionMetadata);
-    setResult(null);
+    clearRunState();
   }
 
   function applyTargetDefaults(
@@ -170,14 +202,33 @@ export function BulkDryRunReviewOperator({
 
   function useSampleRecords() {
     setRecordIds(selectedSampleIds.join("\n"));
-    setResult(null);
+    clearRunState();
+  }
+
+  function buildExecutionFormData(): FormData {
+    const formData = new FormData();
+
+    formData.set("entity", selectedEntity);
+    formData.set("action", selectedAction);
+    formData.set("recordIds", recordIds);
+    formData.set("targetStatus", targetStatus);
+    formData.set("targetStage", targetStage);
+    formData.set("targetOwnerId", targetOwnerId);
+    formData.set("taskTitle", taskTitle);
+    if (executionConfirmed) {
+      formData.set("confirmExecution", "confirmed");
+    }
+
+    return formData;
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    setExecutionResult(null);
+    setExecutionConfirmed(false);
 
-    startTransition(() => {
+    startReviewTransition(() => {
       void (async () => {
         const actionResult = await previewBulkActionDryRunReviewAction(formData);
         setResult(actionResult);
@@ -185,6 +236,24 @@ export function BulkDryRunReviewOperator({
           title: actionResult.ok
             ? "Bulk dry run ready"
             : "Bulk dry run failed",
+          description: actionResult.message,
+          variant: actionResult.ok ? "success" : "error"
+        });
+      })();
+    });
+  }
+
+  function handleExecute() {
+    startExecuteTransition(() => {
+      void (async () => {
+        const actionResult = await executeBulkActionOperatorAction(
+          buildExecutionFormData()
+        );
+        setExecutionResult(actionResult);
+        showToast({
+          title: actionResult.ok
+            ? "Bulk action executed"
+            : "Bulk execution failed",
           description: actionResult.message,
           variant: actionResult.ok ? "success" : "error"
         });
@@ -320,10 +389,22 @@ export function BulkDryRunReviewOperator({
                 targetStage={targetStage}
                 targetStatus={targetStatus}
                 taskTitle={taskTitle}
-                setTargetOwnerId={setTargetOwnerId}
-                setTargetStage={setTargetStage}
-                setTargetStatus={setTargetStatus}
-                setTaskTitle={setTaskTitle}
+                setTargetOwnerId={(value) => {
+                  setTargetOwnerId(value);
+                  clearRunState();
+                }}
+                setTargetStage={(value) => {
+                  setTargetStage(value);
+                  clearRunState();
+                }}
+                setTargetStatus={(value) => {
+                  setTargetStatus(value);
+                  clearRunState();
+                }}
+                setTaskTitle={(value) => {
+                  setTaskTitle(value);
+                  clearRunState();
+                }}
               />
 
               <div className="space-y-2">
@@ -357,7 +438,7 @@ export function BulkDryRunReviewOperator({
                   value={recordIds}
                   onChange={(event) => {
                     setRecordIds(event.target.value);
-                    setResult(null);
+                    clearRunState();
                   }}
                   placeholder="acct-apex&#10;acct-harbor"
                   className="min-h-[14rem] font-mono"
@@ -373,10 +454,10 @@ export function BulkDryRunReviewOperator({
                 </p>
                 <Button
                   type="submit"
-                  loading={isPending}
+                  loading={isReviewPending}
                   data-testid="bulk-dry-run-submit"
                 >
-                  {isPending ? "Reviewing..." : "Review dry run"}
+                  {isReviewPending ? "Reviewing..." : "Review dry run"}
                 </Button>
               </div>
             </div>
@@ -385,6 +466,22 @@ export function BulkDryRunReviewOperator({
       </Card>
 
       {packet ? <BulkDryRunReviewResult packet={packet} /> : null}
+      {packet ? (
+        <BulkExecutionConfirmation
+          packet={packet}
+          confirmed={executionConfirmed}
+          executionResult={executionResult}
+          isPending={isExecutePending}
+          onConfirmedChange={(checked) => {
+            setExecutionConfirmed(checked);
+            setExecutionResult(null);
+          }}
+          onExecute={handleExecute}
+        />
+      ) : null}
+      {executionResult?.ok ? (
+        <BulkExecutionResult execution={executionResult.execution} />
+      ) : null}
     </section>
   );
 }
@@ -653,6 +750,215 @@ function BulkDryRunReviewResult({
   );
 }
 
+function BulkExecutionConfirmation({
+  packet,
+  confirmed,
+  executionResult,
+  isPending,
+  onConfirmedChange,
+  onExecute
+}: {
+  packet: BulkActionDryRunReviewPacket;
+  confirmed: boolean;
+  executionResult: BulkActionExecutionActionResult | null;
+  isPending: boolean;
+  onConfirmedChange: (checked: boolean) => void;
+  onExecute: () => void;
+}) {
+  const executionError =
+    executionResult && !executionResult.ok ? executionResult : null;
+  const confirmationError = executionError?.fieldErrors?.confirmation?.[0];
+  const targetError =
+    executionError?.fieldErrors?.action?.[0] ??
+    executionError?.fieldErrors?.target?.[0] ??
+    executionError?.fieldErrors?.recordIds?.[0] ??
+    executionError?.fieldErrors?.entity?.[0];
+  const canExecute = packet.rollup.eligibleCount > 0 && confirmed;
+
+  return (
+    <Card data-testid="bulk-execution-confirmation-panel">
+      <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+        <div className="space-y-1.5">
+          <CardTitle>Bulk Execution</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Dry run complete for {formatNumber(packet.rollup.eligibleCount)}
+            {" "}eligible records. Execution writes mutations and audit events.
+          </p>
+        </div>
+        <Badge variant={packet.rollup.eligibleCount > 0 ? "warning" : "outline"}>
+          {packet.rollup.eligibleCount > 0 ? "ready" : "blocked"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <label className="flex items-start gap-3 rounded-md border bg-muted/20 px-3 py-3 text-sm">
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(event) => onConfirmedChange(event.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-input"
+            data-testid="bulk-execution-confirm-checkbox"
+          />
+          <span>
+            Confirm execution for eligible records from this dry-run result.
+          </span>
+        </label>
+        <FieldError message={confirmationError} />
+        {targetError ? (
+          <p
+            className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            data-testid="bulk-execution-error"
+          >
+            {targetError}
+          </p>
+        ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            {formatNumber(packet.rollup.blockedCount)} blocked records stay
+            unchanged.
+          </p>
+          <Button
+            type="button"
+            variant="destructive"
+            loading={isPending}
+            disabled={!canExecute}
+            onClick={onExecute}
+            data-testid="bulk-execution-submit"
+          >
+            <Play className="h-4 w-4" aria-hidden="true" />
+            {isPending ? "Executing..." : "Execute eligible records"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BulkExecutionResult({
+  execution
+}: {
+  execution: BulkActionExecutionResult;
+}) {
+  return (
+    <div className="space-y-4" data-testid="bulk-execution-result-panel">
+      <div className="grid gap-4 md:grid-cols-4">
+        <SummaryCard
+          icon={CheckCircle2}
+          label="Executed"
+          value={formatNumber(execution.rollup.executedCount)}
+          testId="bulk-execution-rollup-executed"
+        />
+        <SummaryCard
+          icon={ClipboardCheck}
+          label="Skipped"
+          value={formatNumber(execution.rollup.skippedCount)}
+          testId="bulk-execution-rollup-skipped"
+        />
+        <SummaryCard
+          icon={AlertTriangle}
+          label="Blocked"
+          value={formatNumber(execution.rollup.blockedCount)}
+          testId="bulk-execution-rollup-blocked"
+        />
+        <SummaryCard
+          icon={AlertTriangle}
+          label="Failed"
+          value={formatNumber(execution.rollup.failedCount)}
+          testId="bulk-execution-rollup-failed"
+        />
+      </div>
+
+      <Card>
+        <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle>Execution Feedback</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {formatToken(execution.action)} for {execution.entity}:{" "}
+              {formatNumber(execution.rollup.auditEventCount)} audit events
+              recorded.
+            </p>
+          </div>
+          <Badge variant={executionStatusVariant(execution.rollup.status)}>
+            {execution.rollup.status}
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <Metric
+              label="Would mutate"
+              value={execution.rollup.wouldMutate ? "on" : "off"}
+            />
+            <Metric
+              label="Requires approval"
+              value={execution.rollup.requiresApproval ? "on" : "off"}
+            />
+            <Metric
+              label="Supported"
+              value={execution.supported ? "on" : "off"}
+            />
+          </div>
+
+          <Table data-testid="bulk-execution-record-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Record</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Affected</TableHead>
+                <TableHead>Audit event</TableHead>
+                <TableHead>Message</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {execution.records.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell className="font-medium">
+                    {record.label ?? record.id}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={record.executed ? "success" : "warning"}
+                    >
+                      {formatToken(record.executionStatus)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {record.affectedEntityType && record.affectedRecordId
+                      ? `${record.affectedEntityType}: ${record.affectedRecordId}`
+                      : "Not changed"}
+                  </TableCell>
+                  <TableCell>{record.auditEventId ?? "Not recorded"}</TableCell>
+                  <TableCell>
+                    <span className="block max-w-[28rem] truncate">
+                      {record.error ?? record.message}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <div
+        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+        data-testid="bulk-execution-write-flags"
+      >
+        {executionWriteFlagLabels.map((flag) => (
+          <div
+            key={flag.key}
+            className="rounded-md border bg-muted/20 px-3 py-2 text-sm"
+          >
+            <span className="font-medium">{flag.label}</span>
+            {" "}
+            <span className="ml-2 text-muted-foreground">
+              {execution.write[flag.key] ? "on" : "off"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ReasonRow({
   reason
 }: {
@@ -738,6 +1044,20 @@ function statusVariant(status: BulkActionDryRunReviewPacketStatus) {
     case "partial":
       return "warning";
     case "blocked":
+      return "danger";
+  }
+}
+
+function executionStatusVariant(status: BulkActionExecutionStatus) {
+  switch (status) {
+    case "empty":
+      return "outline";
+    case "completed":
+      return "success";
+    case "partial":
+      return "warning";
+    case "blocked":
+    case "failed":
       return "danger";
   }
 }

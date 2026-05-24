@@ -182,6 +182,35 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   await expect(page.getByTestId("bulk-dry-run-write-flags")).toContainText(
     "Audit events off"
   );
+  await expect(
+    page.getByTestId("bulk-execution-confirmation-panel")
+  ).toBeVisible();
+  await expect(page.getByTestId("bulk-execution-submit")).toBeDisabled();
+  await page.getByTestId("bulk-execution-confirm-checkbox").check();
+  await expect(page.getByTestId("bulk-execution-submit")).toBeEnabled();
+  await page.getByTestId("bulk-execution-submit").click();
+  await expect(page.getByTestId("bulk-execution-result-panel")).toBeVisible();
+  await expect(
+    page.getByTestId("bulk-execution-rollup-executed")
+  ).toContainText(/[1-9]/);
+  await expect(
+    page.getByTestId("bulk-execution-rollup-skipped")
+  ).toContainText(/[1-9]/);
+  await expect(page.getByTestId("bulk-execution-rollup-failed")).toContainText(
+    "0"
+  );
+  await expect(page.getByTestId("bulk-execution-record-table")).toContainText(
+    "executed"
+  );
+  await expect(page.getByTestId("bulk-execution-record-table")).toContainText(
+    "skipped"
+  );
+  await expect(page.getByTestId("bulk-execution-write-flags")).toContainText(
+    "Database on"
+  );
+  await expect(page.getByTestId("bulk-execution-write-flags")).toContainText(
+    "Audit events on"
+  );
 
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(

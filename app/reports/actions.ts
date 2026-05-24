@@ -13,6 +13,14 @@ import {
   type BulkActionDryRunReviewPacketAction,
   type BulkActionDryRunReviewPacketEntity
 } from "@/lib/server/bulkActionDryRunReviewPackets";
+import {
+  executeBulkAction,
+  isBulkActionExecutionAction,
+  isBulkActionExecutionEntity,
+  type BulkActionExecutionAction,
+  type BulkActionExecutionEntity,
+  type BulkActionExecutionResult
+} from "@/lib/server/bulkActionExecution";
 
 export type CsvImportPreviewActionResult =
   | {
@@ -46,7 +54,26 @@ export type BulkActionDryRunReviewActionResult =
       };
     };
 
+export type BulkActionExecutionActionResult =
+  | {
+      ok: true;
+      message: string;
+      execution: BulkActionExecutionResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        confirmation?: string[];
+        entity?: string[];
+        action?: string[];
+        recordIds?: string[];
+        target?: string[];
+      };
+    };
+
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
+const BULK_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -77,6 +104,14 @@ type BulkActionDryRunReviewInput = {
   targetStage?: string;
   targetOwnerId?: string;
   taskTitle?: string;
+};
+
+type BulkActionExecutionInput = Omit<
+  BulkActionDryRunReviewInput,
+  "entity" | "action"
+> & {
+  entity: BulkActionExecutionEntity;
+  action: BulkActionExecutionAction;
 };
 
 function optionalFormString(
@@ -150,6 +185,83 @@ export async function previewBulkActionDryRunReviewAction(
     return {
       ok: false,
       message: "The bulk dry-run review packet could not be built.",
+      fieldErrors: {
+        target: ["Review the selected action target and record IDs."]
+      }
+    };
+  }
+}
+
+export async function executeBulkActionOperatorAction(
+  formData: FormData
+): Promise<BulkActionExecutionActionResult> {
+  const confirmation = formString(formData, "confirmExecution");
+  const entity = formString(formData, "entity");
+  const action = formString(formData, "action");
+  const recordIds = parseRecordIds(formString(formData, "recordIds"));
+
+  if (confirmation !== BULK_EXECUTION_CONFIRMATION_VALUE) {
+    return {
+      ok: false,
+      message: "Confirm execution before running the bulk action.",
+      fieldErrors: {
+        confirmation: ["Confirm execution before running the bulk action."]
+      }
+    };
+  }
+
+  if (!isBulkActionExecutionEntity(entity)) {
+    return {
+      ok: false,
+      message: "Choose a supported bulk execution entity.",
+      fieldErrors: {
+        entity: ["Choose a supported bulk execution entity."]
+      }
+    };
+  }
+
+  if (!isBulkActionExecutionAction(action)) {
+    return {
+      ok: false,
+      message: "Choose a supported executable bulk action.",
+      fieldErrors: {
+        action: ["Choose a supported executable bulk action."]
+      }
+    };
+  }
+
+  if (recordIds.length === 0) {
+    return {
+      ok: false,
+      message: "Enter at least one selected record ID.",
+      fieldErrors: {
+        recordIds: ["Enter at least one selected record ID."]
+      }
+    };
+  }
+
+  const input: BulkActionExecutionInput = {
+    entity,
+    action,
+    recordIds,
+    targetStatus: optionalFormString(formData, "targetStatus"),
+    targetStage: optionalFormString(formData, "targetStage"),
+    targetOwnerId: optionalFormString(formData, "targetOwnerId"),
+    taskTitle: optionalFormString(formData, "taskTitle")
+  };
+
+  try {
+    const execution = await executeBulkAction(input);
+
+    return {
+      ok: true,
+      message: `${execution.action} execution for ${execution.entity}: ${execution.rollup.executedCount} executed, ${execution.rollup.skippedCount} skipped, ${execution.rollup.blockedCount} blocked.`,
+      execution
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The bulk action could not be executed.",
       fieldErrors: {
         target: ["Review the selected action target and record IDs."]
       }
