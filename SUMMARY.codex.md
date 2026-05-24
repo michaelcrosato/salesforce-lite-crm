@@ -2,42 +2,41 @@ Agent: Codex
 
 Sprint: 29
 
-Feature: S29-F2 - Saved list views foundation
+Feature: S29-F3 - Saved list views operator UI
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 7c2f668 - [codex] S29-F2: add saved list view foundation
+- 6940b28 - [codex] S29-F3: add saved list view operator controls
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0; `npm run test` passed 66 files / 359 tests and `npm run test:e2e` passed 19 tests.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0; `npm run test` passed 66 files / 359 tests and `npm run test:e2e` passed 20 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T17:20:23.4425028-07:00
+Timestamp: 2026-05-23T18:44:39.3381382-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `SavedListView` to the SQLite and Postgres Prisma schemas with entity/name uniqueness, serialized filter JSON, sort metadata, optional page size, and timestamps.
-- Added `lib/services/savedListViews.ts` with create/list/get/update/delete helpers plus `buildSavedListViewQuery()` for applying saved filters/sorts or preserving the current query when no saved view is selected.
-- Validated saved-view entities, filters, enum values, date filters, sort keys, and sort order against the existing list-filter support catalog.
-- Added Vitest coverage for create/list, current-query passthrough, saved-view application, update/get/delete, and rejection of unsupported saved-view inputs without writes.
-- Documented the schema addition in `docs/schema-changelog.md`; `CRM-CONTRACT.md` was not changed.
+- Added server actions for saved-list-view create, update, and delete flows with entity-route validation, bounded redirect feedback, and list-route revalidation.
+- Added a reusable saved-view control panel with apply, save, update, and delete controls plus deterministic success/error notices.
+- Wired saved views into the service-backed task, case, and campaign list pages using their existing supported filters and sort keys while preserving current behavior when no saved view is selected.
+- Added E2E coverage proving task saved views can be saved, applied, updated from current filters/sort, and deleted through the operator UI.
 
 ### Discovered this prompt
 
-- PLAN.md §4 still marks S29-F1 as `queued`, but Codex SUMMARY, implementation commits, and the green baseline gate show S29-F1 completed on `main`.
-- Other agents' root SUMMARY/BLOCKERS files remain historical parallel-branch context; no active blocker in those files changes the current Sprint 29 Codex queue on `main`.
+- PLAN.md §4 still marks S29-F1, S29-F2, and S29-F3 as `queued`, but Codex implementation commits and green local-gate evidence now show all three Sprint 29 Codex work units completed on `main`.
+- Gemini's historical SUMMARY references `S5-F1 - E2E Visual Snapshot Baseline`, which does not match the current PLAN.md §4 Sprint 5 `S5-F1 - Server CSV export contracts` row.
 
 ### Next action
 
-Run LOOP.md for S29-F3 - Saved list views operator UI.
+Run sprint rollover to close Sprint 29 and queue the next PLAN.md §4 scope.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; full-repo files were touched only for the S29-F2 schema, service, tests, and schema changelog)
+No cross-ownership edits: YES (single-agent root mode; full-repo files were touched only for the S29-F3 saved-view UI, server actions, route wiring, and E2E coverage)
 
 CRM-CONTRACT.md honored: YES
