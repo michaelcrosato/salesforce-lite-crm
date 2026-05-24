@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.37A |
+| Version | 2.38A |
 
 | Last updated | 2026-05-24 |
 
-| Active sprint | Sprint 31 S31-F1/S31-F2/S31-F3 queued |
+| Active sprint | Sprint 32 S32-F1/S32-F2/S32-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1160,9 +1160,9 @@ Goal: bring bounded bulk actions from the reports operator into day-to-day CRM l
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S31-F1 — Bulk list selection contracts | codex | queued | Add deterministic selected-record contracts for supported CRM list pages so visible-row IDs can be passed into existing bulk dry-run, selected-export, and execution services. Preserve existing filters, sorts, pagination, saved views, and list behavior. |
-| S31-F2 — List-page selected export actions | codex | queued | Add bounded selected-export controls on supported list pages that reuse S30 selected export packets, preserve stable selected-ID ordering, and expose clear blocked/missing feedback without database writes. |
-| S31-F3 — List-page bulk execution actions | codex | queued | Add dry-run-first confirmed bulk execution on supported list pages using the S30 executor, with per-record feedback and audit evidence. The report operator remains available and existing mutation behavior stays unchanged outside confirmed eligible records. |
+| S31-F1 — Bulk list selection contracts | codex | done | Add deterministic selected-record contracts for supported CRM list pages so visible-row IDs can be passed into existing bulk dry-run, selected-export, and execution services. Preserve existing filters, sorts, pagination, saved views, and list behavior. |
+| S31-F2 — List-page selected export actions | codex | done | Add bounded selected-export controls on supported list pages that reuse S30 selected export packets, preserve stable selected-ID ordering, and expose clear blocked/missing feedback without database writes. |
+| S31-F3 — List-page bulk execution actions | codex | done | Add dry-run-first confirmed bulk execution on supported list pages using the S30 executor, with per-record feedback and audit evidence. The report operator remains available and existing mutation behavior stays unchanged outside confirmed eligible records. |
 
 \*\*Sprint 31 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1191,6 +1191,42 @@ Goal: bring bounded bulk actions from the reports operator into day-to-day CRM l
 \- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or SLA timers.
 
 \- No new product routes, report builder, dashboard builder, natural-language filters, command-palette expansion, saved-view schema/model changes, saved-view sharing, user/tenant scoping, permissions model, saved-view import/export, list column builder, custom-field metadata, or search changes.
+
+\*\*Sprint 32 — Case Service Operations\*\*
+
+Goal: add deterministic case queue and SLA foundations to the existing service workflow without changing route boundaries or adding background infrastructure.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S32-F1 — Case queue assignment foundation | codex | queued | Add deterministic service-queue assignment for Cases using repo-local data, validation, seed coverage, and audit evidence. Existing case create/update flows can assign or preserve queue state without changing Case status semantics. |
+| S32-F2 — Case SLA timer contracts | codex | queued | Add deterministic SLA target/due/overdue calculations for Cases with an injected clock, seeded examples, and test coverage. SLA state is computed locally and does not require scheduled jobs or external services. |
+| S32-F3 — Service operations case UI | codex | queued | Existing `/cases` list and drawer surfaces show queue/SLA context and support bounded queue assignment/status workflows with deterministic feedback and e2e coverage. The app keeps the existing `/cases?case=<id>` drawer pattern. |
+
+\*\*Sprint 32 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No new product routes, case detail route, knowledge base, calendar/email integration, approval workflow, pending approvals queue, or service portal.
+
+\- No background scheduler, notification delivery, external telemetry sink, SLA escalation automation, auth-backed entitlements, or multi-tenant queue rules.
+
+\- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, CSV import apply flow, duplicate merge, file storage, Salesforce integration, or external CRM sync.
 
 
 \## 5. File Ownership Matrix
