@@ -547,6 +547,7 @@ function seedDaysRemainingInMonth(now = new Date()) {
 }
 
 async function main() {
+  await prisma.knowledgeArticle.deleteMany();
   await prisma.task.deleteMany();
   await prisma.case.deleteMany();
   await prisma.campaign.deleteMany();
@@ -746,7 +747,7 @@ async function main() {
     "Validate lead routing assignment",
     "Review dealer order pacing",
     "Confirm area coverage for new lead"
-  ];
+  ] as const;
   const taskAccountIds = accounts.map((a) => a[0]);
   const taskContactIds = contacts.map((c) => c[0]);
   const taskDealIds = deals.map((d) => d[0]);
@@ -843,7 +844,7 @@ async function main() {
     { createdHoursAgo: 2, updatedHoursAgo: 1 },
     { createdHoursAgo: 18, updatedHoursAgo: 2 },
     { createdHoursAgo: 110, updatedHoursAgo: 18 }
-  ] as const;
+  ];
 
   const caseData = Array.from({ length: 20 }, (_, i) => {
     const accountId = caseAccountIds[i % caseAccountIds.length];
@@ -888,6 +889,112 @@ async function main() {
 
   await prisma.case.createMany({
     data: caseData
+  });
+
+  // Knowledge article seed data supports case assist suggestions without new routes.
+  const knowledgeArticles = [
+    {
+      id: "knowledge-billing-invoice-review",
+      title: "Resolve billing discrepancy tickets",
+      summary: "Checklist for invoice mismatch, credit, and payment questions.",
+      body:
+        "Confirm invoice number, compare contracted pricing, review recent credits, and send the billing owner a concise resolution note.",
+      status: "published",
+      audience: "internal",
+      category: "Billing",
+      keywords: "billing,invoice,credit,payment,discrepancy",
+      caseQueueKey: "billing_support",
+      ownerId: "user-elena",
+      publishedAt: daysAgo(32)
+    },
+    {
+      id: "knowledge-routing-feedback",
+      title: "Investigate dealer lead routing feedback",
+      summary: "Steps for reviewing routed lead outcomes and dealer pacing context.",
+      body:
+        "Check the lead routing event, matched area, active dealer order capacity, and recent dealer feedback before escalating to operations.",
+      status: "published",
+      audience: "internal",
+      category: "Dealer Operations",
+      keywords: "routing,dealer,lead,pace,area,order",
+      caseQueueKey: "dealer_operations",
+      ownerId: "user-ava",
+      publishedAt: daysAgo(21)
+    },
+    {
+      id: "knowledge-data-migration-validation",
+      title: "Validate migrated CRM records",
+      summary: "Data quality review for duplicate, missing, or malformed records.",
+      body:
+        "Inspect required fields, duplicate candidates, owner assignment, account/contact links, and CSV preview warnings before marking the case resolved.",
+      status: "published",
+      audience: "internal",
+      category: "Data Quality",
+      keywords: "data,migration,duplicate,csv,validation,import",
+      caseQueueKey: "data_quality",
+      ownerId: "user-marcus",
+      publishedAt: daysAgo(14)
+    },
+    {
+      id: "knowledge-urgent-outage-triage",
+      title: "Triage urgent service outages",
+      summary: "First response workflow for urgent customer impact cases.",
+      body:
+        "Confirm the affected account, identify the blocked workflow, assign an owner, create a customer update cadence, and capture the escalation path.",
+      status: "published",
+      audience: "internal",
+      category: "Critical Support",
+      keywords: "urgent,outage,escalation,blocked,customer impact",
+      caseQueueKey: "critical_support",
+      ownerId: "user-elena",
+      publishedAt: daysAgo(7)
+    },
+    {
+      id: "knowledge-onboarding-delay",
+      title: "Recover delayed onboarding milestones",
+      summary: "Customer success playbook for onboarding delays and blocked kickoff tasks.",
+      body:
+        "Review open tasks, confirm the customer owner, reset the milestone plan, and send a short next-step summary.",
+      status: "published",
+      audience: "customer",
+      category: "Customer Success",
+      keywords: "onboarding,kickoff,training,milestone,delay",
+      caseQueueKey: "customer_success",
+      ownerId: "user-ava",
+      publishedAt: daysAgo(5)
+    },
+    {
+      id: "knowledge-password-reset-loop",
+      title: "Handle password reset loops",
+      summary: "Support notes for repeated reset attempts and locked users.",
+      body:
+        "Confirm the affected email address, capture browser/device context, reset the session, and document whether the issue is isolated or account-wide.",
+      status: "draft",
+      audience: "internal",
+      category: "General Support",
+      keywords: "password,reset,login,session,access",
+      caseQueueKey: "general_support",
+      ownerId: "user-marcus",
+      publishedAt: null
+    },
+    {
+      id: "knowledge-compliance-documentation",
+      title: "Prepare compliance audit documentation",
+      summary: "Archived checklist for legacy compliance document requests.",
+      body:
+        "This legacy checklist is retained for reference while the current compliance package is refreshed.",
+      status: "archived",
+      audience: "internal",
+      category: "Compliance",
+      keywords: "compliance,audit,documentation,legacy",
+      caseQueueKey: "data_quality",
+      ownerId: "user-elena",
+      publishedAt: daysAgo(180)
+    }
+  ];
+
+  await prisma.knowledgeArticle.createMany({
+    data: knowledgeArticles
   });
 
   // Campaign seed data covers varied statuses, dates, and lead/contact associations.

@@ -12,6 +12,8 @@ import {
   CASE_PRIORITIES,
   CASE_QUEUE_KEYS,
   CASE_STATUSES,
+  KNOWLEDGE_ARTICLE_AUDIENCES,
+  KNOWLEDGE_ARTICLE_STATUSES,
   TASK_PRIORITIES,
   TASK_STATUSES
 } from "@/lib/crm/registry";
@@ -74,6 +76,10 @@ export const caseStatusSchema = z.enum(CASE_STATUSES);
 export const casePrioritySchema = z.enum(CASE_PRIORITIES);
 export const caseQueueKeySchema = z.enum(CASE_QUEUE_KEYS);
 export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
+export const knowledgeArticleStatusSchema = z.enum(KNOWLEDGE_ARTICLE_STATUSES);
+export const knowledgeArticleAudienceSchema = z.enum(
+  KNOWLEDGE_ARTICLE_AUDIENCES
+);
 
 const blankStringToUndefined = (value: unknown) =>
   typeof value === "string" && value.trim().length === 0 ? undefined : value;
@@ -296,6 +302,21 @@ export const caseCreateSchema = z.object({
   ownerId: optionalText
 });
 export const caseUpdateSchema = caseCreateSchema.partial();
+
+export const knowledgeArticleCreateSchema = z.object({
+  title: z.string().trim().min(1, "Knowledge article title is required."),
+  summary: optionalText,
+  body: z.string().trim().min(1, "Knowledge article body is required."),
+  status: knowledgeArticleStatusSchema.default("draft"),
+  audience: knowledgeArticleAudienceSchema.default("internal"),
+  category: optionalText,
+  keywords: optionalText.default(""),
+  caseQueueKey: optionalCaseQueueKey,
+  ownerId: optionalText,
+  publishedAt: optionalDate
+});
+export const knowledgeArticleUpdateSchema =
+  knowledgeArticleCreateSchema.partial();
 
 export const campaignCreateSchema = z.object({
   name: z.string().trim().min(1, "Campaign name is required."),

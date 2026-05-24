@@ -7,6 +7,7 @@ import type {
   Contact,
   Deal,
   DealerOrder,
+  KnowledgeArticle,
   Lead,
   Task
 } from "@prisma/client";
@@ -34,6 +35,7 @@ export type {
   Contact,
   Deal,
   DealerOrder,
+  KnowledgeArticle,
   Lead,
   Task
 };
@@ -88,6 +90,21 @@ export const CASE_QUEUE_KEYS = [
   "general_support"
 ] as const;
 export type CaseQueueKey = (typeof CASE_QUEUE_KEYS)[number];
+
+export const KNOWLEDGE_ARTICLE_STATUSES = [
+  "draft",
+  "published",
+  "archived"
+] as const;
+export type KnowledgeArticleStatus =
+  (typeof KNOWLEDGE_ARTICLE_STATUSES)[number];
+
+export const KNOWLEDGE_ARTICLE_AUDIENCES = [
+  "internal",
+  "customer"
+] as const;
+export type KnowledgeArticleAudience =
+  (typeof KNOWLEDGE_ARTICLE_AUDIENCES)[number];
 
 export const CAMPAIGN_STATUSES = [
   "planned",

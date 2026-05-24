@@ -66,6 +66,14 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - Priority values: `low`, `normal`, `high`, `urgent`.
 - Optional relations: `Account`, `Contact`, owner `User`.
 
+### KnowledgeArticle
+- Prisma model: `KnowledgeArticle`.
+- Route: no standalone product route. Articles are local service-workflow records consumed by case assist surfaces on `/cases`; detail flows must stay inside the existing `/cases?case=<id>` case drawer unless a later prompt and contract update promote article routes.
+- Status values: `draft`, `published`, `archived`.
+- Audience values: `internal`, `customer`.
+- Optional metadata: `category`, comma-separated `keywords`, `caseQueueKey`, owner `User`, and `publishedAt`.
+- Audit entity type: `knowledge_article`.
+
 ### Campaign
 - Prisma model: `Campaign`.
 - Route: `/campaigns`; detail route: `/campaigns?campaign=<id>`.
@@ -77,6 +85,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
+- `KnowledgeArticle` is exported from the registry with `KNOWLEDGE_ARTICLE_STATUSES` and `KNOWLEDGE_ARTICLE_AUDIENCES`, but it is not added to `ENTITY_REGISTRY` or `ROUTE_REGISTRY` while it has no standalone product route.
 - Existing UI routes are preserved. `/tasks`, `/cases`, `/campaigns`, and `/reports` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
 
 ## Status Constants
@@ -91,6 +100,7 @@ Status and stage values in this contract mirror `lib/crm-constants.ts` and `lib/
 - DealerOrder: `DEALER_ORDER_STATUSES`
 - Task: `TASK_STATUSES`
 - Case: `CASE_STATUSES`
+- KnowledgeArticle: `KNOWLEDGE_ARTICLE_STATUSES`, `KNOWLEDGE_ARTICLE_AUDIENCES`
 - Campaign: `CAMPAIGN_STATUSES`
 
 ## Feature Flags And Excluded Routes
@@ -147,6 +157,7 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 - Header search in `components/app-shell.tsx` submits to `/contacts` and is contacts-only.
 - The global command palette in `components/command-palette.tsx` opens with Ctrl/Cmd+K and calls `globalSearch()` through `components/command-palette-action.ts`.
 - `globalSearch()` returns accounts, contacts, opportunities, leads, tasks, cases, and campaigns with routes from `ROUTE_REGISTRY`.
+- Knowledge articles are not included in header search, command-palette search, or a dedicated search route during Sprint 33.
 - `/search` and `/command-palette` remain excluded route placeholders; they are not product pages.
 
 ## crmClient Adapter Signatures
@@ -254,6 +265,15 @@ New routing events write the structured JSON payload to `Activity.rawText` and k
 - `updateCase(id: string, input: CaseUpdateInput): Promise<Case>`
 - `resolveCase(id: string): Promise<Case>`
 - `deleteCase(id: string): Promise<Case>`
+
+### KnowledgeArticle
+- `listKnowledgeArticles(opts?: KnowledgeArticleListOptions): Promise<KnowledgeArticle[]>`
+- `getKnowledgeArticle(id: string): Promise<KnowledgeArticle | null>`
+- `createKnowledgeArticle(input: KnowledgeArticleCreateInput): Promise<KnowledgeArticle>`
+- `updateKnowledgeArticle(id: string, input: KnowledgeArticleUpdateInput): Promise<KnowledgeArticle>`
+- `publishKnowledgeArticle(id: string, publishedAt?: Date): Promise<KnowledgeArticle>`
+- `archiveKnowledgeArticle(id: string): Promise<KnowledgeArticle>`
+- Object adapter: `crmClient.knowledgeArticles.list/get/create/update/publish/archive`.
 
 ### Campaign
 - `listCampaigns(opts?: CampaignListOptions): Promise<Campaign[]>`

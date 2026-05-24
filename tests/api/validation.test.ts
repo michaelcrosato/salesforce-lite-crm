@@ -8,6 +8,7 @@ import {
   caseCreateSchema,
   contactCreateSchema,
   dealerOrderCreateSchema,
+  knowledgeArticleCreateSchema,
   leadCreateSchema,
   noteCreateSchema,
   opportunityCreateSchema,
@@ -108,6 +109,15 @@ const invalidCases: ValidationCase[] = [
     input: {
       subject: "Invalid case",
       priority: "bad-priority"
+    }
+  },
+  {
+    entity: "KnowledgeArticle",
+    schema: knowledgeArticleCreateSchema,
+    input: {
+      title: "Invalid knowledge article",
+      body: "",
+      status: "published"
     }
   },
   {

@@ -6,7 +6,9 @@ import {
   CASE_STATUSES,
   CASE_PRIORITIES,
   CASE_QUEUE_KEYS,
-  CAMPAIGN_STATUSES
+  CAMPAIGN_STATUSES,
+  KNOWLEDGE_ARTICLE_AUDIENCES,
+  KNOWLEDGE_ARTICLE_STATUSES
 } from "@/lib/crm/registry";
 import { buildCaseSlaSnapshots } from "@/lib/services/caseSlas";
 
@@ -15,15 +17,18 @@ describe("seed integrity (post-seed invariants)", () => {
     // ensure some data exists; in real CI e2e runs seed first
   });
 
-  it("Task, Case, Campaign tables have seeded rows", async () => {
-    const [taskCount, caseCount, campaignCount] = await Promise.all([
-      prisma.task.count(),
-      prisma.case.count(),
-      prisma.campaign.count()
-    ]);
+  it("Task, Case, Campaign, and KnowledgeArticle tables have seeded rows", async () => {
+    const [taskCount, caseCount, campaignCount, articleCount] =
+      await Promise.all([
+        prisma.task.count(),
+        prisma.case.count(),
+        prisma.campaign.count(),
+        prisma.knowledgeArticle.count()
+      ]);
     expect(taskCount).toBeGreaterThanOrEqual(40);
     expect(caseCount).toBeGreaterThanOrEqual(18);
     expect(campaignCount).toBeGreaterThanOrEqual(6);
+    expect(articleCount).toBeGreaterThanOrEqual(6);
   });
 
   it("no orphan Task references (accountId/contactId/dealId/leadId/ownerId)", async () => {
@@ -88,6 +93,26 @@ describe("seed integrity (post-seed invariants)", () => {
     for (const c of campaigns) {
       expect(CAMPAIGN_STATUSES).toContain(c.status);
     }
+
+    const articles = await prisma.knowledgeArticle.findMany({
+      select: {
+        status: true,
+        audience: true,
+        caseQueueKey: true,
+        title: true
+      }
+    });
+    for (const article of articles) {
+      expect(KNOWLEDGE_ARTICLE_STATUSES).toContain(article.status);
+      expect(KNOWLEDGE_ARTICLE_AUDIENCES).toContain(article.audience);
+      if (article.caseQueueKey) {
+        expect(CASE_QUEUE_KEYS).toContain(article.caseQueueKey);
+      }
+      expect(article.title).toBeTruthy();
+    }
+    expect(articles.some((article) => article.status === "published")).toBe(
+      true
+    );
   });
 
   it("date sanity: createdAt <= updatedAt; dueDate within 2020-2030 range where present", async () => {
@@ -135,12 +160,15 @@ describe("seed integrity (post-seed invariants)", () => {
   });
 
   it("no duplicate IDs across seeded entities", async () => {
-    const [tasks, cases, campaigns] = await Promise.all([
+    const [tasks, cases, campaigns, articles] = await Promise.all([
       prisma.task.findMany({ select: { id: true } }),
       prisma.case.findMany({ select: { id: true } }),
-      prisma.campaign.findMany({ select: { id: true } })
+      prisma.campaign.findMany({ select: { id: true } }),
+      prisma.knowledgeArticle.findMany({ select: { id: true } })
     ]);
-    const allIds = [...tasks, ...cases, ...campaigns].map((x) => x.id);
+    const allIds = [...tasks, ...cases, ...campaigns, ...articles].map(
+      (x) => x.id
+    );
     const unique = new Set(allIds);
     expect(unique.size).toBe(allIds.length);
   });

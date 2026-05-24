@@ -21,6 +21,7 @@ model User {
   campaigns  Campaign[]
   opportunityStageChanges OpportunityStageHistory[]
   auditEvents AuditEvent[]
+  knowledgeArticles KnowledgeArticle[]
 }
 
 model SavedListView {
@@ -284,6 +285,30 @@ model Campaign {
   updatedAt   DateTime  @updatedAt @db.Timestamp(3)
 
   @@index([status])
+}
+
+model KnowledgeArticle {
+  id           String    @id @default(cuid()) @db.Text
+  title        String    @db.VarChar(255)
+  summary      String?   @db.Text
+  body         String    @db.Text
+  status       String    @default("draft") @db.VarChar(50)
+  audience     String    @default("internal") @db.VarChar(50)
+  category     String?   @db.VarChar(120)
+  keywords     String    @default("") @db.Text
+  caseQueueKey String?   @db.VarChar(50)
+  ownerId      String?   @db.Text
+  owner        User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  publishedAt  DateTime? @db.Timestamp(3)
+  createdAt    DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamp(3)
+
+  @@index([status])
+  @@index([audience])
+  @@index([category])
+  @@index([caseQueueKey])
+  @@index([ownerId])
+  @@index([updatedAt])
 }
 
 model OpportunityStageHistory {

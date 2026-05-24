@@ -6,6 +6,7 @@ import type {
   Case,
   Contact,
   DealerOrder,
+  KnowledgeArticle,
   Lead,
   OpportunityStageHistory,
   Prisma,
@@ -42,6 +43,15 @@ import {
 } from "@/lib/services/cases";
 import type { CaseListInput as CaseServiceListInput } from "@/lib/services/cases";
 import {
+  archiveKnowledgeArticle as archiveKnowledgeArticleService,
+  createKnowledgeArticle as createKnowledgeArticleService,
+  getKnowledgeArticle as getKnowledgeArticleService,
+  listKnowledgeArticles as listKnowledgeArticlesService,
+  publishKnowledgeArticle as publishKnowledgeArticleService,
+  updateKnowledgeArticle as updateKnowledgeArticleService
+} from "@/lib/services/knowledgeArticles";
+import type { KnowledgeArticleListInput as KnowledgeArticleServiceListInput } from "@/lib/services/knowledgeArticles";
+import {
   completeTask as completeTaskService,
   createTask as createTaskService,
   deleteTask as deleteTaskService,
@@ -77,6 +87,8 @@ import {
   dealerOrderCreateSchema,
   dealerOrderUpdateSchema,
   idSchema,
+  knowledgeArticleCreateSchema,
+  knowledgeArticleUpdateSchema,
   leadCreateSchema,
   leadUpdateSchema,
   noteCreateSchema,
@@ -158,6 +170,7 @@ export type AreaListOptions = ListQueryInput<AreaSortBy, AreaFilters>;
 export type TaskListOptions = TaskServiceListInput;
 export type CaseListOptions = CaseServiceListInput;
 export type CampaignListOptions = CampaignServiceListInput;
+export type KnowledgeArticleListOptions = KnowledgeArticleServiceListInput;
 
 export type AccountCreateInput = z.input<typeof accountCreateSchema>;
 export type AccountUpdateInput = z.input<typeof accountUpdateSchema>;
@@ -181,6 +194,12 @@ export type CaseCreateInput = z.input<typeof caseCreateSchema>;
 export type CaseUpdateInput = z.input<typeof caseUpdateSchema>;
 export type CampaignCreateInput = z.input<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.input<typeof campaignUpdateSchema>;
+export type KnowledgeArticleCreateInput = z.input<
+  typeof knowledgeArticleCreateSchema
+>;
+export type KnowledgeArticleUpdateInput = z.input<
+  typeof knowledgeArticleUpdateSchema
+>;
 export type { RoutingDecision } from "@/lib/services/leads";
 
 function parseId(id: string): string {
@@ -779,6 +798,45 @@ export async function deleteCase(id: string): Promise<Case> {
   return deleteCaseService(id);
 }
 
+/** Lists knowledge articles. Supported filter keys: `status`, `audience`, `caseQueueKey`, `category`, `ownerId`, `search`. */
+export async function listKnowledgeArticles(
+  opts: KnowledgeArticleListOptions = {}
+): Promise<KnowledgeArticle[]> {
+  return listKnowledgeArticlesService(opts);
+}
+
+export async function getKnowledgeArticle(
+  id: string
+): Promise<KnowledgeArticle | null> {
+  return getKnowledgeArticleService(id);
+}
+
+export async function createKnowledgeArticle(
+  input: KnowledgeArticleCreateInput
+): Promise<KnowledgeArticle> {
+  return createKnowledgeArticleService(input);
+}
+
+export async function updateKnowledgeArticle(
+  id: string,
+  input: KnowledgeArticleUpdateInput
+): Promise<KnowledgeArticle> {
+  return updateKnowledgeArticleService(id, input);
+}
+
+export async function publishKnowledgeArticle(
+  id: string,
+  publishedAt?: Date
+): Promise<KnowledgeArticle> {
+  return publishKnowledgeArticleService(id, publishedAt);
+}
+
+export async function archiveKnowledgeArticle(
+  id: string
+): Promise<KnowledgeArticle> {
+  return archiveKnowledgeArticleService(id);
+}
+
 /** Lists campaigns. Supported filter keys: `status`, `ownerId`, `startDateFrom`, `startDateTo`. */
 export async function listCampaigns(
   opts: CampaignListOptions = {}
@@ -827,5 +885,13 @@ export const crmClient = {
     update: updateLead,
     delete: deleteLead,
     getRoutingDecision: getRoutingDecisionForLead
+  },
+  knowledgeArticles: {
+    list: listKnowledgeArticles,
+    get: getKnowledgeArticle,
+    create: createKnowledgeArticle,
+    update: updateKnowledgeArticle,
+    publish: publishKnowledgeArticle,
+    archive: archiveKnowledgeArticle
   }
 } as const;

@@ -24,6 +24,7 @@ export const AUDIT_ENTITY_TYPES = [
   "task",
   "case",
   "campaign",
+  "knowledge_article",
   "report",
   "csv",
   "system"
