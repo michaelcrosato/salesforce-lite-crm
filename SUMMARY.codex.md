@@ -2,38 +2,36 @@ Agent: Codex
 
 Sprint: 30
 
-Feature: Sprint rollover planning - S30-F1/S30-F2/S30-F3 queued
+Feature: Baseline gate repair - Vitest timeout
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- 34a75c2 - [codex] sprint 30: plan codex track
-- d7cb5c9 - [codex] sprint 30: backlog refresh
+- d78ba0e - [codex] gate: dedupe CSV release packet builds
 
-Gate status: PASS - Phase 0 `scripts/local-gate.ps1` exited 0; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` exited 0. `npm run test` passed 66 files / 359 tests.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0. Unit tests passed 66 files / 359 tests; Playwright e2e passed 20 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-23T21:05:06.6360228-07:00
+Timestamp: 2026-05-23T22:06:17.8157665-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Verified the baseline with the full local gate before planning; lint, typecheck, unit tests, build, and e2e were green.
-- Reviewed PLAN.md, CRM-CONTRACT.md, README.md limitations/next-scope material, docs/decisions.md, all SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the recent git log.
-- Closed Sprint 29 for Codex in PLAN.md based on S29-F1/S29-F2/S29-F3 completion evidence and zero active Codex blockers.
-- Planned Sprint 30 for Codex with three queued features: selected export action packets, bulk action execution foundation, and bulk action execution operator UI.
-- Synced docs/FEATURE-BACKLOG.md so S29 rows are done and S30 rows are queued.
+- Reproduced the Phase 0 baseline failure: `npm run test` timed out before build while slow CSV release packet tests were running.
+- Added a shared in-flight cache for read-only CSV packet builders so concurrent aggregate calls share the same pending work and clear after settlement.
+- Wired the cache into CSV fixture, release-note, acceptance, walkthrough, closure, handoff, exception, and disposition aggregate builders without adding product routes, writes, dependencies, or contract changes.
+- Verified the repaired gate with the full local PowerShell gate.
 
 ### Next action
 
-Run LOOP.md to begin S30-F1.
+Run LOOP.md to begin S30-F1 - Selected export action packets.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; this planning prompt only wrote PLAN.md, docs/FEATURE-BACKLOG.md, SUMMARY.codex.md, and BLOCKERS.codex.md)
+No cross-ownership edits: YES (single-agent root mode; gate repair touched server helper files only)
 
 CRM-CONTRACT.md honored: YES

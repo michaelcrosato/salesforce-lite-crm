@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 30
 
-Feature: Sprint rollover planning - S30-F1/S30-F2/S30-F3 queued
+Feature: Baseline gate repair - Vitest timeout
 
 Branch: main
 
-Timestamp: 2026-05-23T21:05:06.6360228-07:00
+Timestamp: 2026-05-23T22:06:17.8157665-07:00
 
 Escalation required: NO
 
@@ -17,5 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
-- Sprint 29 planning drift was resolved by marking S29-F1, S29-F2, and S29-F3 done in PLAN.md and docs/FEATURE-BACKLOG.md.
+- Baseline gate timeout resolved: `npm run test` now exits 0, and `scripts/local-gate.ps1` exits 0.
