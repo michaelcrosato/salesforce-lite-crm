@@ -8,6 +8,7 @@ import {
   CASE_QUEUE_KEYS,
   CAMPAIGN_STATUSES
 } from "@/lib/crm/registry";
+import { buildCaseSlaSnapshots } from "@/lib/services/caseSlas";
 
 describe("seed integrity (post-seed invariants)", () => {
   beforeAll(async () => {
@@ -109,6 +110,28 @@ describe("seed integrity (post-seed invariants)", () => {
     for (const c of cases) {
       expect(c.createdAt.getTime()).toBeLessThanOrEqual(c.updatedAt.getTime());
     }
+  });
+
+  it("seeded cases cover case SLA states", async () => {
+    const cases = await prisma.case.findMany({
+      orderBy: {
+        id: "asc"
+      }
+    });
+    const snapshots = buildCaseSlaSnapshots(cases, {
+      now: () => new Date()
+    });
+    const states = snapshots.map((snapshot) => snapshot.state);
+
+    expect(states).toEqual(
+      expect.arrayContaining([
+        "on_track",
+        "due_soon",
+        "overdue",
+        "stopped_on_time",
+        "stopped_overdue"
+      ])
+    );
   });
 
   it("no duplicate IDs across seeded entities", async () => {

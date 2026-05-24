@@ -830,6 +830,20 @@ async function main() {
   const caseOwnerIds = users.map((u) => u.id);
   const caseStatuses = ["new", "in_progress", "waiting", "resolved", "closed"] as const;
   const casePriorities = ["low", "normal", "high", "urgent"] as const;
+  const caseSlaSeedNow = new Date();
+  const caseSlaHour = 60 * 60 * 1000;
+  const caseSlaProfiles = [
+    { createdHoursAgo: 12, updatedHoursAgo: 2 },
+    { createdHoursAgo: 42, updatedHoursAgo: 3 },
+    { createdHoursAgo: 30, updatedHoursAgo: 4 },
+    { createdHoursAgo: 3, updatedHoursAgo: 1 },
+    { createdHoursAgo: 120, updatedHoursAgo: 8 },
+    { createdHoursAgo: 72, updatedHoursAgo: 6 },
+    { createdHoursAgo: 20, updatedHoursAgo: 2 },
+    { createdHoursAgo: 2, updatedHoursAgo: 1 },
+    { createdHoursAgo: 18, updatedHoursAgo: 2 },
+    { createdHoursAgo: 110, updatedHoursAgo: 18 }
+  ] as const;
 
   const caseData = Array.from({ length: 20 }, (_, i) => {
     const accountId = caseAccountIds[i % caseAccountIds.length];
@@ -848,6 +862,13 @@ async function main() {
       accountId,
       contactId
     });
+    const slaProfile = caseSlaProfiles[i % caseSlaProfiles.length];
+    const createdAt = new Date(
+      caseSlaSeedNow.getTime() - slaProfile.createdHoursAgo * caseSlaHour
+    );
+    const updatedAt = new Date(
+      caseSlaSeedNow.getTime() - slaProfile.updatedHoursAgo * caseSlaHour
+    );
 
     return {
       id: `case-${String(i + 1).padStart(3, "0")}`,
@@ -859,7 +880,9 @@ async function main() {
       queueReason: queueAssignment.reason,
       accountId,
       contactId,
-      ownerId
+      ownerId,
+      createdAt,
+      updatedAt
     };
   });
 

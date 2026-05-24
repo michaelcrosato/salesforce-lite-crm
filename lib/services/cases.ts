@@ -14,6 +14,12 @@ import {
   assignCaseQueue,
   type CaseQueueAssignment
 } from "@/lib/services/caseQueues";
+import {
+  buildCaseSlaSnapshot,
+  buildCaseSlaSnapshots,
+  type CaseSlaClock,
+  type CaseSlaSnapshot
+} from "@/lib/services/caseSlas";
 import { fieldEquals } from "@/lib/services/filterCompiler";
 import { buildListQuery, type ListQueryInput } from "@/lib/services/listQuery";
 import { caseCreateSchema, caseUpdateSchema, idSchema } from "@/lib/validation";
@@ -96,6 +102,17 @@ export async function listCases(input: unknown = {}): Promise<Case[]> {
   return prisma.case.findMany(caseListQuery(parseCaseListInput(input)));
 }
 
+export async function listCaseSlaSnapshots(
+  input: unknown = {},
+  clock?: CaseSlaClock
+): Promise<CaseSlaSnapshot[]> {
+  const cases = await listCases(input);
+
+  return clock
+    ? buildCaseSlaSnapshots(cases, clock)
+    : buildCaseSlaSnapshots(cases);
+}
+
 function parseCaseListInput(input: unknown): ParsedCaseListInput {
   const standard = caseListSchema.safeParse(input);
 
@@ -145,6 +162,21 @@ function caseListQuery(input: ParsedCaseListInput) {
 
 export async function getCase(id: string): Promise<Case | null> {
   return prisma.case.findUnique({ where: { id: idSchema.parse(id) } });
+}
+
+export async function getCaseSlaSnapshot(
+  id: string,
+  clock?: CaseSlaClock
+): Promise<CaseSlaSnapshot | null> {
+  const crmCase = await getCase(id);
+
+  if (!crmCase) {
+    return null;
+  }
+
+  return clock
+    ? buildCaseSlaSnapshot(crmCase, clock)
+    : buildCaseSlaSnapshot(crmCase);
 }
 
 export async function updateCase(id: string, input: unknown): Promise<Case> {
