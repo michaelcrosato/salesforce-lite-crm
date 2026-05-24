@@ -41,10 +41,20 @@ export type CsvExportOptions = {
   limit?: number;
 };
 
+export type CsvSelectedExportOptions = {
+  recordIds: readonly string[];
+};
+
 export type CsvExportResult = CsvExportDefinition & {
   contentType: typeof CSV_EXPORT_CONTENT_TYPE;
   rowCount: number;
   csv: string;
+};
+
+export type CsvSelectedExportResult = CsvExportResult & {
+  requestedRecordCount: number;
+  selectedRecordIds: readonly string[];
+  missingRecordIds: readonly string[];
 };
 
 export type CsvExportPreflightSummary = CsvExportDefinition & {
@@ -77,7 +87,7 @@ export type CsvExportPreview = CsvExportDefinition & {
 };
 
 type CsvCell = string | number | Date | null;
-type CsvRow = Record<string, CsvCell>;
+type CsvRow = Record<string, CsvCell> & { id: string };
 
 type InternalCsvExportDefinition<Row extends CsvRow> = {
   entity: CsvExportEntity;
@@ -86,6 +96,7 @@ type InternalCsvExportDefinition<Row extends CsvRow> = {
   filename: string;
   columns: readonly CsvColumn<Row>[];
   loadRows: (take: number) => Promise<Row[]>;
+  loadRowsByIds: (ids: readonly string[]) => Promise<Row[]>;
   countRows: () => Promise<number>;
 };
 
@@ -313,6 +324,58 @@ async function buildCsvExport<Row extends CsvRow>(
     contentType: CSV_EXPORT_CONTENT_TYPE,
     rowCount: rows.length,
     csv: toCsv(rows, definition.columns)
+  };
+}
+
+function uniqueRecordIds(recordIds: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const output: string[] = [];
+
+  for (const id of recordIds) {
+    if (!seen.has(id)) {
+      seen.add(id);
+      output.push(id);
+    }
+  }
+
+  return output;
+}
+
+function orderRowsByIds<Row extends CsvRow>(
+  ids: readonly string[],
+  rows: readonly Row[]
+): Row[] {
+  const rowsById = new Map(rows.map((row) => [row.id, row]));
+  const orderedRows: Row[] = [];
+
+  for (const id of ids) {
+    const row = rowsById.get(id);
+
+    if (row) {
+      orderedRows.push(row);
+    }
+  }
+
+  return orderedRows;
+}
+
+async function buildSelectedCsvExport<Row extends CsvRow>(
+  definition: InternalCsvExportDefinition<Row>,
+  options: CsvSelectedExportOptions
+): Promise<CsvSelectedExportResult> {
+  const uniqueIds = uniqueRecordIds(options.recordIds);
+  const rows =
+    uniqueIds.length === 0 ? [] : await definition.loadRowsByIds(uniqueIds);
+  const exportedIds = new Set(rows.map((row) => row.id));
+
+  return {
+    ...toPublicDefinition(definition),
+    contentType: CSV_EXPORT_CONTENT_TYPE,
+    rowCount: rows.length,
+    csv: toCsv(rows, definition.columns),
+    requestedRecordCount: options.recordIds.length,
+    selectedRecordIds: rows.map((row) => row.id),
+    missingRecordIds: uniqueIds.filter((id) => !exportedIds.has(id))
   };
 }
 
@@ -928,6 +991,425 @@ async function loadCampaignRows(take: number): Promise<CampaignCsvRow[]> {
   }));
 }
 
+async function loadAccountRowsByIds(
+  ids: readonly string[]
+): Promise<AccountCsvRow[]> {
+  const accounts = await prisma.account.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      name: true,
+      domain: true,
+      industry: true,
+      city: true,
+      region: true,
+      status: true,
+      healthScore: true,
+      ownerId: true,
+      owner: { select: { name: true, email: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    accounts.map((account) => ({
+      id: account.id,
+      name: account.name,
+      domain: account.domain,
+      industry: account.industry,
+      city: account.city,
+      region: account.region,
+      status: account.status,
+      healthScore: account.healthScore,
+      ownerId: account.ownerId,
+      ownerName: account.owner?.name ?? null,
+      ownerEmail: account.owner?.email ?? null,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt
+    }))
+  );
+}
+
+async function loadContactRowsByIds(
+  ids: readonly string[]
+): Promise<ContactCsvRow[]> {
+  const contacts = await prisma.contact.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      title: true,
+      status: true,
+      accountId: true,
+      account: { select: { name: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    contacts.map((contact) => ({
+      id: contact.id,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      email: contact.email,
+      phone: contact.phone,
+      title: contact.title,
+      status: contact.status,
+      accountId: contact.accountId,
+      accountName: contact.account?.name ?? null,
+      createdAt: contact.createdAt,
+      updatedAt: contact.updatedAt
+    }))
+  );
+}
+
+async function loadOpportunityRowsByIds(
+  ids: readonly string[]
+): Promise<OpportunityCsvRow[]> {
+  const opportunities = await prisma.deal.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      name: true,
+      stage: true,
+      value: true,
+      probability: true,
+      accountId: true,
+      account: { select: { name: true } },
+      contactId: true,
+      contact: { select: { firstName: true, lastName: true } },
+      ownerId: true,
+      owner: { select: { name: true } },
+      expectedCloseDate: true,
+      lastActivityAt: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    opportunities.map((opportunity) => ({
+      id: opportunity.id,
+      name: opportunity.name,
+      stage: opportunity.stage,
+      value: opportunity.value,
+      probability: opportunity.probability,
+      accountId: opportunity.accountId,
+      accountName: opportunity.account?.name ?? null,
+      contactId: opportunity.contactId,
+      contactName: fullName(opportunity.contact),
+      ownerId: opportunity.ownerId,
+      ownerName: opportunity.owner?.name ?? null,
+      expectedCloseDate: opportunity.expectedCloseDate,
+      lastActivityAt: opportunity.lastActivityAt,
+      createdAt: opportunity.createdAt,
+      updatedAt: opportunity.updatedAt
+    }))
+  );
+}
+
+async function loadLeadRowsByIds(ids: readonly string[]): Promise<LeadCsvRow[]> {
+  const leads = await prisma.lead.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      email: true,
+      postalCode: true,
+      province: true,
+      source: true,
+      status: true,
+      areaId: true,
+      area: { select: { name: true } },
+      assignedOrderId: true,
+      assignedOrder: { select: { name: true } },
+      assignmentReason: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    leads.map((lead) => ({
+      id: lead.id,
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      phone: lead.phone,
+      email: lead.email,
+      postalCode: lead.postalCode,
+      province: lead.province,
+      source: lead.source,
+      status: lead.status,
+      areaId: lead.areaId,
+      areaName: lead.area?.name ?? null,
+      assignedOrderId: lead.assignedOrderId,
+      assignedOrderName: lead.assignedOrder?.name ?? null,
+      assignmentReason: lead.assignmentReason,
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt
+    }))
+  );
+}
+
+async function loadActivityRowsByIds(
+  ids: readonly string[]
+): Promise<ActivityCsvRow[]> {
+  const activities = await prisma.activity.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      type: true,
+      title: true,
+      summary: true,
+      nextStep: true,
+      accountId: true,
+      account: { select: { name: true } },
+      contactId: true,
+      contact: { select: { firstName: true, lastName: true } },
+      dealId: true,
+      deal: { select: { name: true } },
+      leadId: true,
+      lead: { select: { firstName: true, lastName: true } },
+      taskId: true,
+      task: { select: { title: true } },
+      caseId: true,
+      case: { select: { subject: true } },
+      userId: true,
+      user: { select: { name: true } },
+      createdAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    activities.map((activity) => ({
+      id: activity.id,
+      type: activity.type,
+      title: activity.title,
+      summary: activity.summary,
+      nextStep: activity.nextStep,
+      accountId: activity.accountId,
+      accountName: activity.account?.name ?? null,
+      contactId: activity.contactId,
+      contactName: fullName(activity.contact),
+      dealId: activity.dealId,
+      dealName: activity.deal?.name ?? null,
+      leadId: activity.leadId,
+      leadName: fullName(activity.lead),
+      taskId: activity.taskId,
+      taskTitle: activity.task?.title ?? null,
+      caseId: activity.caseId,
+      caseSubject: activity.case?.subject ?? null,
+      userId: activity.userId,
+      userName: activity.user?.name ?? null,
+      createdAt: activity.createdAt
+    }))
+  );
+}
+
+async function loadDealerOrderRowsByIds(
+  ids: readonly string[]
+): Promise<DealerOrderCsvRow[]> {
+  const dealerOrders = await prisma.dealerOrder.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      monthlyQuota: true,
+      accountId: true,
+      account: { select: { name: true } },
+      startDate: true,
+      endDate: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    dealerOrders.map((dealerOrder) => ({
+      id: dealerOrder.id,
+      name: dealerOrder.name,
+      status: dealerOrder.status,
+      monthlyQuota: dealerOrder.monthlyQuota,
+      accountId: dealerOrder.accountId,
+      accountName: dealerOrder.account?.name ?? null,
+      startDate: dealerOrder.startDate,
+      endDate: dealerOrder.endDate,
+      createdAt: dealerOrder.createdAt,
+      updatedAt: dealerOrder.updatedAt
+    }))
+  );
+}
+
+async function loadAreaRowsByIds(ids: readonly string[]): Promise<AreaCsvRow[]> {
+  const areas = await prisma.area.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      name: true,
+      province: true,
+      region: true,
+      postalPrefixes: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    areas.map((area) => ({
+      id: area.id,
+      name: area.name,
+      province: area.province,
+      region: area.region,
+      postalPrefixes: area.postalPrefixes,
+      createdAt: area.createdAt,
+      updatedAt: area.updatedAt
+    }))
+  );
+}
+
+async function loadTaskRowsByIds(ids: readonly string[]): Promise<TaskCsvRow[]> {
+  const tasks = await prisma.task.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      dueDate: true,
+      status: true,
+      priority: true,
+      ownerId: true,
+      owner: { select: { name: true } },
+      accountId: true,
+      account: { select: { name: true } },
+      contactId: true,
+      contact: { select: { firstName: true, lastName: true } },
+      dealId: true,
+      deal: { select: { name: true } },
+      leadId: true,
+      lead: { select: { firstName: true, lastName: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    tasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      status: task.status,
+      priority: task.priority,
+      ownerId: task.ownerId,
+      ownerName: task.owner?.name ?? null,
+      accountId: task.accountId,
+      accountName: task.account?.name ?? null,
+      contactId: task.contactId,
+      contactName: fullName(task.contact),
+      dealId: task.dealId,
+      dealName: task.deal?.name ?? null,
+      leadId: task.leadId,
+      leadName: fullName(task.lead),
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt
+    }))
+  );
+}
+
+async function loadCaseRowsByIds(ids: readonly string[]): Promise<CaseCsvRow[]> {
+  const cases = await prisma.case.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      subject: true,
+      description: true,
+      status: true,
+      priority: true,
+      ownerId: true,
+      owner: { select: { name: true } },
+      accountId: true,
+      account: { select: { name: true } },
+      contactId: true,
+      contact: { select: { firstName: true, lastName: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    cases.map((crmCase) => ({
+      id: crmCase.id,
+      subject: crmCase.subject,
+      description: crmCase.description,
+      status: crmCase.status,
+      priority: crmCase.priority,
+      ownerId: crmCase.ownerId,
+      ownerName: crmCase.owner?.name ?? null,
+      accountId: crmCase.accountId,
+      accountName: crmCase.account?.name ?? null,
+      contactId: crmCase.contactId,
+      contactName: fullName(crmCase.contact),
+      createdAt: crmCase.createdAt,
+      updatedAt: crmCase.updatedAt
+    }))
+  );
+}
+
+async function loadCampaignRowsByIds(
+  ids: readonly string[]
+): Promise<CampaignCsvRow[]> {
+  const campaigns = await prisma.campaign.findMany({
+    where: { id: { in: [...ids] } },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      status: true,
+      startDate: true,
+      endDate: true,
+      budget: true,
+      ownerId: true,
+      owner: { select: { name: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+
+  return orderRowsByIds(
+    ids,
+    campaigns.map((campaign) => ({
+      id: campaign.id,
+      name: campaign.name,
+      description: campaign.description,
+      status: campaign.status,
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+      budget: campaign.budget,
+      ownerId: campaign.ownerId,
+      ownerName: campaign.owner?.name ?? null,
+      createdAt: campaign.createdAt,
+      updatedAt: campaign.updatedAt
+    }))
+  );
+}
+
 const accountExportDefinition: InternalCsvExportDefinition<AccountCsvRow> = {
   entity: "accounts",
   label: "Accounts",
@@ -935,6 +1417,7 @@ const accountExportDefinition: InternalCsvExportDefinition<AccountCsvRow> = {
   filename: "accounts.csv",
   columns: accountColumns,
   loadRows: loadAccountRows,
+  loadRowsByIds: loadAccountRowsByIds,
   countRows: () => prisma.account.count()
 };
 
@@ -945,6 +1428,7 @@ const contactExportDefinition: InternalCsvExportDefinition<ContactCsvRow> = {
   filename: "contacts.csv",
   columns: contactColumns,
   loadRows: loadContactRows,
+  loadRowsByIds: loadContactRowsByIds,
   countRows: () => prisma.contact.count()
 };
 
@@ -955,6 +1439,7 @@ const opportunityExportDefinition: InternalCsvExportDefinition<OpportunityCsvRow
   filename: "opportunities.csv",
   columns: opportunityColumns,
   loadRows: loadOpportunityRows,
+  loadRowsByIds: loadOpportunityRowsByIds,
   countRows: () => prisma.deal.count()
 };
 
@@ -965,6 +1450,7 @@ const leadExportDefinition: InternalCsvExportDefinition<LeadCsvRow> = {
   filename: "leads.csv",
   columns: leadColumns,
   loadRows: loadLeadRows,
+  loadRowsByIds: loadLeadRowsByIds,
   countRows: () => prisma.lead.count()
 };
 
@@ -975,6 +1461,7 @@ const activityExportDefinition: InternalCsvExportDefinition<ActivityCsvRow> = {
   filename: "activities.csv",
   columns: activityColumns,
   loadRows: loadActivityRows,
+  loadRowsByIds: loadActivityRowsByIds,
   countRows: () => prisma.activity.count()
 };
 
@@ -985,6 +1472,7 @@ const dealerOrderExportDefinition: InternalCsvExportDefinition<DealerOrderCsvRow
   filename: "dealer-orders.csv",
   columns: dealerOrderColumns,
   loadRows: loadDealerOrderRows,
+  loadRowsByIds: loadDealerOrderRowsByIds,
   countRows: () => prisma.dealerOrder.count()
 };
 
@@ -995,6 +1483,7 @@ const areaExportDefinition: InternalCsvExportDefinition<AreaCsvRow> = {
   filename: "areas.csv",
   columns: areaColumns,
   loadRows: loadAreaRows,
+  loadRowsByIds: loadAreaRowsByIds,
   countRows: () => prisma.area.count()
 };
 
@@ -1005,6 +1494,7 @@ const taskExportDefinition: InternalCsvExportDefinition<TaskCsvRow> = {
   filename: "tasks.csv",
   columns: taskColumns,
   loadRows: loadTaskRows,
+  loadRowsByIds: loadTaskRowsByIds,
   countRows: () => prisma.task.count()
 };
 
@@ -1015,6 +1505,7 @@ const caseExportDefinition: InternalCsvExportDefinition<CaseCsvRow> = {
   filename: "cases.csv",
   columns: caseColumns,
   loadRows: loadCaseRows,
+  loadRowsByIds: loadCaseRowsByIds,
   countRows: () => prisma.case.count()
 };
 
@@ -1025,6 +1516,7 @@ const campaignExportDefinition: InternalCsvExportDefinition<CampaignCsvRow> = {
   filename: "campaigns.csv",
   columns: campaignColumns,
   loadRows: loadCampaignRows,
+  loadRowsByIds: loadCampaignRowsByIds,
   countRows: () => prisma.campaign.count()
 };
 
@@ -1184,5 +1676,33 @@ export async function exportCrmListCsv(
       return buildCsvExport(caseExportDefinition, options);
     case "campaigns":
       return buildCsvExport(campaignExportDefinition, options);
+  }
+}
+
+export async function exportSelectedCrmListCsv(
+  entity: CsvExportEntity,
+  options: CsvSelectedExportOptions
+): Promise<CsvSelectedExportResult> {
+  switch (entity) {
+    case "accounts":
+      return buildSelectedCsvExport(accountExportDefinition, options);
+    case "contacts":
+      return buildSelectedCsvExport(contactExportDefinition, options);
+    case "opportunities":
+      return buildSelectedCsvExport(opportunityExportDefinition, options);
+    case "leads":
+      return buildSelectedCsvExport(leadExportDefinition, options);
+    case "activities":
+      return buildSelectedCsvExport(activityExportDefinition, options);
+    case "dealer-orders":
+      return buildSelectedCsvExport(dealerOrderExportDefinition, options);
+    case "areas":
+      return buildSelectedCsvExport(areaExportDefinition, options);
+    case "tasks":
+      return buildSelectedCsvExport(taskExportDefinition, options);
+    case "cases":
+      return buildSelectedCsvExport(caseExportDefinition, options);
+    case "campaigns":
+      return buildSelectedCsvExport(campaignExportDefinition, options);
   }
 }
