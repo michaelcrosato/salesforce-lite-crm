@@ -1,38 +1,40 @@
 Agent: Codex
 
-Sprint: 32
+Sprint: 33
 
-Feature: S32-F3 - Service operations case UI
+Feature: S33-F1 - Knowledge article foundation
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- 3444067 - [codex] S32-F3: add service operations case UI
+- a39818d - [codex] sprint 33: plan codex track
+- ba87b71 - [codex] sprint 33: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation. It ran npm install, Prisma generate/db push, seed, lint, typecheck, 72 Vitest files / 387 tests, build, Playwright chromium install, and 22 Playwright e2e tests successfully.
+Gate status: PASS - Phase 0 LOOP baseline commands exited 0 before planning: npm install, Prisma generate/db push, seed, lint, typecheck, 72 Vitest files / 387 tests, and build. Post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` also exited 0 with 72 Vitest files / 387 tests passing.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T14:20:13.2225382-07:00
+Timestamp: 2026-05-24T14:58:48.4548592-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added service operations context to `/cases` by showing deterministic queue assignment and SLA state on case rows and the case detail drawer.
-- Added a bounded queue assignment server action and drawer control using existing `CASE_QUEUE_KEYS`, while preserving the existing status update flow and `/cases?case=<id>` drawer route.
-- Added queue selection to the case create/edit form without changing Case status semantics, schema fields, or `crmClient` adapter signatures.
-- Extended `e2e/cases.spec.ts` to verify queue/SLA visibility and queue reassignment feedback.
-- Reconciled prompt context: PLAN §4 still lists S32-F1/S32-F2/S32-F3 as queued, but local commits and green gates now support S32-F1, S32-F2, and S32-F3 as done.
+- Confirmed the Sprint 32 baseline was green with the LOOP Phase 0 gate before editing planning files.
+- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the 30-day git log.
+- Confirmed Codex-owned Sprint 32 work was complete based on S32-F1/S32-F2/S32-F3 commits, Codex report evidence, zero active Codex blockers, and green gate output.
+- Marked S32-F1, S32-F2, and S32-F3 done in PLAN.md.
+- Planned Sprint 33 for Codex with S33-F1 knowledge article foundation, S33-F2 case knowledge suggestion contracts, and S33-F3 case knowledge assist UI.
+- Synced docs/FEATURE-BACKLOG.md with Sprint 32 done status and Sprint 33 queued status.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md or equivalent planning scope to reconcile Sprint 32 status and queue the next valid work unit.
+Run LOOP.md to begin S33-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; historical ownership zones were advisory)
+No cross-ownership edits: YES (single-agent root mode; writes were limited to authorized planning and report files)
 
 CRM-CONTRACT.md honored: YES
