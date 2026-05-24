@@ -6,35 +6,33 @@ Feature: S32-F1 - Case queue assignment foundation
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- 28e0020 - [codex] sprint 32: plan codex track
-- 176b244 - [codex] sprint 32: backlog refresh
+- 7083598 - [codex] S32-F1: add case queue assignment foundation
 
-Gate status: PASS - baseline `scripts/local-gate.ps1` exited 0 before planning with 71 Vitest files / 379 tests and 22 Playwright tests passing; post-planning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` all exited 0. Unit tests passed 71 files / 379 tests in the post-planning run.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation. It ran npm install, Prisma generate/db push, seed, lint, typecheck, 71 Vitest files / 381 tests, build, Playwright chromium install, and 22 Playwright e2e tests successfully.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T11:39:10.2866169-07:00
+Timestamp: 2026-05-24T12:08:44.4545253-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed the Sprint 31 baseline was green with the full local gate before editing planning files.
-- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the 30-day git log.
-- Confirmed Codex-owned Sprint 31 work was complete based on S31-F1/S31-F2/S31-F3 commits, report evidence, and green gate output.
-- Marked S31-F1, S31-F2, and S31-F3 done in PLAN.md.
-- Planned Sprint 32 for Codex with S32-F1 case queue assignment foundation, S32-F2 case SLA timer contracts, and S32-F3 service operations case UI.
-- Synced docs/FEATURE-BACKLOG.md with Sprint 31 done status and Sprint 32 queued status.
+- Added deterministic Case queue assignment metadata with `queueKey` and `queueReason` fields in SQLite and Postgres Prisma schemas.
+- Added the shared Case queue key catalog and service helper for explicit queues, urgent priority routing, keyword routing, linked-customer fallback, and default support routing.
+- Wired Case create/update flows to assign queues deterministically, preserve explicit queues, and include queue metadata plus previous queue evidence in audit events.
+- Updated seed data to populate queue assignments and expanded service/action/seed integrity coverage for queue creation, explicit preservation, reassignment, and seeded queue diversity.
+- Recorded the schema/seed change in `docs/schema-changelog.md`.
 
 ### Next action
 
-Run LOOP.md to begin S32-F1.
+Run LOOP.md to begin S32-F2 - Case SLA timer contracts.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; writes were limited to authorized planning and report files)
+No cross-ownership edits: YES (single-agent root mode; historical ownership zones were advisory)
 
 CRM-CONTRACT.md honored: YES
