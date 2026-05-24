@@ -69,9 +69,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S30-F1 | Selected export action packets | Codex | done |
 | S30-F2 | Bulk action execution foundation | Codex | done |
 | S30-F3 | Bulk action execution operator UI | Codex | done |
-| S31-F1 | Bulk list selection contracts | Codex | queued |
-| S31-F2 | List-page selected export actions | Codex | queued |
-| S31-F3 | List-page bulk execution actions | Codex | queued |
+| S31-F1 | Bulk list selection contracts | Codex | done |
+| S31-F2 | List-page selected export actions | Codex | done |
+| S31-F3 | List-page bulk execution actions | Codex | done |
+| S32-F1 | Case queue assignment foundation | Codex | queued |
+| S32-F2 | Case SLA timer contracts | Codex | queued |
+| S32-F3 | Service operations case UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
