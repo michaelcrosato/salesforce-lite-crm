@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.36A |
+| Version | 2.37A |
 
-| Last updated | 2026-05-23 |
+| Last updated | 2026-05-24 |
 
-| Active sprint | Sprint 30 S30-F1/S30-F2/S30-F3 queued |
+| Active sprint | Sprint 31 S31-F1/S31-F2/S31-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1122,9 +1122,9 @@ Goal: promote the existing dry-run bulk action surface into bounded local execut
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S30-F1 — Selected export action packets | codex | queued | Generate deterministic selected-record export packets from the existing bulk selected-export dry-run path and CSV export definitions, with bounded IDs, stable ordering, and no database writes. It must preserve current export contracts and avoid new routes, file storage, background jobs, Salesforce integration, or import apply behavior. |
-| S30-F2 — Bulk action execution foundation | codex | queued | Add a bounded server-side executor for eligible dry-run records covering status update, stage update, owner assignment, and task creation, with per-record results, skipped/blocked counts, and audit events. It must reuse existing validation and mutation services while avoiding approvals, async jobs, routing execution, duplicate merge, CSV import writes, or auth/permission scope. |
-| S30-F3 — Bulk action execution operator UI | codex | queued | Extend the existing `/reports` bulk dry-run operator with explicit confirmation, execution feedback, and tests while preserving dry-run-first behavior. It depends on S30-F2 and must avoid new product routes, list-page selection builders, approval workflows, background processing, saved-view changes, or search changes. |
+| S30-F1 — Selected export action packets | codex | done | Generate deterministic selected-record export packets from the existing bulk selected-export dry-run path and CSV export definitions, with bounded IDs, stable ordering, and no database writes. It must preserve current export contracts and avoid new routes, file storage, background jobs, Salesforce integration, or import apply behavior. |
+| S30-F2 — Bulk action execution foundation | codex | done | Add a bounded server-side executor for eligible dry-run records covering status update, stage update, owner assignment, and task creation, with per-record results, skipped/blocked counts, and audit events. It must reuse existing validation and mutation services while avoiding approvals, async jobs, routing execution, duplicate merge, CSV import writes, or auth/permission scope. |
+| S30-F3 — Bulk action execution operator UI | codex | done | Extend the existing `/reports` bulk dry-run operator with explicit confirmation, execution feedback, and tests while preserving dry-run-first behavior. It depends on S30-F2 and must avoid new product routes, list-page selection builders, approval workflows, background processing, saved-view changes, or search changes. |
 
 \*\*Sprint 30 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1153,6 +1153,44 @@ Goal: promote the existing dry-run bulk action surface into bounded local execut
 \- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or SLA timers.
 
 \- No new product routes, list-page selection builder, report builder, dashboard builder, saved-view changes, natural-language filters, or command-palette expansion.
+
+\*\*Sprint 31 — List Bulk Actions\*\*
+
+Goal: bring bounded bulk actions from the reports operator into day-to-day CRM list workflows while preserving dry-run-first confirmation, auditability, and existing route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S31-F1 — Bulk list selection contracts | codex | queued | Add deterministic selected-record contracts for supported CRM list pages so visible-row IDs can be passed into existing bulk dry-run, selected-export, and execution services. Preserve existing filters, sorts, pagination, saved views, and list behavior. |
+| S31-F2 — List-page selected export actions | codex | queued | Add bounded selected-export controls on supported list pages that reuse S30 selected export packets, preserve stable selected-ID ordering, and expose clear blocked/missing feedback without database writes. |
+| S31-F3 — List-page bulk execution actions | codex | queued | Add dry-run-first confirmed bulk execution on supported list pages using the S30 executor, with per-record feedback and audit evidence. The report operator remains available and existing mutation behavior stays unchanged outside confirmed eligible records. |
+
+\*\*Sprint 31 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No approval workflow, pending approvals queue, scheduled sweep, async/background job, request-log pipeline, external telemetry sink, or auth-backed audit permissions.
+
+\- No CSV import apply flow, CSV bulk create/update from imported rows, duplicate merge, file storage, Salesforce integration, or external CRM sync.
+
+\- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or SLA timers.
+
+\- No new product routes, report builder, dashboard builder, natural-language filters, command-palette expansion, saved-view schema/model changes, saved-view sharing, user/tenant scoping, permissions model, saved-view import/export, list column builder, custom-field metadata, or search changes.
 
 
 \## 5. File Ownership Matrix
