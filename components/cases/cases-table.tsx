@@ -16,9 +16,11 @@ import {
 import {
   ROUTE_REGISTRY,
   type CasePriority,
+  type CaseQueueKey,
   type CaseStatus
 } from "@/lib/crm/registry";
 import { formatRelativeDays } from "@/lib/formatters";
+import type { CaseSlaState } from "@/lib/services/caseSlas";
 
 type BadgeVariant =
   | "default"
@@ -38,6 +40,16 @@ export type CaseRow = {
   subject: string;
   status: CaseStatus;
   priority: CasePriority;
+  queueKey: CaseQueueKey;
+  queueReason: string;
+  sla: {
+    state: CaseSlaState;
+    policyLabel: string;
+    dueAt: string;
+    remainingMinutes: number;
+    overdueMinutes: number;
+    isStopped: boolean;
+  };
   owner: { id: string; name: string } | null;
   linkedRecord: CaseLinkedRecord;
   updatedAt: string;
@@ -73,6 +85,42 @@ const PRIORITY_VARIANT: Record<CasePriority, BadgeVariant> = {
   urgent: "danger"
 };
 
+const QUEUE_LABELS: Record<CaseQueueKey, string> = {
+  critical_support: "Critical Support",
+  billing_support: "Billing Support",
+  dealer_operations: "Dealer Operations",
+  data_quality: "Data Quality",
+  customer_success: "Customer Success",
+  general_support: "General Support"
+};
+
+const QUEUE_REASON_LABELS: Record<string, string> = {
+  default_general_support: "Default rule",
+  explicit_queue: "Manual assignment",
+  linked_customer_record: "Linked customer",
+  matched_billing_language: "Billing language",
+  matched_customer_success_language: "Customer success language",
+  matched_data_quality_language: "Data quality language",
+  matched_dealer_operations_language: "Dealer operations language",
+  urgent_priority: "Urgent priority"
+};
+
+const SLA_STATE_LABELS: Record<CaseSlaState, string> = {
+  on_track: "On track",
+  due_soon: "Due soon",
+  overdue: "Overdue",
+  stopped_on_time: "Stopped on time",
+  stopped_overdue: "Stopped overdue"
+};
+
+const SLA_STATE_VARIANT: Record<CaseSlaState, BadgeVariant> = {
+  on_track: "success",
+  due_soon: "warning",
+  overdue: "danger",
+  stopped_on_time: "outline",
+  stopped_overdue: "danger"
+};
+
 export function CasesTable({ cases }: { cases: CaseRow[] }) {
   return (
     <>
@@ -90,6 +138,8 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
             <TableHead>Subject</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Priority</TableHead>
+            <TableHead>Queue</TableHead>
+            <TableHead>SLA</TableHead>
             <TableHead>Linked to</TableHead>
             <TableHead>Owner</TableHead>
             <TableHead>Updated</TableHead>
@@ -117,6 +167,27 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
                   {PRIORITY_LABELS[crmCase.priority]}
                 </Badge>
               </TableCell>
+              <TableCell data-testid="case-row-queue">
+                <div className="flex flex-col gap-1">
+                  <Badge variant="secondary">
+                    {QUEUE_LABELS[crmCase.queueKey]}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {QUEUE_REASON_LABELS[crmCase.queueReason] ??
+                      crmCase.queueReason}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell data-testid="case-row-sla">
+                <div className="flex flex-col gap-1">
+                  <Badge variant={SLA_STATE_VARIANT[crmCase.sla.state]}>
+                    {SLA_STATE_LABELS[crmCase.sla.state]}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {slaTimingText(crmCase.sla)}
+                  </span>
+                </div>
+              </TableCell>
               <TableCell>{renderLink(crmCase.linkedRecord)}</TableCell>
               <TableCell>{crmCase.owner?.name ?? "Unassigned"}</TableCell>
               <TableCell>{formatRelativeDays(crmCase.updatedAt)}</TableCell>
@@ -136,6 +207,32 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
       </Table>
     </>
   );
+}
+
+function slaTimingText(crmCaseSla: CaseRow["sla"]): string {
+  if (crmCaseSla.isStopped) {
+    return crmCaseSla.overdueMinutes > 0
+      ? `Stopped ${formatMinutes(crmCaseSla.overdueMinutes)} late`
+      : "Stopped before target";
+  }
+
+  if (crmCaseSla.overdueMinutes > 0) {
+    return `${formatMinutes(crmCaseSla.overdueMinutes)} overdue`;
+  }
+
+  return `${formatMinutes(crmCaseSla.remainingMinutes)} left`;
+}
+
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes === 0
+    ? `${hours}h`
+    : `${hours}h ${remainingMinutes}m`;
 }
 
 function renderLink(record: CaseLinkedRecord) {

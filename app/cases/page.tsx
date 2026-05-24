@@ -27,12 +27,19 @@ import {
 import type { CaseListOptions } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
 import {
+  CASE_QUEUE_KEYS,
   CASE_STATUSES,
   type CasePriority,
+  type CaseQueueKey,
   type CaseStatus
 } from "@/lib/crm/registry";
 import { nonEmptyQueryParam } from "@/lib/queryParams";
 import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
+import {
+  buildCaseSlaSnapshot,
+  buildCaseSlaSnapshots,
+  type CaseSlaSnapshot
+} from "@/lib/services/caseSlas";
 import {
   buildSavedListViewQuery,
   listSavedListViews,
@@ -84,6 +91,20 @@ function isCaseStatus(value: string | undefined): value is CaseStatus {
     return false;
   }
   return (CASE_STATUSES as readonly string[]).includes(value);
+}
+
+function isCaseQueueKey(value: string): value is CaseQueueKey {
+  return (CASE_QUEUE_KEYS as readonly string[]).includes(value);
+}
+
+function normalizeCaseQueueKey(value: string): CaseQueueKey {
+  return isCaseQueueKey(value) ? value : "general_support";
+}
+
+function normalizeCaseQueueReason(value: string | null): string {
+  return value && value.trim().length > 0
+    ? value
+    : "default_general_support";
 }
 
 function isCaseSortBy(value: string | undefined): value is CaseSortBy {
@@ -212,6 +233,12 @@ export default async function CasesPage({
   const contactById = new Map(
     contactsList.map((contact) => [contact.id, contact])
   );
+  const caseSlaById = new Map(
+    buildCaseSlaSnapshots(cases).map((sla) => [
+      sla.caseId,
+      serializeCaseSla(sla)
+    ])
+  );
 
   const ownerOptions: CaseOptionItem[] = owners.map((owner) => ({
     id: owner.id,
@@ -251,6 +278,11 @@ export default async function CasesPage({
     subject: crmCase.subject,
     status: crmCase.status as CaseStatus,
     priority: crmCase.priority as CasePriority,
+    queueKey: normalizeCaseQueueKey(crmCase.queueKey),
+    queueReason: normalizeCaseQueueReason(crmCase.queueReason),
+    sla:
+      caseSlaById.get(crmCase.id) ??
+      serializeCaseSla(buildCaseSlaSnapshot(crmCase)),
     owner: crmCase.ownerId
       ? {
           id: crmCase.ownerId,
@@ -271,6 +303,9 @@ export default async function CasesPage({
         description: found.description,
         status: found.status as CaseStatus,
         priority: found.priority as CasePriority,
+        queueKey: normalizeCaseQueueKey(found.queueKey),
+        queueReason: normalizeCaseQueueReason(found.queueReason),
+        sla: serializeCaseSla(buildCaseSlaSnapshot(found)),
         ownerId: found.ownerId,
         ownerName: found.ownerId
           ? ownerById.get(found.ownerId)?.name ?? null
@@ -411,4 +446,15 @@ export default async function CasesPage({
       </Card>
     </div>
   );
+}
+
+function serializeCaseSla(snapshot: CaseSlaSnapshot) {
+  return {
+    state: snapshot.state,
+    policyLabel: snapshot.policyLabel,
+    dueAt: snapshot.dueAt.toISOString(),
+    remainingMinutes: snapshot.remainingMinutes,
+    overdueMinutes: snapshot.overdueMinutes,
+    isStopped: snapshot.isStopped
+  };
 }

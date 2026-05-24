@@ -3,7 +3,11 @@
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { deleteCaseAction, updateCaseStatusAction } from "@/app/cases/actions";
+import {
+  deleteCaseAction,
+  updateCaseQueueAction,
+  updateCaseStatusAction
+} from "@/app/cases/actions";
 import {
   CaseForm,
   type CaseFormInitialValues,
@@ -15,11 +19,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import {
+  CASE_QUEUE_KEYS,
   CASE_STATUSES,
   type CasePriority,
+  type CaseQueueKey,
   type CaseStatus
 } from "@/lib/crm/registry";
 import { formatDate } from "@/lib/formatters";
+import type { CaseSlaState } from "@/lib/services/caseSlas";
 
 type BadgeVariant =
   | "default"
@@ -34,6 +41,16 @@ export type DrawerCase = CaseFormInitialValues & {
   subject: string;
   status: CaseStatus;
   priority: CasePriority;
+  queueKey: CaseQueueKey;
+  queueReason: string;
+  sla: {
+    state: CaseSlaState;
+    policyLabel: string;
+    dueAt: string;
+    remainingMinutes: number;
+    overdueMinutes: number;
+    isStopped: boolean;
+  };
   ownerName: string | null;
   createdAt: string;
   updatedAt: string;
@@ -53,6 +70,42 @@ const STATUS_VARIANT: Record<CaseStatus, BadgeVariant> = {
   waiting: "secondary",
   resolved: "success",
   closed: "outline"
+};
+
+const QUEUE_LABELS: Record<CaseQueueKey, string> = {
+  critical_support: "Critical Support",
+  billing_support: "Billing Support",
+  dealer_operations: "Dealer Operations",
+  data_quality: "Data Quality",
+  customer_success: "Customer Success",
+  general_support: "General Support"
+};
+
+const QUEUE_REASON_LABELS: Record<string, string> = {
+  default_general_support: "Default rule",
+  explicit_queue: "Manual assignment",
+  linked_customer_record: "Linked customer",
+  matched_billing_language: "Billing language",
+  matched_customer_success_language: "Customer success language",
+  matched_data_quality_language: "Data quality language",
+  matched_dealer_operations_language: "Dealer operations language",
+  urgent_priority: "Urgent priority"
+};
+
+const SLA_STATE_LABELS: Record<CaseSlaState, string> = {
+  on_track: "On track",
+  due_soon: "Due soon",
+  overdue: "Overdue",
+  stopped_on_time: "Stopped on time",
+  stopped_overdue: "Stopped overdue"
+};
+
+const SLA_STATE_VARIANT: Record<CaseSlaState, BadgeVariant> = {
+  on_track: "success",
+  due_soon: "warning",
+  overdue: "danger",
+  stopped_on_time: "outline",
+  stopped_overdue: "danger"
 };
 
 export function CaseDetailDrawer({
@@ -83,6 +136,20 @@ export function CaseDetailDrawer({
     startTransition(() => {
       void (async () => {
         const result = await updateCaseStatusAction(activeCaseId, status);
+        showToast({
+          title: result.ok ? "Case updated" : "Case not updated",
+          description: result.message,
+          variant: result.ok ? "success" : "error"
+        });
+        router.refresh();
+      })();
+    });
+  }
+
+  function moveQueue(queueKey: string) {
+    startTransition(() => {
+      void (async () => {
+        const result = await updateCaseQueueAction(activeCaseId, queueKey);
         showToast({
           title: result.ok ? "Case updated" : "Case not updated",
           description: result.message,
@@ -166,6 +233,10 @@ export function CaseDetailDrawer({
                   value={crmCase.ownerName ?? "Unassigned"}
                 />
                 <FieldView
+                  label="Queue"
+                  value={QUEUE_LABELS[crmCase.queueKey]}
+                />
+                <FieldView
                   label="Created"
                   value={formatDate(crmCase.createdAt)}
                 />
@@ -186,6 +257,49 @@ export function CaseDetailDrawer({
               </CardContent>
             </Card>
           )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Service operations</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 sm:grid-cols-2">
+              <div data-testid="case-drawer-queue-context">
+                <FieldView
+                  label="Queue"
+                  value={QUEUE_LABELS[crmCase.queueKey]}
+                />
+              </div>
+              <div>
+                <FieldView
+                  label="Queue rule"
+                  value={
+                    QUEUE_REASON_LABELS[crmCase.queueReason] ??
+                    crmCase.queueReason
+                  }
+                />
+              </div>
+              <div
+                className="rounded-md border bg-background p-3 sm:col-span-2"
+                data-testid="case-drawer-sla-context"
+              >
+                <span className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
+                  SLA
+                </span>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Badge variant={SLA_STATE_VARIANT[crmCase.sla.state]}>
+                    {SLA_STATE_LABELS[crmCase.sla.state]}
+                  </Badge>
+                  <span className="text-sm font-medium">
+                    {crmCase.sla.policyLabel}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Due {formatDate(crmCase.sla.dueAt)} ·{" "}
+                  {slaTimingText(crmCase.sla)}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
@@ -214,6 +328,32 @@ export function CaseDetailDrawer({
 
           <Card>
             <CardHeader>
+              <CardTitle>Update queue</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Select
+                aria-label={`Assign ${crmCase.subject} queue`}
+                data-testid="case-queue-update-select"
+                defaultValue={crmCase.queueKey}
+                disabled={isPending}
+                onChange={(event) => moveQueue(event.currentTarget.value)}
+              >
+                {CASE_QUEUE_KEYS.map((queueKey) => (
+                  <option key={queueKey} value={queueKey}>
+                    {QUEUE_LABELS[queueKey]}
+                  </option>
+                ))}
+              </Select>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary">
+                  {QUEUE_LABELS[crmCase.queueKey]}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Danger zone</CardTitle>
             </CardHeader>
             <CardContent>
@@ -231,6 +371,32 @@ export function CaseDetailDrawer({
       </aside>
     </div>
   );
+}
+
+function slaTimingText(crmCaseSla: DrawerCase["sla"]): string {
+  if (crmCaseSla.isStopped) {
+    return crmCaseSla.overdueMinutes > 0
+      ? `stopped ${formatMinutes(crmCaseSla.overdueMinutes)} late`
+      : "stopped before target";
+  }
+
+  if (crmCaseSla.overdueMinutes > 0) {
+    return `${formatMinutes(crmCaseSla.overdueMinutes)} overdue`;
+  }
+
+  return `${formatMinutes(crmCaseSla.remainingMinutes)} left`;
+}
+
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes === 0
+    ? `${hours}h`
+    : `${hours}h ${remainingMinutes}m`;
 }
 
 function FieldView({ label, value }: { label: string; value: string }) {

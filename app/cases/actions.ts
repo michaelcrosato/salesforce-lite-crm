@@ -10,7 +10,7 @@ import {
   resolveCase,
   updateCase
 } from "@/lib/crm/crmClient";
-import { CASE_STATUSES } from "@/lib/crm/registry";
+import { CASE_QUEUE_KEYS, CASE_STATUSES } from "@/lib/crm/registry";
 import { caseCreateSchema, caseUpdateSchema } from "@/lib/validation";
 
 function formString(formData: FormData, key: string): string {
@@ -24,6 +24,7 @@ function buildRawInput(formData: FormData) {
     description: formString(formData, "description"),
     status: formString(formData, "status"),
     priority: formString(formData, "priority"),
+    queueKey: formString(formData, "queueKey"),
     ownerId: formString(formData, "ownerId"),
     accountId: formString(formData, "accountId"),
     contactId: formString(formData, "contactId")
@@ -103,6 +104,7 @@ export async function updateCaseAction(
 }
 
 const statusSchema = z.enum(CASE_STATUSES);
+const queueSchema = z.enum(CASE_QUEUE_KEYS);
 
 export async function updateCaseStatusAction(
   caseId: string,
@@ -122,6 +124,25 @@ export async function updateCaseStatusAction(
     }
     revalidateAll();
     return { ok: true, message: "Case status updated." };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+export async function updateCaseQueueAction(
+  caseId: string,
+  queueKey: string
+): Promise<ActionResult> {
+  const parsed = queueSchema.safeParse(queueKey);
+
+  if (!parsed.success) {
+    return { ok: false, message: "Invalid queue." };
+  }
+
+  try {
+    await updateCase(caseId, { queueKey: parsed.data });
+    revalidateAll();
+    return { ok: true, message: "Case queue updated." };
   } catch (error) {
     return failureFrom(error);
   }

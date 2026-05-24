@@ -13,8 +13,10 @@ import { useToast } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
 import {
   CASE_PRIORITIES,
+  CASE_QUEUE_KEYS,
   CASE_STATUSES,
   type CasePriority,
+  type CaseQueueKey,
   type CaseStatus
 } from "@/lib/crm/registry";
 
@@ -29,6 +31,8 @@ export type CaseFormInitialValues = {
   description?: string | null;
   status?: CaseStatus;
   priority?: CasePriority;
+  queueKey?: CaseQueueKey | null;
+  queueReason?: string | null;
   ownerId?: string | null;
   accountId?: string | null;
   contactId?: string | null;
@@ -47,6 +51,15 @@ const PRIORITY_LABELS: Record<CasePriority, string> = {
   normal: "Normal",
   high: "High",
   urgent: "Urgent"
+};
+
+const QUEUE_LABELS: Record<CaseQueueKey, string> = {
+  critical_support: "Critical Support",
+  billing_support: "Billing Support",
+  dealer_operations: "Dealer Operations",
+  data_quality: "Data Quality",
+  customer_success: "Customer Success",
+  general_support: "General Support"
 };
 
 export function CaseForm({
@@ -100,6 +113,10 @@ export function CaseForm({
   }
 
   const errors = result && !result.ok ? result.fieldErrors : undefined;
+  const queueDefault =
+    initialValues?.queueReason === "explicit_queue"
+      ? initialValues.queueKey ?? ""
+      : "";
 
   return (
     <Card>
@@ -176,6 +193,18 @@ export function CaseForm({
               ))}
             </Select>
             <FieldError errors={errors?.ownerId} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="queueKey">Queue</Label>
+            <Select id="queueKey" name="queueKey" defaultValue={queueDefault}>
+              <option value="">Auto assign</option>
+              {CASE_QUEUE_KEYS.map((queueKey) => (
+                <option key={queueKey} value={queueKey}>
+                  {QUEUE_LABELS[queueKey]}
+                </option>
+              ))}
+            </Select>
+            <FieldError errors={errors?.queueKey} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="accountId">Account</Label>
