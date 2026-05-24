@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { PacingBar } from "@/components/pacing-bar";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +81,14 @@ export default async function OrdersPage() {
         <CardContent>
           {orders.length > 0 ? (
             <div className="overflow-x-auto">
+              <ListSelectedExportAction
+                entity="dealer-orders"
+                entityLabel="Dealer Orders"
+                records={orders.map((order) => ({
+                  id: order.id,
+                  label: order.name
+                }))}
+              />
               <table className="w-full min-w-[980px] text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase text-muted-foreground">

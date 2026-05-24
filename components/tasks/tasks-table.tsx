@@ -2,6 +2,7 @@
 
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,56 +73,66 @@ const PRIORITY_VARIANT: Record<
 
 export function TasksTable({ tasks }: { tasks: TaskRow[] }) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Priority</TableHead>
-          <TableHead>Due date</TableHead>
-          <TableHead>Owner</TableHead>
-          <TableHead>Linked to</TableHead>
-          <TableHead className="w-16">Action</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tasks.map((task) => (
-          <TableRow key={task.id}>
-            <TableCell className="font-medium">
-              <Link
-                href={ROUTE_REGISTRY.taskDetail(task.id)}
-                className="text-primary hover:underline"
-              >
-                {task.title}
-              </Link>
-            </TableCell>
-            <TableCell>
-              <Badge variant={STATUS_VARIANT[task.status]}>
-                {STATUS_LABELS[task.status]}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge variant={PRIORITY_VARIANT[task.priority]}>
-                {PRIORITY_LABELS[task.priority]}
-              </Badge>
-            </TableCell>
-            <TableCell>{formatDate(task.dueDate)}</TableCell>
-            <TableCell>{task.owner?.name ?? "Unassigned"}</TableCell>
-            <TableCell>{renderLink(task.linkedRecord)}</TableCell>
-            <TableCell>
-              <Button asChild variant="ghost" size="icon">
+    <>
+      <ListSelectedExportAction
+        entity="tasks"
+        entityLabel="Tasks"
+        records={tasks.map((task) => ({
+          id: task.id,
+          label: task.title
+        }))}
+      />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Title</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Due date</TableHead>
+            <TableHead>Owner</TableHead>
+            <TableHead>Linked to</TableHead>
+            <TableHead className="w-16">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {tasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell className="font-medium">
                 <Link
                   href={ROUTE_REGISTRY.taskDetail(task.id)}
-                  aria-label="Open task"
+                  className="text-primary hover:underline"
                 >
-                  <Eye className="h-4 w-4" aria-hidden="true" />
+                  {task.title}
                 </Link>
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              </TableCell>
+              <TableCell>
+                <Badge variant={STATUS_VARIANT[task.status]}>
+                  {STATUS_LABELS[task.status]}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant={PRIORITY_VARIANT[task.priority]}>
+                  {PRIORITY_LABELS[task.priority]}
+                </Badge>
+              </TableCell>
+              <TableCell>{formatDate(task.dueDate)}</TableCell>
+              <TableCell>{task.owner?.name ?? "Unassigned"}</TableCell>
+              <TableCell>{renderLink(task.linkedRecord)}</TableCell>
+              <TableCell>
+                <Button asChild variant="ghost" size="icon">
+                  <Link
+                    href={ROUTE_REGISTRY.taskDetail(task.id)}
+                    aria-label="Open task"
+                  >
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -82,6 +83,14 @@ export function ContactsTable({ contacts, "data-testid": testid }: ContactsTable
 
   return (
     <div data-testid={testid}>
+      <ListSelectedExportAction
+        entity="contacts"
+        entityLabel="Contacts"
+        records={sortedContacts.map((contact) => ({
+          id: contact.id,
+          label: `${contact.firstName} ${contact.lastName}`
+        }))}
+      />
       <Table>
       <TableHeader>
         <TableRow>

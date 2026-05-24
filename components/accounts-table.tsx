@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AccountStatusBadge, HealthBadge } from "@/components/account-badges";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -78,6 +79,14 @@ export function AccountsTable({ accounts, "data-testid": testid }: AccountsTable
 
   return (
     <div data-testid={testid}>
+      <ListSelectedExportAction
+        entity="accounts"
+        entityLabel="Accounts"
+        records={sortedAccounts.map((account) => ({
+          id: account.id,
+          label: account.name
+        }))}
+      />
       <Table>
       <TableHeader>
         <TableRow>

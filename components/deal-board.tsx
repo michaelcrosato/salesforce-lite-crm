@@ -13,6 +13,7 @@ import type {
   DealContactOption,
   DealOwnerOption
 } from "@/components/deal-form";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -104,6 +105,14 @@ export function DealBoard({
 
   return (
     <div className="space-y-3">
+      <ListSelectedExportAction
+        entity="opportunities"
+        entityLabel="Opportunities"
+        records={deals.map((deal) => ({
+          id: deal.id,
+          label: deal.name
+        }))}
+      />
       <div className="min-h-5 text-sm text-muted-foreground">
         {isPending ? "Updating pipeline..." : null}
       </div>

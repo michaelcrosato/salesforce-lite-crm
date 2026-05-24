@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ActivityTimeline } from "@/components/activity-timeline";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -117,7 +118,17 @@ export default async function ActivitiesPage({
         </CardHeader>
         <CardContent>
           {activities.length > 0 ? (
-            <ActivityTimeline activities={activities} />
+            <>
+              <ListSelectedExportAction
+                entity="activities"
+                entityLabel="Activities"
+                records={activities.map((activity) => ({
+                  id: activity.id,
+                  label: activity.title
+                }))}
+              />
+              <ActivityTimeline activities={activities} />
+            </>
           ) : (
             <EmptyState
               title="No activities found"

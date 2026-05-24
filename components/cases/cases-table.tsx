@@ -2,6 +2,7 @@
 
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,56 +75,66 @@ const PRIORITY_VARIANT: Record<CasePriority, BadgeVariant> = {
 
 export function CasesTable({ cases }: { cases: CaseRow[] }) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Subject</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Priority</TableHead>
-          <TableHead>Linked to</TableHead>
-          <TableHead>Owner</TableHead>
-          <TableHead>Updated</TableHead>
-          <TableHead className="w-16">Action</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {cases.map((crmCase) => (
-          <TableRow key={crmCase.id}>
-            <TableCell className="font-medium">
-              <Link
-                href={ROUTE_REGISTRY.caseDetail(crmCase.id)}
-                className="text-primary hover:underline"
-              >
-                {crmCase.subject}
-              </Link>
-            </TableCell>
-            <TableCell>
-              <Badge variant={STATUS_VARIANT[crmCase.status]}>
-                {STATUS_LABELS[crmCase.status]}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge variant={PRIORITY_VARIANT[crmCase.priority]}>
-                {PRIORITY_LABELS[crmCase.priority]}
-              </Badge>
-            </TableCell>
-            <TableCell>{renderLink(crmCase.linkedRecord)}</TableCell>
-            <TableCell>{crmCase.owner?.name ?? "Unassigned"}</TableCell>
-            <TableCell>{formatRelativeDays(crmCase.updatedAt)}</TableCell>
-            <TableCell>
-              <Button asChild variant="ghost" size="icon">
+    <>
+      <ListSelectedExportAction
+        entity="cases"
+        entityLabel="Cases"
+        records={cases.map((crmCase) => ({
+          id: crmCase.id,
+          label: crmCase.subject
+        }))}
+      />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Subject</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Linked to</TableHead>
+            <TableHead>Owner</TableHead>
+            <TableHead>Updated</TableHead>
+            <TableHead className="w-16">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {cases.map((crmCase) => (
+            <TableRow key={crmCase.id}>
+              <TableCell className="font-medium">
                 <Link
                   href={ROUTE_REGISTRY.caseDetail(crmCase.id)}
-                  aria-label="Open case"
+                  className="text-primary hover:underline"
                 >
-                  <Eye className="h-4 w-4" aria-hidden="true" />
+                  {crmCase.subject}
                 </Link>
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              </TableCell>
+              <TableCell>
+                <Badge variant={STATUS_VARIANT[crmCase.status]}>
+                  {STATUS_LABELS[crmCase.status]}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant={PRIORITY_VARIANT[crmCase.priority]}>
+                  {PRIORITY_LABELS[crmCase.priority]}
+                </Badge>
+              </TableCell>
+              <TableCell>{renderLink(crmCase.linkedRecord)}</TableCell>
+              <TableCell>{crmCase.owner?.name ?? "Unassigned"}</TableCell>
+              <TableCell>{formatRelativeDays(crmCase.updatedAt)}</TableCell>
+              <TableCell>
+                <Button asChild variant="ghost" size="icon">
+                  <Link
+                    href={ROUTE_REGISTRY.caseDetail(crmCase.id)}
+                    aria-label="Open case"
+                  >
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 }
 

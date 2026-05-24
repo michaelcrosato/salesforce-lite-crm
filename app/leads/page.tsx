@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import { LeadForm } from "@/components/lead-form";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { PageHeader } from "@/components/page-header";
 import { RoutingDecisionDetail } from "@/components/routing-decision-detail";
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +171,14 @@ export default async function LeadsPage({
         <CardContent>
           {leads.length > 0 ? (
             <div className="overflow-x-auto">
+              <ListSelectedExportAction
+                entity="leads"
+                entityLabel="Leads"
+                records={leads.map((lead) => ({
+                  id: lead.id,
+                  label: `${lead.firstName} ${lead.lastName}`
+                }))}
+              />
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase text-muted-foreground">

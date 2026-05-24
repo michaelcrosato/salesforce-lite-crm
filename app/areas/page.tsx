@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -51,6 +52,14 @@ export default async function AreasPage() {
         <CardContent>
           {areas.length > 0 ? (
             <div className="overflow-x-auto">
+              <ListSelectedExportAction
+                entity="areas"
+                entityLabel="Areas"
+                records={areas.map((area) => ({
+                  id: area.id,
+                  label: area.name
+                }))}
+              />
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase text-muted-foreground">
