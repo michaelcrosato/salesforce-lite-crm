@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 37
 
-Feature: S37-F2 — Workflow dry-run evaluator
+Feature: S37-F3 — Workflow review packets
 
 Branch: main
 
-Timestamp: 2026-05-25T07:32:15.8207773-07:00
+Timestamp: 2026-05-25T08:58:44.7967790-07:00
 
 Escalation required: NO
 
