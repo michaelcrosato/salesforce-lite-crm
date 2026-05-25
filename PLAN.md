@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.39A |
+| Version | 2.40A |
 
 | Last updated | 2026-05-24 |
 
-| Active sprint | Sprint 33 S33-F1/S33-F2 done; S33-F3 queued |
+| Active sprint | Sprint 34 S34-F1/S34-F2/S34-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1236,7 +1236,7 @@ Goal: add local knowledge article foundations to the case service workflow witho
 |---|---|---|---|
 | S33-F1 — Knowledge article foundation | codex | done | Add a local Knowledge Article foundation for service workflows: schema, seed data, validation/service helpers, CRM contract/registry updates, audit evidence, and tests. Existing case, task, campaign, dealer, lead, and opportunity semantics stay unchanged. |
 | S33-F2 — Case knowledge suggestion contracts | codex | done | Add deterministic case-to-article suggestion helpers using repo-local case fields and article metadata. Suggestions are read-only, hermetic, and avoid external AI/RAG/provider calls or case/article mutations. |
-| S33-F3 — Case knowledge assist UI | codex | queued | Existing `/cases` list and drawer surfaces show bounded knowledge suggestions with clear empty/loading states and e2e coverage. No new route is added; `/cases?case=<id>` remains the service operations detail flow. |
+| S33-F3 — Case knowledge assist UI | codex | done | Existing `/cases` list and drawer surfaces show bounded knowledge suggestions with clear empty/loading states and e2e coverage. No new route is added; `/cases?case=<id>` remains the service operations detail flow. |
 
 \*\*Sprint 33 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1263,6 +1263,44 @@ Goal: add local knowledge article foundations to the case service workflow witho
 \- No new product routes, article CRUD admin pages, article import/export, file storage, or search index expansion.
 
 \- No case status, queue, SLA, routing, lead disposition, pacing-engine, forecast, CSV import apply, duplicate merge, Salesforce integration, or external CRM sync changes.
+
+\*\*Sprint 34 — Dependency Modernization\*\*
+
+Goal: reduce dependency and audit drift without weakening the local gate or adding product scope.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S34-F1 — Non-major dependency refresh | codex | queued | Update only direct package patch/minor releases that do not require framework migration or new configuration, then keep install, lint, typecheck, test, build, and e2e green. Document any skipped major-version candidates in the Codex summary. |
+| S34-F2 — Transitive advisory containment | codex | queued | Reduce or explicitly contain npm audit moderate findings where safe through package-manager-level overrides or compatible dependency updates, with package lock integrity and the full local gate green. Any advisory that requires an unsafe downgrade or unavailable upstream fix is recorded with evidence instead of forced. |
+| S34-F3 — Vitest major compatibility pass | codex | queued | Attempt the Vitest/Vite advisory migration path in a bounded branch-local pass; either land a green Vitest 4-compatible test stack or leave package files reverted and file a precise gate/dependency blocker with failing command, error surface, and safe next action. |
+
+\*\*Sprint 34 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No `npm audit fix --force`.
+
+\- No package downgrade to satisfy misleading audit `fixAvailable` output.
+
+\- No product behavior changes, product routes, schema changes, or CRM-CONTRACT.md changes unless a later prompt explicitly promotes them.
+
+\- No replacement test runner or unrelated test rewrites.
 
 
 \## 5. File Ownership Matrix
