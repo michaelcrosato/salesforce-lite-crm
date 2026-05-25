@@ -2,8 +2,13 @@ import type { Case, KnowledgeArticle } from "@prisma/client";
 import { z } from "zod";
 import {
   CASE_QUEUE_KEYS,
+  KNOWLEDGE_ARTICLE_AUDIENCES,
   type CaseQueueKey
 } from "@/lib/crm/registry";
+import {
+  validateDeterministicAiOutput,
+  type DeterministicAiOutputValidationResult
+} from "@/lib/ai/outputValidation";
 import { prisma } from "@/lib/prisma";
 import { idSchema } from "@/lib/validation";
 
@@ -25,41 +30,79 @@ export type CaseKnowledgeSuggestionOptions = z.input<
   typeof caseKnowledgeSuggestionOptionsSchema
 >;
 
-export type CaseKnowledgeSuggestionReasonCode =
-  | "queue_match"
-  | "keyword_match"
-  | "metadata_text_match"
-  | "urgent_priority_match";
+export const CASE_KNOWLEDGE_SUGGESTION_REASON_CODES = [
+  "queue_match",
+  "keyword_match",
+  "metadata_text_match",
+  "urgent_priority_match"
+] as const;
 
-export type CaseKnowledgeSuggestionEmptyReason =
-  | "no_published_articles"
-  | "no_relevant_articles";
+export const CASE_KNOWLEDGE_SUGGESTION_EMPTY_REASONS = [
+  "no_published_articles",
+  "no_relevant_articles"
+] as const;
 
-export type CaseKnowledgeSuggestion = {
-  rank: number;
-  articleId: string;
-  title: string;
-  summary: string | null;
-  category: string | null;
-  audience: string;
-  caseQueueKey: CaseQueueKey | null;
-  publishedAt: Date | null;
-  score: number;
-  reasonCodes: CaseKnowledgeSuggestionReasonCode[];
-  matchedKeywords: string[];
-  matchedTerms: string[];
-};
+export const caseKnowledgeSuggestionReasonCodeSchema = z.enum(
+  CASE_KNOWLEDGE_SUGGESTION_REASON_CODES
+);
 
-export type CaseKnowledgeSuggestionPacket = {
-  caseId: string;
-  caseSubject: string;
-  caseQueueKey: CaseQueueKey | null;
-  source: "local_case_article_metadata";
-  limit: number;
-  totalAvailable: number;
-  emptyReason: CaseKnowledgeSuggestionEmptyReason | null;
-  suggestions: CaseKnowledgeSuggestion[];
-};
+export type CaseKnowledgeSuggestionReasonCode = z.output<
+  typeof caseKnowledgeSuggestionReasonCodeSchema
+>;
+
+export const caseKnowledgeSuggestionEmptyReasonSchema = z.enum(
+  CASE_KNOWLEDGE_SUGGESTION_EMPTY_REASONS
+);
+
+export type CaseKnowledgeSuggestionEmptyReason = z.output<
+  typeof caseKnowledgeSuggestionEmptyReasonSchema
+>;
+
+export const caseKnowledgeArticleAudienceSchema = z.enum(
+  KNOWLEDGE_ARTICLE_AUDIENCES
+);
+
+type CaseKnowledgeArticleAudience = z.output<
+  typeof caseKnowledgeArticleAudienceSchema
+>;
+
+export const caseKnowledgeSuggestionSchema = z
+  .object({
+    rank: z.number().int().min(1),
+    articleId: z.string().min(1),
+    title: z.string().min(1),
+    summary: z.string().nullable(),
+    category: z.string().nullable(),
+    audience: caseKnowledgeArticleAudienceSchema,
+    caseQueueKey: z.enum(CASE_QUEUE_KEYS).nullable(),
+    publishedAt: z.date().nullable(),
+    score: z.number().nonnegative(),
+    reasonCodes: z.array(caseKnowledgeSuggestionReasonCodeSchema),
+    matchedKeywords: z.array(z.string().min(1)),
+    matchedTerms: z.array(z.string().min(1))
+  })
+  .strict();
+
+export type CaseKnowledgeSuggestion = z.output<
+  typeof caseKnowledgeSuggestionSchema
+>;
+
+export const caseKnowledgeSuggestionPacketSchema = z
+  .object({
+    caseId: z.string().min(1),
+    caseSubject: z.string().min(1),
+    caseQueueKey: z.enum(CASE_QUEUE_KEYS).nullable(),
+    source: z.literal("local_case_article_metadata"),
+    limit: z.number().int().min(1).max(maxSuggestionLimit),
+    totalAvailable: z.number().int().nonnegative(),
+    emptyReason: caseKnowledgeSuggestionEmptyReasonSchema.nullable(),
+    suggestions: z.array(caseKnowledgeSuggestionSchema)
+  })
+  .strict();
+
+export type CaseKnowledgeSuggestionPacket = z.output<
+  typeof caseKnowledgeSuggestionPacketSchema
+>;
 
 type SuggestionCase = Pick<
   Case,
@@ -208,6 +251,7 @@ function scoreArticle(
   article: SuggestionArticle
 ): ScoredSuggestion | null {
   const articleQueueKey = normalizeCaseQueueKey(article.caseQueueKey);
+  const articleAudience = normalizeKnowledgeArticleAudience(article.audience);
   const reasonCodes: CaseKnowledgeSuggestionReasonCode[] = [];
   const matchedKeywords = matchArticleKeywords(article.keywords, caseText);
   const matchedTerms = matchArticleTerms(article, caseTerms);
@@ -247,7 +291,7 @@ function scoreArticle(
       title: article.title,
       summary: article.summary,
       category: article.category,
-      audience: article.audience,
+      audience: articleAudience,
       caseQueueKey: articleQueueKey,
       publishedAt: article.publishedAt,
       score,
@@ -287,6 +331,18 @@ function normalizeCaseQueueKey(value: string | null): CaseQueueKey | null {
   }
 
   return null;
+}
+
+function normalizeKnowledgeArticleAudience(
+  value: string
+): CaseKnowledgeArticleAudience {
+  for (const audience of KNOWLEDGE_ARTICLE_AUDIENCES) {
+    if (audience === value) {
+      return audience;
+    }
+  }
+
+  return "internal";
 }
 
 function matchArticleKeywords(keywords: string, caseText: string): string[] {
@@ -351,5 +407,14 @@ function uniqueInOrder(values: readonly string[]): string[] {
 function uniqueSorted(values: readonly string[]): string[] {
   return [...new Set(values)].sort((left, right) =>
     left.localeCompare(right)
+  );
+}
+
+export function validateCaseKnowledgeSuggestionPacket(
+  output: unknown
+): DeterministicAiOutputValidationResult<CaseKnowledgeSuggestionPacket> {
+  return validateDeterministicAiOutput(
+    caseKnowledgeSuggestionPacketSchema,
+    output
   );
 }

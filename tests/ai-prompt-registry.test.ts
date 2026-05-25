@@ -11,7 +11,7 @@ import {
 describe("deterministic AI prompt registry", () => {
   it("publishes stable current deterministic prompt ids in order", () => {
     expect(DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION).toBe(
-      "2026-05-25.s35-f1"
+      "2026-05-25.s35-f2"
     );
     expect(listDeterministicAiPrompts().map((entry) => entry.id)).toEqual(
       DETERMINISTIC_AI_PROMPT_IDS
@@ -33,7 +33,8 @@ describe("deterministic AI prompt registry", () => {
         exportName: "ActivitySummarizerInput"
       },
       outputSchema: {
-        exportName: "ActivitySummaryResult"
+        kind: "zod",
+        exportName: "activitySummaryResultSchema"
       }
     });
     expect(getDeterministicAiPrompt("dashboard.analyst-actions")).toMatchObject({
@@ -46,7 +47,8 @@ describe("deterministic AI prompt registry", () => {
         exportName: "AnalystPanelInput"
       },
       outputSchema: {
-        exportName: "AnalystPanel"
+        kind: "zod",
+        exportName: "analystPanelSchema"
       }
     });
     expect(getDeterministicAiPrompt("case.knowledge-suggestions")).toMatchObject(
@@ -60,7 +62,8 @@ describe("deterministic AI prompt registry", () => {
           exportName: "CaseKnowledgeSuggestionOptions"
         },
         outputSchema: {
-          exportName: "CaseKnowledgeSuggestionPacket"
+          kind: "zod",
+          exportName: "caseKnowledgeSuggestionPacketSchema"
         }
       }
     );
@@ -71,7 +74,7 @@ describe("deterministic AI prompt registry", () => {
       expectNoExternalSurface(entry);
       expect(entry.routeScope.length).toBeGreaterThan(0);
       expect(entry.inputSchema.kind).toBe("typescript");
-      expect(entry.outputSchema.kind).toBe("typescript");
+      expect(entry.outputSchema.kind).toBe("zod");
     }
   });
 

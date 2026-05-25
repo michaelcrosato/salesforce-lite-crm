@@ -1,5 +1,10 @@
+import { z } from "zod";
+import {
+  validateDeterministicAiOutput,
+  type DeterministicAiOutputValidationResult
+} from "@/lib/ai/outputValidation";
 import { isStaleDeal } from "@/lib/business/deals";
-import { getPacingStatus, type PacingStatus } from "@/lib/business/dealerOps";
+import { getPacingStatus } from "@/lib/business/dealerOps";
 import {
   calculatePaceGap,
   daysRemainingInMonth
@@ -36,59 +41,94 @@ export type AnalystDeal = {
   accountName?: string | null;
 };
 
-export type AnalystBehindOrder = {
-  id: string;
-  name: string;
-  href: string;
-  accountName: string;
-  deliveredThisMonth: number;
-  monthlyQuota: number;
-  remaining: number;
-  daysRemaining: number;
-  paceStatus: PacingStatus;
-  explanation: string;
-  score: number;
-};
+export const analystPacingStatusSchema = z.enum([
+  "behind",
+  "on_pace",
+  "ahead",
+  "over"
+]);
 
-export type AnalystUnroutedLead = {
-  id: string;
-  name: string;
-  href: string;
-  assignmentReason: string;
-};
+export const analystBehindOrderSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    href: z.string().min(1),
+    accountName: z.string().min(1),
+    deliveredThisMonth: z.number().nonnegative(),
+    monthlyQuota: z.number().nonnegative(),
+    remaining: z.number().nonnegative(),
+    daysRemaining: z.number().int().nonnegative(),
+    paceStatus: analystPacingStatusSchema,
+    explanation: z.string().min(1),
+    score: z.number().nonnegative()
+  })
+  .strict();
 
-export type AnalystStaleDeal = {
-  id: string;
-  name: string;
-  href: string;
-  value: number;
-  accountName: string;
-};
+export type AnalystBehindOrder = z.output<typeof analystBehindOrderSchema>;
 
-export type AnalystLowHealthAccount = {
-  id: string;
-  name: string;
-  href: string;
-  healthScore: number;
-  orderName: string;
-};
+export const analystUnroutedLeadSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    href: z.string().min(1),
+    assignmentReason: z.string().min(1)
+  })
+  .strict();
 
-export type AnalystAction = {
-  id: string;
-  title: string;
-  reason: string;
-  href: string;
-  suggestedNextAction: string;
-  score: number;
-};
+export type AnalystUnroutedLead = z.output<
+  typeof analystUnroutedLeadSchema
+>;
 
-export type AnalystPanel = {
-  behindOrders: AnalystBehindOrder[];
-  unroutedLeads: AnalystUnroutedLead[];
-  staleHighValueDeals: AnalystStaleDeal[];
-  lowHealthAccounts: AnalystLowHealthAccount[];
-  actions: AnalystAction[];
-};
+export const analystStaleDealSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    href: z.string().min(1),
+    value: z.number().nonnegative(),
+    accountName: z.string().min(1)
+  })
+  .strict();
+
+export type AnalystStaleDeal = z.output<typeof analystStaleDealSchema>;
+
+export const analystLowHealthAccountSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    href: z.string().min(1),
+    healthScore: z.number().nonnegative(),
+    orderName: z.string().min(1)
+  })
+  .strict();
+
+export type AnalystLowHealthAccount = z.output<
+  typeof analystLowHealthAccountSchema
+>;
+
+export const analystActionSchema = z
+  .object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    reason: z.string().min(1),
+    href: z.string().min(1),
+    suggestedNextAction: z.string().min(1),
+    score: z.number().nonnegative()
+  })
+  .strict();
+
+export type AnalystAction = z.output<typeof analystActionSchema>;
+
+export const analystPanelSchema = z
+  .object({
+    behindOrders: z.array(analystBehindOrderSchema),
+    unroutedLeads: z.array(analystUnroutedLeadSchema),
+    staleHighValueDeals: z.array(analystStaleDealSchema),
+    lowHealthAccounts: z.array(analystLowHealthAccountSchema),
+    actions: z.array(analystActionSchema)
+  })
+  .strict();
+
+export type AnalystPanel = z.output<typeof analystPanelSchema>;
 
 export type AnalystPanelInput = {
   orders: AnalystOrder[];
@@ -250,4 +290,10 @@ function rankAnalystActions(input: {
   return actions
     .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
     .slice(0, input.limit);
+}
+
+export function validateAnalystPanel(
+  output: unknown
+): DeterministicAiOutputValidationResult<AnalystPanel> {
+  return validateDeterministicAiOutput(analystPanelSchema, output);
 }

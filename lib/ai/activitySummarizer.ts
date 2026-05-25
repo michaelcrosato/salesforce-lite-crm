@@ -1,3 +1,17 @@
+import { z } from "zod";
+import {
+  validateDeterministicAiOutput,
+  type DeterministicAiOutputValidationResult
+} from "@/lib/ai/outputValidation";
+
+export const activitySummaryResultSchema = z
+  .object({
+    summary: z.string(),
+    nextStep: z.string().min(1),
+    tags: z.array(z.string().min(1))
+  })
+  .strict();
+
 export type ActivitySummaryResult = {
   summary: string;
   nextStep: string;
@@ -97,3 +111,9 @@ export class DeterministicActivitySummarizer implements ActivitySummarizer {
 
 export const deterministicActivitySummarizer =
   new DeterministicActivitySummarizer();
+
+export function validateActivitySummaryResult(
+  output: unknown
+): DeterministicAiOutputValidationResult<ActivitySummaryResult> {
+  return validateDeterministicAiOutput(activitySummaryResultSchema, output);
+}

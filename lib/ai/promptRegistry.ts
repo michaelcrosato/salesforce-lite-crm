@@ -1,4 +1,4 @@
-export const DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION = "2026-05-25.s35-f1";
+export const DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION = "2026-05-25.s35-f2";
 
 export const DETERMINISTIC_AI_PROMPT_IDS = [
   "activity.note-summary",
@@ -17,7 +17,7 @@ export type DeterministicAiPromptKind =
   | "case_assist";
 
 export type DeterministicAiPromptSchemaRef = {
-  readonly kind: "typescript";
+  readonly kind: "typescript" | "zod";
   readonly module: string;
   readonly exportName: string;
 };
@@ -73,9 +73,9 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       exportName: "ActivitySummarizerInput"
     },
     outputSchema: {
-      kind: "typescript",
+      kind: "zod",
       module: "lib/ai/activitySummarizer.ts",
-      exportName: "ActivitySummaryResult"
+      exportName: "activitySummaryResultSchema"
     },
     routeScope: ["/contacts/[id]"],
     safety: deterministicLocalSafety
@@ -96,9 +96,9 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       exportName: "AnalystPanelInput"
     },
     outputSchema: {
-      kind: "typescript",
+      kind: "zod",
       module: "lib/business/analyst.ts",
-      exportName: "AnalystPanel"
+      exportName: "analystPanelSchema"
     },
     routeScope: ["/dashboard"],
     safety: deterministicLocalSafety
@@ -119,9 +119,9 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       exportName: "CaseKnowledgeSuggestionOptions"
     },
     outputSchema: {
-      kind: "typescript",
+      kind: "zod",
       module: "lib/services/caseKnowledgeSuggestions.ts",
-      exportName: "CaseKnowledgeSuggestionPacket"
+      exportName: "caseKnowledgeSuggestionPacketSchema"
     },
     routeScope: ["/cases"],
     safety: deterministicLocalSafety
