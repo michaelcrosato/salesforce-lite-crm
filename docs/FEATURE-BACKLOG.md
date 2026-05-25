@@ -90,9 +90,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S37-F1 | Workflow rule catalog | Codex | done |
 | S37-F2 | Workflow dry-run evaluator | Codex | done |
 | S37-F3 | Workflow review packets | Codex | done |
-| S38-F1 | Workflow rule example contracts | Codex | queued |
-| S38-F2 | Workflow dry-run operator UI | Codex | queued |
-| S38-F3 | Workflow execution readiness receipts | Codex | queued |
+| S38-F1 | Workflow rule example contracts | Codex | done |
+| S38-F2 | Workflow dry-run operator UI | Codex | done |
+| S38-F3 | Workflow execution readiness receipts | Codex | done |
+| S39-F1 | Workflow execution capability matrix | Codex | queued |
+| S39-F2 | Workflow manual executor foundation | Codex | queued |
+| S39-F3 | Workflow execution operator UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
