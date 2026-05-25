@@ -77,7 +77,10 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S32-F3 | Service operations case UI | Codex | done |
 | S33-F1 | Knowledge article foundation | Codex | done |
 | S33-F2 | Case knowledge suggestion contracts | Codex | done |
-| S33-F3 | Case knowledge assist UI | Codex | queued |
+| S33-F3 | Case knowledge assist UI | Codex | done |
+| S34-F1 | Non-major dependency refresh | Codex | queued |
+| S34-F2 | Transitive advisory containment | Codex | queued |
+| S34-F3 | Vitest major compatibility pass | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
