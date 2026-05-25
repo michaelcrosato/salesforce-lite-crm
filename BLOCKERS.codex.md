@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 36
+Sprint: 37
 
-Feature: S36-F3 - AI governance review packets
+Feature: SPRINT-ROLLOVER - Sprint 37 planning
 
 Branch: main
 
-Timestamp: 2026-05-25T04:50:37.9741539-07:00
+Timestamp: 2026-05-25T05:27:41.4601783-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open during this iteration.
+- No active Codex blockers were open during sprint rollover.

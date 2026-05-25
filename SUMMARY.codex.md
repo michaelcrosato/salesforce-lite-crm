@@ -1,37 +1,35 @@
 Agent: Codex
 
-Sprint: 36
+Sprint: 37
 
-Feature: S36-F3 - AI governance review packets
+Feature: SPRINT-ROLLOVER - Sprint 37 planning
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 34afd37 - [codex] S36-F3: add AI governance review packets
+- 5a94408 - [codex] sprint 37: plan codex track
+- 8f106d0 - [codex] sprint 37: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation; lint and typecheck passed, Vitest passed 80 files / 422 tests, build passed, and Playwright e2e passed 22/22.
+Gate status: PASS - Phase 0 baseline passed `npm install`, `.env` check, `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run lint`, `npm run typecheck`, `npm run test` (80 files / 422 tests), and `npm run build`; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (80 files / 422 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T04:50:37.9741539-07:00
+Timestamp: 2026-05-25T05:27:41.4601783-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/governanceReviewPackets.ts` with read-only packet helpers that compose deterministic AI prompt registry entries, output schema refs, fixture review metadata, stable run receipts, policy guardrails, route-scope review, and explicit no-provider/no-RAG/no-tool-plan/no-route-change safety flags.
-- Added `tests/ai-governance-review-packets.test.ts` to verify packet coverage for every current deterministic AI-style surface, fixture receipt stability without raw payload exposure, policy/receipt/version composition, and forbidden capability drift auditing.
-
-### Discovered this prompt
-
-- `PLAN.md` §4 and `docs/FEATURE-BACKLOG.md` still list S36-F1, S36-F2, and S36-F3 as queued, but recent green-gated commits now support S36-F1, S36-F2, and this prompt's S36-F3 as done.
-- `SUMMARY.gemini.md` references a Sprint 5 visual snapshot scope that is not present in current `PLAN.md` §4; treated as historical/stale report context and not promoted into §4.
+- Confirmed Sprint 36 Codex work is complete from S36-F1/S36-F2/S36-F3 implementation/report commits, current SUMMARY evidence, and zero active Codex blockers.
+- Updated `PLAN.md` document control, marked S36-F1/S36-F2/S36-F3 done, and queued Sprint 37 Workflow Rule Readiness with S37-F1/S37-F2/S37-F3.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 36 is done and Sprint 37 is queued for Codex.
+- Verified planning changes did not affect runtime behavior with lint, typecheck, unit tests, and build.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md or equivalent planning prompt to launch the next Codex scope; no further Sprint 36 Codex feature remains queued.
+Run LOOP.md to begin S37-F1.
 
 ### Scope confirmation
 
