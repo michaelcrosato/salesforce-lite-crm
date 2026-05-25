@@ -117,3 +117,9 @@ action, and scope confirmation.
   page, dealer order CRUD, area CRUD, or new product routes during readiness
   work. The Ctrl/Cmd+K command palette is already the implemented cross-entity
   search surface.
+
+## Multi-Agent Orchestration (alpha-scale-engine4)
+
+The sibling `alpha-scale-engine4` provides v0.1+ hybrid dispatch (`orchestrate.ps1` + `spawn-agent.ps1`) for safe, principle-governed scale-out. It can spawn specialized agents (Grok 4.3, Claude, Gemini...) into isolated `.agent-worktrees/` (ephemeral, A#3 hygiene) with engine overlay (AXIOMS/AGENT-LOOP/GOAL + 5 rich personas) while *strictly* honoring this `AGENTS.md`, `CRM-CONTRACT.md`, ownership zones, and the full target local-gate + CONTRACT. 
+
+See engine `docs/GOAL.md` (ACTIVE_SPEC, Phase-3 hybrid priority, TARGET Multi-Agent Scale-Out) and CRM `GROK-NOTES.md` / dedicated grok worktree patterns. All engine-driven changes are doc-scoped or contract-respecting, gate-enforced before integrate, and produce full traces/LOG provenance. Doc-only notes (like this) are zero-risk and encouraged for discoverability.
