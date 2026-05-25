@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 37
 
-Feature: SPRINT-ROLLOVER - Sprint 37 planning
+Feature: S37-F1 — Workflow rule catalog
 
 Branch: main
 
-Timestamp: 2026-05-25T05:27:41.4601783-07:00
+Timestamp: 2026-05-25T05:54:34.5758144-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open during sprint rollover.
+- No active Codex blockers were open during this prompt.
