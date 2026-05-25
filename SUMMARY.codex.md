@@ -2,32 +2,32 @@ Agent: Codex
 
 Sprint: 38
 
-Feature: S38-F1 - Workflow rule example contracts
+Feature: S38-F2 - Workflow dry-run operator UI
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 5cd532a - [codex] S38-F1: add workflow rule example contracts
+- c714033 - [codex] S38-F2: add workflow dry-run reports operator
 
-Gate status: PASS - Phase 0 baseline and Phase 5 verification passed the full local gate via `scripts/local-gate.ps1`: install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (84 files / 438 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed). Focused pre-commit checks also passed `npm run test -- tests/api/workflow-rule-examples.test.ts`, `npm run lint`, and `npm run typecheck`.
+Gate status: PASS - Phase 0 baseline passed `npm install`, env bootstrap, Prisma generate/db push, seed, lint, typecheck, `npm run test` (84 files / 438 tests), and build. Phase 5 verification passed the full local gate via `scripts/local-gate.ps1`: install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (84 files / 438 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed). Focused checks also passed `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run seed`, and `npx playwright test e2e/reports.spec.ts`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T10:05:20.2734252-07:00
+Timestamp: 2026-05-25T11:49:32.8696829-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/server/workflowRuleExamples.ts` with deterministic, catalog-backed workflow-rule example contracts for every supported workflow entity, including sample draft rules, fixture metadata, coverage summaries, and explicit no-write/no-executor safety flags.
-- Added `tests/api/workflow-rule-examples.test.ts` to verify example coverage across supported entities/triggers/conditions/actions, review-packet compatibility against synthetic fixtures, no CRM/audit/workflow writes, and exclusion of unsupported non-goal entities/routes/actions.
-- Reconciled stale historical side-branch reports against current `PLAN.md` Sprint 38 scope and green local gate evidence; no active Codex blockers or cross-agent blockers affect S38-F1.
+- Added a workflow dry-run operator to `/reports` using the S38 workflow example catalog and S37 workflow review packets, including example selection, server-action validation, match counts, proposed action summaries, operator warnings, matched-record output, and no-write safety flags.
+- Extended the reports e2e flow to run a workflow example dry-run and assert the workflow operator summaries, result panel, warnings, action summaries, matched/empty record state, and disabled database/action-execution surfaces.
+- Reconciled the stale PLAN §4 S38-F1 queued marker against Codex's latest green-gate S38-F1 report and selected S38-F2 as the next valid work unit.
 
 ### Next action
 
-Run LOOP.md to begin S38-F2 - Workflow dry-run operator UI.
+Run LOOP.md to begin S38-F3 - Workflow execution readiness receipts.
 
 ### Scope confirmation
 
