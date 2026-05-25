@@ -1,41 +1,39 @@
 Agent: Codex
 
-Sprint: 33
+Sprint: 34
 
-Feature: S33-F3 - Case knowledge assist UI
+Feature: Sprint 34 planning
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 3aacde4 - [codex] S33-F3: add case knowledge assist UI
-- 8bbbf57 - [codex] S33-F3: stabilize case knowledge e2e fixture
+- d91a490 - [codex] sprint 34: plan codex track
+- 472f2ce - [codex] sprint 34: backlog refresh
 
-Gate status: PASS - Full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0: npm install, Prisma generate/db push, seed, lint, typecheck, 74 Vitest files / 396 tests, build, Playwright chromium install, and 22 e2e tests. `npm install` still reports 10 moderate audit findings tracked as B-68.
+Gate status: PASS - Baseline full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0: npm install, Prisma generate/db push, seed, lint, typecheck, 74 Vitest files / 396 tests, build, Playwright chromium install, and 22 e2e tests. Post-planning verification also passed `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T20:30:49.2661051-07:00
+Timestamp: 2026-05-24T21:34:57.1387922-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline through `npm run build` on clean `main`; local gate subset was green before implementation.
-- Reconciled current Sprint 33 scope against reports and docs; noted stale historical other-agent summaries, including Gemini's Sprint 5 visual-snapshot scope not present in current PLAN §4.
-- Added read-only case knowledge assist UI to `/cases`: list rows now show bounded suggestion state, and the existing case drawer shows top local article suggestions or a no-match empty state.
-- Added route loading skeleton coverage for the new cases knowledge-assist area.
-- Updated `e2e/cases.spec.ts` to verify matched and no-match knowledge assist states while preserving case status and queue update coverage.
-- Resolved a transient e2e fixture assumption during verification by creating a neutral no-match case inside the test instead of relying on seeded queue behavior.
-- Browser smoke checked `http://127.0.0.1:3005/cases` and `/cases?case=case-001`; the list summaries and drawer knowledge card rendered.
+- Ran Phase 0 baseline from clean `main`; full local gate was green before planning.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Confirmed Codex Sprint 33 work is complete: S33-F1, S33-F2, and S33-F3 have implementation/report evidence and Codex has no active blockers.
+- Marked S33-F3 done in `PLAN.md` and planned Sprint 34 as a B-68 dependency modernization track with S34-F1, S34-F2, and S34-F3 queued.
+- Synced `docs/FEATURE-BACKLOG.md` so S33-F3 is done and the three Sprint 34 Codex features are queued.
 
 ### Next action
 
-Sprint 33 has no remaining queued Codex feature after S33-F3; run sprint rollover or promote the next PLAN §4 scope before another implementation loop.
+Run LOOP.md to begin S34-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; app, component, and e2e changes were one coherent S33-F3 slice)
+No cross-ownership edits: YES (single-agent root mode; prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
 
 CRM-CONTRACT.md honored: YES
