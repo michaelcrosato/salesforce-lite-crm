@@ -13,6 +13,10 @@ import {
   type CaseFormInitialValues,
   type CaseOptionItem
 } from "@/components/cases/case-form";
+import {
+  CaseKnowledgeAssistCard,
+  type CaseKnowledgeAssistPacketView
+} from "@/components/cases/case-knowledge-assist";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +55,7 @@ export type DrawerCase = CaseFormInitialValues & {
     overdueMinutes: number;
     isStopped: boolean;
   };
+  knowledge: CaseKnowledgeAssistPacketView;
   ownerName: string | null;
   createdAt: string;
   updatedAt: string;
@@ -300,6 +305,8 @@ export function CaseDetailDrawer({
               </div>
             </CardContent>
           </Card>
+
+          <CaseKnowledgeAssistCard packet={crmCase.knowledge} />
 
           <Card>
             <CardHeader>

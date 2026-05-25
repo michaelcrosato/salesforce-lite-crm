@@ -23,6 +23,9 @@ test("create case, edit status, and verify in list", async ({ page }) => {
     "Billing Support"
   );
   await expect(row.getByTestId("case-row-sla")).toContainText("On track");
+  await expect(row.getByTestId("case-knowledge-summary")).toContainText(
+    "Resolve billing discrepancy tickets"
+  );
 
   await row.getByRole("link", { name: caseSubject }).click();
   await expect(page).toHaveURL(/[?&]case=/);
@@ -38,7 +41,30 @@ test("create case, edit status, and verify in list", async ({ page }) => {
   await expect(page.getByTestId("case-drawer-sla-context")).toContainText(
     "High priority response"
   );
+  await expect(page.getByTestId("case-knowledge-card")).toContainText(
+    "Knowledge assist"
+  );
+  await expect(page.getByTestId("case-knowledge-card")).toContainText(
+    "Resolve billing discrepancy tickets"
+  );
 
+  await page.goto("/cases");
+  const emptyKnowledgeRow = page
+    .getByRole("row")
+    .filter({ hasText: "Password reset loop for fleet users" })
+    .first();
+  await expect(emptyKnowledgeRow.getByTestId("case-knowledge-summary")).toContainText(
+    "No matches"
+  );
+  await emptyKnowledgeRow
+    .getByRole("link", { name: /Password reset loop for fleet users/ })
+    .click();
+  await expect(page.getByTestId("case-knowledge-empty")).toContainText(
+    "No knowledge matches"
+  );
+
+  await page.goto("/cases");
+  await row.getByRole("link", { name: caseSubject }).click();
   await page
     .getByLabel(`Move ${caseSubject} status`)
     .selectOption("in_progress");

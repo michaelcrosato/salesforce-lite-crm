@@ -2,6 +2,10 @@
 
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import {
+  CaseKnowledgeListSummary,
+  type CaseKnowledgeAssistPacketView
+} from "@/components/cases/case-knowledge-assist";
 import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +54,7 @@ export type CaseRow = {
     overdueMinutes: number;
     isStopped: boolean;
   };
+  knowledge: CaseKnowledgeAssistPacketView;
   owner: { id: string; name: string } | null;
   linkedRecord: CaseLinkedRecord;
   updatedAt: string;
@@ -140,6 +145,7 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
             <TableHead>Priority</TableHead>
             <TableHead>Queue</TableHead>
             <TableHead>SLA</TableHead>
+            <TableHead>Knowledge</TableHead>
             <TableHead>Linked to</TableHead>
             <TableHead>Owner</TableHead>
             <TableHead>Updated</TableHead>
@@ -187,6 +193,9 @@ export function CasesTable({ cases }: { cases: CaseRow[] }) {
                     {slaTimingText(crmCase.sla)}
                   </span>
                 </div>
+              </TableCell>
+              <TableCell>
+                <CaseKnowledgeListSummary packet={crmCase.knowledge} />
               </TableCell>
               <TableCell>{renderLink(crmCase.linkedRecord)}</TableCell>
               <TableCell>{crmCase.owner?.name ?? "Unassigned"}</TableCell>

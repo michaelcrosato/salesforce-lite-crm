@@ -8,6 +8,7 @@ import {
 import {
   type DrawerCase
 } from "@/components/cases/case-detail-drawer";
+import { type CaseKnowledgeAssistPacketView } from "@/components/cases/case-knowledge-assist";
 import { type CaseOptionItem } from "@/components/cases/case-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +41,10 @@ import {
   buildCaseSlaSnapshots,
   type CaseSlaSnapshot
 } from "@/lib/services/caseSlas";
+import {
+  buildCaseKnowledgeSuggestionPacket,
+  type CaseKnowledgeSuggestionPacket
+} from "@/lib/services/caseKnowledgeSuggestions";
 import {
   buildSavedListViewQuery,
   listSavedListViews,
@@ -218,14 +223,36 @@ export default async function CasesPage({
     }
   };
 
-  const [cases, owners, accountsList, contactsList] = await Promise.all([
+  const [
+    cases,
+    owners,
+    accountsList,
+    contactsList,
+    publishedKnowledgeArticles
+  ] = await Promise.all([
     listCases(listOptions),
     prisma.user.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true }
     }),
     listAccounts({ pageSize: 100 }),
-    listContacts({ pageSize: 100 })
+    listContacts({ pageSize: 100 }),
+    prisma.knowledgeArticle.findMany({
+      where: {
+        status: "published"
+      },
+      orderBy: [
+        {
+          publishedAt: "desc"
+        },
+        {
+          updatedAt: "desc"
+        },
+        {
+          title: "asc"
+        }
+      ]
+    })
   ]);
 
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
@@ -237,6 +264,20 @@ export default async function CasesPage({
     buildCaseSlaSnapshots(cases).map((sla) => [
       sla.caseId,
       serializeCaseSla(sla)
+    ])
+  );
+  const caseKnowledgeById = new Map(
+    cases.map((crmCase) => [
+      crmCase.id,
+      serializeCaseKnowledgePacket(
+        buildCaseKnowledgeSuggestionPacket(
+          crmCase,
+          publishedKnowledgeArticles,
+          {
+            limit: 3
+          }
+        )
+      )
     ])
   );
 
@@ -283,6 +324,17 @@ export default async function CasesPage({
     sla:
       caseSlaById.get(crmCase.id) ??
       serializeCaseSla(buildCaseSlaSnapshot(crmCase)),
+    knowledge:
+      caseKnowledgeById.get(crmCase.id) ??
+      serializeCaseKnowledgePacket(
+        buildCaseKnowledgeSuggestionPacket(
+          crmCase,
+          publishedKnowledgeArticles,
+          {
+            limit: 3
+          }
+        )
+      ),
     owner: crmCase.ownerId
       ? {
           id: crmCase.ownerId,
@@ -306,6 +358,15 @@ export default async function CasesPage({
         queueKey: normalizeCaseQueueKey(found.queueKey),
         queueReason: normalizeCaseQueueReason(found.queueReason),
         sla: serializeCaseSla(buildCaseSlaSnapshot(found)),
+        knowledge: serializeCaseKnowledgePacket(
+          buildCaseKnowledgeSuggestionPacket(
+            found,
+            publishedKnowledgeArticles,
+            {
+              limit: 3
+            }
+          )
+        ),
         ownerId: found.ownerId,
         ownerName: found.ownerId
           ? ownerById.get(found.ownerId)?.name ?? null
@@ -456,5 +517,17 @@ function serializeCaseSla(snapshot: CaseSlaSnapshot) {
     remainingMinutes: snapshot.remainingMinutes,
     overdueMinutes: snapshot.overdueMinutes,
     isStopped: snapshot.isStopped
+  };
+}
+
+function serializeCaseKnowledgePacket(
+  packet: CaseKnowledgeSuggestionPacket
+): CaseKnowledgeAssistPacketView {
+  return {
+    ...packet,
+    suggestions: packet.suggestions.map((suggestion) => ({
+      ...suggestion,
+      publishedAt: suggestion.publishedAt?.toISOString() ?? null
+    }))
   };
 }
