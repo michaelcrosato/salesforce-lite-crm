@@ -2,38 +2,38 @@ Agent: Codex
 
 Sprint: 35
 
-Feature: S35-F2 - Structured deterministic output contracts
+Feature: S35-F3 - Deterministic AI eval fixtures
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- daeaadd - [codex] S35-F2: add deterministic AI output contracts
+- e9bb8a6 - [codex] S35-F3: add deterministic AI eval fixtures
 
-Gate status: PASS - Phase 0 baseline `scripts/local-gate.ps1` passed on clean `main`; post-implementation `scripts/local-gate.ps1` passed install, Prisma generate/db push, seed, lint, typecheck, unit tests (76 files / 403 tests), build, Playwright chromium install, and e2e (22 passed).
+Gate status: PASS - Phase 0 baseline passed through `npm run build`; post-implementation `scripts/local-gate.ps1` initially hit two existing CSV test timeouts during `npm run test`, then `npm run test` passed on retry and the full `scripts/local-gate.ps1` rerun passed install, Prisma generate/db push, seed, lint, typecheck, unit tests (77 files / 407 tests), build, Playwright chromium install, and e2e (22 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T00:23:02.7473393-07:00
+Timestamp: 2026-05-25T01:32:44.0987255-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/outputValidation.ts` with deterministic non-throwing Zod output validation that returns stable issue paths for recoverable invalid-output handling.
-- Added Zod-backed output schemas and validation helpers for the activity note summarizer, dashboard analyst panel, and case knowledge suggestion packets without adding providers, network calls, writes, routes, or product surfaces.
-- Updated the deterministic AI prompt registry to reference the new Zod output schema exports and bumped the registry version to `2026-05-25.s35-f2`.
-- Added `tests/ai-output-contracts.test.ts` and updated registry tests to cover valid deterministic outputs and invalid-shape issue reporting.
+- Added `lib/ai/evalFixtures.ts` with a bounded deterministic eval fixture catalog, stable fixture IDs, golden expected outputs, safety metadata, prompt-scoped lookup helpers, and a replay helper for the current local summarizer, analyst panel, and case knowledge suggestion outputs.
+- Linked all current deterministic AI prompt registry entries to their eval fixture IDs and bumped the registry version to `2026-05-25.s35-f3`.
+- Added `tests/ai-eval-fixtures.test.ts` and updated `tests/ai-prompt-registry.test.ts` so `npm run test` validates fixture registry coverage, Zod output contracts, deterministic replay, untrusted CRM text fallback, no-write metadata, and golden output regressions.
 
 ### Discovered this prompt
 
-- PLAN §4 and `docs/FEATURE-BACKLOG.md` still list S35-F1 as `queued`, while Codex's prior SUMMARY and implementation/report commits show S35-F1 completed with a green local gate. Per PLAN §2, current local gate evidence and recent commits support continuing to S35-F2 this prompt.
-- Other-agent SUMMARY/BLOCKERS files remain historical and reference Sprint 4 or a non-current Sprint 5 track. They do not include active gate or contract blockers that affect the root-mode Codex Sprint 35 queue.
+- PLAN.md §4 and `docs/FEATURE-BACKLOG.md` still list S35-F1, S35-F2, and S35-F3 as `queued`; local commits and the green full gate now support treating the Sprint 35 implementation queue as complete pending planning/status rollover.
+- Historical Claude/Grok/Gemini SUMMARY/BLOCKERS files remain stale and do not contain active blockers affecting this root-mode Codex run.
+- Unrelated local orchestration artifacts appeared under `.agent-worktrees/`, `state/`, `tasks/`, and `traces/`; they were kept out of commits and stashed as `stash@{0}` with message `loop-recovery-20260525-012440`.
 
 ### Next action
 
-Run LOOP.md to begin S35-F3 - Deterministic AI eval fixtures.
+Run sprint rollover/status planning before selecting more Codex work; no additional Sprint 35 feature remains after S35-F3.
 
 ### Scope confirmation
 
