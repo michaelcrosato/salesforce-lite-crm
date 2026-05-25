@@ -1,39 +1,35 @@
 Agent: Codex
 
-Sprint: 35
+Sprint: 36
 
-Feature: S35-F3 - Deterministic AI eval fixtures
+Feature: SPRINT-ROLLOVER - Sprint 36 planning
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- e9bb8a6 - [codex] S35-F3: add deterministic AI eval fixtures
+- f221872 - [codex] sprint 36: plan codex track
+- 7af4bf7 - [codex] sprint 36: backlog refresh
 
-Gate status: PASS - Phase 0 baseline passed through `npm run build`; post-implementation `scripts/local-gate.ps1` initially hit two existing CSV test timeouts during `npm run test`, then `npm run test` passed on retry and the full `scripts/local-gate.ps1` rerun passed install, Prisma generate/db push, seed, lint, typecheck, unit tests (77 files / 407 tests), build, Playwright chromium install, and e2e (22 passed).
+Gate status: PASS - Phase 0 baseline passed install, Prisma generate/db push, seed, lint, typecheck, unit tests, and build on clean `main`; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (77 files / 407 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T01:32:44.0987255-07:00
+Timestamp: 2026-05-25T02:55:26.4239305-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/evalFixtures.ts` with a bounded deterministic eval fixture catalog, stable fixture IDs, golden expected outputs, safety metadata, prompt-scoped lookup helpers, and a replay helper for the current local summarizer, analyst panel, and case knowledge suggestion outputs.
-- Linked all current deterministic AI prompt registry entries to their eval fixture IDs and bumped the registry version to `2026-05-25.s35-f3`.
-- Added `tests/ai-eval-fixtures.test.ts` and updated `tests/ai-prompt-registry.test.ts` so `npm run test` validates fixture registry coverage, Zod output contracts, deterministic replay, untrusted CRM text fallback, no-write metadata, and golden output regressions.
-
-### Discovered this prompt
-
-- PLAN.md §4 and `docs/FEATURE-BACKLOG.md` still list S35-F1, S35-F2, and S35-F3 as `queued`; local commits and the green full gate now support treating the Sprint 35 implementation queue as complete pending planning/status rollover.
-- Historical Claude/Grok/Gemini SUMMARY/BLOCKERS files remain stale and do not contain active blockers affecting this root-mode Codex run.
-- Unrelated local orchestration artifacts appeared under `.agent-worktrees/`, `state/`, `tasks/`, and `traces/`; they were kept out of commits and stashed as `stash@{0}` with message `loop-recovery-20260525-012440`.
+- Confirmed Sprint 35 Codex work is complete from S35-F1/S35-F2/S35-F3 implementation commits, prior SUMMARY snapshots, and current no-active-blocker state.
+- Updated `PLAN.md` document control, marked S35-F1/S35-F2/S35-F3 done, and queued Sprint 36 Local AI Governance with S36-F1/S36-F2/S36-F3.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 35 is done and Sprint 36 is queued for Codex.
+- Verified planning changes did not affect runtime behavior with lint, typecheck, unit tests, and build.
 
 ### Next action
 
-Run sprint rollover/status planning before selecting more Codex work; no additional Sprint 35 feature remains after S35-F3.
+Run LOOP.md to begin S36-F1 - Deterministic AI run receipts.
 
 ### Scope confirmation
 
