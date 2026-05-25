@@ -2,32 +2,32 @@ Agent: Codex
 
 Sprint: 36
 
-Feature: S36-F1 - Deterministic AI run receipts
+Feature: S36-F2 - AI privacy and cost policy guardrails
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 77afd51 - [codex] S36-F1: add deterministic AI run receipts
+- 3c6a2d3 - [codex] S36-F2: add AI policy guardrails
 
-Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation; unit tests passed 78 files / 411 tests, build passed, and Playwright e2e passed 22/22.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation; lint and typecheck passed, Vitest passed 79 files / 417 tests, build passed, and Playwright e2e passed 22/22.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T03:25:46.4332716-07:00
+Timestamp: 2026-05-25T04:03:35.2032665-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/runReceipts.ts` with typed deterministic run receipts for current local AI-style prompt surfaces: prompt id/version, local deterministic provider label, validation status/issues, stable SHA-256 input/output hashes, zero token/cost defaults, and explicit no-write/no-network/no-provider/no-persistence flags.
-- Added `tests/ai-run-receipts.test.ts` to cover all current deterministic eval fixtures, receipt determinism, invalid-output receipt status, stable key-order hashing, prompt-registry coverage, and provider-free safety metadata.
-- Reconciled current handoffs: older Claude/Grok/Gemini summaries and `docs/PROJECT-CONTROL.md`/`docs/ROADMAP.md` still reference prior sprint state, but current `PLAN.md` §4, `docs/FEATURE-BACKLOG.md`, and the green local gate authorize Sprint 36 work.
+- Added `lib/ai/policyGuardrails.ts` with typed local-only policy metadata for all current deterministic AI-style prompt surfaces: redaction-sensitive field catalogs, provider/secret/network/write/persistence disallowance, zero-token/zero-cost defaults, and explicit no auth/org quota enforcement.
+- Added `tests/ai-policy-guardrails.test.ts` to verify policy coverage stays aligned with the prompt registry, all current surfaces expose redaction-sensitive fields, providers and secrets remain disallowed, and local deterministic accounting remains zero-cost.
+- Reconciled current handoffs: `PLAN.md` §4 and `docs/FEATURE-BACKLOG.md` still list S36-F1/S36-F2 as queued, but recent implementation commits and the final green local gate support S36-F2 as done in this report.
 
 ### Next action
 
-Run LOOP.md to begin S36-F2 - AI privacy and cost policy guardrails.
+Run LOOP.md to begin S36-F3 - AI governance review packets.
 
 ### Scope confirmation
 
