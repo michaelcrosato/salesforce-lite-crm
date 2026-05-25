@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.42A |
+| Version | 2.43A |
 
 | Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 36 S36-F1/S36-F2/S36-F3 queued |
+| Active sprint | Sprint 37 S37-F1/S37-F2/S37-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1348,9 +1348,9 @@ Goal: add read-only local governance metadata around existing deterministic AI-s
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S36-F1 — Deterministic AI run receipts | codex | queued | Existing deterministic AI-style surfaces can produce typed, non-persistent run receipt metadata with prompt ID/version, local deterministic provider label, validation status, input/output hashes, and explicit no-write/no-network flags. Tests cover stable receipt generation and no database, network, or provider dependency. |
-| S36-F2 — AI privacy and cost policy guardrails | codex | queued | Local deterministic AI surfaces have policy metadata/helpers for redaction-sensitive fields, provider/secret disallowance, and zero-cost/zero-token accounting defaults. Tests verify all current deterministic surfaces are covered without adding auth/org quota enforcement or provider calls. |
-| S36-F3 — AI governance review packets | codex | queued | Read-only review packets compose prompt registry, output contract, eval fixture, run receipt, and policy metadata for each current deterministic AI-style surface. Tests ensure packet completeness and explicitly exclude RAG, tool-plan execution, external-provider claims, and product route changes. |
+| S36-F1 — Deterministic AI run receipts | codex | done | Existing deterministic AI-style surfaces can produce typed, non-persistent run receipt metadata with prompt ID/version, local deterministic provider label, validation status, input/output hashes, and explicit no-write/no-network flags. Tests cover stable receipt generation and no database, network, or provider dependency. |
+| S36-F2 — AI privacy and cost policy guardrails | codex | done | Local deterministic AI surfaces have policy metadata/helpers for redaction-sensitive fields, provider/secret disallowance, and zero-cost/zero-token accounting defaults. Tests verify all current deterministic surfaces are covered without adding auth/org quota enforcement or provider calls. |
+| S36-F3 — AI governance review packets | codex | done | Read-only review packets compose prompt registry, output contract, eval fixture, run receipt, and policy metadata for each current deterministic AI-style surface. Tests ensure packet completeness and explicitly exclude RAG, tool-plan execution, external-provider claims, and product route changes. |
 
 \*\*Sprint 36 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1379,6 +1379,45 @@ Goal: add read-only local governance metadata around existing deterministic AI-s
 \- No RAG/vector search, external knowledge provider, prompt-to-action tool execution, agentic writes, or live provider evals.
 
 \- No new AI-generated content surfaces, generated-content expansion, product routes, CI/deployment changes, or auth/org quota enforcement.
+
+
+\*\*Sprint 37 — Workflow Rule Readiness\*\*
+
+Goal: establish deterministic, read-only workflow-rule planning contracts without adding product routes, persistence workflows, scheduled execution, or write-capable automation.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S37-F1 — Workflow rule catalog | codex | queued | Typed workflow-rule metadata lists supported draft triggers, CRM objects, condition families, and non-mutating action descriptors using current CRM constants. Tests verify the supported object/action matrix and keep unsupported permanent non-goal surfaces out of the catalog. |
+| S37-F2 — Workflow dry-run evaluator | codex | queued | Server-side dry-run helpers validate a draft rule against the catalog and return bounded deterministic matched record references plus proposed action summaries without mutating data. Tests cover invalid actions, empty matches, match bounds, deterministic ordering, and no write side effects. |
+| S37-F3 — Workflow review packets | codex | queued | Read-only workflow review packets compose catalog and dry-run output into rule metadata, affected-object counts, proposed action categories, safety flags, and operator warnings for later UI consumption. Tests ensure packet completeness and no product route, CRM-CONTRACT, persistence, or action-execution drift. |
+
+\*\*Sprint 37 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No workflow builder UI, product routes, route handlers, or navigation changes.
+
+\- No workflow rule persistence, scheduled sweeps, approval engine, background jobs, audit/event writes, action execution, agentic writes, arbitrary JavaScript, or `eval`.
+
+\- No new CRM entities, statuses, adapter signatures, CRM-CONTRACT route/entity/status changes, or schema changes unless a later prompt explicitly promotes them.
+
+\- No Salesforce integration, CSV import apply workflow, provider secrets, webhooks, external services, or network calls.
 
 
 \## 5. File Ownership Matrix
