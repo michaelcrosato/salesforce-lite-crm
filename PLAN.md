@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.40A |
+| Version | 2.41A |
 
-| Last updated | 2026-05-24 |
+| Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 34 S34-F1/S34-F2/S34-F3 queued |
+| Active sprint | Sprint 35 S35-F1/S35-F2/S35-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1270,9 +1270,9 @@ Goal: reduce dependency and audit drift without weakening the local gate or addi
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S34-F1 — Non-major dependency refresh | codex | queued | Update only direct package patch/minor releases that do not require framework migration or new configuration, then keep install, lint, typecheck, test, build, and e2e green. Document any skipped major-version candidates in the Codex summary. |
-| S34-F2 — Transitive advisory containment | codex | queued | Reduce or explicitly contain npm audit moderate findings where safe through package-manager-level overrides or compatible dependency updates, with package lock integrity and the full local gate green. Any advisory that requires an unsafe downgrade or unavailable upstream fix is recorded with evidence instead of forced. |
-| S34-F3 — Vitest major compatibility pass | codex | queued | Attempt the Vitest/Vite advisory migration path in a bounded branch-local pass; either land a green Vitest 4-compatible test stack or leave package files reverted and file a precise gate/dependency blocker with failing command, error surface, and safe next action. |
+| S34-F1 — Non-major dependency refresh | codex | done | Update only direct package patch/minor releases that do not require framework migration or new configuration, then keep install, lint, typecheck, test, build, and e2e green. Document any skipped major-version candidates in the Codex summary. |
+| S34-F2 — Transitive advisory containment | codex | done | Reduce or explicitly contain npm audit moderate findings where safe through package-manager-level overrides or compatible dependency updates, with package lock integrity and the full local gate green. Any advisory that requires an unsafe downgrade or unavailable upstream fix is recorded with evidence instead of forced. |
+| S34-F3 — Vitest major compatibility pass | codex | done | Attempt the Vitest/Vite advisory migration path in a bounded branch-local pass; either land a green Vitest 4-compatible test stack or leave package files reverted and file a precise gate/dependency blocker with failing command, error surface, and safe next action. |
 
 \*\*Sprint 34 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1301,6 +1301,45 @@ Goal: reduce dependency and audit drift without weakening the local gate or addi
 \- No product behavior changes, product routes, schema changes, or CRM-CONTRACT.md changes unless a later prompt explicitly promotes them.
 
 \- No replacement test runner or unrelated test rewrites.
+
+
+\*\*Sprint 35 — Deterministic AI Contracts\*\*
+
+Goal: make existing local AI-style outputs easier to govern, validate, and regression-test without adding providers, routes, or write-capable automation.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S35-F1 — Deterministic AI prompt registry | codex | queued | Register existing deterministic AI-style surfaces with stable prompt IDs, versions, owners, and input/output schema references. No routes, external providers, secrets, network calls, RAG, or agentic writes are added. |
+| S35-F2 — Structured deterministic output contracts | codex | queued | Add Zod-backed output contracts for existing local summarizer, analyst, and case-assist outputs so invalid output can be handled deterministically and covered by tests. No provider calls, generated-content expansion, persistence workflow, or route changes are added. |
+| S35-F3 — Deterministic AI eval fixtures | codex | queued | Add a bounded fixture/eval harness for current deterministic outputs so regressions are caught by `npm run test` without network calls, external services, or provider credentials. No live provider evals, RAG answers, tool-plan execution, CI/deployment changes, or new product surfaces are added. |
+
+\*\*Sprint 35 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No AI provider credentials, network calls, or environment-variable secrets.
+
+\- No RAG/vector search, external knowledge provider, prompt-to-action tool execution, or agentic writes.
+
+\- No new AI-generated content surfaces beyond validating and registering existing deterministic outputs.
+
+\- No CRM-CONTRACT route, entity, status, or adapter changes unless a later prompt explicitly promotes them.
 
 
 \## 5. File Ownership Matrix
@@ -2192,7 +2231,7 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-67 | Salesforce import | CSV mapping first, API sync later. |
 
-| B-68 | Dependency and security modernization | Track `npm audit` findings and package-major upgrade paths without weakening the local gate. Current repo-local evidence shows Next/Prisma/Playwright on current registry versions, Vitest behind the current registry major, and moderate transitive advisories requiring a planned upgrade/test pass rather than `npm audit fix --force` during feature work. |
+| B-68 | Dependency and security modernization | Track future `npm audit` findings and package-major upgrade paths without weakening the local gate. Sprint 34 completed the non-major refresh, safe transitive containment, and Vitest 4 compatibility pass; current Codex evidence reports `npm audit --json` at 0 vulnerabilities. |
 
 
 
