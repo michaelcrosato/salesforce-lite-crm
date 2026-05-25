@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.44A |
+| Version | 2.45A |
 
 | Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 38 S38-F1/S38-F2/S38-F3 queued |
+| Active sprint | Sprint 39 S39-F1/S39-F2/S39-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1426,9 +1426,9 @@ Goal: make the deterministic workflow-rule planning surface operator-ready while
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S38-F1 — Workflow rule example contracts | codex | queued | Server-side workflow-rule examples provide deterministic sample draft rules and fixture metadata for supported entities, triggers, conditions, and descriptor-only actions. Tests verify examples stay catalog-backed, no-write, and exclude unsupported permanent non-goal surfaces. |
-| S38-F2 — Workflow dry-run operator UI | codex | queued | The existing `/reports` surface can run and review bounded workflow-rule dry-runs using catalog examples, validation feedback, match counts, proposed action summaries, and safety warnings. No new product route, workflow persistence, action execution, background job, or CRM-CONTRACT route/status drift is added. |
-| S38-F3 — Workflow execution readiness receipts | codex | queued | Read-only readiness receipts summarize whether proposed workflow actions are eligible for a future manual executor and what audit intent would be required, without executing actions or writing audit/CRM records. Tests cover blocked/eligible action categories, no persistence, and no provider/network dependencies. |
+| S38-F1 — Workflow rule example contracts | codex | done | Server-side workflow-rule examples provide deterministic sample draft rules and fixture metadata for supported entities, triggers, conditions, and descriptor-only actions. Tests verify examples stay catalog-backed, no-write, and exclude unsupported permanent non-goal surfaces. |
+| S38-F2 — Workflow dry-run operator UI | codex | done | The existing `/reports` surface can run and review bounded workflow-rule dry-runs using catalog examples, validation feedback, match counts, proposed action summaries, and safety warnings. No new product route, workflow persistence, action execution, background job, or CRM-CONTRACT route/status drift is added. |
+| S38-F3 — Workflow execution readiness receipts | codex | done | Read-only readiness receipts summarize whether proposed workflow actions are eligible for a future manual executor and what audit intent would be required, without executing actions or writing audit/CRM records. Tests cover blocked/eligible action categories, no persistence, and no provider/network dependencies. |
 
 \*\*Sprint 38 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1453,6 +1453,43 @@ Goal: make the deterministic workflow-rule planning surface operator-ready while
 \- No standalone workflow-builder route, saved workflow-rule model, workflow persistence, scheduled sweeps, approval engine, background jobs, or action execution.
 
 \- No audit/event writes, CRM writes, arbitrary JavaScript, `eval`, agentic writes, provider secrets, external services, webhooks, or network calls.
+
+\- No new CRM entities, statuses, adapter signatures, CRM-CONTRACT route/entity/status changes, routing decision changes, pacing-engine changes, CSV import apply workflow, or Salesforce integration.
+
+
+\*\*Sprint 39 — Workflow Manual Execution\*\*
+
+Goal: promote the deterministic workflow-rule planning surface into a bounded manual execution path while preserving explicit operator approval, audit evidence, and route/contract guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S39-F1 — Workflow execution capability matrix | codex | queued | Server-side workflow execution capability metadata maps catalog actions to supported manual-executor paths and explicit blocked reasons. Tests prove the matrix is deterministic, catalog-backed, no-write, and excludes unsupported permanent non-goal surfaces. |
+| S39-F2 — Workflow manual executor foundation | codex | queued | An explicit operator-approved server-side manual executor applies eligible workflow actions through existing validation/catalog paths, records audit evidence for mutations, and blocks unsupported, empty, or truncated cases. No workflow persistence, scheduled sweep, background job, external delivery, webhook, provider call, or CRM-CONTRACT drift is added. |
+| S39-F3 — Workflow execution operator UI | codex | queued | The existing `/reports` workflow dry-run surface adds a confirmation-driven manual execution path with visible execution, skipped/blocked, and audit outcomes. No new route, workflow builder, saved rule model, scheduler, or global search/deal-detail expansion is added. |
+
+\*\*Sprint 39 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No saved workflow-rule model, workflow builder route, scheduled sweeps, approval engine, background jobs, or agentic/autonomous writes.
+
+\- No external message delivery, webhooks, provider secrets, external services, network calls, arbitrary JavaScript, or `eval`.
 
 \- No new CRM entities, statuses, adapter signatures, CRM-CONTRACT route/entity/status changes, routing decision changes, pacing-engine changes, CSV import apply workflow, or Salesforce integration.
 
