@@ -10,7 +10,12 @@ export const AUDIT_EVENT_ACTIONS = {
   ai: ["summary_generated", "recommendation_generated"],
   import: ["csv_previewed", "csv_validated", "dry_run_receipt_created"],
   routing: ["lead_routed", "lead_unrouted", "routing_evaluated"],
-  workflow: ["task_completed", "case_resolved", "campaign_completed"]
+  workflow: [
+    "task_completed",
+    "case_resolved",
+    "campaign_completed",
+    "workflow_action_execute"
+  ]
 } as const;
 
 export const AUDIT_ENTITY_TYPES = [

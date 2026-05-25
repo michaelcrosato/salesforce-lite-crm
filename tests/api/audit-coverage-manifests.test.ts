@@ -73,7 +73,7 @@ describe("server audit coverage manifests", () => {
     expect(workflowCategory).toMatchObject({
       category: "workflow",
       status: "covered",
-      actionCount: 3,
+      actionCount: 4,
       coveredActionCount: 3,
       knownGapCount: 0,
       entityCount: 3
