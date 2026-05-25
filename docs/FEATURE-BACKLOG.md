@@ -78,9 +78,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S33-F1 | Knowledge article foundation | Codex | done |
 | S33-F2 | Case knowledge suggestion contracts | Codex | done |
 | S33-F3 | Case knowledge assist UI | Codex | done |
-| S34-F1 | Non-major dependency refresh | Codex | queued |
-| S34-F2 | Transitive advisory containment | Codex | queued |
-| S34-F3 | Vitest major compatibility pass | Codex | queued |
+| S34-F1 | Non-major dependency refresh | Codex | done |
+| S34-F2 | Transitive advisory containment | Codex | done |
+| S34-F3 | Vitest major compatibility pass | Codex | done |
+| S35-F1 | Deterministic AI prompt registry | Codex | queued |
+| S35-F2 | Structured deterministic output contracts | Codex | queued |
+| S35-F3 | Deterministic AI eval fixtures | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
@@ -107,7 +110,7 @@ The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
   `lib/business`.
 - Lead to Account + Contact + Opportunity conversion. Consumer leads route to
   dealer orders in this vertical.
-- Dependency/security modernization for moderate transitive audit findings and
+- Future dependency/security modernization for new audit findings and
   package-major upgrade paths (`B-68` in `PLAN.md`).
 
 ## Excluded Routes Still Guarded
