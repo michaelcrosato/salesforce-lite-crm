@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("create case, edit status, and verify in list", async ({ page }) => {
   const caseSubject = `E2E Case ${Date.now()}`;
+  const emptyCaseSubject = `E2E Neutral ${Date.now()}`;
 
   await page.goto("/cases/new");
   await expect(page.getByRole("heading", { name: "New Case" })).toBeVisible();
@@ -48,16 +49,24 @@ test("create case, edit status, and verify in list", async ({ page }) => {
     "Resolve billing discrepancy tickets"
   );
 
+  await page.goto("/cases/new");
+  await page.getByLabel("Subject").fill(emptyCaseSubject);
+  await page
+    .getByLabel("Description")
+    .fill("Synthetic neutral marker for empty assist path.");
+  await page.getByRole("button", { name: "Create case" }).click();
+  await expect(page.getByText("Case created.", { exact: true })).toBeVisible();
+
   await page.goto("/cases");
   const emptyKnowledgeRow = page
     .getByRole("row")
-    .filter({ hasText: "Password reset loop for fleet users" })
+    .filter({ hasText: emptyCaseSubject })
     .first();
   await expect(emptyKnowledgeRow.getByTestId("case-knowledge-summary")).toContainText(
     "No matches"
   );
   await emptyKnowledgeRow
-    .getByRole("link", { name: /Password reset loop for fleet users/ })
+    .getByRole("link", { name: emptyCaseSubject })
     .click();
   await expect(page.getByTestId("case-knowledge-empty")).toContainText(
     "No knowledge matches"
