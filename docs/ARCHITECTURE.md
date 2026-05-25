@@ -14,6 +14,9 @@ implemented entities, routes, statuses, registries, and adapter signatures.
   `lib/featureFlags.ts`, `EXCLUDED_ROUTES`, and `CRM-CONTRACT.md`.
 - Determinism: routing, forecasts, summaries, and analyst output are local and
   deterministic by default.
+- Service knowledge: `KnowledgeArticle` records and case suggestion packets are
+  local service-workflow helpers, not a standalone route, search index, RAG
+  service, or external provider integration.
 - Gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` define the
   authoritative local validation sequence.
 

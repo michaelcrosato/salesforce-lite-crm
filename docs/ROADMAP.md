@@ -31,6 +31,10 @@ Implemented CRM areas include:
 - Forecast simulation and deterministic analyst recommendations.
 - Task, case, campaign, and report routes that are part of the current
   contract.
+- Case service foundations for queue assignment, SLA timing, local
+  `KnowledgeArticle` records, and deterministic case-to-article suggestion
+  contracts. Knowledge articles remain service-workflow records, not a
+  standalone knowledge-base product route.
 
 Current exclusions and defaults:
 
@@ -70,11 +74,25 @@ The roadmap is governed by seven rules:
    validation, deterministic fallback, and replayable tests before broader
    rollout.
 
-## Recommended Next Sprint
+## Current Track And Next Work
 
-Sprint 5 should be `Roadmap Canon, QA Reconciliation, and Deterministic
-AI/Data Foundations`. This recommendation is not active implementation scope
-until `PLAN.md` section 4 promotes it.
+`PLAN.md` section 4 is the active queue. As of the 2026-05-24 readiness review,
+Sprint 33 is the current feature track:
+
+| Item | Status | Loop guidance |
+|---|---|---|
+| S33-F1 Knowledge article foundation | done | Present on `main` with schema, seed, service, registry, audit, contract, and tests. |
+| S33-F2 Case knowledge suggestion contracts | done | Deterministic read-only case-to-article suggestion helpers and Vitest coverage are ready for the loop baseline. |
+| S33-F3 Case knowledge assist UI | queued | Next implementation target: wire bounded suggestions into existing `/cases` list/drawer surfaces without adding a route, external provider, search expansion, or article admin UI. |
+
+After Sprint 33, the next recommended readiness lane is a dependency/security
+modernization pass (`B-68`) before promoting larger AI, auth, deployment, or
+integration work. The local registry check shows Next, Prisma, and Playwright
+at current published versions while Vitest is behind the current major; local
+`npm audit` reports moderate transitive advisories that require a planned
+compatibility pass, not a forced audit fix during feature work.
+
+## Readiness Lane
 
 Goal: make the repo safe for the next feature sprint without tripping any
 current non-goal.
@@ -97,6 +115,7 @@ Non-goals:
 | QA/blocker reconciliation | `B-48` | Gemini primary; Claude/Grok support | Reconcile stale SUMMARY/BLOCKERS and verify visual/test-id/demo-path blockers after recent app/component changes. | Every root SUMMARY/BLOCKERS file is current; no stale active blocker conflicts remain. |
 | Tooling scripts | `B-03`, `B-14` | Gemini + shared | Maintain `lint` and `typecheck`; keep `*.tsbuildinfo` ignored. | Scripts exist and pass, or PLAN explicitly keeps a gap deferred; local gate remains authoritative. |
 | Gate/CI audit | `B-11` | Gemini | Audit `.github` workflow against `scripts/local-gate.ps1`; mark B-11 landed or tighten parity. | CI mirrors, not replaces, the PowerShell gate. |
+| Dependency/security modernization | `B-68` | Codex + Gemini | Plan and execute toolchain upgrades for audit findings and current package majors. | Full local gate stays green; no forced downgrade/upgrade is accepted without compatibility evidence. |
 | AI scaffold, no live provider | `B-25` | Codex + Gemini; Claude/Grok UI later | Provider port, deterministic provider, recorded provider, prompt registry skeleton, eval harness. | No external provider call; tests use deterministic/recorded fixtures; AI feature flags default off. |
 | CSV import/export quick win | `B-22`, `B-24`; optional `B-23` | Claude + Grok + Codex + Gemini | Wire existing CSV helpers to import/export UI; dedupe preview can start read-only. | Import preview validates rows; export works on list pages; no external dependency. |
 
@@ -285,9 +304,15 @@ contractual when AI platform features are promoted:
 ## Market Context
 
 External market direction supports the AI sequence, but it does not override
-repo guardrails. Salesforce, HubSpot, Zoho, and Microsoft all position AI
-features around summaries, predictions, scoring, workflow guidance, agents, and
-sales/service productivity. Treat that as design pressure only. Before
+repo guardrails. The 2026-05-24 web review of official Salesforce, HubSpot,
+Microsoft, and Zoho materials still points toward CRM-native agents,
+assistants, summaries, record lookup, meeting prep, service automation, and
+configurable agent workflows. Treat that as design pressure only. Before
 implementation, re-check current vendor docs and translate any useful pattern
-through `CRM-CONTRACT.md`, `PLAN.md`, deterministic fallbacks, and hermetic
-tests.
+through `CRM-CONTRACT.md`, `PLAN.md`, deterministic fallbacks, audit, approval
+flows, and hermetic tests.
+
+Dependency/security posture is also part of roadmap readiness. The same review
+checked current npm registry versions and public advisories surfaced by local
+`npm audit`; moderate transitive findings should become planned B-68 work when
+the feature loop has capacity.

@@ -14,7 +14,7 @@
 
 | Last updated | 2026-05-24 |
 
-| Active sprint | Sprint 33 S33-F1/S33-F2/S33-F3 queued |
+| Active sprint | Sprint 33 S33-F1/S33-F2 done; S33-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1234,8 +1234,8 @@ Goal: add local knowledge article foundations to the case service workflow witho
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S33-F1 — Knowledge article foundation | codex | queued | Add a local Knowledge Article foundation for service workflows: schema, seed data, validation/service helpers, CRM contract/registry updates, audit evidence, and tests. Existing case, task, campaign, dealer, lead, and opportunity semantics stay unchanged. |
-| S33-F2 — Case knowledge suggestion contracts | codex | queued | Add deterministic case-to-article suggestion helpers using repo-local case fields and article metadata. Suggestions are read-only, hermetic, and avoid external AI/RAG/provider calls or case/article mutations. |
+| S33-F1 — Knowledge article foundation | codex | done | Add a local Knowledge Article foundation for service workflows: schema, seed data, validation/service helpers, CRM contract/registry updates, audit evidence, and tests. Existing case, task, campaign, dealer, lead, and opportunity semantics stay unchanged. |
+| S33-F2 — Case knowledge suggestion contracts | codex | done | Add deterministic case-to-article suggestion helpers using repo-local case fields and article metadata. Suggestions are read-only, hermetic, and avoid external AI/RAG/provider calls or case/article mutations. |
 | S33-F3 — Case knowledge assist UI | codex | queued | Existing `/cases` list and drawer surfaces show bounded knowledge suggestions with clear empty/loading states and e2e coverage. No new route is added; `/cases?case=<id>` remains the service operations detail flow. |
 
 \*\*Sprint 33 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
@@ -2154,6 +2154,8 @@ Backlog items are not active sprint work. Active sprint detail is in §4. IFT us
 
 | B-67 | Salesforce import | CSV mapping first, API sync later. |
 
+| B-68 | Dependency and security modernization | Track `npm audit` findings and package-major upgrade paths without weakening the local gate. Current repo-local evidence shows Next/Prisma/Playwright on current registry versions, Vitest behind the current registry major, and moderate transitive advisories requiring a planned upgrade/test pass rather than `npm audit fix --force` during feature work. |
+
 
 
 \## 17. Decision Log
@@ -2199,6 +2201,18 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+\### 2026-05-24 — Run decision (Sprint 33 and roadmap readiness)
+
+\*\*Decision:\*\* Record S33-F1 and S33-F2 as done, keep S33-F3 as the next queued loop target, and add B-68 for dependency/security modernization after repo-local and internet-backed audit review.
+
+\*\*Rationale:\*\* S33-F1 has an implementation and report commit on `main`; the S33-F2 local service/test files pass the full local gate and match the queued Sprint 33 scope. `npm audit` still reports moderate transitive issues, but the available fixes involve package-major movement and should be handled as a planned modernization pass after the current feature loop rather than forced during a readiness update.
+
+\*\*Alternatives rejected:\*\* Leaving S33-F2 as untracked dirty state before launching the loop, because the loop pre-flight would treat it as unexpected and may stash valid sprint work; running `npm audit fix --force`, because that would downgrade or major-upgrade core toolchain packages without a targeted compatibility pass.
+
+\*\*Sections changed:\*\* §1, §4, §16, §17; `CRM-CONTRACT.md`; roadmap/control/backlog docs; Codex reports.
+
+\*\*Open questions handled:\*\* Current Sprint 33 progress, next loop target, and how to track dependency advisories discovered during readiness review.
 
 
 

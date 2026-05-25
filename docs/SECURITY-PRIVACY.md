@@ -57,3 +57,7 @@ implementation:
   production use.
 - Backup and restore tests are required before treating the app as a production
   system of record.
+- Moderate dependency advisories from `npm audit` are tracked as B-68 roadmap
+  work. Do not run `npm audit fix --force` during feature loops unless the
+  prompt explicitly promotes a compatibility-tested dependency modernization
+  pass.

@@ -34,6 +34,7 @@ Every promoted AI capability should include:
 | Record summaries | `B-25`, `B-64` | Contacts, accounts, opportunities, cases, activities, and notes. |
 | Routing explanations | `B-25`, `B-54`, `B-64` | Postal normalization, area matching, quota filtering, pace-gap ranking. |
 | Forecast explanations | `B-07`, `B-64` | Scenario assumptions, deterministic month-end projections, risk narration. |
+| Case knowledge suggestions | `B-43`, `B-64` | Queue matches, keyword matches, empty states, ranking tie-breakers, and no-write assertions. |
 | Natural-language filters | `B-51`, `B-64` | Filter AST generation, invalid-field recovery, permission-safe query plans. |
 | RAG answers | `B-34`, `B-63`, `B-64` | Tenant/RBAC-filtered retrieval, provenance, refusal on missing evidence. |
 | Tool plans | `B-62`, `B-64` | Preview-only plans, approval requirements, audit metadata. |

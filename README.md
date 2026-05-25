@@ -170,6 +170,8 @@ Primary workflows:
   campaigns.
 - Create or update tasks, cases, and campaigns through their list, new-page,
   and drawer flows.
+- Maintain local service-workflow knowledge articles and deterministic
+  case-to-article suggestion contracts for case assist surfaces.
 - Open reports from `/reports`, drill into the supported report slugs, review
   CSV export packets, and preview contact or lead CSV imports without writes.
 
@@ -300,6 +302,9 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - CSV export review/download and CSV import preview are surfaced on `/reports`.
   CSV import remains read-only: there is no apply flow, bulk create/update,
   routing execution, duplicate merge, file storage, or database write.
+- Knowledge articles are local service-workflow records consumed by case assist
+  contracts; there is no standalone knowledge base route or external knowledge
+  provider integration.
 - No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
   leads route to dealer orders instead.
 
@@ -312,9 +317,10 @@ future scope. Companion docs cover [AI sequencing](docs/AI-ROADMAP.md),
 [security/privacy](docs/SECURITY-PRIVACY.md). Current product truth still comes
 from `CRM-CONTRACT.md`, `PLAN.md`, and repo-local evidence.
 
-The current tree includes the Sprint 4B demo-hardening surface: seeded demo
-anchors, route-level QA hooks, shared component polish, task/case/campaign
-workflows, reports, and local gate documentation.
+The current tree includes the Sprint 4B demo-hardening surface, the CSV
+handoff/operator tracks, audit/list/bulk action foundations, and the Sprint 33
+service knowledge foundation. `PLAN.md` section 4 is the current queue; S33-F3
+case knowledge assist UI is the next feature target.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,

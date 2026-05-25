@@ -15,6 +15,9 @@ contract update explicitly promote it.
 - AI feature flags default off unless the contract and PLAN say otherwise.
 - AI can summarize and suggest before auth, but AI writes wait for identity,
   authorization, audit, and approval flows.
+- Current case knowledge suggestions are deterministic metadata matching over
+  local cases and `KnowledgeArticle` rows. They are not RAG, embeddings,
+  provider-backed AI, or external knowledge sync.
 
 ## Platform Layers
 
