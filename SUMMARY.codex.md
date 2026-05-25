@@ -2,37 +2,38 @@ Agent: Codex
 
 Sprint: 35
 
-Feature: S35-F1 - Deterministic AI prompt registry
+Feature: S35-F2 - Structured deterministic output contracts
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 688830b - [codex] S35-F1: add deterministic AI prompt registry
+- daeaadd - [codex] S35-F2: add deterministic AI output contracts
 
-Gate status: PASS - Phase 0 baseline passed install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, unit tests, and build on clean `main`; post-implementation `scripts/local-gate.ps1` passed install, Prisma generate/db push, seed, lint, typecheck, unit tests (75 files / 400 tests), build, Playwright chromium install, and e2e (22 passed).
+Gate status: PASS - Phase 0 baseline `scripts/local-gate.ps1` passed on clean `main`; post-implementation `scripts/local-gate.ps1` passed install, Prisma generate/db push, seed, lint, typecheck, unit tests (76 files / 403 tests), build, Playwright chromium install, and e2e (22 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T23:32:23.2133623-07:00
+Timestamp: 2026-05-25T00:23:02.7473393-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/promptRegistry.ts` with stable `v1` registry entries for activity note summaries, dashboard analyst actions, and case knowledge suggestions.
-- Registered each deterministic AI-style surface with owner, kind, source export, TypeScript input/output schema references, route scope, and explicit no-provider/no-network/no-write/no-RAG/no-secrets safety flags.
-- Exported the existing dashboard analyst input shape as `AnalystPanelInput` so the registry points at a named source contract without changing runtime behavior.
-- Added `tests/ai-prompt-registry.test.ts` to verify registry ordering, unique IDs, lookup behavior, schema references, owner filtering, and safety flags.
+- Added `lib/ai/outputValidation.ts` with deterministic non-throwing Zod output validation that returns stable issue paths for recoverable invalid-output handling.
+- Added Zod-backed output schemas and validation helpers for the activity note summarizer, dashboard analyst panel, and case knowledge suggestion packets without adding providers, network calls, writes, routes, or product surfaces.
+- Updated the deterministic AI prompt registry to reference the new Zod output schema exports and bumped the registry version to `2026-05-25.s35-f2`.
+- Added `tests/ai-output-contracts.test.ts` and updated registry tests to cover valid deterministic outputs and invalid-shape issue reporting.
 
 ### Discovered this prompt
 
-- Other-agent SUMMARY/BLOCKERS files remain historical and disagree with current PLAN section 4: Claude still reports Sprint 4 active, Grok reports Sprint 4 continuous component polish, and Gemini reports a visual Sprint 5 queue that is not the current PLAN section 4 Sprint 35 track. Current repo-local authority is the green local gate plus PLAN section 4 Sprint 35.
+- PLAN §4 and `docs/FEATURE-BACKLOG.md` still list S35-F1 as `queued`, while Codex's prior SUMMARY and implementation/report commits show S35-F1 completed with a green local gate. Per PLAN §2, current local gate evidence and recent commits support continuing to S35-F2 this prompt.
+- Other-agent SUMMARY/BLOCKERS files remain historical and reference Sprint 4 or a non-current Sprint 5 track. They do not include active gate or contract blockers that affect the root-mode Codex Sprint 35 queue.
 
 ### Next action
 
-Run LOOP.md to begin S35-F2 - Structured deterministic output contracts.
+Run LOOP.md to begin S35-F3 - Deterministic AI eval fixtures.
 
 ### Scope confirmation
 
