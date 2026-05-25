@@ -160,6 +160,25 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 - Knowledge articles are not included in header search, command-palette search, or a dedicated search route during Sprint 33.
 - `/search` and `/command-palette` remain excluded route placeholders; they are not product pages.
 
+## Case Knowledge Suggestions
+
+`lib/services/caseKnowledgeSuggestions.ts` exports deterministic, read-only
+helpers for the existing case workflow:
+
+- `getCaseKnowledgeSuggestionPacket(caseId: string, options?: CaseKnowledgeSuggestionOptions): Promise<CaseKnowledgeSuggestionPacket | null>`
+- `buildCaseKnowledgeSuggestionPacket(crmCase, articles, options?: CaseKnowledgeSuggestionOptions): CaseKnowledgeSuggestionPacket`
+
+Suggestion packets use existing `Case` fields and published
+`KnowledgeArticle` metadata only. They return source
+`local_case_article_metadata`, a default limit of 3, a maximum limit of 5,
+ranked article suggestions, score/reason metadata, matched keywords/terms, and
+empty reasons of `no_published_articles` or `no_relevant_articles`.
+
+The suggestion helpers do not mutate cases, articles, audit rows, routing,
+queues, SLA state, search indexes, or CSV/import/export state. They do not call
+external AI providers, RAG/vector search, web services, or external knowledge
+providers.
+
 ## crmClient Adapter Signatures
 
 All adapter functions live in `lib/crm/crmClient.ts`, validate inputs with Zod schemas from `lib/validation.ts`, and access Prisma internally.
