@@ -81,9 +81,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S34-F1 | Non-major dependency refresh | Codex | done |
 | S34-F2 | Transitive advisory containment | Codex | done |
 | S34-F3 | Vitest major compatibility pass | Codex | done |
-| S35-F1 | Deterministic AI prompt registry | Codex | queued |
-| S35-F2 | Structured deterministic output contracts | Codex | queued |
-| S35-F3 | Deterministic AI eval fixtures | Codex | queued |
+| S35-F1 | Deterministic AI prompt registry | Codex | done |
+| S35-F2 | Structured deterministic output contracts | Codex | done |
+| S35-F3 | Deterministic AI eval fixtures | Codex | done |
+| S36-F1 | Deterministic AI run receipts | Codex | queued |
+| S36-F2 | AI privacy and cost policy guardrails | Codex | queued |
+| S36-F3 | AI governance review packets | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
