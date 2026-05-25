@@ -2,34 +2,32 @@ Agent: Codex
 
 Sprint: 36
 
-Feature: SPRINT-ROLLOVER - Sprint 36 planning
+Feature: S36-F1 - Deterministic AI run receipts
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- f221872 - [codex] sprint 36: plan codex track
-- 7af4bf7 - [codex] sprint 36: backlog refresh
+- 77afd51 - [codex] S36-F1: add deterministic AI run receipts
 
-Gate status: PASS - Phase 0 baseline passed install, Prisma generate/db push, seed, lint, typecheck, unit tests, and build on clean `main`; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (77 files / 407 tests), and `npm run build`.
+Gate status: PASS - `scripts/local-gate.ps1` exited 0 after implementation; unit tests passed 78 files / 411 tests, build passed, and Playwright e2e passed 22/22.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T02:55:26.4239305-07:00
+Timestamp: 2026-05-25T03:25:46.4332716-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed Sprint 35 Codex work is complete from S35-F1/S35-F2/S35-F3 implementation commits, prior SUMMARY snapshots, and current no-active-blocker state.
-- Updated `PLAN.md` document control, marked S35-F1/S35-F2/S35-F3 done, and queued Sprint 36 Local AI Governance with S36-F1/S36-F2/S36-F3.
-- Synced `docs/FEATURE-BACKLOG.md` so Sprint 35 is done and Sprint 36 is queued for Codex.
-- Verified planning changes did not affect runtime behavior with lint, typecheck, unit tests, and build.
+- Added `lib/ai/runReceipts.ts` with typed deterministic run receipts for current local AI-style prompt surfaces: prompt id/version, local deterministic provider label, validation status/issues, stable SHA-256 input/output hashes, zero token/cost defaults, and explicit no-write/no-network/no-provider/no-persistence flags.
+- Added `tests/ai-run-receipts.test.ts` to cover all current deterministic eval fixtures, receipt determinism, invalid-output receipt status, stable key-order hashing, prompt-registry coverage, and provider-free safety metadata.
+- Reconciled current handoffs: older Claude/Grok/Gemini summaries and `docs/PROJECT-CONTROL.md`/`docs/ROADMAP.md` still reference prior sprint state, but current `PLAN.md` §4, `docs/FEATURE-BACKLOG.md`, and the green local gate authorize Sprint 36 work.
 
 ### Next action
 
-Run LOOP.md to begin S36-F1 - Deterministic AI run receipts.
+Run LOOP.md to begin S36-F2 - AI privacy and cost policy guardrails.
 
 ### Scope confirmation
 
