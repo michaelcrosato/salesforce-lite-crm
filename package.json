@@ -19,6 +19,10 @@
     "autonomy:overnight": "powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1",
     "autonomy:watchdog": "powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1"
   },
+  "overrides": {
+    "@hono/node-server": "1.19.14",
+    "postcss": "8.5.15"
+  },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "7.8.0",
     "@prisma/client": "7.8.0",
