@@ -1,43 +1,38 @@
 Agent: Codex
 
-Sprint: 34
+Sprint: 35
 
-Feature: S34-F3 - Vitest major compatibility pass
+Feature: Sprint 35 rollover planning
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 6acaac3 - [codex] S34-F3: upgrade vitest stack
+- 2eed58f - [codex] sprint 35: plan codex track
+- ff6c3d9 - [codex] sprint 35: backlog refresh
 
-Gate status: PASS - Baseline and post-change full local gate via `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` exited 0: npm install, Prisma generate/db push, seed, lint, typecheck, 74 Vitest files / 396 tests on Vitest 4.1.7, build, Playwright chromium install, and 22 e2e tests. Post-change `npm audit --json` reports 0 vulnerabilities.
+Gate status: PASS - Phase 0 baseline passed install, Prisma generate/db push, seed, lint, typecheck, unit tests, and build on clean `main`; post-planning verification passed `npm run lint`, `npm run typecheck`, `npm run test` (74 files / 396 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-24T22:48:28.3063944-07:00
+Timestamp: 2026-05-24T23:15:40.9829313-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 baseline from clean `main`; full local gate was green before changes.
-- Upgraded `vitest` from `2.1.9` to exact `4.1.7` and regenerated `package-lock.json`.
-- Removed the obsolete `--minWorkers=1` Vitest CLI flag from the `test` package script while preserving single-worker execution with `--maxWorkers=1`.
-- Verified `npm run test` passes under Vitest 4.1.7 with 74 files and 396 tests.
-- Verified the full local gate passes after the package/script change.
-- Verified `npm audit --json` now reports 0 vulnerabilities, clearing the S34-F2 carry-forward Vitest/Vite moderate advisory set.
-
-### Discovered this prompt
-
-- PLAN.md §4 and `docs/FEATURE-BACKLOG.md` still list S34-F1, S34-F2, and S34-F3 as queued. Repo-local evidence now shows implementation commits and green full local gates for all three: `a5306f4` for S34-F1, `15dfff0` for S34-F2, and `6acaac3` for S34-F3.
+- Confirmed Sprint 34 Codex work complete from SUMMARY evidence, green gate evidence, and zero active Codex blockers.
+- Updated PLAN.md document control to Version 2.41A with Sprint 35 active, marked S34-F1/S34-F2/S34-F3 done, appended Sprint 35 queued Codex scope, and refreshed B-68 dependency-modernization evidence.
+- Synced docs/FEATURE-BACKLOG.md so S34 is done, S35-F1/S35-F2/S35-F3 are queued, and dependency modernization is future tracking instead of an active moderate-advisory item.
+- Verified planning changes did not affect runtime behavior with lint, typecheck, unit tests, and build all green.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md to close Sprint 34 and queue the next promoted scope.
+Run LOOP.md to begin S35-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; package manifest, lockfile, and test script edits were the queued S34-F3 scope)
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES
