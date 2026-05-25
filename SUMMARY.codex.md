@@ -2,32 +2,37 @@ Agent: Codex
 
 Sprint: 37
 
-Feature: S37-F1 — Workflow rule catalog
+Feature: S37-F2 — Workflow dry-run evaluator
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 040e042 — [codex] S37-F1: add workflow rule catalog
+- e718131 — [codex] S37-F2: add workflow dry-run evaluator
 
-Gate status: PASS — Phase 0 baseline passed `npm install`, `.env` check, `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run lint`, `npm run typecheck`, `npm run test` (80 files / 422 tests), and `npm run build`; Phase 5 full local gate via `scripts/local-gate.ps1` passed install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (81 files / 427 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
+Gate status: PASS — Phase 0 baseline and Phase 5 verification both passed the full local gate via `scripts/local-gate.ps1`: install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (82 files / 431 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T05:54:34.5758144-07:00
+Timestamp: 2026-05-25T07:32:15.8207773-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/server/workflowRuleCatalog.ts`, a typed deterministic workflow-rule catalog for draft planning over supported current CRM objects, triggers, condition families, and descriptor-only actions.
-- Added `tests/api/workflow-rule-catalog.test.ts` coverage for catalog metadata, object/action matrix, CRM constant-backed condition/action targets, strict input handling, non-goal exclusions, and no-write behavior.
-- Verified the new server contract surface with the full local gate through unit, build, and e2e.
+- Added `lib/server/workflowRuleDryRun.ts`, a read-only workflow-rule dry-run evaluator that validates draft rules against the S37-F1 catalog, scans bounded CRM candidates deterministically, and returns matched record references plus summary-only proposed actions.
+- Added `tests/api/workflow-rule-dry-run.test.ts` coverage for invalid actions/targets, empty matches, match limits, deterministic ordering, and no database-write side effects.
+- Verified S37-F2 with focused tests, lint, typecheck, the required business-logic subset, and the full local gate.
+
+### Discovered this prompt
+
+- `PLAN.md` §4 still lists S37-F1 as queued, but `main` contains `040e042` and the previous Codex report cites a green full local gate for S37-F1; per §2, this run treated S37-F2 as the next valid unit.
+- Gemini's root report still references a Sprint 5 queue that is not the current active §4 sprint; it did not block Codex's Sprint 37 work.
 
 ### Next action
 
-Run LOOP.md to begin S37-F2 — Workflow dry-run evaluator.
+Run LOOP.md to begin S37-F3 — Workflow review packets.
 
 ### Scope confirmation
 

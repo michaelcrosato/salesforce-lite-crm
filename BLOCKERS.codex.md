@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 37
 
-Feature: S37-F1 — Workflow rule catalog
+Feature: S37-F2 — Workflow dry-run evaluator
 
 Branch: main
 
-Timestamp: 2026-05-25T05:54:34.5758144-07:00
+Timestamp: 2026-05-25T07:32:15.8207773-07:00
 
 Escalation required: NO
 
