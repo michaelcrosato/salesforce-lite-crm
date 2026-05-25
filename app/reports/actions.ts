@@ -21,6 +21,15 @@ import {
   type BulkActionExecutionEntity,
   type BulkActionExecutionResult
 } from "@/lib/server/bulkActionExecution";
+import {
+  getWorkflowRuleExampleContract,
+  isWorkflowRuleExampleEntity,
+  type WorkflowRuleExampleContract
+} from "@/lib/server/workflowRuleExamples";
+import {
+  getWorkflowRuleReviewPacket,
+  type WorkflowRuleReviewPacket
+} from "@/lib/server/workflowRuleReviewPackets";
 
 export type CsvImportPreviewActionResult =
   | {
@@ -68,6 +77,22 @@ export type BulkActionExecutionActionResult =
         entity?: string[];
         action?: string[];
         recordIds?: string[];
+        target?: string[];
+      };
+    };
+
+export type WorkflowRuleDryRunActionResult =
+  | {
+      ok: true;
+      message: string;
+      example: WorkflowRuleExampleContract;
+      packet: WorkflowRuleReviewPacket;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        exampleEntity?: string[];
         target?: string[];
       };
     };
@@ -310,6 +335,53 @@ export async function previewCsvImportReviewAction(
     return {
       ok: false,
       message: "The CSV preview could not be built."
+    };
+  }
+}
+
+export async function previewWorkflowRuleDryRunAction(
+  formData: FormData
+): Promise<WorkflowRuleDryRunActionResult> {
+  const exampleEntity = formString(formData, "exampleEntity");
+
+  if (!isWorkflowRuleExampleEntity(exampleEntity)) {
+    return {
+      ok: false,
+      message: "Choose a supported workflow example.",
+      fieldErrors: {
+        exampleEntity: ["Choose a supported workflow example."]
+      }
+    };
+  }
+
+  const example = getWorkflowRuleExampleContract(exampleEntity);
+
+  if (example === null) {
+    return {
+      ok: false,
+      message: "The workflow example could not be found.",
+      fieldErrors: {
+        exampleEntity: ["The workflow example could not be found."]
+      }
+    };
+  }
+
+  try {
+    const packet = await getWorkflowRuleReviewPacket(example.rule);
+
+    return {
+      ok: true,
+      message: `${packet.ruleMetadata.entityLabel} workflow dry run: ${packet.affectedObjects.matchedRecordCount} matched, ${packet.dryRun.proposedActions.length} action summaries.`,
+      example,
+      packet
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The workflow dry-run review packet could not be built.",
+      fieldErrors: {
+        target: ["Review the selected workflow example."]
+      }
     };
   }
 }

@@ -7,6 +7,7 @@ import { BulkDryRunReviewOperator } from "@/components/reports/bulk-dry-run-revi
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
+import { WorkflowDryRunOperator } from "@/components/reports/workflow-dry-run-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REPORT_DEFINITIONS,
@@ -22,6 +23,7 @@ import { listCsvImportTemplates } from "@/lib/server/csvImportTemplates";
 import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
 import { getListFilterSupportCatalog } from "@/lib/server/listFilterSupportCatalog";
 import { listBulkActionDryRunReviewPacketDefinitions } from "@/lib/server/bulkActionDryRunReviewPackets";
+import { getWorkflowRuleExampleCatalog } from "@/lib/server/workflowRuleExamples";
 import {
   AUDIT_ENTITY_TYPES,
   AUDIT_EVENT_CATEGORIES,
@@ -67,6 +69,7 @@ export default async function ReportsPage({
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();
   const bulkDryRunDefinitions = listBulkActionDryRunReviewPacketDefinitions();
+  const workflowRuleExampleCatalog = getWorkflowRuleExampleCatalog();
   const bulkDryRunSampleRecordIds = csvPackets.map((packet) => ({
     entity: packet.entity,
     ids: packet.review.preview.rows.flatMap((row) => {
@@ -99,6 +102,8 @@ export default async function ReportsPage({
         definitions={bulkDryRunDefinitions}
         sampleRecordIds={bulkDryRunSampleRecordIds}
       />
+
+      <WorkflowDryRunOperator catalog={workflowRuleExampleCatalog} />
 
       <CsvExportOperator
         packets={csvPackets}

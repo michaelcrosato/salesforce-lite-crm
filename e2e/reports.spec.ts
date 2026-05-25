@@ -212,6 +212,52 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     "Audit events on"
   );
 
+  await expect(page.getByTestId("workflow-dry-run-operator")).toBeVisible();
+  await expect(
+    page.getByTestId("workflow-dry-run-summary-examples")
+  ).toContainText("7");
+  await expect(
+    page.getByTestId("workflow-dry-run-summary-entities")
+  ).toContainText("7");
+  await expect(
+    page.getByTestId("workflow-dry-run-summary-actions")
+  ).toContainText("3");
+  await page.getByTestId("workflow-dry-run-submit").click();
+  await expect(page.getByTestId("workflow-dry-run-result-panel")).toBeVisible();
+  await expect(page.getByTestId("workflow-dry-run-rollup-matched")).toContainText(
+    /\d+/
+  );
+  await expect(page.getByTestId("workflow-dry-run-rollup-returned")).toContainText(
+    /\d+/
+  );
+  await expect(page.getByTestId("workflow-dry-run-rollup-warnings")).toContainText(
+    /[1-9]/
+  );
+  await expect(page.getByTestId("workflow-dry-run-rollup-actions")).toContainText(
+    "3"
+  );
+  await expect(page.getByTestId("workflow-dry-run-action-table")).toContainText(
+    "Draft task"
+  );
+  await expect(page.getByTestId("workflow-dry-run-action-table")).toContainText(
+    "no records matched"
+  );
+  await expect(page.getByTestId("workflow-dry-run-warning-list")).toContainText(
+    "preview only"
+  );
+  await expect(page.getByTestId("workflow-dry-run-warning-list")).toContainText(
+    "action execution disabled"
+  );
+  await expect(page.getByTestId("workflow-dry-run-record-table")).toContainText(
+    /matched|No records matched/
+  );
+  await expect(page.getByTestId("workflow-dry-run-write-flags")).toContainText(
+    "Database off"
+  );
+  await expect(page.getByTestId("workflow-dry-run-write-flags")).toContainText(
+    "Action execution off"
+  );
+
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
     "10"
