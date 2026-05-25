@@ -90,13 +90,15 @@ export type AnalystPanel = {
   actions: AnalystAction[];
 };
 
-export function buildAnalystPanel(input: {
+export type AnalystPanelInput = {
   orders: AnalystOrder[];
   leads: AnalystLead[];
   deals: AnalystDeal[];
   now?: Date;
   actionLimit?: number;
-}): AnalystPanel {
+};
+
+export function buildAnalystPanel(input: AnalystPanelInput): AnalystPanel {
   const now = input.now ?? new Date();
   const actionLimit = input.actionLimit ?? 5;
   const daysRemaining = daysRemainingInMonth(now);
