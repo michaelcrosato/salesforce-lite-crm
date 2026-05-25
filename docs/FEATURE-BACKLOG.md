@@ -84,9 +84,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S35-F1 | Deterministic AI prompt registry | Codex | done |
 | S35-F2 | Structured deterministic output contracts | Codex | done |
 | S35-F3 | Deterministic AI eval fixtures | Codex | done |
-| S36-F1 | Deterministic AI run receipts | Codex | queued |
-| S36-F2 | AI privacy and cost policy guardrails | Codex | queued |
-| S36-F3 | AI governance review packets | Codex | queued |
+| S36-F1 | Deterministic AI run receipts | Codex | done |
+| S36-F2 | AI privacy and cost policy guardrails | Codex | done |
+| S36-F3 | AI governance review packets | Codex | done |
+| S37-F1 | Workflow rule catalog | Codex | queued |
+| S37-F2 | Workflow dry-run evaluator | Codex | queued |
+| S37-F3 | Workflow review packets | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
