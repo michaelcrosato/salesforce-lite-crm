@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.41A |
+| Version | 2.42A |
 
 | Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 35 S35-F1/S35-F2/S35-F3 queued |
+| Active sprint | Sprint 36 S36-F1/S36-F2/S36-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1309,9 +1309,9 @@ Goal: make existing local AI-style outputs easier to govern, validate, and regre
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S35-F1 — Deterministic AI prompt registry | codex | queued | Register existing deterministic AI-style surfaces with stable prompt IDs, versions, owners, and input/output schema references. No routes, external providers, secrets, network calls, RAG, or agentic writes are added. |
-| S35-F2 — Structured deterministic output contracts | codex | queued | Add Zod-backed output contracts for existing local summarizer, analyst, and case-assist outputs so invalid output can be handled deterministically and covered by tests. No provider calls, generated-content expansion, persistence workflow, or route changes are added. |
-| S35-F3 — Deterministic AI eval fixtures | codex | queued | Add a bounded fixture/eval harness for current deterministic outputs so regressions are caught by `npm run test` without network calls, external services, or provider credentials. No live provider evals, RAG answers, tool-plan execution, CI/deployment changes, or new product surfaces are added. |
+| S35-F1 — Deterministic AI prompt registry | codex | done | Register existing deterministic AI-style surfaces with stable prompt IDs, versions, owners, and input/output schema references. No routes, external providers, secrets, network calls, RAG, or agentic writes are added. |
+| S35-F2 — Structured deterministic output contracts | codex | done | Add Zod-backed output contracts for existing local summarizer, analyst, and case-assist outputs so invalid output can be handled deterministically and covered by tests. No provider calls, generated-content expansion, persistence workflow, or route changes are added. |
+| S35-F3 — Deterministic AI eval fixtures | codex | done | Add a bounded fixture/eval harness for current deterministic outputs so regressions are caught by `npm run test` without network calls, external services, or provider credentials. No live provider evals, RAG answers, tool-plan execution, CI/deployment changes, or new product surfaces are added. |
 
 \*\*Sprint 35 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1340,6 +1340,45 @@ Goal: make existing local AI-style outputs easier to govern, validate, and regre
 \- No new AI-generated content surfaces beyond validating and registering existing deterministic outputs.
 
 \- No CRM-CONTRACT route, entity, status, or adapter changes unless a later prompt explicitly promotes them.
+
+
+\*\*Sprint 36 — Local AI Governance\*\*
+
+Goal: add read-only local governance metadata around existing deterministic AI-style outputs without adding providers, persistence workflows, routes, or write-capable automation.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S36-F1 — Deterministic AI run receipts | codex | queued | Existing deterministic AI-style surfaces can produce typed, non-persistent run receipt metadata with prompt ID/version, local deterministic provider label, validation status, input/output hashes, and explicit no-write/no-network flags. Tests cover stable receipt generation and no database, network, or provider dependency. |
+| S36-F2 — AI privacy and cost policy guardrails | codex | queued | Local deterministic AI surfaces have policy metadata/helpers for redaction-sensitive fields, provider/secret disallowance, and zero-cost/zero-token accounting defaults. Tests verify all current deterministic surfaces are covered without adding auth/org quota enforcement or provider calls. |
+| S36-F3 — AI governance review packets | codex | queued | Read-only review packets compose prompt registry, output contract, eval fixture, run receipt, and policy metadata for each current deterministic AI-style surface. Tests ensure packet completeness and explicitly exclude RAG, tool-plan execution, external-provider claims, and product route changes. |
+
+\*\*Sprint 36 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No AI provider credentials, network calls, environment-variable secrets, provider billing, token-metering service, or external telemetry.
+
+\- No persistent AI run log table, audit schema, database writes, persistence workflow, or CRM-CONTRACT route/entity/status/adapter changes.
+
+\- No RAG/vector search, external knowledge provider, prompt-to-action tool execution, agentic writes, or live provider evals.
+
+\- No new AI-generated content surfaces, generated-content expansion, product routes, CI/deployment changes, or auth/org quota enforcement.
 
 
 \## 5. File Ownership Matrix
