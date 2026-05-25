@@ -1,4 +1,6 @@
-export const DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION = "2026-05-25.s35-f2";
+import type { DeterministicAiEvalFixtureId } from "@/lib/ai/evalFixtures";
+
+export const DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION = "2026-05-25.s35-f3";
 
 export const DETERMINISTIC_AI_PROMPT_IDS = [
   "activity.note-summary",
@@ -43,6 +45,7 @@ export type DeterministicAiPromptRegistryEntry = {
   };
   readonly inputSchema: DeterministicAiPromptSchemaRef;
   readonly outputSchema: DeterministicAiPromptSchemaRef;
+  readonly evalFixtureIds: readonly DeterministicAiEvalFixtureId[];
   readonly routeScope: readonly string[];
   readonly safety: DeterministicAiPromptSafety;
 };
@@ -77,6 +80,10 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       module: "lib/ai/activitySummarizer.ts",
       exportName: "activitySummaryResultSchema"
     },
+    evalFixtureIds: [
+      "activity.note-summary.proposal-followup",
+      "activity.note-summary.untrusted-fallback"
+    ],
     routeScope: ["/contacts/[id]"],
     safety: deterministicLocalSafety
   },
@@ -100,6 +107,7 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       module: "lib/business/analyst.ts",
       exportName: "analystPanelSchema"
     },
+    evalFixtureIds: ["dashboard.analyst-actions.mixed-priority"],
     routeScope: ["/dashboard"],
     safety: deterministicLocalSafety
   },
@@ -123,6 +131,10 @@ export const DETERMINISTIC_AI_PROMPT_REGISTRY = [
       module: "lib/services/caseKnowledgeSuggestions.ts",
       exportName: "caseKnowledgeSuggestionPacketSchema"
     },
+    evalFixtureIds: [
+      "case.knowledge-suggestions.billing-match",
+      "case.knowledge-suggestions.no-published"
+    ],
     routeScope: ["/cases"],
     safety: deterministicLocalSafety
   }

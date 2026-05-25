@@ -11,7 +11,7 @@ import {
 describe("deterministic AI prompt registry", () => {
   it("publishes stable current deterministic prompt ids in order", () => {
     expect(DETERMINISTIC_AI_PROMPT_REGISTRY_VERSION).toBe(
-      "2026-05-25.s35-f2"
+      "2026-05-25.s35-f3"
     );
     expect(listDeterministicAiPrompts().map((entry) => entry.id)).toEqual(
       DETERMINISTIC_AI_PROMPT_IDS
@@ -35,7 +35,11 @@ describe("deterministic AI prompt registry", () => {
       outputSchema: {
         kind: "zod",
         exportName: "activitySummaryResultSchema"
-      }
+      },
+      evalFixtureIds: [
+        "activity.note-summary.proposal-followup",
+        "activity.note-summary.untrusted-fallback"
+      ]
     });
     expect(getDeterministicAiPrompt("dashboard.analyst-actions")).toMatchObject({
       owner: "revops",
@@ -49,7 +53,8 @@ describe("deterministic AI prompt registry", () => {
       outputSchema: {
         kind: "zod",
         exportName: "analystPanelSchema"
-      }
+      },
+      evalFixtureIds: ["dashboard.analyst-actions.mixed-priority"]
     });
     expect(getDeterministicAiPrompt("case.knowledge-suggestions")).toMatchObject(
       {
@@ -64,7 +69,11 @@ describe("deterministic AI prompt registry", () => {
         outputSchema: {
           kind: "zod",
           exportName: "caseKnowledgeSuggestionPacketSchema"
-        }
+        },
+        evalFixtureIds: [
+          "case.knowledge-suggestions.billing-match",
+          "case.knowledge-suggestions.no-published"
+        ]
       }
     );
   });
@@ -73,6 +82,7 @@ describe("deterministic AI prompt registry", () => {
     for (const entry of listDeterministicAiPrompts()) {
       expectNoExternalSurface(entry);
       expect(entry.routeScope.length).toBeGreaterThan(0);
+      expect(entry.evalFixtureIds.length).toBeGreaterThan(0);
       expect(entry.inputSchema.kind).toBe("typescript");
       expect(entry.outputSchema.kind).toBe("zod");
     }
