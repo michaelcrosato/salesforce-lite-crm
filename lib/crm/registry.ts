@@ -125,6 +125,7 @@ export type CrmEntityName =
   | "Area"
   | "Task"
   | "Case"
+  | "KnowledgeArticle"
   | "Campaign";
 
 export type CrmEntityDefinition = {
@@ -207,6 +208,13 @@ export const ENTITY_REGISTRY: readonly CrmEntityDefinition[] = [
     singularLabel: "Case"
   },
   {
+    name: "KnowledgeArticle",
+    route: "/knowledge",
+    iconName: "BookOpenText",
+    listLabel: "Knowledge Articles",
+    singularLabel: "Knowledge Article"
+  },
+  {
     name: "Campaign",
     route: "/campaigns",
     iconName: "Megaphone",
@@ -233,6 +241,9 @@ export const ROUTE_REGISTRY = {
   taskDetail: (id: string) => `/tasks?task=${encodeURIComponent(id)}`,
   cases: "/cases",
   caseDetail: (id: string) => `/cases?case=${encodeURIComponent(id)}`,
+  knowledgeArticles: "/knowledge",
+  knowledgeArticleDetail: (id: string) =>
+    `/knowledge?article=${encodeURIComponent(id)}`,
   campaigns: "/campaigns",
   campaignDetail: (id: string) =>
     `/campaigns?campaign=${encodeURIComponent(id)}`

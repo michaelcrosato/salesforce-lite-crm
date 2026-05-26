@@ -3,7 +3,8 @@ export const FEATURE_FLAGS = {
   globalSearchUi: false,
   commandPalette: false,
   dealerOrderEdit: false,
-  areaEdit: false
+  areaEdit: false,
+  knowledgeArticleDetailRoute: false
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAGS;
@@ -17,7 +18,8 @@ export const EXCLUDED_ROUTES = [
   "/orders/new",
   "/orders/[id]/edit",
   "/areas/new",
-  "/areas/[id]/edit"
+  "/areas/[id]/edit",
+  "/knowledge/[id]"
 ] as const satisfies readonly string[];
 
 export function isEnabled(flag: FeatureFlag): boolean {

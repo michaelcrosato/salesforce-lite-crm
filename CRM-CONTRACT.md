@@ -68,7 +68,7 @@ This file is the source of truth for CRM entity names, routes, status values, an
 
 ### KnowledgeArticle
 - Prisma model: `KnowledgeArticle`.
-- Route: no standalone product route. Articles are local service-workflow records consumed by case assist surfaces on `/cases`; detail flows must stay inside the existing `/cases?case=<id>` case drawer unless a later prompt and contract update promote article routes.
+- Route: `/knowledge`; detail route uses the `/knowledge?article=<id>` drawer flow, not a bracketed dynamic article detail segment.
 - Status values: `draft`, `published`, `archived`.
 - Audience values: `internal`, `customer`.
 - Optional metadata: `category`, comma-separated `keywords`, `caseQueueKey`, owner `User`, and `publishedAt`.
@@ -85,8 +85,8 @@ This file is the source of truth for CRM entity names, routes, status values, an
 - `lib/crm/registry.ts` exports entity model types, status arrays, `ENTITY_REGISTRY`, and `ROUTE_REGISTRY`.
 - `Opportunity` is the exported type alias for the existing `Deal` model.
 - `Note` is the exported type alias for an `Activity` with `type = "note"`.
-- `KnowledgeArticle` is exported from the registry with `KNOWLEDGE_ARTICLE_STATUSES` and `KNOWLEDGE_ARTICLE_AUDIENCES`, but it is not added to `ENTITY_REGISTRY` or `ROUTE_REGISTRY` while it has no standalone product route.
-- Existing UI routes are preserved. `/tasks`, `/cases`, `/campaigns`, and `/reports` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`.
+- `KnowledgeArticle` is exported from the registry with `KNOWLEDGE_ARTICLE_STATUSES`, `KNOWLEDGE_ARTICLE_AUDIENCES`, an `ENTITY_REGISTRY` entry, and `ROUTE_REGISTRY.knowledgeArticles` / `ROUTE_REGISTRY.knowledgeArticleDetail` route helpers.
+- Existing UI routes are preserved. `/tasks`, `/cases`, `/campaigns`, and `/reports` are live routes with UI and E2E coverage, so they are not in `EXCLUDED_ROUTES`. `/knowledge` is the promoted knowledge article route contract and is not excluded.
 
 ## Status Constants
 
@@ -115,6 +115,7 @@ Remaining excluded-route flags default to `false` until a later prompt and contr
 | `commandPalette` | The command palette mounts globally and has no dedicated app-router page. | `/command-palette` | The route is intentionally a placeholder even though the shortcut UI exists. |
 | `dealerOrderEdit` | Dealer orders are seeded and browsable only; create/edit flows are excluded. | `/orders/new`, `/orders/[id]/edit` | PLAN.md Sprint 4 non-goals. |
 | `areaEdit` | Routing areas are seeded and browsable only; create/edit flows are excluded. | `/areas/new`, `/areas/[id]/edit` | PLAN.md Sprint 4 non-goals. |
+| `knowledgeArticleDetailRoute` | Knowledge article detail stays in the drawer flow. | `/knowledge/[id]` | PLAN.md Sprint 43 non-goals. |
 
 `EXCLUDED_ROUTES` is the source of truth for routes without live demo pages that should either 404 or render the demo placeholder.
 
@@ -157,7 +158,7 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 - Header search in `components/app-shell.tsx` submits to `/contacts` and is contacts-only.
 - The global command palette in `components/command-palette.tsx` opens with Ctrl/Cmd+K and calls `globalSearch()` through `components/command-palette-action.ts`.
 - `globalSearch()` returns accounts, contacts, opportunities, leads, tasks, cases, and campaigns with routes from `ROUTE_REGISTRY`.
-- Knowledge articles are not included in header search, command-palette search, or a dedicated search route during Sprint 33.
+- Knowledge articles are not included in header search, command-palette search, or a dedicated search route during Sprint 43.
 - `/search` and `/command-palette` remain excluded route placeholders; they are not product pages.
 
 ## Case Knowledge Suggestions
