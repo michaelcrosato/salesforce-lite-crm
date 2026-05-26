@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.51A |
+| Version | 2.52A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 45 S45-F1/S45-F2/S45-F3 queued |
+| Active sprint | Sprint 46 S46-F1/S46-F2/S46-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1701,9 +1701,9 @@ Goal: add preview-only deterministic AI action safety contracts so future assist
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S45-F1 — AI action intent registry | codex | queued | A deterministic registry describes allowed and deferred AI action intents, input/output schemas, approval needs, audit expectations, CRM object scope, and forbidden capabilities. The registry is metadata only: no executor, product UI, provider call, route change, routing execution, or database write is added. |
-| S45-F2 — AI action review packets | codex | queued | Server-side review packets validate proposed AI action intents against the registry, produce deterministic ready/blocked summaries, and expose approval/audit expectations for later UI. Review packet builders are no-write and do not create tasks, activities, opportunity stage changes, lead assignments, email drafts, provider requests, or background jobs. |
-| S45-F3 — AI action eval fixtures | codex | queued | Golden fixtures cover supported, blocked, malformed, and deferred action-plan examples with schema-validation and policy-guardrail tests. The eval surface uses deterministic local data only and adds no external AI provider, RAG, search expansion, agentic execution, auth, route, or integration behavior. |
+| S45-F1 — AI action intent registry | codex | done | A deterministic registry describes allowed and deferred AI action intents, input/output schemas, approval needs, audit expectations, CRM object scope, and forbidden capabilities. The registry is metadata only: no executor, product UI, provider call, route change, routing execution, or database write is added. |
+| S45-F2 — AI action review packets | codex | done | Server-side review packets validate proposed AI action intents against the registry, produce deterministic ready/blocked summaries, and expose approval/audit expectations for later UI. Review packet builders are no-write and do not create tasks, activities, opportunity stage changes, lead assignments, email drafts, provider requests, or background jobs. |
+| S45-F3 — AI action eval fixtures | codex | done | Golden fixtures cover supported, blocked, malformed, and deferred action-plan examples with schema-validation and policy-guardrail tests. The eval surface uses deterministic local data only and adds no external AI provider, RAG, search expansion, agentic execution, auth, route, or integration behavior. |
 
 \*\*Sprint 45 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1733,6 +1733,42 @@ Goal: add preview-only deterministic AI action safety contracts so future assist
 
 \- No transactional email provider, email sending, calendar sync, Salesforce integration, RAG/vector search, web crawling, provider credentials, network calls, or background jobs.
 
+
+\*\*Sprint 46 — AI Action Operator Preview\*\*
+
+Goal: expose the completed AI action safety contracts through deterministic no-write readiness and review surfaces without adding execution, providers, routes, or integrations.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S46-F1 — AI action readiness digest | codex | queued | Server-side readiness digest composes the S45 intent registry, review-packet audit, and eval-fixture audit into deterministic status metadata with sample proposal references and explicit no-write/no-execution flags. No product UI, action executor, audit persistence, provider call, route change, or database write is added. |
+| S46-F2 — AI action review operator panel | codex | queued | The existing `/reports` surface exposes a no-write AI action review panel that can preview supported, blocked, deferred, and malformed proposals, showing readiness, payload issues, approval/audit expectations, and safety flags. The panel depends on S46-F1 and must not execute actions, create records, call providers, or add new routes. |
+| S46-F3 — AI action review guardrail coverage | codex | queued | Focused tests and e2e coverage prove the reports panel stays no-write, displays all major review statuses, preserves excluded-route boundaries, and keeps Sprint 45 eval fixtures aligned with the operator surface. No broad visual redesign, external provider mocks, routing/pacing changes, or dealer-order/area behavior changes are added. |
+
+\*\*Sprint 46 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No AI action executor, agentic writes, silent writes, autonomous actions, or mutation side effects.
+
+\- No provider calls, RAG/vector search, web crawling, provider credentials, network calls, transactional email provider, calendar sync, Salesforce integration, or background jobs.
+
+\- No new product routes, route handlers, feature-flag promotions, search expansion, routing execution, routing reassignment, pacing-engine changes, dealer capacity rules, or lead disposition state expansion.
 
 \## 5. File Ownership Matrix
 
