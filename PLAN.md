@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.50A |
+| Version | 2.51A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 44 S44-F1/S44-F2/S44-F3 queued |
+| Active sprint | Sprint 45 S45-F1/S45-F2/S45-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1662,9 +1662,9 @@ Goal: harden existing CRM surfaces for stable rendering, mobile usability, and a
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S44-F1 — UI identity and key stability | codex | queued | Existing green e2e coverage no longer emits duplicate React key warnings from current CRM surfaces, with unstable/colliding UI keys replaced by stable identifiers and focused regression coverage where practical. No product routes, search expansion, routing execution, or pacing-engine changes are added. |
-| S44-F2 — Responsive CRM surface audit | codex | queued | Existing high-traffic CRM surfaces are hardened for mobile and desktop layout stability, including bounded overflow, table/drawer readability, and no incoherent text overlap. The work stays on current routes and avoids new workflows, navigation surfaces, or route contract changes. |
-| S44-F3 — Keyboard and accessible-state pass | codex | queued | Existing forms, drawers, and operator controls expose clear accessible names, focus behavior, and deterministic feedback states with focused tests. No auth, permissions model, external accessibility service, or broad dependency change is added. |
+| S44-F1 — UI identity and key stability | codex | done | Existing green e2e coverage no longer emits duplicate React key warnings from current CRM surfaces, with unstable/colliding UI keys replaced by stable identifiers and focused regression coverage where practical. No product routes, search expansion, routing execution, or pacing-engine changes are added. |
+| S44-F2 — Responsive CRM surface audit | codex | done | Existing high-traffic CRM surfaces are hardened for mobile and desktop layout stability, including bounded overflow, table/drawer readability, and no incoherent text overlap. The work stays on current routes and avoids new workflows, navigation surfaces, or route contract changes. |
+| S44-F3 — Keyboard and accessible-state pass | codex | done | Existing forms, drawers, and operator controls expose clear accessible names, focus behavior, and deterministic feedback states with focused tests. No auth, permissions model, external accessibility service, or broad dependency change is added. |
 
 \*\*Sprint 44 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1693,6 +1693,45 @@ Goal: harden existing CRM surfaces for stable rendering, mobile usability, and a
 \- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or area/order CRUD.
 
 \- No external accessibility service, browser telemetry sink, provider credentials, network calls, or broad dependency modernization.
+
+
+\*\*Sprint 45 — AI Action Safety Contracts\*\*
+
+Goal: add preview-only deterministic AI action safety contracts so future assistive workflows can describe possible CRM actions without executing writes, calling providers, or expanding product routes.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S45-F1 — AI action intent registry | codex | queued | A deterministic registry describes allowed and deferred AI action intents, input/output schemas, approval needs, audit expectations, CRM object scope, and forbidden capabilities. The registry is metadata only: no executor, product UI, provider call, route change, routing execution, or database write is added. |
+| S45-F2 — AI action review packets | codex | queued | Server-side review packets validate proposed AI action intents against the registry, produce deterministic ready/blocked summaries, and expose approval/audit expectations for later UI. Review packet builders are no-write and do not create tasks, activities, opportunity stage changes, lead assignments, email drafts, provider requests, or background jobs. |
+| S45-F3 — AI action eval fixtures | codex | queued | Golden fixtures cover supported, blocked, malformed, and deferred action-plan examples with schema-validation and policy-guardrail tests. The eval surface uses deterministic local data only and adds no external AI provider, RAG, search expansion, agentic execution, auth, route, or integration behavior. |
+
+\*\*Sprint 45 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No AI action executor, agentic writes, silent writes, autonomous actions, or mutation side effects.
+
+\- No product UI, product routes, route handlers, navigation surfaces, or feature-flag promotions.
+
+\- No routing execution, routing reassignment, pacing-engine changes, dealer capacity rules, lead disposition state expansion, or area/order CRUD.
+
+\- No transactional email provider, email sending, calendar sync, Salesforce integration, RAG/vector search, web crawling, provider credentials, network calls, or background jobs.
 
 
 \## 5. File Ownership Matrix
