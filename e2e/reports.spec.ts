@@ -290,6 +290,50 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     "Audit events on"
   );
 
+  await expect(page.getByTestId("ai-action-review-operator")).toBeVisible();
+  await expect(page.getByTestId("ai-action-review-summary-ready")).toContainText(
+    "1"
+  );
+  await expect(
+    page.getByTestId("ai-action-review-summary-blocked")
+  ).toContainText("3");
+  await expect(
+    page.getByTestId("ai-action-review-summary-deferred")
+  ).toContainText("1");
+  await expect(page.getByTestId("ai-action-review-summary-writes")).toContainText(
+    "None"
+  );
+  await expect(page.getByTestId("ai-action-review-source-table")).toContainText(
+    "AI action intent registry"
+  );
+  await expect(page.getByTestId("ai-action-review-source-table")).toContainText(
+    "AI action eval fixture audit"
+  );
+  await expect(
+    page.getByTestId("ai-action-review-proposal-supported")
+  ).toContainText("ready for review");
+  await expect(page.getByTestId("ai-action-review-proposal-blocked").first()).toContainText(
+    "payload invalid"
+  );
+  await expect(
+    page.getByTestId("ai-action-review-proposal-malformed")
+  ).toContainText("proposal invalid");
+  await expect(
+    page.getByTestId("ai-action-review-proposal-deferred")
+  ).toContainText("intent deferred");
+  await expect(page.getByTestId("ai-action-review-proposal-table")).toContainText(
+    "Approval required"
+  );
+  await expect(page.getByTestId("ai-action-review-proposal-table")).toContainText(
+    "Audit required before execution"
+  );
+  await expect(page.getByTestId("ai-action-review-safety-flags")).toContainText(
+    "Database off"
+  );
+  await expect(page.getByTestId("ai-action-review-safety-flags")).toContainText(
+    "Action execution off"
+  );
+
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
     "10"

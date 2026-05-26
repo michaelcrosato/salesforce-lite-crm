@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { AiActionReviewOperator } from "@/components/reports/ai-action-review-operator";
 import { AuditCoverageOperator } from "@/components/reports/audit-coverage-operator";
 import { AuditEventExplorer } from "@/components/reports/audit-event-explorer";
 import { BulkDryRunReviewOperator } from "@/components/reports/bulk-dry-run-review-operator";
@@ -24,6 +25,7 @@ import { getAuditCoverageManifest } from "@/lib/server/auditCoverageManifests";
 import { getListFilterSupportCatalog } from "@/lib/server/listFilterSupportCatalog";
 import { listBulkActionDryRunReviewPacketDefinitions } from "@/lib/server/bulkActionDryRunReviewPackets";
 import { getWorkflowRuleExampleCatalog } from "@/lib/server/workflowRuleExamples";
+import { getAiActionReadinessDigest } from "@/lib/ai/actionReadinessDigest";
 import {
   AUDIT_ENTITY_TYPES,
   AUDIT_EVENT_CATEGORIES,
@@ -70,6 +72,7 @@ export default async function ReportsPage({
   const listFilterSupportCatalog = getListFilterSupportCatalog();
   const bulkDryRunDefinitions = listBulkActionDryRunReviewPacketDefinitions();
   const workflowRuleExampleCatalog = getWorkflowRuleExampleCatalog();
+  const aiActionReadinessDigest = getAiActionReadinessDigest();
   const bulkDryRunSampleRecordIds = csvPackets.map((packet) => ({
     entity: packet.entity,
     ids: packet.review.preview.rows.flatMap((row) => {
@@ -104,6 +107,8 @@ export default async function ReportsPage({
       />
 
       <WorkflowDryRunOperator catalog={workflowRuleExampleCatalog} />
+
+      <AiActionReviewOperator digest={aiActionReadinessDigest} />
 
       <CsvExportOperator
         packets={csvPackets}
