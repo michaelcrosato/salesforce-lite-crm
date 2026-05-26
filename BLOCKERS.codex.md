@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 42
 
-Feature: Sprint 42 planning - Campaign Operations Completion
+Feature: S42-F1 - Campaign member removal and availability contracts
 
 Branch: main
 
-Timestamp: 2026-05-26T00:16:48.7604542-07:00
+Timestamp: 2026-05-26T00:35:47.1828883-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this sprint rollover.
+- No active Codex blockers were open at the start of this prompt.

@@ -2,37 +2,35 @@ Agent: Codex
 
 Sprint: 42
 
-Feature: Sprint 42 planning - Campaign Operations Completion
+Feature: S42-F1 - Campaign member removal and availability contracts
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- c1998a0 - [codex] sprint 42: plan codex track
-- 064e3ba - [codex] sprint 42: backlog refresh
+- e1bb7ec - [codex] S42-F1: add campaign member removal contracts
 
-Gate status: PASS - Phase 0 baseline passed through `npm run build`; rollover verification passed `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`. Verification evidence: `npm run test` passed 91 files / 460 tests.
+Gate status: PASS - Full `scripts/local-gate.ps1` passed after implementation, including `npm run lint`, `npm run typecheck`, `npm run test` (91 files / 462 tests), `npm run build`, and `npm run test:e2e` (23 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T00:16:48.7604542-07:00
+Timestamp: 2026-05-26T00:35:47.1828883-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed Sprint 41 Codex work is complete from S41-F1, S41-F2, and S41-F3 report evidence and zero active Codex blockers.
-- Marked S41-F1, S41-F2, and S41-F3 `done` in PLAN.md, bumped PLAN.md to version 2.48A, and set the active sprint to Sprint 42.
-- Queued Sprint 42 Campaign Operations Completion with S42-F1 campaign member removal and availability contracts, S42-F2 campaign ROI rollup summaries, and S42-F3 campaign member operator controls.
-- Synced `docs/FEATURE-BACKLOG.md` so S41 is done and S42 is queued.
+- Added deterministic server-side campaign member availability contracts that exclude current contact/lead members, support trimmed search, bound returned candidates per type, and return stable counts plus sorted member rows.
+- Added audited campaign member removal contracts that disconnect only current members, report skipped non-members idempotently, preserve existing add/list behavior, and record deterministic campaign audit metadata.
+- Extended focused campaign member Vitest coverage for availability, removal audit evidence, validation, and compatibility with existing add/list behavior.
 
 ### Next action
 
-Run LOOP.md to begin S42-F1.
+Run LOOP.md to begin S42-F2 campaign ROI rollup summaries.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly scoped PLAN.md, docs/FEATURE-BACKLOG.md, SUMMARY.codex.md, and BLOCKERS.codex.md)
+No cross-ownership edits: YES (single-agent root mode; implementation touched `lib/services/campaignMembers.ts` and `tests/api/campaignMembers.test.ts`)
 
 CRM-CONTRACT.md honored: YES
