@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { KnowledgeArticlesView } from "@/components/knowledge/knowledge-articles-view";
 import { type DrawerKnowledgeArticle } from "@/components/knowledge/knowledge-article-detail-drawer";
+import {
+  KnowledgeLifecyclePanel,
+  type KnowledgeArticleOwnerOption
+} from "@/components/knowledge/knowledge-lifecycle-panel";
 import { type KnowledgeArticleRow } from "@/components/knowledge/knowledge-articles-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -176,6 +180,10 @@ export default async function KnowledgePage({
     })
   ]);
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
+  const ownerOptions: KnowledgeArticleOwnerOption[] = owners.map((owner) => ({
+    id: owner.id,
+    label: owner.name
+  }));
   const categoryOptions = Array.from(
     new Set(
       allArticles
@@ -218,6 +226,7 @@ export default async function KnowledgePage({
         caseQueueKey: isCaseQueueKey(found.caseQueueKey)
           ? found.caseQueueKey
           : null,
+        ownerId: found.ownerId,
         ownerName: found.ownerId
           ? ownerById.get(found.ownerId)?.name ?? null
           : null,
@@ -391,12 +400,22 @@ export default async function KnowledgePage({
         </CardContent>
       </Card>
 
+      <KnowledgeLifecyclePanel
+        owners={ownerOptions}
+        title="Create Article"
+        submitLabel="Create article"
+      />
+
       <Card>
         <CardHeader>
           <CardTitle>Article List</CardTitle>
         </CardHeader>
         <CardContent>
-          <KnowledgeArticlesView articles={rows} drawerArticle={drawerArticle} />
+          <KnowledgeArticlesView
+            articles={rows}
+            drawerArticle={drawerArticle}
+            owners={ownerOptions}
+          />
         </CardContent>
       </Card>
     </div>

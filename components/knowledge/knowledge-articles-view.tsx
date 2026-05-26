@@ -6,6 +6,7 @@ import {
   KnowledgeArticleDetailDrawer,
   type DrawerKnowledgeArticle
 } from "@/components/knowledge/knowledge-article-detail-drawer";
+import { type KnowledgeArticleOwnerOption } from "@/components/knowledge/knowledge-lifecycle-panel";
 import {
   KnowledgeArticlesTable,
   type KnowledgeArticleRow
@@ -14,10 +15,12 @@ import { EmptyState } from "@/components/ui/empty-state";
 
 export function KnowledgeArticlesView({
   articles,
-  drawerArticle
+  drawerArticle,
+  owners
 }: {
   articles: KnowledgeArticleRow[];
   drawerArticle: DrawerKnowledgeArticle | null;
+  owners: KnowledgeArticleOwnerOption[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,6 +42,7 @@ export function KnowledgeArticlesView({
         />
         <KnowledgeArticleDetailDrawer
           article={drawerArticle}
+          owners={owners}
           onClose={closeDrawer}
         />
       </>
@@ -50,6 +54,7 @@ export function KnowledgeArticlesView({
       <KnowledgeArticlesTable articles={articles} />
       <KnowledgeArticleDetailDrawer
         article={drawerArticle}
+        owners={owners}
         onClose={closeDrawer}
       />
     </>

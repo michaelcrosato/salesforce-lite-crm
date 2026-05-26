@@ -53,6 +53,77 @@ test("knowledge workspace lists articles, filters, and opens drawer context", as
   );
 });
 
+test("knowledge workspace creates, edits, publishes, and archives articles", async ({
+  page
+}) => {
+  await page.goto("/knowledge");
+
+  const title = "Playwright lifecycle article";
+  const updatedTitle = "Playwright lifecycle article updated";
+  const createForm = page.getByTestId("knowledge-create-form");
+
+  await createForm.getByTestId("knowledge-field-title").fill(title);
+  await createForm
+    .getByTestId("knowledge-field-summary")
+    .fill("Lifecycle article summary");
+  await createForm
+    .getByTestId("knowledge-field-body")
+    .fill("Lifecycle article body for local service workflows.");
+  await createForm.getByTestId("knowledge-field-category").fill("Lifecycle");
+  await createForm
+    .getByTestId("knowledge-field-keywords")
+    .fill("lifecycle,playwright");
+  await createForm
+    .getByTestId("knowledge-field-queue")
+    .selectOption("general_support");
+  await createForm.getByTestId("knowledge-button-submit").click();
+
+  await expect(
+    page.getByRole("status").filter({ hasText: "Article created." })
+  ).toBeVisible();
+  await expect(page.getByTestId("knowledge-article-table")).toContainText(
+    title
+  );
+
+  await page.getByRole("link", { exact: true, name: title }).click();
+  await expect(page.getByTestId("knowledge-article-drawer")).toBeVisible();
+  await page.getByTestId("knowledge-button-edit").click();
+
+  const editForm = page.getByTestId("knowledge-edit-form");
+  await editForm.getByTestId("knowledge-field-title").fill(updatedTitle);
+  await editForm
+    .getByTestId("knowledge-field-summary")
+    .fill("Updated lifecycle summary");
+  await editForm
+    .getByTestId("knowledge-field-body")
+    .fill("Updated lifecycle body for local service workflows.");
+  await editForm.getByTestId("knowledge-field-audience").selectOption("customer");
+  await editForm.getByTestId("knowledge-button-submit").click();
+
+  await expect(
+    page.getByRole("status").filter({ hasText: "Article updated." })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { exact: true, name: updatedTitle })
+  ).toBeVisible();
+
+  await page.getByTestId("knowledge-button-publish").click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Article published." })
+  ).toBeVisible();
+  await expect(page.getByTestId("knowledge-lifecycle-panel")).toContainText(
+    "Published"
+  );
+
+  await page.getByTestId("knowledge-button-archive").click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Article archived." })
+  ).toBeVisible();
+  await expect(page.getByTestId("knowledge-lifecycle-panel")).toContainText(
+    "Archived"
+  );
+});
+
 test("knowledge bracket detail route remains excluded", async ({ page }) => {
   const response = await page.goto("/knowledge/knowledge-routing-feedback");
 

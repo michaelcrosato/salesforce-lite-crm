@@ -1,9 +1,21 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Archive, Pencil, Send, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import {
+  archiveKnowledgeArticleAction,
+  publishKnowledgeArticleAction
+} from "@/app/knowledge/actions";
+import {
+  KnowledgeLifecyclePanel,
+  type KnowledgeArticleFormInitialValues,
+  type KnowledgeArticleOwnerOption
+} from "@/components/knowledge/knowledge-lifecycle-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/toast";
 import {
   type CaseQueueKey,
   type KnowledgeArticleAudience,
@@ -19,16 +31,15 @@ type BadgeVariant =
   | "warning"
   | "danger";
 
-export type DrawerKnowledgeArticle = {
+export type DrawerKnowledgeArticle = KnowledgeArticleFormInitialValues & {
   id: string;
   title: string;
-  summary: string | null;
   body: string;
   status: KnowledgeArticleStatus;
   audience: KnowledgeArticleAudience;
-  category: string | null;
   keywords: string[];
   caseQueueKey: CaseQueueKey | null;
+  ownerId: string | null;
   ownerName: string | null;
   publishedAt: string | null;
   createdAt: string;
@@ -68,13 +79,50 @@ const QUEUE_LABELS: Record<CaseQueueKey, string> = {
 
 export function KnowledgeArticleDetailDrawer({
   article,
+  owners,
   onClose
 }: {
   article: DrawerKnowledgeArticle | null;
+  owners: KnowledgeArticleOwnerOption[];
   onClose: () => void;
 }) {
+  const router = useRouter();
+  const { showToast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
   if (!article) {
     return null;
+  }
+
+  const activeArticleId = article.id;
+
+  function handlePublish() {
+    startTransition(() => {
+      void (async () => {
+        const result = await publishKnowledgeArticleAction(activeArticleId);
+        showToast({
+          title: result.ok ? "Article published" : "Article not published",
+          description: result.message,
+          variant: result.ok ? "success" : "error"
+        });
+        router.refresh();
+      })();
+    });
+  }
+
+  function handleArchive() {
+    startTransition(() => {
+      void (async () => {
+        const result = await archiveKnowledgeArticleAction(activeArticleId);
+        showToast({
+          title: result.ok ? "Article archived" : "Article not archived",
+          description: result.message,
+          variant: result.ok ? "success" : "error"
+        });
+        router.refresh();
+      })();
+    });
   }
 
   return (
@@ -107,19 +155,74 @@ export function KnowledgeArticleDetailDrawer({
         </div>
 
         <div className="space-y-5 p-5">
-          <Card>
-            <CardHeader>
-              <CardTitle>Article</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {article.summary ? (
-                <p className="text-sm text-muted-foreground">
-                  {article.summary}
+          {isEditing ? (
+            <KnowledgeLifecyclePanel
+              owners={owners}
+              initialValues={article}
+              title="Edit Article"
+              submitLabel="Save article"
+              testId="knowledge-edit-form"
+              onSaved={() => setIsEditing(false)}
+            />
+          ) : (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Article</CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  data-testid="knowledge-button-edit"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Pencil className="h-4 w-4" aria-hidden="true" />
+                  Edit
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {article.summary ? (
+                  <p className="text-sm text-muted-foreground">
+                    {article.summary}
+                  </p>
+                ) : null}
+                <p className="whitespace-pre-wrap text-sm leading-6">
+                  {article.body}
                 </p>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card data-testid="knowledge-lifecycle-panel">
+            <CardHeader>
+              <CardTitle>Lifecycle</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-wrap items-center gap-3">
+              {article.status !== "published" ? (
+                <Button
+                  type="button"
+                  data-testid="knowledge-button-publish"
+                  disabled={isPending}
+                  onClick={handlePublish}
+                >
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                  Publish article
+                </Button>
               ) : null}
-              <p className="whitespace-pre-wrap text-sm leading-6">
-                {article.body}
-              </p>
+              {article.status !== "archived" ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  data-testid="knowledge-button-archive"
+                  disabled={isPending}
+                  onClick={handleArchive}
+                >
+                  <Archive className="h-4 w-4" aria-hidden="true" />
+                  Archive article
+                </Button>
+              ) : null}
+              <Badge variant={STATUS_VARIANT[article.status]}>
+                {STATUS_LABELS[article.status]}
+              </Badge>
             </CardContent>
           </Card>
 
