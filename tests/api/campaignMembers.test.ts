@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   addCampaignMembers,
-  listCampaignMembers
+  listAvailableCampaignMembers,
+  listCampaignMembers,
+  removeCampaignMembers
 } from "@/lib/services/campaignMembers";
 import { createCampaign } from "@/lib/services/campaigns";
 import { prisma } from "@/lib/prisma";
@@ -9,11 +11,13 @@ import { prisma } from "@/lib/prisma";
 const ownerId = "test-campaign-member-owner";
 const contactIds = [
   "test-campaign-member-contact-1",
-  "test-campaign-member-contact-2"
+  "test-campaign-member-contact-2",
+  "test-campaign-member-contact-3"
 ] as const;
 const leadIds = [
   "test-campaign-member-lead-1",
-  "test-campaign-member-lead-2"
+  "test-campaign-member-lead-2",
+  "test-campaign-member-lead-3"
 ] as const;
 
 describe("campaign member service", () => {
@@ -22,8 +26,10 @@ describe("campaign member service", () => {
     await createOwner();
     await createContact(contactIds[0], "Ada", "Contact");
     await createContact(contactIds[1], "Zoe", "Contact");
+    await createContact(contactIds[2], "Mia", "Available");
     await createLead(leadIds[0], "Ben", "Lead", "web");
     await createLead(leadIds[1], "Nora", "Lead", "referral");
+    await createLead(leadIds[2], "Liam", "Available", "event");
   });
 
   afterEach(async () => {
@@ -139,6 +145,123 @@ describe("campaign member service", () => {
     expect(withRelations.leads).toHaveLength(1);
   });
 
+  it("lists available members while excluding current campaign members", async () => {
+    const campaign = await createCampaign({
+      name: "Campaign member availability",
+      ownerId,
+      contactIds: [contactIds[0]],
+      leadIds: [leadIds[0]]
+    });
+
+    const result = await listAvailableCampaignMembers({
+      campaignId: campaign.id,
+      search: "available",
+      limit: 1
+    });
+
+    expect(result).toMatchObject({
+      campaignId: campaign.id,
+      search: "available",
+      limit: 1,
+      availableCounts: {
+        contacts: 1,
+        leads: 1,
+        total: 2
+      },
+      existingMemberCounts: {
+        contacts: 1,
+        leads: 1,
+        total: 2
+      },
+      memberCounts: {
+        contacts: 1,
+        leads: 1,
+        total: 2
+      }
+    });
+    expect(result.contacts.map((member) => member.memberId)).toEqual([
+      contactIds[2]
+    ]);
+    expect(result.leads.map((member) => member.memberId)).toEqual([
+      leadIds[2]
+    ]);
+    expect(result.members.map((member) => member.displayName)).toEqual([
+      "Liam Available",
+      "Mia Available"
+    ]);
+    expect(result.members).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ memberId: contactIds[0] }),
+        expect.objectContaining({ memberId: leadIds[0] })
+      ])
+    );
+  });
+
+  it("removes current members with deterministic audit evidence", async () => {
+    const campaign = await createCampaign({
+      name: "Campaign member remove",
+      ownerId,
+      contactIds: [contactIds[0], contactIds[1]],
+      leadIds: [leadIds[0], leadIds[1]]
+    });
+
+    const result = await removeCampaignMembers({
+      campaignId: campaign.id,
+      contactIds: [contactIds[1], contactIds[2], contactIds[1]],
+      leadIds: [leadIds[0], "missing-campaign-member-lead"]
+    });
+    const withRelations = await prisma.campaign.findUniqueOrThrow({
+      where: { id: campaign.id },
+      include: {
+        contacts: true,
+        leads: true
+      }
+    });
+
+    expect(result.removedContactIds).toEqual([contactIds[1]]);
+    expect(result.removedLeadIds).toEqual([leadIds[0]]);
+    expect(result.skippedNonMemberContactIds).toEqual([contactIds[2]]);
+    expect(result.skippedNonMemberLeadIds).toEqual([
+      "missing-campaign-member-lead"
+    ]);
+    expect(result.memberCounts).toEqual({
+      contacts: 1,
+      leads: 1,
+      total: 2
+    });
+    expect(result.members.map((member) => member.memberId)).toEqual([
+      contactIds[0],
+      leadIds[1]
+    ]);
+    expect(withRelations.contacts.map((contact) => contact.id)).toEqual([
+      contactIds[0]
+    ]);
+    expect(withRelations.leads.map((lead) => lead.id)).toEqual([leadIds[1]]);
+
+    const audit = await prisma.auditEvent.findFirstOrThrow({
+      where: {
+        action: "updated",
+        entityId: campaign.id,
+        entityType: "campaign",
+        summary: "Campaign members removed: Campaign member remove."
+      }
+    });
+    expect(audit.category).toBe("record");
+    expect(auditMetadata(audit)).toMatchObject({
+      campaignId: campaign.id,
+      campaignName: "Campaign member remove",
+      contactMemberCount: 1,
+      leadMemberCount: 1,
+      removedContactIds: [contactIds[1]],
+      removedLeadIds: [leadIds[0]],
+      requestedContactIds: [contactIds[1], contactIds[2]],
+      requestedLeadIds: [leadIds[0], "missing-campaign-member-lead"],
+      skippedNonMemberContactIds: [contactIds[2]],
+      skippedNonMemberLeadIds: ["missing-campaign-member-lead"],
+      totalMemberCount: 2
+    });
+  });
+
   it("rejects empty or invalid member input", async () => {
     const campaign = await createCampaign({
       name: "Campaign member invalid",
@@ -154,6 +277,23 @@ describe("campaign member service", () => {
       addCampaignMembers({
         campaignId: campaign.id,
         contactIds: [""]
+      })
+    ).rejects.toThrow();
+    await expect(
+      removeCampaignMembers({
+        campaignId: campaign.id
+      })
+    ).rejects.toThrow("At least one campaign member ID is required.");
+    await expect(
+      removeCampaignMembers({
+        campaignId: campaign.id,
+        leadIds: [""]
+      })
+    ).rejects.toThrow();
+    await expect(
+      listAvailableCampaignMembers({
+        campaignId: "",
+        limit: 1
       })
     ).rejects.toThrow();
     await expect(listCampaignMembers("missing-campaign")).rejects.toThrow();
