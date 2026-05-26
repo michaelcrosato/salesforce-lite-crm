@@ -1,37 +1,37 @@
 Agent: Codex
 
-Sprint: 40
+Sprint: 41
 
-Feature: S40-F3 - CSV import apply operator UI
+Feature: S41-F1 - Campaign member model foundation
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- f284610 - [codex] S40-F3: add CSV import apply operator UI
+- 540aa5d - [codex] sprint 41: plan codex track
+- e45c0e3 - [codex] sprint 41: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` completed npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (89 files / 453 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
+Gate status: PASS - Phase 0 baseline passed `scripts/local-gate.ps1` including npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (89 files / 453 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed). Phase 4 planning verification passed lint, typecheck, `npm run test` (89 files / 453 tests), and build.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T20:49:02.6694201-07:00
+Timestamp: 2026-05-25T21:40:57.2914243-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added a reports server action for the existing S40-F2 contact CSV manual apply executor, with confirmation, contacts-only, non-blank CSV, seeded actor, and deterministic action-result handling.
-- Extended the `/reports` CSV import preview operator with a confirmation-gated contact apply panel and visible created, skipped, blocked, audit-event, row outcome, and write-flag results while keeping lead apply, routing, storage, background jobs, new routes, and Salesforce integration out of scope.
-- Extended `e2e/reports.spec.ts` to preview mixed contact CSV rows, confirm apply, and verify created/skipped/blocked/audit outcomes plus guardrail write flags.
-- Reconciled current coordination state: `PLAN.md` still lists S40-F1/S40-F2/S40-F3 as queued, but S40-F1, S40-F2, and S40-F3 now have implementation commits plus green full local gate evidence on `main`; older Claude/Grok/Gemini reports remain historical and do not alter the active Codex queue.
+- Confirmed Sprint 40 completion from Codex SUMMARY evidence, recent S40 implementation/report commits on `main`, zero active Codex blockers, and a green Phase 0 baseline.
+- Marked S40-F1, S40-F2, and S40-F3 done in `PLAN.md`, bumped Document Control to 2.47A, and queued Sprint 41 S41-F1/S41-F2/S41-F3 for Campaign Influence Lite.
+- Synced `docs/FEATURE-BACKLOG.md` so S40 is done, S41 is queued, and deferred CSV write scope reflects the completed S40 contact-create manual apply track.
 
 ### Next action
 
-Run `SPRINT-ROLLOVER.md` to mark Sprint 40 complete and queue the next Codex track.
+Run LOOP.md to begin S41-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation touched reports server actions, report UI, and focused Playwright coverage)
+No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and Codex reports)
 
 CRM-CONTRACT.md honored: YES

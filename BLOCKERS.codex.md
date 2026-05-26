@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 40
+Sprint: 41
 
-Feature: S40-F3 - CSV import apply operator UI
+Feature: S41-F1 - Campaign member model foundation
 
 Branch: main
 
-Timestamp: 2026-05-25T20:49:02.6694201-07:00
+Timestamp: 2026-05-25T21:40:57.2914243-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
+- No active Codex blockers were open at the start of this sprint rollover.
