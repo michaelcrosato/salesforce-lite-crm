@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  addCampaignMemberAction,
   createCampaignAction,
   deleteCampaignAction,
+  removeCampaignMemberAction,
   updateCampaignAction,
   updateCampaignStatusAction
 } from "@/app/campaigns/actions";
@@ -12,6 +14,9 @@ vi.mock("next/cache", () => ({
 }));
 
 const testCampaignName = "Test Campaign Action Name";
+const testMemberCampaignName = "Test Campaign Member Action Name";
+const testContactId = "test-campaign-action-contact";
+const testLeadId = "test-campaign-action-lead";
 
 describe("Campaign Actions", () => {
   beforeEach(async () => {
@@ -128,6 +133,94 @@ describe("Campaign Actions", () => {
     });
     expect(deleted).toBeNull();
   });
+
+  it("adds and removes campaign members", async () => {
+    await createMemberFixtures();
+    const campaign = await prisma.campaign.create({
+      data: {
+        name: testMemberCampaignName,
+        status: "planned"
+      }
+    });
+
+    const addContactResult = await addCampaignMemberAction(
+      campaign.id,
+      `contact:${testContactId}`
+    );
+    const addLeadResult = await addCampaignMemberAction(
+      campaign.id,
+      `lead:${testLeadId}`
+    );
+
+    expect(addContactResult).toEqual({
+      ok: true,
+      message: "Campaign member added."
+    });
+    expect(addLeadResult).toEqual({
+      ok: true,
+      message: "Campaign member added."
+    });
+
+    const withMembers = await prisma.campaign.findUniqueOrThrow({
+      where: { id: campaign.id },
+      include: {
+        contacts: true,
+        leads: true
+      }
+    });
+    expect(withMembers.contacts.map((contact) => contact.id)).toEqual([
+      testContactId
+    ]);
+    expect(withMembers.leads.map((lead) => lead.id)).toEqual([testLeadId]);
+
+    const removeContactResult = await removeCampaignMemberAction(
+      campaign.id,
+      "contact",
+      testContactId
+    );
+    const removeLeadResult = await removeCampaignMemberAction(
+      campaign.id,
+      "lead",
+      testLeadId
+    );
+
+    expect(removeContactResult).toEqual({
+      ok: true,
+      message: "Campaign member removed."
+    });
+    expect(removeLeadResult).toEqual({
+      ok: true,
+      message: "Campaign member removed."
+    });
+
+    const withoutMembers = await prisma.campaign.findUniqueOrThrow({
+      where: { id: campaign.id },
+      include: {
+        contacts: true,
+        leads: true
+      }
+    });
+    expect(withoutMembers.contacts).toHaveLength(0);
+    expect(withoutMembers.leads).toHaveLength(0);
+  });
+
+  it("rejects invalid campaign member action input", async () => {
+    const addResult = await addCampaignMemberAction("some-id", "invalid");
+    const removeResult = await removeCampaignMemberAction(
+      "some-id",
+      "account",
+      "member-id"
+    );
+
+    expect(addResult).toEqual({
+      ok: false,
+      message: "Select a valid campaign member."
+    });
+    expect(removeResult).toEqual({
+      ok: false,
+      message: "Select a valid campaign member."
+    });
+  });
 });
 
 function formData(values: Record<string, string>) {
@@ -139,7 +232,57 @@ function formData(values: Record<string, string>) {
 }
 
 async function cleanup() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      OR: [
+        {
+          entityType: "campaign",
+          summary: {
+            contains: "Test Campaign Member Action"
+          }
+        },
+        {
+          entityType: "campaign",
+          metadata: {
+            contains: "test-campaign-action"
+          }
+        }
+      ]
+    }
+  });
   await prisma.campaign.deleteMany({
-    where: { name: { in: [testCampaignName, "Updated Campaign"] } }
+    where: {
+      name: {
+        in: [testCampaignName, "Updated Campaign", testMemberCampaignName]
+      }
+    }
+  });
+  await prisma.lead.deleteMany({
+    where: { id: testLeadId }
+  });
+  await prisma.contact.deleteMany({
+    where: { id: testContactId }
+  });
+}
+
+async function createMemberFixtures() {
+  await prisma.contact.create({
+    data: {
+      id: testContactId,
+      firstName: "Action",
+      lastName: "Contact",
+      email: `${testContactId}@example.test`,
+      status: "active"
+    }
+  });
+  await prisma.lead.create({
+    data: {
+      id: testLeadId,
+      firstName: "Action",
+      lastName: "Lead",
+      email: `${testLeadId}@example.test`,
+      source: "web",
+      status: "new"
+    }
   });
 }

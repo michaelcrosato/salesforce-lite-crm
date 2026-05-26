@@ -43,6 +43,30 @@ test("shows seeded campaign performance summaries in list and drawer", async ({
   await expect(
     page.getByTestId("campaign-opportunity-influence").first()
   ).toContainText("Luma patient intake CRM");
+
+  const memberPanel = page.getByTestId("campaign-member-panel-controls");
+  await expect(memberPanel).toBeVisible();
+  await expect(memberPanel).toContainText("7 members");
+
+  await memberPanel
+    .getByTestId("campaign-member-select-add")
+    .selectOption("contact:contact-19");
+  await memberPanel.getByTestId("campaign-member-button-add").click();
+  await expect(
+    page.getByText("Campaign member added.", { exact: true })
+  ).toBeVisible();
+  const addedMemberRow = memberPanel
+    .getByTestId("campaign-member-row-current")
+    .filter({ hasText: "Amara Scott" });
+  await expect(addedMemberRow).toBeVisible();
+  await expect(memberPanel).toContainText("8 members");
+
+  await addedMemberRow.getByTestId("campaign-member-button-remove").click();
+  await expect(
+    page.getByText("Campaign member removed.", { exact: true })
+  ).toBeVisible();
+  await expect(addedMemberRow).toHaveCount(0);
+  await expect(memberPanel).toContainText("7 members");
 });
 
 test("create campaign, edit dates, and verify in list", async ({ page }) => {

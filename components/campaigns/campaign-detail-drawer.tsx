@@ -1,10 +1,13 @@
 "use client";
 
 import { X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import {
+  addCampaignMemberAction,
   deleteCampaignAction,
+  removeCampaignMemberAction,
   updateCampaignStatusAction
 } from "@/app/campaigns/actions";
 import {
@@ -21,6 +24,10 @@ import { useToast } from "@/components/ui/toast";
 import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import type { CampaignInfluenceSummary } from "@/lib/services/campaignInfluence";
+import type {
+  CampaignMember,
+  CampaignMemberCounts
+} from "@/lib/services/campaignMembers";
 
 type BadgeVariant =
   | "default"
@@ -38,6 +45,9 @@ export type DrawerCampaign = CampaignFormInitialValues & {
   createdAt: string;
   updatedAt: string;
   influenceSummary: CampaignInfluenceSummary | null;
+  members: CampaignMember[];
+  availableMembers: CampaignMember[];
+  availableMemberCounts: CampaignMemberCounts;
 };
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
@@ -54,6 +64,8 @@ const STATUS_VARIANT: Record<CampaignStatus, BadgeVariant> = {
   cancelled: "outline"
 };
 
+const EMPTY_CAMPAIGN_MEMBERS: CampaignMember[] = [];
+
 export function CampaignDetailDrawer({
   campaign,
   owners,
@@ -66,13 +78,30 @@ export function CampaignDetailDrawer({
   const router = useRouter();
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedAvailableMember, setSelectedAvailableMember] = useState("");
   const [isPending, startTransition] = useTransition();
+  const availableMembers = campaign?.availableMembers ?? EMPTY_CAMPAIGN_MEMBERS;
+  const availableOptions = useMemo(
+    () =>
+      availableMembers.map((member) => ({
+        label: memberOptionLabel(member),
+        value: memberOptionValue(member)
+      })),
+    [availableMembers]
+  );
+  const firstAvailableOption = availableOptions[0]?.value ?? "";
+  const activeSelectedAvailableMember = availableOptions.some(
+    (option) => option.value === selectedAvailableMember
+  )
+    ? selectedAvailableMember
+    : firstAvailableOption;
 
   if (!campaign) {
     return null;
   }
 
   const activeCampaignId = campaign.id;
+  const currentMemberCounts = countCampaignMembers(campaign.members);
 
   function moveStatus(status: string) {
     startTransition(() => {
@@ -103,6 +132,52 @@ export function CampaignDetailDrawer({
         if (result.ok) {
           onClose();
         }
+        router.refresh();
+      })();
+    });
+  }
+
+  function handleAddMember() {
+    if (!activeSelectedAvailableMember) {
+      showToast({
+        title: "Campaign member not added",
+        description: "Select a contact or lead to add.",
+        variant: "error"
+      });
+      return;
+    }
+
+    startTransition(() => {
+      void (async () => {
+        const result = await addCampaignMemberAction(
+          activeCampaignId,
+          activeSelectedAvailableMember
+        );
+        showToast({
+          title: result.ok ? "Campaign member added" : "Campaign member not added",
+          description: result.message,
+          variant: result.ok ? "success" : "error"
+        });
+        router.refresh();
+      })();
+    });
+  }
+
+  function handleRemoveMember(member: CampaignMember) {
+    startTransition(() => {
+      void (async () => {
+        const result = await removeCampaignMemberAction(
+          activeCampaignId,
+          member.memberType,
+          member.memberId
+        );
+        showToast({
+          title: result.ok
+            ? "Campaign member removed"
+            : "Campaign member not removed",
+          description: result.message,
+          variant: result.ok ? "success" : "error"
+        });
         router.refresh();
       })();
     });
@@ -196,6 +271,111 @@ export function CampaignDetailDrawer({
 
           <CampaignPerformanceCard summary={campaign.influenceSummary} />
 
+          <Card data-testid="campaign-member-panel-controls">
+            <CardHeader>
+              <CardTitle>Campaign members</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <FieldView
+                  label="Current"
+                  value={`${currentMemberCounts.total} members`}
+                />
+                <FieldView
+                  label="Contacts"
+                  value={String(currentMemberCounts.contacts)}
+                />
+                <FieldView
+                  label="Leads"
+                  value={String(currentMemberCounts.leads)}
+                />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <Select
+                  aria-label={`Add member to ${campaign.name}`}
+                  data-testid="campaign-member-select-add"
+                  value={activeSelectedAvailableMember}
+                  disabled={isPending || availableOptions.length === 0}
+                  onChange={(event) =>
+                    setSelectedAvailableMember(event.currentTarget.value)
+                  }
+                >
+                  {availableOptions.length === 0 ? (
+                    <option value="">No available contacts or leads</option>
+                  ) : null}
+                  {availableOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  type="button"
+                  data-testid="campaign-member-button-add"
+                  disabled={isPending || !activeSelectedAvailableMember}
+                  onClick={handleAddMember}
+                >
+                  Add member
+                </Button>
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                {campaign.availableMemberCounts.total} available existing
+                contacts and leads.
+              </p>
+
+              {campaign.members.length === 0 ? (
+                <p className="rounded-md border bg-muted/30 p-3 text-sm text-muted-foreground">
+                  No campaign members are linked yet.
+                </p>
+              ) : (
+                <div
+                  className="divide-y rounded-md border"
+                  data-testid="campaign-member-list-current"
+                >
+                  {campaign.members.map((member) => (
+                    <div
+                      key={`${member.memberType}-${member.memberId}`}
+                      className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
+                      data-testid="campaign-member-row-current"
+                    >
+                      <div className="min-w-0 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="outline">
+                            {member.memberType === "contact"
+                              ? "Contact"
+                              : "Lead"}
+                          </Badge>
+                          <Link
+                            href={member.route}
+                            className="truncate text-sm font-medium text-primary hover:underline"
+                          >
+                            {member.displayName}
+                          </Link>
+                        </div>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {member.email ?? "No email"} - {member.status}
+                          {member.source ? ` - ${member.source}` : ""}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        data-testid="campaign-member-button-remove"
+                        disabled={isPending}
+                        onClick={() => handleRemoveMember(member)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Update status</CardTitle>
@@ -251,4 +431,31 @@ function FieldView({ label, value }: { label: string; value: string }) {
       <span className="mt-1 block text-sm font-medium">{value}</span>
     </div>
   );
+}
+
+function countCampaignMembers(members: CampaignMember[]): CampaignMemberCounts {
+  const contacts = members.filter((member) => member.memberType === "contact")
+    .length;
+  const leads = members.filter((member) => member.memberType === "lead").length;
+
+  return {
+    contacts,
+    leads,
+    total: contacts + leads
+  };
+}
+
+function memberOptionValue(member: CampaignMember): string {
+  return `${member.memberType}:${member.memberId}`;
+}
+
+function memberOptionLabel(member: CampaignMember): string {
+  const memberType = member.memberType === "contact" ? "Contact" : "Lead";
+  const details = [member.email, member.source, member.status]
+    .filter((value) => value && value.length > 0)
+    .join(" / ");
+
+  return details.length > 0
+    ? `${memberType}: ${member.displayName} (${details})`
+    : `${memberType}: ${member.displayName}`;
 }

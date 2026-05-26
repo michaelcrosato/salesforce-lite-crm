@@ -29,6 +29,10 @@ import {
   listCampaignInfluenceSummaries
 } from "@/lib/services/campaignInfluence";
 import {
+  listAvailableCampaignMembers,
+  listCampaignMembers
+} from "@/lib/services/campaignMembers";
+import {
   CAMPAIGN_STATUSES,
   type CampaignStatus
 } from "@/lib/crm/registry";
@@ -257,9 +261,16 @@ export default async function CampaignsPage({
   if (params.campaign) {
     const found = await getCampaign(params.campaign);
     if (found) {
-      const influenceSummary =
-        influenceSummaryByCampaignId.get(found.id) ??
-        (await getCampaignInfluenceSummary(found.id, { opportunityLimit: 5 }));
+      const [influenceSummary, members, availableMemberResult] =
+        await Promise.all([
+          influenceSummaryByCampaignId.get(found.id) ??
+            getCampaignInfluenceSummary(found.id, { opportunityLimit: 5 }),
+          listCampaignMembers(found.id),
+          listAvailableCampaignMembers({
+            campaignId: found.id,
+            limit: 8
+          })
+        ]);
 
       drawerCampaign = {
         id: found.id,
@@ -275,7 +286,10 @@ export default async function CampaignsPage({
           : null,
         createdAt: found.createdAt.toISOString(),
         updatedAt: found.updatedAt.toISOString(),
-        influenceSummary
+        influenceSummary,
+        members,
+        availableMembers: availableMemberResult.members,
+        availableMemberCounts: availableMemberResult.availableCounts
       };
     }
   }
