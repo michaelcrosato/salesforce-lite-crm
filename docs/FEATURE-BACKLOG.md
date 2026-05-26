@@ -111,9 +111,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S44-F1 | UI identity and key stability | Codex | done |
 | S44-F2 | Responsive CRM surface audit | Codex | done |
 | S44-F3 | Keyboard and accessible-state pass | Codex | done |
-| S45-F1 | AI action intent registry | Codex | queued |
-| S45-F2 | AI action review packets | Codex | queued |
-| S45-F3 | AI action eval fixtures | Codex | queued |
+| S45-F1 | AI action intent registry | Codex | done |
+| S45-F2 | AI action review packets | Codex | done |
+| S45-F3 | AI action eval fixtures | Codex | done |
+| S46-F1 | AI action readiness digest | Codex | queued |
+| S46-F2 | AI action review operator panel | Codex | queued |
+| S46-F3 | AI action review guardrail coverage | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
