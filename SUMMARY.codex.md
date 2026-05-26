@@ -2,38 +2,38 @@ Agent: Codex
 
 Sprint: 45
 
-Feature: S45-F2 — AI action review packets
+Feature: S45-F3 — AI action eval fixtures
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- fc736f9 - [codex] S45-F2: add action review packets
+- a267619 - [codex] S45-F3: add action eval fixtures
 
-Gate status: PASS - Pre-flight and post-implementation full local gate passed via `scripts/local-gate.ps1`: npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (95 files / 482 tests), build, Playwright chromium install, and e2e (35 tests). Targeted checks also passed before commit: `npm run test -- tests/ai-action-review-packets.test.ts`, `npm run lint`, `npm run typecheck`, and `npm run build`.
+Gate status: PASS - Pre-flight baseline passed through `npm run build`, targeted checks passed (`npm run test -- tests/ai-action-eval-fixtures.test.ts`, `npm run lint`, `npm run typecheck`, `npm run build`), and post-implementation full local gate passed via `scripts/local-gate.ps1`: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (96 files / 487 tests), build, Playwright chromium install, and e2e (35 tests).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T10:29:32.5530984-07:00
+Timestamp: 2026-05-26T11:39:00.5844159-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/actionReviewPackets.ts`, a deterministic preview-only review packet builder for AI action proposals. It validates proposal shape against the S45-F1 registry, validates supported-intent payloads with existing Zod schemas, summarizes ready/blocked/deferred outcomes, and exposes approval/audit expectations without writes or execution.
-- Added `tests/ai-action-review-packets.test.ts` covering ready supported proposals, invalid payload blocking, deferred intent guidance, malformed proposal blocking, unknown intents, mixed batch summaries, no-write flags, source metadata, and contract audit output.
+- Added `lib/ai/actionEvalFixtures.ts`, a deterministic replay-only fixture catalog for AI action proposals covering supported, invalid-payload, malformed, deferred, and unknown-intent examples.
+- Added `tests/ai-action-eval-fixtures.test.ts` covering fixture metadata, audit output, golden replay outcomes, schema-valid/schema-invalid cases, category indexing, no-write policy flags, and excluded-route guardrails.
 - Committed implementation work atomically and verified the full local gate remains green.
 
 ### Discovered this prompt
 
-- `PLAN.md` §4 still lists S45-F1 and S45-F2 as queued even though S45-F1 and S45-F2 are now implemented on `main` with green local-gate evidence. Per §2, local gate output and current prompt evidence are higher authority; no PLAN rollover/edit was bundled into S45-F2.
+- `PLAN.md` §4 still lists S45-F1, S45-F2, and S45-F3 as queued even though all three now have implementation commits on `main` with green local-gate evidence. Per §2, current prompt and local gate evidence are higher authority; no PLAN rollover/edit was bundled into S45-F3.
 - `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`, and README roadmap prose still contain older Sprint 33 orientation language. This remains lower-authority documentation drift and did not affect the selected Sprint 45 work.
 - Other agents' SUMMARY/BLOCKERS files remain historical branch snapshots with no active blockers impacting this single-agent root run.
 
 ### Next action
 
-Run LOOP.md to begin S45-F3 — AI action eval fixtures.
+Run SPRINT-ROLLOVER.md to close Sprint 45 and queue the next Codex work unit.
 
 ### Scope confirmation
 
