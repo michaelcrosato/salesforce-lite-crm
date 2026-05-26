@@ -12,6 +12,7 @@ import {
   type CampaignFormInitialValues,
   type CampaignOptionItem
 } from "@/components/campaigns/campaign-form";
+import { CampaignPerformanceCard } from "@/components/campaigns/campaign-performance-summary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { formatCurrency, formatDate } from "@/lib/formatters";
+import type { CampaignInfluenceSummary } from "@/lib/services/campaignInfluence";
 
 type BadgeVariant =
   | "default"
@@ -35,6 +37,7 @@ export type DrawerCampaign = CampaignFormInitialValues & {
   ownerName: string | null;
   createdAt: string;
   updatedAt: string;
+  influenceSummary: CampaignInfluenceSummary | null;
 };
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
@@ -190,6 +193,8 @@ export function CampaignDetailDrawer({
               </CardContent>
             </Card>
           )}
+
+          <CampaignPerformanceCard summary={campaign.influenceSummary} />
 
           <Card>
             <CardHeader>

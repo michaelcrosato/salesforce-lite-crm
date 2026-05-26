@@ -1,5 +1,41 @@
 import { expect, test } from "@playwright/test";
 
+test("shows seeded campaign performance summaries in list and drawer", async ({
+  page
+}) => {
+  await page.goto("/campaigns");
+
+  const row = page
+    .getByRole("row")
+    .filter({ hasText: "Spring Fleet Lead Push" });
+  await expect(row).toBeVisible();
+  await expect(row.getByTestId("campaign-row-performance")).toContainText(
+    "7 members"
+  );
+  await expect(row.getByTestId("campaign-row-performance")).toContainText(
+    "$274,000 open pipeline"
+  );
+
+  await row.getByRole("link", { name: "Spring Fleet Lead Push" }).click();
+  await expect(page).toHaveURL(/[?&]campaign=campaign-001/);
+  await expect(page.getByTestId("campaign-summary-performance")).toBeVisible();
+  await expect(page.getByTestId("campaign-metric-members")).toContainText(
+    "7"
+  );
+  await expect(page.getByTestId("campaign-metric-open-pipeline")).toContainText(
+    "$274,000"
+  );
+  await expect(page.getByTestId("campaign-metric-routed-rate")).toContainText(
+    "100%"
+  );
+  await expect(page.getByTestId("campaign-metric-coverage-rate")).toContainText(
+    "67%"
+  );
+  await expect(
+    page.getByTestId("campaign-opportunity-influence").first()
+  ).toContainText("Luma patient intake CRM");
+});
+
 test("create campaign, edit dates, and verify in list", async ({ page }) => {
   const campaignName = `E2E Campaign ${Date.now()}`;
 

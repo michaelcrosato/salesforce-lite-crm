@@ -25,6 +25,10 @@ import {
 import type { CampaignListOptions } from "@/lib/crm/crmClient";
 import { prisma } from "@/lib/prisma";
 import {
+  getCampaignInfluenceSummary,
+  listCampaignInfluenceSummaries
+} from "@/lib/services/campaignInfluence";
+import {
   CAMPAIGN_STATUSES,
   type CampaignStatus
 } from "@/lib/crm/registry";
@@ -214,6 +218,17 @@ export default async function CampaignsPage({
       select: { id: true, name: true }
     })
   ]);
+  const influenceSummaries =
+    campaigns.length > 0
+      ? await listCampaignInfluenceSummaries({
+          campaignIds: campaigns.map((campaign) => campaign.id),
+          limit: campaigns.length,
+          opportunityLimit: 3
+        })
+      : [];
+  const influenceSummaryByCampaignId = new Map(
+    influenceSummaries.map((summary) => [summary.campaignId, summary])
+  );
 
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
 
@@ -234,13 +249,18 @@ export default async function CampaignsPage({
           id: campaign.ownerId,
           name: ownerById.get(campaign.ownerId)?.name ?? "Unassigned"
         }
-      : null
+      : null,
+    influenceSummary: influenceSummaryByCampaignId.get(campaign.id) ?? null
   }));
 
   let drawerCampaign: DrawerCampaign | null = null;
   if (params.campaign) {
     const found = await getCampaign(params.campaign);
     if (found) {
+      const influenceSummary =
+        influenceSummaryByCampaignId.get(found.id) ??
+        (await getCampaignInfluenceSummary(found.id, { opportunityLimit: 5 }));
+
       drawerCampaign = {
         id: found.id,
         name: found.name,
@@ -254,7 +274,8 @@ export default async function CampaignsPage({
           ? ownerById.get(found.ownerId)?.name ?? null
           : null,
         createdAt: found.createdAt.toISOString(),
-        updatedAt: found.updatedAt.toISOString()
+        updatedAt: found.updatedAt.toISOString(),
+        influenceSummary
       };
     }
   }

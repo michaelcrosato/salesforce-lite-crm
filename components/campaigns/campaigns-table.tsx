@@ -2,6 +2,7 @@
 
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import { CampaignPerformanceListSummary } from "@/components/campaigns/campaign-performance-summary";
 import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { ROUTE_REGISTRY, type CampaignStatus } from "@/lib/crm/registry";
 import { formatCurrency, formatDate } from "@/lib/formatters";
+import type { CampaignInfluenceSummary } from "@/lib/services/campaignInfluence";
 
 type BadgeVariant =
   | "default"
@@ -32,6 +34,7 @@ export type CampaignRow = {
   endDate: string | null;
   budget: number | null;
   owner: { id: string; name: string } | null;
+  influenceSummary: CampaignInfluenceSummary | null;
 };
 
 const STATUS_LABELS: Record<CampaignStatus, string> = {
@@ -64,6 +67,7 @@ export function CampaignsTable({ campaigns }: { campaigns: CampaignRow[] }) {
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Performance</TableHead>
             <TableHead>Start date</TableHead>
             <TableHead>End date</TableHead>
             <TableHead>Budget</TableHead>
@@ -86,6 +90,11 @@ export function CampaignsTable({ campaigns }: { campaigns: CampaignRow[] }) {
                 <Badge variant={STATUS_VARIANT[campaign.status]}>
                   {STATUS_LABELS[campaign.status]}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <CampaignPerformanceListSummary
+                  summary={campaign.influenceSummary}
+                />
               </TableCell>
               <TableCell>{formatDate(campaign.startDate)}</TableCell>
               <TableCell>{formatDate(campaign.endDate)}</TableCell>
