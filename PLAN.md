@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.46A |
+| Version | 2.47A |
 
 | Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 40 S40-F1/S40-F2/S40-F3 queued |
+| Active sprint | Sprint 41 S41-F1/S41-F2/S41-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1499,9 +1499,9 @@ Goal: graduate the current read-only CSV import preview into a bounded, operator
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S40-F1 — CSV contact import apply capability matrix | codex | queued | Server-side metadata maps current contact import preview/readiness actions to explicit manual-apply eligibility and blocked reasons. The matrix is deterministic, no-write, and excludes lead routing, updates/upserts, duplicate merge, file storage, and Salesforce integration. |
-| S40-F2 — CSV contact import manual apply executor | codex | queued | An explicit operator-approved server-side executor creates only contact rows classified as create-safe by existing preview/preflight contracts, records audit evidence, and returns row-level created/skipped/blocked outcomes. No lead import apply, routing execution, update/upsert, duplicate merge, file storage, background job, or CRM-CONTRACT drift is added. |
-| S40-F3 — CSV import apply operator UI | codex | queued | The existing `/reports` CSV import preview surface adds a confirmation-driven contact apply path with visible apply, skipped/blocked, and audit outcomes. No new product route, mapping wizard, persistent upload history, lead routing, Salesforce integration, or global search/deal-detail expansion is added. |
+| S40-F1 — CSV contact import apply capability matrix | codex | done | Server-side metadata maps current contact import preview/readiness actions to explicit manual-apply eligibility and blocked reasons. The matrix is deterministic, no-write, and excludes lead routing, updates/upserts, duplicate merge, file storage, and Salesforce integration. |
+| S40-F2 — CSV contact import manual apply executor | codex | done | An explicit operator-approved server-side executor creates only contact rows classified as create-safe by existing preview/preflight contracts, records audit evidence, and returns row-level created/skipped/blocked outcomes. No lead import apply, routing execution, update/upsert, duplicate merge, file storage, background job, or CRM-CONTRACT drift is added. |
+| S40-F3 — CSV import apply operator UI | codex | done | The existing `/reports` CSV import preview surface adds a confirmation-driven contact apply path with visible apply, skipped/blocked, and audit outcomes. No new product route, mapping wizard, persistent upload history, lead routing, Salesforce integration, or global search/deal-detail expansion is added. |
 
 \*\*Sprint 40 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1532,6 +1532,46 @@ Goal: graduate the current read-only CSV import preview into a bounded, operator
 \- No Salesforce integration, external enrichment, network calls, provider secrets, or webhooks.
 
 \- No new product route or CRM-CONTRACT route/entity/status/adapter changes.
+
+\*\*Sprint 41 — Campaign Influence Lite\*\*
+
+Goal: promote the campaign-member and influence-lite backlog into the existing campaign workflow without adding new routes, external integrations, or attribution automation.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S41-F1 — Campaign member model foundation | codex | queued | Add an explicit CampaignMember foundation for contacts/leads participating in campaigns, keeping existing campaign create/update flows compatible and CRM contract references aligned. Tests cover member creation/query behavior and audit-safe service patterns without auth, Salesforce sync, or new routes. |
+| S41-F2 — Campaign influence summaries | codex | queued | Add deterministic helpers that summarize campaign member counts, related opportunity value, and influence-lite metrics from local CRM data. Output is bounded and test-covered, with no automated attribution engine, opportunity line-item work, report-builder persistence, or external enrichment. |
+| S41-F3 — Campaign performance UI | codex | queued | Existing `/campaigns` list and `/campaigns?campaign=<id>` drawer surfaces show member and influence summaries with focused e2e coverage. No new product route, campaign-member CRUD page, report/dashboard builder, Salesforce sync, or search expansion is added. |
+
+\*\*Sprint 41 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No standalone campaign-member route, campaign-member CRUD page, or new navigation surface.
+
+\- No Salesforce integration, external campaign sync, webhooks, external enrichment, provider secrets, or network calls.
+
+\- No automated multi-touch attribution engine, opportunity line items, products, price books, quote generation, or transactional email.
+
+\- No report builder, dashboard builder, persistent forecast scenario, saved report definition, or dedicated analytics route.
+
+\- No routing execution, routing reassignment, pacing-engine changes, lead disposition state expansion, dealer capacity rules, or area/order CRUD.
 
 
 \## 5. File Ownership Matrix
