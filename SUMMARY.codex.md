@@ -1,37 +1,37 @@
 Agent: Codex
 
-Sprint: 39
+Sprint: 40
 
-Feature: S39-F3 - Workflow execution operator UI
+Feature: S40-F1 - CSV contact import apply capability matrix
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- 30b9ea5 - [codex] S39-F3: add workflow execution operator UI
+- 30825ab - [codex] sprint 40: plan codex track
+- 8c8ce54 - [codex] sprint 40: backlog refresh
 
-Gate status: PASS - Phase 0 baseline passed install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (87 files / 447 tests), and build. Phase 4 checks passed lint, typecheck, `npm run test` (87 files / 447 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed). Phase 5 full local gate via `scripts/local-gate.ps1` passed install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (87 files / 447 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
+Gate status: PASS - Phase 0 baseline passed git status/branch/log, install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (87 files / 447 tests), and build. Phase 4 planning verification passed lint, typecheck, `npm run test` (87 files / 447 tests), and build.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T17:18:26.2530439-07:00
+Timestamp: 2026-05-25T18:06:54.8708052-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added a confirmed workflow execution server action on the existing reports action surface, backed by the S39-F2 manual executor and the current catalog example contracts.
-- Extended the `/reports` workflow dry-run operator with an explicit confirmation panel, execution submit action, and visible executed/blocked/failed/audit rollups, action rows, record outcome rows, and write-flag indicators.
-- Updated `e2e/reports.spec.ts` to cover the workflow execution confirmation path and blocked/no-audit outcome from the current seeded catalog example.
-- Reconciled coordination context: PLAN §4 still lists S39-F1, S39-F2, and S39-F3 as queued, but recent implementation/report commits and green gates on `main` support treating Sprint 39 as complete.
+- Confirmed Sprint 39 completion from Codex SUMMARY evidence, zero active Codex blockers, recent S39 implementation/report commits, and a green Phase 0 baseline.
+- Marked S39-F1, S39-F2, and S39-F3 done in `PLAN.md`, bumped Document Control to 2.46A, and queued Sprint 40 S40-F1/S40-F2/S40-F3 for CSV contact import apply.
+- Synced `docs/FEATURE-BACKLOG.md` so S39 is done, S40 is queued, and deferred CSV write scope reflects the new contact-create manual apply track.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md to refresh PLAN §4 and queue the next valid work unit.
+Run LOOP.md to begin S40-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; historical ownership zones were advisory)
+No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and Codex reports)
 
 CRM-CONTRACT.md honored: YES
