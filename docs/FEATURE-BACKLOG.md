@@ -96,9 +96,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S39-F1 | Workflow execution capability matrix | Codex | done |
 | S39-F2 | Workflow manual executor foundation | Codex | done |
 | S39-F3 | Workflow execution operator UI | Codex | done |
-| S40-F1 | CSV contact import apply capability matrix | Codex | queued |
-| S40-F2 | CSV contact import manual apply executor | Codex | queued |
-| S40-F3 | CSV import apply operator UI | Codex | queued |
+| S40-F1 | CSV contact import apply capability matrix | Codex | done |
+| S40-F2 | CSV contact import manual apply executor | Codex | done |
+| S40-F3 | CSV import apply operator UI | Codex | done |
+| S41-F1 | Campaign member model foundation | Codex | queued |
+| S41-F2 | Campaign influence summaries | Codex | queued |
+| S41-F3 | Campaign performance UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
@@ -118,7 +121,7 @@ The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 - Postgres cutover as the default runtime.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
-- CSV writes remain deferred except for the queued S40 contact-create manual
+- CSV writes remain deferred except for the S40 contact-create manual
   apply track. Lead import apply, routing execution, contact update/upsert,
   duplicate merge, file storage, mapping wizard, persistent CSV release-note/
   acceptance/verification/fixture/snapshot/walkthrough/scorecard/handoff/
