@@ -114,9 +114,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S45-F1 | AI action intent registry | Codex | done |
 | S45-F2 | AI action review packets | Codex | done |
 | S45-F3 | AI action eval fixtures | Codex | done |
-| S46-F1 | AI action readiness digest | Codex | queued |
-| S46-F2 | AI action review operator panel | Codex | queued |
-| S46-F3 | AI action review guardrail coverage | Codex | queued |
+| S46-F1 | AI action readiness digest | Codex | done |
+| S46-F2 | AI action review operator panel | Codex | done |
+| S46-F3 | AI action review guardrail coverage | Codex | done |
+| S47-F1 | Approval policy registry | Codex | queued |
+| S47-F2 | Approval review packets | Codex | queued |
+| S47-F3 | Approval readiness operator surface | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
