@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 40
 
-Feature: S40-F2 - CSV contact import manual apply executor
+Feature: S40-F3 - CSV import apply operator UI
 
 Branch: main
 
-Timestamp: 2026-05-25T19:28:39.5649972-07:00
+Timestamp: 2026-05-25T20:49:02.6694201-07:00
 
 Escalation required: NO
 
