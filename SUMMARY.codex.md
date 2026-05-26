@@ -6,35 +6,33 @@ Feature: S43-F1 - Knowledge article route contract
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- 535d8f9 - [codex] sprint 43: plan codex track
-- 5c25039 - [codex] sprint 43: backlog refresh
+- cbb8da5 - [codex] S43-F1: add knowledge route contract
 
-Gate status: PASS - Baseline `scripts/local-gate.ps1` passed before planning, including lint, typecheck, unit tests, build, Playwright install, and e2e. Post-plan checks also passed: `npm run lint`, `npm run typecheck`, `npm run test` (91 files / 466 tests), and `npm run build`.
+Gate status: PASS - Baseline and post-change `scripts/local-gate.ps1` both passed. Post-change gate included npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (92 files / 468 tests), build, Playwright chromium install, and e2e (24 tests).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T02:30:21.3414468-07:00
+Timestamp: 2026-05-26T02:46:12.3004173-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the full Phase 0 local gate successfully before any planning edits.
-- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the last 30 days of git history.
-- Marked Sprint 42 Codex features S42-F1, S42-F2, and S42-F3 done in PLAN.md based on existing green implementation/report evidence.
-- Planned Sprint 43 for Codex with S43-F1/S43-F2/S43-F3 queued around a bounded Knowledge Operator Workspace track.
-- Synced docs/FEATURE-BACKLOG.md so Sprint 42 is done and Sprint 43 is queued.
-- Verified planning did not change runtime behavior with lint, typecheck, unit tests, and build.
+- Ran the full Phase 0 local gate successfully before implementation.
+- Promoted `KnowledgeArticle` route metadata to the CRM contract with `/knowledge` and `/knowledge?article=<id>` while keeping standalone `/knowledge/[id]` detail routes excluded.
+- Added `KnowledgeArticle` registry metadata plus `ROUTE_REGISTRY.knowledgeArticles` and `ROUTE_REGISTRY.knowledgeArticleDetail`.
+- Added focused registry/feature-flag tests for the knowledge route contract and excluded-route stability.
+- Re-ran the full local gate successfully after the implementation.
 
 ### Next action
 
-Run LOOP.md to begin S43-F1.
+Run LOOP.md to begin S43-F2 - Knowledge article operator workspace.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; writes limited to the prompt-allowed planning/report files)
+No cross-ownership edits: YES (single-agent root mode; historical zones were advisory)
 
 CRM-CONTRACT.md honored: YES
