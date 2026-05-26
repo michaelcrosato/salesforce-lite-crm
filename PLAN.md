@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.48A |
+| Version | 2.49A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 42 S42-F1/S42-F2/S42-F3 queued |
+| Active sprint | Sprint 43 S43-F1/S43-F2/S43-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1580,9 +1580,9 @@ Goal: close the campaign influence-lite operational gaps by making campaign memb
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S42-F1 — Campaign member removal and availability contracts | codex | queued | Server-side campaign-member helpers expose deterministic available-member lists and remove-member operations for existing contacts/leads, with audit evidence and focused tests. Existing campaign create/update behavior remains compatible; no standalone campaign-member route, bulk segmentation builder, Salesforce sync, or external enrichment is added. |
-| S42-F2 — Campaign ROI rollup summaries | codex | queued | Campaign influence summaries include budget-aware rollups derived from existing `Campaign.budget` and related local opportunity values, with deterministic handling for missing budget and zero-value cases. Tests cover bounded output and the existing campaign UI surfaces display the new rollups without attribution automation, opportunity line items, products, quotes, or report-builder persistence. |
-| S42-F3 — Campaign member operator controls | codex | queued | Existing `/campaigns` and `/campaigns?campaign=<id>` surfaces let operators add and remove existing contact/lead campaign members with bounded controls, feedback, and focused e2e coverage. No new product route, standalone campaign-member CRUD page, saved audience definition, Salesforce sync, or global search expansion is added. |
+| S42-F1 — Campaign member removal and availability contracts | codex | done | Server-side campaign-member helpers expose deterministic available-member lists and remove-member operations for existing contacts/leads, with audit evidence and focused tests. Existing campaign create/update behavior remains compatible; no standalone campaign-member route, bulk segmentation builder, Salesforce sync, or external enrichment is added. |
+| S42-F2 — Campaign ROI rollup summaries | codex | done | Campaign influence summaries include budget-aware rollups derived from existing `Campaign.budget` and related local opportunity values, with deterministic handling for missing budget and zero-value cases. Tests cover bounded output and the existing campaign UI surfaces display the new rollups without attribution automation, opportunity line items, products, quotes, or report-builder persistence. |
+| S42-F3 — Campaign member operator controls | codex | done | Existing `/campaigns` and `/campaigns?campaign=<id>` surfaces let operators add and remove existing contact/lead campaign members with bounded controls, feedback, and focused e2e coverage. No new product route, standalone campaign-member CRUD page, saved audience definition, Salesforce sync, or global search expansion is added. |
 
 \*\*Sprint 42 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1613,6 +1613,47 @@ Goal: close the campaign influence-lite operational gaps by making campaign memb
 \- No report builder, dashboard builder, persistent forecast scenario, saved report definition, or dedicated analytics route.
 
 \- No routing execution, routing reassignment, pacing-engine changes, lead disposition state expansion, dealer capacity rules, or area/order CRUD.
+
+
+\*\*Sprint 43 — Knowledge Operator Workspace\*\*
+
+Goal: promote local service-workflow knowledge articles into a bounded operator workspace while preserving deterministic case assist behavior and external-provider guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S43-F1 — Knowledge article route contract | codex | queued | Promote `KnowledgeArticle` from service-only case-assist support to an explicit `/knowledge` product route contract and registry surface, with focused tests for route metadata and excluded-route stability. Implementation updates must keep existing case assist behavior compatible and must not add global search expansion, external providers, RAG, or standalone article detail routes. |
+| S43-F2 — Knowledge article operator workspace | codex | queued | Add a read-oriented `/knowledge` workspace using existing knowledge article services, filters, article detail drawer context, and focused e2e coverage. The workspace surfaces local article status, audience, category, queue, keywords, and case-assist context without adding customer portals, external knowledge sources, command-palette expansion, or article write controls. |
+| S43-F3 — Knowledge article lifecycle controls | codex | queued | Add bounded create/update/publish/archive controls for local service-workflow articles from the existing knowledge workspace, with validation, audit feedback, and tests. No external sync, provider calls, public publishing, global search expansion, standalone article detail route, or case/routing/pacing behavior changes are added. |
+
+\*\*Sprint 43 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No external knowledge provider, RAG/vector search, web crawling, provider credentials, or network calls.
+
+\- No customer-facing knowledge portal, public article publishing workflow, email/chat/channel deflection, or Salesforce Knowledge sync.
+
+\- No product route beyond `/knowledge` and the `/knowledge?article=<id>` drawer flow.
+
+\- No knowledge article inclusion in header search, command-palette search, or a dedicated search page.
+
+\- No case SLA changes, routing execution, routing reassignment, pacing-engine changes, lead disposition state expansion, dealer capacity rules, or area/order CRUD.
 
 
 \## 5. File Ownership Matrix
