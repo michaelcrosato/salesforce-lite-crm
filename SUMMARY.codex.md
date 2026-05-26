@@ -1,38 +1,40 @@
 Agent: Codex
 
-Sprint: 42
+Sprint: 43
 
-Feature: S42-F3 - Campaign member operator controls
+Feature: S43-F1 - Knowledge article route contract
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- f7ce0e8 - [codex] S42-F3: add campaign member operator controls
+- 535d8f9 - [codex] sprint 43: plan codex track
+- 5c25039 - [codex] sprint 43: backlog refresh
 
-Gate status: PASS - Full `scripts/local-gate.ps1` passed after implementation, including `npm run lint`, `npm run typecheck`, `npm run test` (91 files / 466 tests), `npm run build`, and `npm run test:e2e` (23 passed).
+Gate status: PASS - Baseline `scripts/local-gate.ps1` passed before planning, including lint, typecheck, unit tests, build, Playwright install, and e2e. Post-plan checks also passed: `npm run lint`, `npm run typecheck`, `npm run test` (91 files / 466 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T01:44:13.9308815-07:00
+Timestamp: 2026-05-26T02:30:21.3414468-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added campaign-member server actions for adding and removing existing contacts/leads from a campaign through the current `/campaigns` drawer workflow.
-- Loaded current members and bounded available existing members for selected drawer campaigns without adding routes, standalone CRUD pages, audience builders, sync, or search expansion.
-- Added drawer controls with stable selectors: `campaign-member-panel-controls`, `campaign-member-select-add`, `campaign-member-button-add`, `campaign-member-list-current`, `campaign-member-row-current`, and `campaign-member-button-remove`.
-- Extended campaign action Vitest coverage and the campaign e2e smoke to verify add/remove feedback and refreshed member counts.
-- Reconciled PLAN §4 drift: S42-F1 and S42-F2 still appear queued in PLAN, but current `main` has recent green-gate implementation/report commits for both; S42-F3 is now implemented with a green full local gate.
+- Ran the full Phase 0 local gate successfully before any planning edits.
+- Reviewed PLAN.md, CRM-CONTRACT.md, README limitations, docs/decisions.md, all agent SUMMARY/BLOCKERS files, docs/FEATURE-BACKLOG.md, and the last 30 days of git history.
+- Marked Sprint 42 Codex features S42-F1, S42-F2, and S42-F3 done in PLAN.md based on existing green implementation/report evidence.
+- Planned Sprint 43 for Codex with S43-F1/S43-F2/S43-F3 queued around a bounded Knowledge Operator Workspace track.
+- Synced docs/FEATURE-BACKLOG.md so Sprint 42 is done and Sprint 43 is queued.
+- Verified planning did not change runtime behavior with lint, typecheck, unit tests, and build.
 
 ### Next action
 
-Run sprint rollover or the next planning prompt to close/promote Sprint 42; no further Codex S42 feature remains after S42-F3.
+Run LOOP.md to begin S43-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation touched app, component, Vitest, and Playwright files for one coherent feature)
+No cross-ownership edits: YES (single-agent root mode; writes limited to the prompt-allowed planning/report files)
 
 CRM-CONTRACT.md honored: YES

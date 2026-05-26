@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 42
+Sprint: 43
 
-Feature: S42-F3 - Campaign member operator controls
+Feature: S43-F1 - Knowledge article route contract
 
 Branch: main
 
-Timestamp: 2026-05-26T01:44:13.9308815-07:00
+Timestamp: 2026-05-26T02:30:21.3414468-07:00
 
 Escalation required: NO
 
