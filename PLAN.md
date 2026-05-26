@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.49A |
+| Version | 2.50A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 43 S43-F1/S43-F2/S43-F3 queued |
+| Active sprint | Sprint 44 S44-F1/S44-F2/S44-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1621,9 +1621,9 @@ Goal: promote local service-workflow knowledge articles into a bounded operator 
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S43-F1 — Knowledge article route contract | codex | queued | Promote `KnowledgeArticle` from service-only case-assist support to an explicit `/knowledge` product route contract and registry surface, with focused tests for route metadata and excluded-route stability. Implementation updates must keep existing case assist behavior compatible and must not add global search expansion, external providers, RAG, or standalone article detail routes. |
-| S43-F2 — Knowledge article operator workspace | codex | queued | Add a read-oriented `/knowledge` workspace using existing knowledge article services, filters, article detail drawer context, and focused e2e coverage. The workspace surfaces local article status, audience, category, queue, keywords, and case-assist context without adding customer portals, external knowledge sources, command-palette expansion, or article write controls. |
-| S43-F3 — Knowledge article lifecycle controls | codex | queued | Add bounded create/update/publish/archive controls for local service-workflow articles from the existing knowledge workspace, with validation, audit feedback, and tests. No external sync, provider calls, public publishing, global search expansion, standalone article detail route, or case/routing/pacing behavior changes are added. |
+| S43-F1 — Knowledge article route contract | codex | done | Promote `KnowledgeArticle` from service-only case-assist support to an explicit `/knowledge` product route contract and registry surface, with focused tests for route metadata and excluded-route stability. Implementation updates must keep existing case assist behavior compatible and must not add global search expansion, external providers, RAG, or standalone article detail routes. |
+| S43-F2 — Knowledge article operator workspace | codex | done | Add a read-oriented `/knowledge` workspace using existing knowledge article services, filters, article detail drawer context, and focused e2e coverage. The workspace surfaces local article status, audience, category, queue, keywords, and case-assist context without adding customer portals, external knowledge sources, command-palette expansion, or article write controls. |
+| S43-F3 — Knowledge article lifecycle controls | codex | done | Add bounded create/update/publish/archive controls for local service-workflow articles from the existing knowledge workspace, with validation, audit feedback, and tests. No external sync, provider calls, public publishing, global search expansion, standalone article detail route, or case/routing/pacing behavior changes are added. |
 
 \*\*Sprint 43 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1654,6 +1654,45 @@ Goal: promote local service-workflow knowledge articles into a bounded operator 
 \- No knowledge article inclusion in header search, command-palette search, or a dedicated search page.
 
 \- No case SLA changes, routing execution, routing reassignment, pacing-engine changes, lead disposition state expansion, dealer capacity rules, or area/order CRUD.
+
+
+\*\*Sprint 44 — Responsive Accessibility Hardening\*\*
+
+Goal: harden existing CRM surfaces for stable rendering, mobile usability, and accessible operator feedback without adding product scope.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S44-F1 — UI identity and key stability | codex | queued | Existing green e2e coverage no longer emits duplicate React key warnings from current CRM surfaces, with unstable/colliding UI keys replaced by stable identifiers and focused regression coverage where practical. No product routes, search expansion, routing execution, or pacing-engine changes are added. |
+| S44-F2 — Responsive CRM surface audit | codex | queued | Existing high-traffic CRM surfaces are hardened for mobile and desktop layout stability, including bounded overflow, table/drawer readability, and no incoherent text overlap. The work stays on current routes and avoids new workflows, navigation surfaces, or route contract changes. |
+| S44-F3 — Keyboard and accessible-state pass | codex | queued | Existing forms, drawers, and operator controls expose clear accessible names, focus behavior, and deterministic feedback states with focused tests. No auth, permissions model, external accessibility service, or broad dependency change is added. |
+
+\*\*Sprint 44 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No new product routes, route handlers, navigation surfaces, or route contract changes.
+
+\- No new workflow builders, report builders, dashboard builders, saved-view schema changes, custom-field metadata, or search changes.
+
+\- No routing execution, routing reassignment, pacing-engine changes, routing simulator, dealer capacity rules, lead disposition state expansion, or area/order CRUD.
+
+\- No external accessibility service, browser telemetry sink, provider credentials, network calls, or broad dependency modernization.
 
 
 \## 5. File Ownership Matrix
