@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 41
+Sprint: 42
 
-Feature: S41-F3 - Campaign performance UI
+Feature: Sprint 42 planning - Campaign Operations Completion
 
 Branch: main
 
-Timestamp: 2026-05-25T23:44:54.2821779-07:00
+Timestamp: 2026-05-26T00:16:48.7604542-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
+- No active Codex blockers were open at the start of this sprint rollover.

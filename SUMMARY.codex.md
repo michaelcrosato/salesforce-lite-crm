@@ -1,38 +1,38 @@
 Agent: Codex
 
-Sprint: 41
+Sprint: 42
 
-Feature: S41-F3 - Campaign performance UI
+Feature: Sprint 42 planning - Campaign Operations Completion
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- 292deb8 - [codex] S41-F3: add campaign performance UI
+- c1998a0 - [codex] sprint 42: plan codex track
+- 064e3ba - [codex] sprint 42: backlog refresh
 
-Gate status: PASS - Phase 0 baseline passed through `npm run build`; Phase 5 full `scripts/local-gate.ps1` passed npm install, Prisma generate/db push, seed, lint, typecheck, test, build, Playwright Chromium install, and `npm run test:e2e`. Phase 5 evidence: `npm run test` passed 91 files / 460 tests and `npm run test:e2e` passed 23 tests.
+Gate status: PASS - Phase 0 baseline passed through `npm run build`; rollover verification passed `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`. Verification evidence: `npm run test` passed 91 files / 460 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T23:44:54.2821779-07:00
+Timestamp: 2026-05-26T00:16:48.7604542-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added campaign performance UI for S41-F3 on the existing `/campaigns` list and `/campaigns?campaign=<id>` drawer using the deterministic S41-F2 campaign influence summary service.
-- Added `components/campaigns/campaign-performance-summary.tsx` for typed list and drawer presentation of member counts, open pipeline, routed lead rate, opportunity coverage, weighted open value, and bounded top opportunities.
-- Updated `e2e/campaigns.spec.ts` with focused seeded coverage for `campaign-001` (`Spring Fleet Lead Push`) list and drawer performance summaries.
-- Discovered this prompt: PLAN.md §4 still lists S41-F1, S41-F2, and S41-F3 as `queued` even though S41-F1, S41-F2, and now S41-F3 have implementation/report commits and full green local-gate evidence. Treated recent local-gate evidence as authoritative per PLAN.md §2.
-- Discovered this prompt: `SUMMARY.gemini.md` still references a Sprint 5 E2E visual snapshot feature that conflicts with current PLAN.md Sprint 5 history; treated as stale historical context and not blocking root-mode S41 work.
+- Confirmed Sprint 41 Codex work is complete from S41-F1, S41-F2, and S41-F3 report evidence and zero active Codex blockers.
+- Marked S41-F1, S41-F2, and S41-F3 `done` in PLAN.md, bumped PLAN.md to version 2.48A, and set the active sprint to Sprint 42.
+- Queued Sprint 42 Campaign Operations Completion with S42-F1 campaign member removal and availability contracts, S42-F2 campaign ROI rollup summaries, and S42-F3 campaign member operator controls.
+- Synced `docs/FEATURE-BACKLOG.md` so S41 is done and S42 is queued.
 
 ### Next action
 
-Run sprint rollover or merge-readiness reconciliation so PLAN.md §4 can advance beyond the completed Sprint 41 queue.
+Run LOOP.md to begin S42-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; implementation coherently touched campaign route, components, and e2e coverage)
+No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly scoped PLAN.md, docs/FEATURE-BACKLOG.md, SUMMARY.codex.md, and BLOCKERS.codex.md)
 
 CRM-CONTRACT.md honored: YES
