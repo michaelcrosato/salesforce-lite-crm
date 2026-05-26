@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 45
 
-Feature: Sprint rollover planning
+Feature: S45-F1 — AI action intent registry
 
 Branch: main
 
-Timestamp: 2026-05-26T08:29:39.6727568-07:00
+Timestamp: 2026-05-26T08:55:57.6161853-07:00
 
 Escalation required: NO
 
@@ -21,5 +21,5 @@ Escalation required: NO
 
 ### Notes
 
-- `LOOP.md` is not present in this checkout, but rollover was not blocked because the current prompt provided the rollover instructions and the runner context pointed to `scripts/local-gate.ps1` as validation truth.
-- Sprint 45 is queued in `PLAN.md` as preview-only deterministic AI action safety contract work. It excludes external AI providers, product routes/UI, silent writes, agentic execution, auth, deployment, routing execution, dealer/area CRUD, geocoding, Postgres default, persistent forecast scenarios, and global search expansion.
+- S45-F1 is complete and verified with the full local gate.
+- Lower-authority docs still contain older Sprint 33 orientation prose, but PLAN.md §4 and the green local gate were sufficient to select and complete S45-F1. A later documentation consistency unit can address that drift without changing the S45-F1 product surface.
