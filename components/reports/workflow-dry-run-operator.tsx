@@ -3,6 +3,7 @@
 import { type FormEvent, useMemo, useState, useTransition } from "react";
 import {
   AlertTriangle,
+  CheckCircle2,
   ClipboardCheck,
   FileText,
   Play,
@@ -12,8 +13,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import {
+  executeWorkflowRuleOperatorAction,
   previewWorkflowRuleDryRunAction,
-  type WorkflowRuleDryRunActionResult
+  type WorkflowRuleDryRunActionResult,
+  type WorkflowRuleExecutionActionResult
 } from "@/app/reports/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,6 +42,11 @@ import type {
   WorkflowRuleReviewPacketStatus,
   WorkflowRuleReviewPacketWriteFlags
 } from "@/lib/server/workflowRuleReviewPackets";
+import type {
+  WorkflowRuleManualExecutionResult,
+  WorkflowRuleManualExecutionStatus,
+  WorkflowRuleManualExecutionWriteFlags
+} from "@/lib/server/workflowRuleManualExecutor";
 
 type WorkflowDryRunOperatorProps = {
   catalog: WorkflowRuleExampleCatalog;
@@ -61,16 +69,34 @@ const writeFlagLabels = [
   label: string;
 }>;
 
+const executionWriteFlagLabels = [
+  { key: "database", label: "Database" },
+  { key: "crmRecords", label: "CRM records" },
+  { key: "auditEvents", label: "Audit events" },
+  { key: "actionExecution", label: "Action execution" },
+  { key: "routes", label: "Routes" },
+  { key: "externalServices", label: "External services" },
+  { key: "backgroundJobs", label: "Background jobs" },
+  { key: "executorRuns", label: "Executor runs" }
+] satisfies ReadonlyArray<{
+  key: keyof WorkflowRuleManualExecutionWriteFlags;
+  label: string;
+}>;
+
 export function WorkflowDryRunOperator({
   catalog
 }: WorkflowDryRunOperatorProps) {
   const { showToast } = useToast();
   const [isPending, startTransition] = useTransition();
+  const [isExecutePending, startExecuteTransition] = useTransition();
   const [selectedEntity, setSelectedEntity] = useState<WorkflowRuleExampleEntity>(
     catalog.examples[0]?.entity ?? "accounts"
   );
   const [result, setResult] =
     useState<WorkflowRuleDryRunActionResult | null>(null);
+  const [executionConfirmed, setExecutionConfirmed] = useState(false);
+  const [executionResult, setExecutionResult] =
+    useState<WorkflowRuleExecutionActionResult | null>(null);
 
   const selectedExample = useMemo(
     () =>
@@ -85,14 +111,32 @@ export function WorkflowDryRunOperator({
     ? writeFlagLabels.some((flag) => packet.write[flag.key])
     : writeFlagLabels.some((flag) => catalog.write[flag.key]);
 
+  function clearExecutionState() {
+    setExecutionConfirmed(false);
+    setExecutionResult(null);
+  }
+
   function handleEntityChange(nextEntity: WorkflowRuleExampleEntity) {
     setSelectedEntity(nextEntity);
     setResult(null);
+    clearExecutionState();
+  }
+
+  function buildExecutionFormData(): FormData {
+    const formData = new FormData();
+
+    formData.set("exampleEntity", selectedEntity);
+    if (executionConfirmed) {
+      formData.set("confirmExecution", "confirmed");
+    }
+
+    return formData;
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    clearExecutionState();
 
     startTransition(() => {
       void (async () => {
@@ -102,6 +146,24 @@ export function WorkflowDryRunOperator({
           title: actionResult.ok
             ? "Workflow dry run ready"
             : "Workflow dry run failed",
+          description: actionResult.message,
+          variant: actionResult.ok ? "success" : "error"
+        });
+      })();
+    });
+  }
+
+  function handleExecute() {
+    startExecuteTransition(() => {
+      void (async () => {
+        const actionResult = await executeWorkflowRuleOperatorAction(
+          buildExecutionFormData()
+        );
+        setExecutionResult(actionResult);
+        showToast({
+          title: actionResult.ok
+            ? "Workflow execution complete"
+            : "Workflow execution failed",
           description: actionResult.message,
           variant: actionResult.ok ? "success" : "error"
         });
@@ -232,6 +294,22 @@ export function WorkflowDryRunOperator({
       </Card>
 
       {packet ? <WorkflowDryRunResult packet={packet} /> : null}
+      {packet ? (
+        <WorkflowExecutionConfirmation
+          packet={packet}
+          confirmed={executionConfirmed}
+          executionResult={executionResult}
+          isPending={isExecutePending}
+          onConfirmedChange={(checked) => {
+            setExecutionConfirmed(checked);
+            setExecutionResult(null);
+          }}
+          onExecute={handleExecute}
+        />
+      ) : null}
+      {executionResult?.ok ? (
+        <WorkflowExecutionResult execution={executionResult.execution} />
+      ) : null}
     </section>
   );
 }
@@ -416,6 +494,258 @@ function WorkflowDryRunResult({ packet }: { packet: WorkflowRuleReviewPacket }) 
   );
 }
 
+function WorkflowExecutionConfirmation({
+  packet,
+  confirmed,
+  executionResult,
+  isPending,
+  onConfirmedChange,
+  onExecute
+}: {
+  packet: WorkflowRuleReviewPacket;
+  confirmed: boolean;
+  executionResult: WorkflowRuleExecutionActionResult | null;
+  isPending: boolean;
+  onConfirmedChange: (checked: boolean) => void;
+  onExecute: () => void;
+}) {
+  const executionError =
+    executionResult && !executionResult.ok ? executionResult : null;
+  const confirmationError = executionError?.fieldErrors?.confirmation?.[0];
+  const targetError =
+    executionError?.fieldErrors?.target?.[0] ??
+    executionError?.fieldErrors?.exampleEntity?.[0];
+
+  return (
+    <Card data-testid="workflow-execution-confirmation-panel">
+      <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+        <div className="space-y-1.5">
+          <CardTitle>Workflow Execution</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Review packet ready for{" "}
+            {formatNumber(packet.dryRun.proposedActions.length)} proposed
+            actions. Execution writes supported local mutations and audit
+            events.
+          </p>
+        </div>
+        <Badge
+          variant={
+            packet.affectedObjects.matchedRecordCount > 0 ? "warning" : "outline"
+          }
+        >
+          {packet.affectedObjects.matchedRecordCount > 0 ? "ready" : "blocked"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <label className="flex items-start gap-3 rounded-md border bg-muted/20 px-3 py-3 text-sm">
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(event) => onConfirmedChange(event.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-input"
+            data-testid="workflow-execution-confirm-checkbox"
+          />
+          <span>
+            Confirm manual execution for this workflow dry-run result.
+          </span>
+        </label>
+        <FieldError message={confirmationError} />
+        {targetError ? (
+          <p
+            className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            data-testid="workflow-execution-error"
+          >
+            {targetError}
+          </p>
+        ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            {formatNumber(packet.affectedObjects.returnedRecordCount)} returned
+            records are evaluated by the manual executor.
+          </p>
+          <Button
+            type="button"
+            variant="destructive"
+            loading={isPending}
+            disabled={!confirmed}
+            onClick={onExecute}
+            data-testid="workflow-execution-submit"
+          >
+            <Play className="h-4 w-4" aria-hidden="true" />
+            {isPending ? "Executing..." : "Execute workflow"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function WorkflowExecutionResult({
+  execution
+}: {
+  execution: WorkflowRuleManualExecutionResult;
+}) {
+  const records = execution.actions.flatMap((action) => action.records);
+
+  return (
+    <div className="space-y-4" data-testid="workflow-execution-result-panel">
+      <div className="grid gap-4 md:grid-cols-4">
+        <SummaryCard
+          icon={CheckCircle2}
+          label="Executed"
+          value={formatNumber(execution.summary.executedRecordActionCount)}
+          testId="workflow-execution-rollup-executed"
+        />
+        <SummaryCard
+          icon={AlertTriangle}
+          label="Blocked"
+          value={formatNumber(execution.summary.blockedActionCount)}
+          testId="workflow-execution-rollup-blocked"
+        />
+        <SummaryCard
+          icon={AlertTriangle}
+          label="Failed"
+          value={formatNumber(execution.summary.failedRecordActionCount)}
+          testId="workflow-execution-rollup-failed"
+        />
+        <SummaryCard
+          icon={ClipboardCheck}
+          label="Audit events"
+          value={formatNumber(execution.summary.auditEventCount)}
+          testId="workflow-execution-rollup-audit-events"
+        />
+      </div>
+
+      <Card>
+        <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle>Execution Feedback</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {formatToken(execution.summary.entity)} workflow:{" "}
+              {formatNumber(execution.summary.proposedActionCount)} proposed
+              actions, {formatNumber(execution.summary.executedActionCount)}
+              {" "}executed actions.
+            </p>
+          </div>
+          <Badge variant={executionStatusVariant(execution.status)}>
+            {execution.status}
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <Metric
+              label="Approved"
+              value={execution.approval.approved ? "on" : "off"}
+            />
+            <Metric
+              label="Did mutate"
+              value={execution.summary.didMutate ? "on" : "off"}
+            />
+            <Metric
+              label="Manual executor"
+              value={execution.safety.manualExecutorOnly ? "on" : "off"}
+            />
+          </div>
+
+          <Table data-testid="workflow-execution-action-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Action</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Executed</TableHead>
+                <TableHead>Blocked</TableHead>
+                <TableHead>Audit events</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {execution.actions.map((action) => (
+                <TableRow key={action.action}>
+                  <TableCell className="font-medium">{action.label}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        action.status === "executed" ? "success" : "warning"
+                      }
+                    >
+                      {formatToken(action.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatNumber(action.executedCount)}</TableCell>
+                  <TableCell>{formatNumber(action.blockedCount)}</TableCell>
+                  <TableCell>{formatNumber(action.auditEventCount)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          <Table data-testid="workflow-execution-record-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Record</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Affected</TableHead>
+                <TableHead>Audit event</TableHead>
+                <TableHead>Message</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {records.length > 0 ? (
+                records.map((record) => (
+                  <TableRow key={`${record.action}-${record.id}`}>
+                    <TableCell className="font-medium">{record.label}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={record.executed ? "success" : "warning"}
+                      >
+                        {formatToken(record.executionStatus)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {record.affectedEntityType && record.affectedRecordId
+                        ? `${record.affectedEntityType}: ${record.affectedRecordId}`
+                        : "Not changed"}
+                    </TableCell>
+                    <TableCell>{record.auditEventId ?? "Not recorded"}</TableCell>
+                    <TableCell>
+                      <span className="block max-w-[28rem] truncate">
+                        {record.error ?? record.message}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5}>
+                    No record actions were attempted.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <div
+        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+        data-testid="workflow-execution-write-flags"
+      >
+        {executionWriteFlagLabels.map((flag) => (
+          <div
+            key={flag.key}
+            className="rounded-md border bg-muted/20 px-3 py-2 text-sm"
+          >
+            <span className="font-medium">{flag.label}</span>
+            {" "}
+            <span className="ml-2 text-muted-foreground">
+              {execution.write[flag.key] ? "on" : "off"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WarningCard({
   warning
 }: {
@@ -487,6 +817,19 @@ function statusVariant(status: WorkflowRuleReviewPacketStatus) {
       return "success";
     case "review":
       return "warning";
+  }
+}
+
+function executionStatusVariant(status: WorkflowRuleManualExecutionStatus) {
+  switch (status) {
+    case "completed":
+      return "success";
+    case "partial":
+      return "warning";
+    case "blocked":
+      return "outline";
+    case "failed":
+      return "danger";
   }
 }
 

@@ -30,6 +30,10 @@ import {
   getWorkflowRuleReviewPacket,
   type WorkflowRuleReviewPacket
 } from "@/lib/server/workflowRuleReviewPackets";
+import {
+  executeWorkflowRuleManually,
+  type WorkflowRuleManualExecutionResult
+} from "@/lib/server/workflowRuleManualExecutor";
 
 export type CsvImportPreviewActionResult =
   | {
@@ -97,8 +101,26 @@ export type WorkflowRuleDryRunActionResult =
       };
     };
 
+export type WorkflowRuleExecutionActionResult =
+  | {
+      ok: true;
+      message: string;
+      execution: WorkflowRuleManualExecutionResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        confirmation?: string[];
+        exampleEntity?: string[];
+        target?: string[];
+      };
+    };
+
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
 const BULK_EXECUTION_CONFIRMATION_VALUE = "confirmed";
+const WORKFLOW_EXECUTION_CONFIRMATION_VALUE = "confirmed";
+const WORKFLOW_EXECUTION_ACTOR_USER_ID = "user-ava";
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -381,6 +403,71 @@ export async function previewWorkflowRuleDryRunAction(
       message: "The workflow dry-run review packet could not be built.",
       fieldErrors: {
         target: ["Review the selected workflow example."]
+      }
+    };
+  }
+}
+
+export async function executeWorkflowRuleOperatorAction(
+  formData: FormData
+): Promise<WorkflowRuleExecutionActionResult> {
+  const confirmation = formString(formData, "confirmExecution");
+  const exampleEntity = formString(formData, "exampleEntity");
+
+  if (confirmation !== WORKFLOW_EXECUTION_CONFIRMATION_VALUE) {
+    return {
+      ok: false,
+      message: "Confirm execution before running the workflow action.",
+      fieldErrors: {
+        confirmation: ["Confirm execution before running the workflow action."]
+      }
+    };
+  }
+
+  if (!isWorkflowRuleExampleEntity(exampleEntity)) {
+    return {
+      ok: false,
+      message: "Choose a supported workflow example.",
+      fieldErrors: {
+        exampleEntity: ["Choose a supported workflow example."]
+      }
+    };
+  }
+
+  const example = getWorkflowRuleExampleContract(exampleEntity);
+
+  if (example === null) {
+    return {
+      ok: false,
+      message: "The workflow example could not be found.",
+      fieldErrors: {
+        exampleEntity: ["The workflow example could not be found."]
+      }
+    };
+  }
+
+  try {
+    const execution = await executeWorkflowRuleManually({
+      ...example.rule,
+      approval: {
+        approved: true,
+        actorUserId: WORKFLOW_EXECUTION_ACTOR_USER_ID,
+        approvedAt: new Date(),
+        note: `Operator confirmed ${example.label} from the reports workflow panel.`
+      }
+    });
+
+    return {
+      ok: true,
+      message: `${example.entityLabel} workflow execution: ${execution.summary.executedRecordActionCount} executed, ${execution.summary.blockedActionCount} blocked actions, ${execution.summary.auditEventCount} audit events.`,
+      execution
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The workflow execution could not be completed.",
+      fieldErrors: {
+        target: ["Review the selected workflow example and dry-run packet."]
       }
     };
   }

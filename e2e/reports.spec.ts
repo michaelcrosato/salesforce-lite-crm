@@ -257,6 +257,38 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   await expect(page.getByTestId("workflow-dry-run-write-flags")).toContainText(
     "Action execution off"
   );
+  await expect(
+    page.getByTestId("workflow-execution-confirmation-panel")
+  ).toBeVisible();
+  await expect(page.getByTestId("workflow-execution-submit")).toBeDisabled();
+  await page.getByTestId("workflow-execution-confirm-checkbox").check();
+  await expect(page.getByTestId("workflow-execution-submit")).toBeEnabled();
+  await page.getByTestId("workflow-execution-submit").click();
+  await expect(page.getByTestId("workflow-execution-result-panel")).toBeVisible();
+  await expect(
+    page.getByTestId("workflow-execution-rollup-executed")
+  ).toContainText("0");
+  await expect(
+    page.getByTestId("workflow-execution-rollup-blocked")
+  ).toContainText("3");
+  await expect(page.getByTestId("workflow-execution-rollup-failed")).toContainText(
+    "0"
+  );
+  await expect(
+    page.getByTestId("workflow-execution-rollup-audit-events")
+  ).toContainText("0");
+  await expect(page.getByTestId("workflow-execution-action-table")).toContainText(
+    "blocked"
+  );
+  await expect(page.getByTestId("workflow-execution-record-table")).toContainText(
+    "No record actions were attempted."
+  );
+  await expect(page.getByTestId("workflow-execution-write-flags")).toContainText(
+    "Database on"
+  );
+  await expect(page.getByTestId("workflow-execution-write-flags")).toContainText(
+    "Audit events on"
+  );
 
   await expect(page.getByTestId("csv-export-operator")).toBeVisible();
   await expect(page.getByTestId("csv-export-summary-supported")).toContainText(
