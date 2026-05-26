@@ -1,42 +1,38 @@
 Agent: Codex
 
-Sprint: 45
+Sprint: 46
 
-Feature: S45-F3 — AI action eval fixtures
+Feature: S46-F1 — AI action readiness digest
 
 Branch: main
 
-Status: done
+Status: queued
 
 Commits this prompt:
-- a267619 - [codex] S45-F3: add action eval fixtures
+- 0fa3120 - [codex] sprint 46: plan codex track
+- 4c27c09 - [codex] sprint 46: backlog refresh
 
-Gate status: PASS - Pre-flight baseline passed through `npm run build`, targeted checks passed (`npm run test -- tests/ai-action-eval-fixtures.test.ts`, `npm run lint`, `npm run typecheck`, `npm run build`), and post-implementation full local gate passed via `scripts/local-gate.ps1`: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (96 files / 487 tests), build, Playwright chromium install, and e2e (35 tests).
+Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (96 files / 487 tests), build, Playwright chromium install, and e2e (35 tests). Post-planning checks also passed: `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T11:39:00.5844159-07:00
+Timestamp: 2026-05-26T12:30:16.3284255-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/ai/actionEvalFixtures.ts`, a deterministic replay-only fixture catalog for AI action proposals covering supported, invalid-payload, malformed, deferred, and unknown-intent examples.
-- Added `tests/ai-action-eval-fixtures.test.ts` covering fixture metadata, audit output, golden replay outcomes, schema-valid/schema-invalid cases, category indexing, no-write policy flags, and excluded-route guardrails.
-- Committed implementation work atomically and verified the full local gate remains green.
-
-### Discovered this prompt
-
-- `PLAN.md` §4 still lists S45-F1, S45-F2, and S45-F3 as queued even though all three now have implementation commits on `main` with green local-gate evidence. Per §2, current prompt and local gate evidence are higher authority; no PLAN rollover/edit was bundled into S45-F3.
-- `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`, and README roadmap prose still contain older Sprint 33 orientation language. This remains lower-authority documentation drift and did not affect the selected Sprint 45 work.
-- Other agents' SUMMARY/BLOCKERS files remain historical branch snapshots with no active blockers impacting this single-agent root run.
+- Ran Sprint 46 rollover from the single-agent root worktree after confirming the full local gate was green.
+- Marked Sprint 45 Codex features S45-F1, S45-F2, and S45-F3 as `done` in `PLAN.md` using SUMMARY, commit, and local-gate evidence.
+- Appended Sprint 46 to `PLAN.md` with S46-F1, S46-F2, and S46-F3 queued for Codex and permanent non-goals carried forward.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 45 is done and Sprint 46 is queued.
 
 ### Next action
 
-Run SPRINT-ROLLOVER.md to close Sprint 45 and queue the next Codex work unit.
+Run LOOP.md to begin S46-F1.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; historical zones were advisory)
+No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly scoped `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
 
 CRM-CONTRACT.md honored: YES
