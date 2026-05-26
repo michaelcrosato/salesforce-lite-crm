@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: 43
+Sprint: 44
 
-Feature: S43-F3 - Knowledge article lifecycle controls
+Feature: Sprint rollover planning
 
 Branch: main
 
-Timestamp: 2026-05-26T04:39:08.4637419-07:00
+Timestamp: 2026-05-26T05:47:47.5930791-07:00
 
 Escalation required: NO
 
@@ -18,3 +18,7 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
+
+### Notes
+
+- `LOOP.md` is not present in this checkout, but rollover was not blocked because the current prompt provided the rollover instructions and the runner context pointed to `scripts/local-gate.ps1` as validation truth.
