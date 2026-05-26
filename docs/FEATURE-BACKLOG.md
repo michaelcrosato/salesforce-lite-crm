@@ -93,9 +93,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S38-F1 | Workflow rule example contracts | Codex | done |
 | S38-F2 | Workflow dry-run operator UI | Codex | done |
 | S38-F3 | Workflow execution readiness receipts | Codex | done |
-| S39-F1 | Workflow execution capability matrix | Codex | queued |
-| S39-F2 | Workflow manual executor foundation | Codex | queued |
-| S39-F3 | Workflow execution operator UI | Codex | queued |
+| S39-F1 | Workflow execution capability matrix | Codex | done |
+| S39-F2 | Workflow manual executor foundation | Codex | done |
+| S39-F3 | Workflow execution operator UI | Codex | done |
+| S40-F1 | CSV contact import apply capability matrix | Codex | queued |
+| S40-F2 | CSV contact import manual apply executor | Codex | queued |
+| S40-F3 | CSV import apply operator UI | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
@@ -115,10 +118,12 @@ The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 - Postgres cutover as the default runtime.
 - Geocoding or territory polygons.
 - Persistent forecast scenarios.
-- CSV bulk import writes, file storage, mapping wizard, persistent CSV
-  release-note/acceptance/verification/fixture/snapshot/walkthrough/scorecard/
-  handoff/exception/disposition/readiness history, and Salesforce-connected
-  import/export remain deferred; server helpers exist under `lib/server` and
+- CSV writes remain deferred except for the queued S40 contact-create manual
+  apply track. Lead import apply, routing execution, contact update/upsert,
+  duplicate merge, file storage, mapping wizard, persistent CSV release-note/
+  acceptance/verification/fixture/snapshot/walkthrough/scorecard/handoff/
+  exception/disposition/readiness history, and Salesforce-connected import/
+  export remain deferred; server helpers exist under `lib/server` and
   `lib/business`.
 - Lead to Account + Contact + Opportunity conversion. Consumer leads route to
   dealer orders in this vertical.
