@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 42
 
-Feature: S42-F2 - Campaign ROI rollup summaries
+Feature: S42-F3 - Campaign member operator controls
 
 Branch: main
 
-Timestamp: 2026-05-26T01:07:32.5771915-07:00
+Timestamp: 2026-05-26T01:44:13.9308815-07:00
 
 Escalation required: NO
 
