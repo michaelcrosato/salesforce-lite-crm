@@ -99,9 +99,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S40-F1 | CSV contact import apply capability matrix | Codex | done |
 | S40-F2 | CSV contact import manual apply executor | Codex | done |
 | S40-F3 | CSV import apply operator UI | Codex | done |
-| S41-F1 | Campaign member model foundation | Codex | queued |
-| S41-F2 | Campaign influence summaries | Codex | queued |
-| S41-F3 | Campaign performance UI | Codex | queued |
+| S41-F1 | Campaign member model foundation | Codex | done |
+| S41-F2 | Campaign influence summaries | Codex | done |
+| S41-F3 | Campaign performance UI | Codex | done |
+| S42-F1 | Campaign member removal and availability contracts | Codex | queued |
+| S42-F2 | Campaign ROI rollup summaries | Codex | queued |
+| S42-F3 | Campaign member operator controls | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
