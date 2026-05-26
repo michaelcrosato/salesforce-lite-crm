@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 47
 
-Feature: Local gate repair - transient e2e failure verification
+Feature: S47-F1 — Approval policy registry
 
 Branch: main
 
-Timestamp: 2026-05-26T15:29:51.7571746-07:00
+Timestamp: 2026-05-26T15:46:52.0760928-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- The reported `npm run test:e2e` failure with exit code `-1073740791` did not reproduce. Direct `npm run test:e2e` passed with 39 tests, and the full `scripts/local-gate.ps1` passed afterward. No active blocker remains.
+- None. No active Codex blockers were open, and S47-F1 completed with a green full local gate.
