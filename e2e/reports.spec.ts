@@ -318,10 +318,11 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     "2"
   );
 
+  const csvApplyEmail = `csv.safe.${Date.now()}@e2e.example.test`;
   await page.getByTestId("csv-import-input").fill(
     [
       "First Name,Last Name,Email,Status,Phone",
-      "Csv,Safe,csv.safe.e2e@example.test,active,604-555-0201",
+      `Csv,Safe,${csvApplyEmail},active,604-555-0201`,
       "Maya,Singh,MAYA.SINGH@NORTHSTARFREIGHT.EXAMPLE,active,303-555-0101",
       ",Broken,csv.broken.e2e@example.test,active,604-555-0203"
     ].join("\n")
@@ -346,5 +347,49 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   );
   await expect(page.getByTestId("csv-import-write-flags")).toContainText(
     "Import apply off"
+  );
+  await expect(
+    page.getByTestId("csv-import-apply-confirmation-panel")
+  ).toBeVisible();
+  await expect(page.getByTestId("csv-import-apply-submit")).toBeDisabled();
+  await page.getByTestId("csv-import-apply-confirm-checkbox").check();
+  await expect(page.getByTestId("csv-import-apply-submit")).toBeEnabled();
+  await page.getByTestId("csv-import-apply-submit").click();
+  await expect(page.getByTestId("csv-import-apply-result-panel")).toBeVisible();
+  await expect(
+    page.getByTestId("csv-import-apply-rollup-created")
+  ).toContainText("1");
+  await expect(
+    page.getByTestId("csv-import-apply-rollup-skipped")
+  ).toContainText("1");
+  await expect(
+    page.getByTestId("csv-import-apply-rollup-blocked")
+  ).toContainText("1");
+  await expect(
+    page.getByTestId("csv-import-apply-rollup-audit-events")
+  ).toContainText("1");
+  await expect(page.getByTestId("csv-import-apply-row-results")).toContainText(
+    "Csv Safe"
+  );
+  await expect(page.getByTestId("csv-import-apply-row-results")).toContainText(
+    "created"
+  );
+  await expect(page.getByTestId("csv-import-apply-row-results")).toContainText(
+    "skipped"
+  );
+  await expect(page.getByTestId("csv-import-apply-row-results")).toContainText(
+    "blocked"
+  );
+  await expect(page.getByTestId("csv-import-apply-write-flags")).toContainText(
+    "Database on"
+  );
+  await expect(page.getByTestId("csv-import-apply-write-flags")).toContainText(
+    "Audit events on"
+  );
+  await expect(page.getByTestId("csv-import-apply-write-flags")).toContainText(
+    "Leads off"
+  );
+  await expect(page.getByTestId("csv-import-apply-write-flags")).toContainText(
+    "Routing assignments off"
   );
 });

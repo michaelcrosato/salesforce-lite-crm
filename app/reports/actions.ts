@@ -6,6 +6,10 @@ import {
   type CsvDedupeReviewBundle
 } from "@/lib/server/csvDedupeReviewBundles";
 import {
+  executeCsvContactImportApply,
+  type CsvContactImportManualApplyResult
+} from "@/lib/server/csvImportApplyExecutor";
+import {
   BULK_ACTION_DRY_RUN_REVIEW_PACKET_ACTIONS,
   getBulkActionDryRunReviewPacket,
   isBulkActionDryRunReviewPacketEntity,
@@ -47,6 +51,23 @@ export type CsvImportPreviewActionResult =
       fieldErrors?: {
         csv?: string[];
         entity?: string[];
+      };
+    };
+
+export type CsvImportApplyActionResult =
+  | {
+      ok: true;
+      message: string;
+      execution: CsvContactImportManualApplyResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        confirmation?: string[];
+        csv?: string[];
+        entity?: string[];
+        target?: string[];
       };
     };
 
@@ -118,6 +139,8 @@ export type WorkflowRuleExecutionActionResult =
     };
 
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
+const CSV_IMPORT_APPLY_CONFIRMATION_VALUE = "confirmed";
+const CSV_IMPORT_APPLY_ACTOR_USER_ID = "user-ava";
 const BULK_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_ACTOR_USER_ID = "user-ava";
@@ -357,6 +380,73 @@ export async function previewCsvImportReviewAction(
     return {
       ok: false,
       message: "The CSV preview could not be built."
+    };
+  }
+}
+
+export async function executeCsvImportApplyOperatorAction(
+  formData: FormData
+): Promise<CsvImportApplyActionResult> {
+  const confirmation = formString(formData, "confirmApply");
+  const entity = formString(formData, "entity");
+  const csv = formString(formData, "csv");
+
+  if (confirmation !== CSV_IMPORT_APPLY_CONFIRMATION_VALUE) {
+    return {
+      ok: false,
+      message: "Confirm contact apply before creating CSV contacts.",
+      fieldErrors: {
+        confirmation: ["Confirm contact apply before creating CSV contacts."]
+      }
+    };
+  }
+
+  if (entity !== "contacts") {
+    return {
+      ok: false,
+      message: "CSV apply is available for contact create-safe rows only.",
+      fieldErrors: {
+        entity: ["CSV apply is available for contact create-safe rows only."]
+      }
+    };
+  }
+
+  if (csv.trim().length === 0) {
+    return {
+      ok: false,
+      message: "Paste or select a CSV file before applying.",
+      fieldErrors: {
+        csv: ["Paste or select a CSV file before applying."]
+      }
+    };
+  }
+
+  try {
+    const approvedAt = new Date();
+    const execution = await executeCsvContactImportApply({
+      entity: "contacts",
+      csv,
+      generatedAt: approvedAt,
+      approval: {
+        approved: true,
+        actorUserId: CSV_IMPORT_APPLY_ACTOR_USER_ID,
+        approvedAt,
+        note: "Operator confirmed contact CSV import apply from reports."
+      }
+    });
+
+    return {
+      ok: true,
+      message: `Contact CSV apply: ${execution.summary.createdRows} created, ${execution.summary.skippedRows} skipped, ${execution.summary.blockedRows} blocked.`,
+      execution
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The contact CSV apply could not be completed.",
+      fieldErrors: {
+        target: ["Review the contact CSV preview before applying."]
+      }
     };
   }
 }
