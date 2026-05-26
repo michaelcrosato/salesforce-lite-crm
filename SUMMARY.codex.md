@@ -2,32 +2,33 @@ Agent: Codex
 
 Sprint: 41
 
-Feature: S41-F1 - Campaign member service foundation
+Feature: S41-F2 - Campaign influence summaries
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- f91a3a5 - [codex] S41-F1: add campaign member service foundation
+- 1bb3bf7 - [codex] S41-F2: add campaign influence summaries
 
-Gate status: PASS - Phase 0 baseline passed through `npm run build`; Phase 5 verification passed `npm run typecheck`, `npm run test` (90 files / 456 tests), and `npm run build`. Full `scripts/local-gate.ps1` also passed: npm install, Prisma generate/db push, seed, lint, typecheck, test, build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
+Gate status: PASS - Phase 0 baseline and Phase 5 verification both passed full `scripts/local-gate.ps1`: npm install, Prisma generate/db push, seed, lint, typecheck, test, build, Playwright Chromium install, and `npm run test:e2e`. Phase 5 evidence: `npm run test` passed 91 files / 460 tests and `npm run test:e2e` passed 22 tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T22:00:08.7075999-07:00
+Timestamp: 2026-05-25T22:45:11.2459124-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/services/campaignMembers.ts` with a validated server-side CampaignMember service over existing campaign Contact/Lead relations, including deterministic member rows, idempotent duplicate handling, existing detail routes, and campaign audit metadata.
-- Added `tests/api/campaignMembers.test.ts` covering mixed contact/lead member creation and listing, repeated member adds, audit metadata, and invalid input rejection.
+- Added `lib/services/campaignInfluence.ts` with deterministic campaign influence summaries over existing campaign contact/lead relations, contact-linked opportunities, routed-lead evidence, bounded top opportunities, member/source/status counts, and no attribution automation or external calls.
+- Added `tests/api/campaignInfluence.test.ts` covering mixed contact/lead members, opportunity value metrics, influence-lite rates, empty campaigns, bounded selected-campaign lists, and invalid ID rejection.
+- Discovered this prompt: PLAN.md §4 still lists S41-F1 as `queued` even though Codex has implementation/report commits and a full green local gate for S41-F1. Treated recent local-gate evidence as authoritative and continued with S41-F2.
 - Discovered this prompt: `SUMMARY.gemini.md` still references a Sprint 5 E2E visual snapshot feature that conflicts with current PLAN.md Sprint 5 history; treated as stale historical context and not blocking root-mode S41 work.
 
 ### Next action
 
-Run LOOP.md for S41-F2 - Campaign influence summaries.
+Run LOOP.md for S41-F3 - Campaign performance UI.
 
 ### Scope confirmation
 
