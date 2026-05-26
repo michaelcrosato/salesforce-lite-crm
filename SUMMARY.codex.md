@@ -6,27 +6,28 @@ Feature: S44-F2 — Responsive CRM surface audit
 
 Branch: main
 
-Status: blocked
+Status: repaired
 
 Commits this prompt:
-- none
+- bc6e14b
 
-Gate status: FAIL — pre-flight baseline passed through `npm run build`; implementation verification passed `npm run build` and `npx playwright install chromium`, but `npm run test:e2e` exited 1 after the bounded repair loop. See `BLOCKERS.codex.md` #1.
+Gate status: PASS — `scripts/local-gate.ps1` completed successfully after the implementation commit. A preceding rerun hit transient Vitest timeouts in `tests/api/csv-release-readiness-packets.test.ts`; the focused file and full `npm run test` both passed before the final green local gate.
 
-DoD self-check: FAIL
+DoD self-check: PASS
 
-Timestamp: 2026-05-26T06:37:52.8685372-07:00
+Timestamp: 2026-05-26T07:20:16.4748881-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Selected S44-F2 responsive shell/table containment and added scoped uncommitted changes, but stopped before an implementation commit because the new responsive e2e coverage still found page-level horizontal overflow after the bounded repair loop.
-- Filed a gate blocker with the failing command, final errors, dirty implementation paths, suspected cause, and safe next action.
+- Repaired S44-F2 responsive overflow by containing mobile shell navigation, shared card/table scroll regions, list selected-export controls, and dense report operator grids with `min-w-0`, constrained scroll containers, and `minmax(0,1fr)` grid tracks.
+- Removed redundant absolute `sr-only` pacing status text from the dealer orders table because `PacingBar` already renders the status label; the hidden absolute element was contributing document-level horizontal scroll from inside the local table scroll region.
+- Added `e2e/responsive-layout.spec.ts` coverage for current CRM routes at mobile and desktop widths.
 
 ### Next action
 
-Resume S44-F2 from `BLOCKERS.codex.md` #1 by diagnosing the `/orders` mobile and `/reports` desktop overflow elements, then rerun the e2e gate.
+Continue Sprint 44 from `PLAN.md` after confirming no new blockers are introduced by the next prompt.
 
 ### Scope confirmation
 
