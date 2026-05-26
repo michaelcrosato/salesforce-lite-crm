@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.52A |
+| Version | 2.53A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 46 S46-F1/S46-F2/S46-F3 queued |
+| Active sprint | Sprint 47 S47-F1/S47-F2/S47-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1740,9 +1740,9 @@ Goal: expose the completed AI action safety contracts through deterministic no-w
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S46-F1 — AI action readiness digest | codex | queued | Server-side readiness digest composes the S45 intent registry, review-packet audit, and eval-fixture audit into deterministic status metadata with sample proposal references and explicit no-write/no-execution flags. No product UI, action executor, audit persistence, provider call, route change, or database write is added. |
-| S46-F2 — AI action review operator panel | codex | queued | The existing `/reports` surface exposes a no-write AI action review panel that can preview supported, blocked, deferred, and malformed proposals, showing readiness, payload issues, approval/audit expectations, and safety flags. The panel depends on S46-F1 and must not execute actions, create records, call providers, or add new routes. |
-| S46-F3 — AI action review guardrail coverage | codex | queued | Focused tests and e2e coverage prove the reports panel stays no-write, displays all major review statuses, preserves excluded-route boundaries, and keeps Sprint 45 eval fixtures aligned with the operator surface. No broad visual redesign, external provider mocks, routing/pacing changes, or dealer-order/area behavior changes are added. |
+| S46-F1 — AI action readiness digest | codex | done | Server-side readiness digest composes the S45 intent registry, review-packet audit, and eval-fixture audit into deterministic status metadata with sample proposal references and explicit no-write/no-execution flags. No product UI, action executor, audit persistence, provider call, route change, or database write is added. |
+| S46-F2 — AI action review operator panel | codex | done | The existing `/reports` surface exposes a no-write AI action review panel that can preview supported, blocked, deferred, and malformed proposals, showing readiness, payload issues, approval/audit expectations, and safety flags. The panel depends on S46-F1 and must not execute actions, create records, call providers, or add new routes. |
+| S46-F3 — AI action review guardrail coverage | codex | done | Focused tests and e2e coverage prove the reports panel stays no-write, displays all major review statuses, preserves excluded-route boundaries, and keeps Sprint 45 eval fixtures aligned with the operator surface. No broad visual redesign, external provider mocks, routing/pacing changes, or dealer-order/area behavior changes are added. |
 
 \*\*Sprint 46 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1769,6 +1769,42 @@ Goal: expose the completed AI action safety contracts through deterministic no-w
 \- No provider calls, RAG/vector search, web crawling, provider credentials, network calls, transactional email provider, calendar sync, Salesforce integration, or background jobs.
 
 \- No new product routes, route handlers, feature-flag promotions, search expansion, routing execution, routing reassignment, pacing-engine changes, dealer capacity rules, or lead disposition state expansion.
+
+\*\*Sprint 47 — Approval Readiness Foundation\*\*
+
+Goal: add deterministic no-write approval readiness contracts for high-risk CRM and AI-action proposal classes without enforcing approvals, executing actions, or adding auth/integration scope.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S47-F1 — Approval policy registry | codex | queued | A metadata-only approval policy registry defines supported approval subjects, risk levels, reviewer labels, evidence requirements, audit expectations, and explicit blocked capabilities for high-risk CRM and AI-action proposal classes. No authentication, role model, persistence, approval enforcement, executor, route, UI, external provider, or database write is added. |
+| S47-F2 — Approval review packets | codex | queued | Server-side review packets evaluate representative CRM and AI-action proposals against the S47-F1 registry, returning deterministic approval-needed, blocked, and not-needed summaries with evidence and audit expectations. Packets are no-write and do not approve, reject, execute, mutate records, persist approvals, call providers, or schedule jobs. |
+| S47-F3 — Approval readiness operator surface | codex | queued | The existing `/reports` surface exposes a no-write approval readiness view with registry coverage, sample review-packet outcomes, and guardrail messaging, backed by focused tests/e2e coverage. The surface must not add routes, approve/reject controls, mutation controls, provider calls, auth/permission behavior, or database writes. |
+
+\*\*Sprint 47 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No approval persistence, approve/reject workflow, reviewer assignment workflow, role/permission model, mutation gating, stage-change enforcement, or scheduled approval sweeps.
+
+\- No AI action executor, agentic writes, silent writes, autonomous actions, provider calls, transactional email provider, calendar sync, Salesforce integration, RAG/vector search, web crawling, provider credentials, network calls, or background jobs.
+
+\- No new product routes, route handlers, feature-flag promotions, search expansion, routing execution, routing reassignment, pacing-engine changes, dealer capacity rules, lead disposition state expansion, or area/order CRUD.
 
 \## 5. File Ownership Matrix
 
