@@ -2,32 +2,35 @@ Agent: Codex
 
 Sprint: 44
 
-Feature: S44-F2 — Responsive CRM surface audit
+Feature: S44-F3 — Keyboard and accessible-state pass
 
 Branch: main
 
-Status: repaired
+Status: done
 
 Commits this prompt:
-- bc6e14b
+- 268821f — [codex] S44-F3: add accessible drawer semantics
 
-Gate status: PASS — `scripts/local-gate.ps1` completed successfully after the implementation commit. A preceding rerun hit transient Vitest timeouts in `tests/api/csv-release-readiness-packets.test.ts`; the focused file and full `npm run test` both passed before the final green local gate.
+Gate status: PASS — `npx playwright test e2e/drawer-accessibility.spec.ts` passed 5/5, then `scripts/local-gate.ps1` completed successfully through e2e.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T07:20:16.4748881-07:00
+Timestamp: 2026-05-26T07:46:27.5642890-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Repaired S44-F2 responsive overflow by containing mobile shell navigation, shared card/table scroll regions, list selected-export controls, and dense report operator grids with `min-w-0`, constrained scroll containers, and `minmax(0,1fr)` grid tracks.
-- Removed redundant absolute `sr-only` pacing status text from the dealer orders table because `PacingBar` already renders the status label; the hidden absolute element was contributing document-level horizontal scroll from inside the local table scroll region.
-- Added `e2e/responsive-layout.spec.ts` coverage for current CRM routes at mobile and desktop widths.
+- Added modal dialog semantics, stable title relationships, named close controls, and deterministic initial focus to the existing deal, task, case, campaign, and knowledge article detail drawers.
+- Added Playwright coverage that opens seeded drawers by keyboard, verifies `role="dialog"`/`aria-modal`, verifies close-button focus, and closes each drawer from the keyboard.
+
+### Discovered this prompt
+
+- `PLAN.md` §4 still lists S44-F1 and S44-F2 as queued even though recent Codex commits and green gate reports show both slices implemented on `main`; S44-F3 is now also implemented and gate-green.
 
 ### Next action
 
-Continue Sprint 44 from `PLAN.md` after confirming no new blockers are introduced by the next prompt.
+Run sprint rollover or planning refresh for the next queued scope; do not invent additional Sprint 44 feature work.
 
 ### Scope confirmation
 
