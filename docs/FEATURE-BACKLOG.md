@@ -102,9 +102,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S41-F1 | Campaign member model foundation | Codex | done |
 | S41-F2 | Campaign influence summaries | Codex | done |
 | S41-F3 | Campaign performance UI | Codex | done |
-| S42-F1 | Campaign member removal and availability contracts | Codex | queued |
-| S42-F2 | Campaign ROI rollup summaries | Codex | queued |
-| S42-F3 | Campaign member operator controls | Codex | queued |
+| S42-F1 | Campaign member removal and availability contracts | Codex | done |
+| S42-F2 | Campaign ROI rollup summaries | Codex | done |
+| S42-F3 | Campaign member operator controls | Codex | done |
+| S43-F1 | Knowledge article route contract | Codex | queued |
+| S43-F2 | Knowledge article operator workspace | Codex | queued |
+| S43-F3 | Knowledge article lifecycle controls | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
