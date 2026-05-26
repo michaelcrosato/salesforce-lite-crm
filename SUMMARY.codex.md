@@ -2,36 +2,35 @@ Agent: Codex
 
 Sprint: 41
 
-Feature: S41-F1 - Campaign member model foundation
+Feature: S41-F1 - Campaign member service foundation
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- 540aa5d - [codex] sprint 41: plan codex track
-- e45c0e3 - [codex] sprint 41: backlog refresh
+- f91a3a5 - [codex] S41-F1: add campaign member service foundation
 
-Gate status: PASS - Phase 0 baseline passed `scripts/local-gate.ps1` including npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (89 files / 453 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed). Phase 4 planning verification passed lint, typecheck, `npm run test` (89 files / 453 tests), and build.
+Gate status: PASS - Phase 0 baseline passed through `npm run build`; Phase 5 verification passed `npm run typecheck`, `npm run test` (90 files / 456 tests), and `npm run build`. Full `scripts/local-gate.ps1` also passed: npm install, Prisma generate/db push, seed, lint, typecheck, test, build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T21:40:57.2914243-07:00
+Timestamp: 2026-05-25T22:00:08.7075999-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Confirmed Sprint 40 completion from Codex SUMMARY evidence, recent S40 implementation/report commits on `main`, zero active Codex blockers, and a green Phase 0 baseline.
-- Marked S40-F1, S40-F2, and S40-F3 done in `PLAN.md`, bumped Document Control to 2.47A, and queued Sprint 41 S41-F1/S41-F2/S41-F3 for Campaign Influence Lite.
-- Synced `docs/FEATURE-BACKLOG.md` so S40 is done, S41 is queued, and deferred CSV write scope reflects the completed S40 contact-create manual apply track.
+- Added `lib/services/campaignMembers.ts` with a validated server-side CampaignMember service over existing campaign Contact/Lead relations, including deterministic member rows, idempotent duplicate handling, existing detail routes, and campaign audit metadata.
+- Added `tests/api/campaignMembers.test.ts` covering mixed contact/lead member creation and listing, repeated member adds, audit metadata, and invalid input rejection.
+- Discovered this prompt: `SUMMARY.gemini.md` still references a Sprint 5 E2E visual snapshot feature that conflicts with current PLAN.md Sprint 5 history; treated as stale historical context and not blocking root-mode S41 work.
 
 ### Next action
 
-Run LOOP.md to begin S41-F1.
+Run LOOP.md for S41-F2 - Campaign influence summaries.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and Codex reports)
+No cross-ownership edits: YES (single-agent root mode; implementation touched service and test files only)
 
 CRM-CONTRACT.md honored: YES
