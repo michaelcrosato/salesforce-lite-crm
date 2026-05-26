@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.47A |
+| Version | 2.48A |
 
-| Last updated | 2026-05-25 |
+| Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 41 S41-F1/S41-F2/S41-F3 queued |
+| Active sprint | Sprint 42 S42-F1/S42-F2/S42-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1539,9 +1539,9 @@ Goal: promote the campaign-member and influence-lite backlog into the existing c
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S41-F1 — Campaign member model foundation | codex | queued | Add an explicit CampaignMember foundation for contacts/leads participating in campaigns, keeping existing campaign create/update flows compatible and CRM contract references aligned. Tests cover member creation/query behavior and audit-safe service patterns without auth, Salesforce sync, or new routes. |
-| S41-F2 — Campaign influence summaries | codex | queued | Add deterministic helpers that summarize campaign member counts, related opportunity value, and influence-lite metrics from local CRM data. Output is bounded and test-covered, with no automated attribution engine, opportunity line-item work, report-builder persistence, or external enrichment. |
-| S41-F3 — Campaign performance UI | codex | queued | Existing `/campaigns` list and `/campaigns?campaign=<id>` drawer surfaces show member and influence summaries with focused e2e coverage. No new product route, campaign-member CRUD page, report/dashboard builder, Salesforce sync, or search expansion is added. |
+| S41-F1 — Campaign member model foundation | codex | done | Add an explicit CampaignMember foundation for contacts/leads participating in campaigns, keeping existing campaign create/update flows compatible and CRM contract references aligned. Tests cover member creation/query behavior and audit-safe service patterns without auth, Salesforce sync, or new routes. |
+| S41-F2 — Campaign influence summaries | codex | done | Add deterministic helpers that summarize campaign member counts, related opportunity value, and influence-lite metrics from local CRM data. Output is bounded and test-covered, with no automated attribution engine, opportunity line-item work, report-builder persistence, or external enrichment. |
+| S41-F3 — Campaign performance UI | codex | done | Existing `/campaigns` list and `/campaigns?campaign=<id>` drawer surfaces show member and influence summaries with focused e2e coverage. No new product route, campaign-member CRUD page, report/dashboard builder, Salesforce sync, or search expansion is added. |
 
 \*\*Sprint 41 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1564,6 +1564,47 @@ Goal: promote the campaign-member and influence-lite backlog into the existing c
 \- No global search expansion.
 
 \- No standalone campaign-member route, campaign-member CRUD page, or new navigation surface.
+
+\- No Salesforce integration, external campaign sync, webhooks, external enrichment, provider secrets, or network calls.
+
+\- No automated multi-touch attribution engine, opportunity line items, products, price books, quote generation, or transactional email.
+
+\- No report builder, dashboard builder, persistent forecast scenario, saved report definition, or dedicated analytics route.
+
+\- No routing execution, routing reassignment, pacing-engine changes, lead disposition state expansion, dealer capacity rules, or area/order CRUD.
+
+
+\*\*Sprint 42 — Campaign Operations Completion\*\*
+
+Goal: close the campaign influence-lite operational gaps by making campaign membership and budget-aware performance actionable inside the existing campaign workflow.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S42-F1 — Campaign member removal and availability contracts | codex | queued | Server-side campaign-member helpers expose deterministic available-member lists and remove-member operations for existing contacts/leads, with audit evidence and focused tests. Existing campaign create/update behavior remains compatible; no standalone campaign-member route, bulk segmentation builder, Salesforce sync, or external enrichment is added. |
+| S42-F2 — Campaign ROI rollup summaries | codex | queued | Campaign influence summaries include budget-aware rollups derived from existing `Campaign.budget` and related local opportunity values, with deterministic handling for missing budget and zero-value cases. Tests cover bounded output and the existing campaign UI surfaces display the new rollups without attribution automation, opportunity line items, products, quotes, or report-builder persistence. |
+| S42-F3 — Campaign member operator controls | codex | queued | Existing `/campaigns` and `/campaigns?campaign=<id>` surfaces let operators add and remove existing contact/lead campaign members with bounded controls, feedback, and focused e2e coverage. No new product route, standalone campaign-member CRUD page, saved audience definition, Salesforce sync, or global search expansion is added. |
+
+\*\*Sprint 42 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No standalone campaign-member route, campaign-member CRUD page, saved audience builder, or new navigation surface.
 
 \- No Salesforce integration, external campaign sync, webhooks, external enrichment, provider secrets, or network calls.
 
