@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   deleteCaseAction,
   updateCaseQueueAction,
@@ -130,12 +130,21 @@ export function CaseDetailDrawer({
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const focusedCaseId = crmCase?.id;
+
+  useEffect(() => {
+    if (focusedCaseId) {
+      closeButtonRef.current?.focus();
+    }
+  }, [focusedCaseId]);
 
   if (!crmCase) {
     return null;
   }
 
   const activeCaseId = crmCase.id;
+  const drawerTitleId = `case-detail-title-${activeCaseId}`;
 
   function moveStatus(status: string) {
     startTransition(() => {
@@ -187,18 +196,34 @@ export function CaseDetailDrawer({
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/30"
-        aria-label="Close case detail"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={onClose}
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl">
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={drawerTitleId}
+        className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b bg-background p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
               Case Detail
             </p>
-            <h2 className="mt-1 text-xl font-semibold">{crmCase.subject}</h2>
+            <h2 id={drawerTitleId} className="mt-1 text-xl font-semibold">
+              {crmCase.subject}
+            </h2>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+          <Button
+            ref={closeButtonRef}
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Close case detail"
+            data-testid="case-drawer-close"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>

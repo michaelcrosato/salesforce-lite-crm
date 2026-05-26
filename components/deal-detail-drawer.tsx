@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { moveDealAction } from "@/app/deals/actions";
 import {
@@ -77,6 +77,14 @@ export function DealDetailDrawer({
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const focusedDealId = deal?.id;
+
+  useEffect(() => {
+    if (focusedDealId) {
+      closeButtonRef.current?.focus();
+    }
+  }, [focusedDealId]);
 
   if (!deal) {
     return null;
@@ -84,6 +92,7 @@ export function DealDetailDrawer({
 
   const activeDeal = deal;
   const activeDealId = activeDeal.id;
+  const drawerTitleId = `deal-detail-title-${activeDealId}`;
 
   function moveStage(stage: DealStage) {
     startTransition(() => {
@@ -107,18 +116,34 @@ export function DealDetailDrawer({
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/30"
-        aria-label="Close deal detail"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={onClose}
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl">
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={drawerTitleId}
+        className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b bg-background p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
               Deal Detail
             </p>
-            <h2 className="mt-1 text-xl font-semibold">{activeDeal.name}</h2>
+            <h2 id={drawerTitleId} className="mt-1 text-xl font-semibold">
+              {activeDeal.name}
+            </h2>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+          <Button
+            ref={closeButtonRef}
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Close deal detail"
+            data-testid="deal-drawer-close"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>

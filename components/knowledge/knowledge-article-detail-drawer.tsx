@@ -2,7 +2,7 @@
 
 import { Archive, Pencil, Send, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   archiveKnowledgeArticleAction,
   publishKnowledgeArticleAction
@@ -90,12 +90,21 @@ export function KnowledgeArticleDetailDrawer({
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const focusedArticleId = article?.id;
+
+  useEffect(() => {
+    if (focusedArticleId) {
+      closeButtonRef.current?.focus();
+    }
+  }, [focusedArticleId]);
 
   if (!article) {
     return null;
   }
 
   const activeArticleId = article.id;
+  const drawerTitleId = `knowledge-detail-title-${activeArticleId}`;
 
   function handlePublish() {
     startTransition(() => {
@@ -130,16 +139,24 @@ export function KnowledgeArticleDetailDrawer({
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/30"
-        aria-label="Close knowledge article detail"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={onClose}
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl">
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={drawerTitleId}
+        className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b bg-background p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
               Article Detail
             </p>
-            <h2 className="mt-1 text-xl font-semibold">{article.title}</h2>
+            <h2 id={drawerTitleId} className="mt-1 text-xl font-semibold">
+              {article.title}
+            </h2>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge variant={STATUS_VARIANT[article.status]}>
                 {STATUS_LABELS[article.status]}
@@ -149,7 +166,15 @@ export function KnowledgeArticleDetailDrawer({
               </Badge>
             </div>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+          <Button
+            ref={closeButtonRef}
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Close knowledge article detail"
+            data-testid="knowledge-drawer-close"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>

@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteTaskAction, updateTaskStatusAction } from "@/app/tasks/actions";
 import {
   TaskForm,
@@ -70,12 +70,21 @@ export function TaskDetailDrawer({
   const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const focusedTaskId = task?.id;
+
+  useEffect(() => {
+    if (focusedTaskId) {
+      closeButtonRef.current?.focus();
+    }
+  }, [focusedTaskId]);
 
   if (!task) {
     return null;
   }
 
   const activeTaskId = task.id;
+  const drawerTitleId = `task-detail-title-${activeTaskId}`;
 
   function moveStatus(status: string) {
     startTransition(() => {
@@ -113,18 +122,34 @@ export function TaskDetailDrawer({
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/30"
-        aria-label="Close task detail"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={onClose}
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl">
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={drawerTitleId}
+        className="absolute right-0 top-0 flex h-full w-full max-w-2xl flex-col overflow-y-auto border-l bg-background shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b bg-background p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
               Task Detail
             </p>
-            <h2 className="mt-1 text-xl font-semibold">{task.title}</h2>
+            <h2 id={drawerTitleId} className="mt-1 text-xl font-semibold">
+              {task.title}
+            </h2>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={onClose}>
+          <Button
+            ref={closeButtonRef}
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Close task detail"
+            data-testid="task-drawer-close"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
