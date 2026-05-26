@@ -95,8 +95,8 @@ export function AuditCoverageOperator({
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(16rem,22rem)_1fr]">
-        <div className="space-y-3">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]">
+        <div className="min-w-0 space-y-3">
           {manifest.entities.map((entity) => (
             <Card
               key={entity.entity}
@@ -130,7 +130,7 @@ export function AuditCoverageOperator({
           ))}
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Category Rollup</CardTitle>

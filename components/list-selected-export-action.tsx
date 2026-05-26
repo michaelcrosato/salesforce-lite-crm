@@ -290,7 +290,7 @@ export function ListSelectedExportAction({
 
   return (
     <section
-      className={cn("mb-4 rounded-md border bg-muted/30 p-3", className)}
+      className={cn("mb-4 min-w-0 rounded-md border bg-muted/30 p-3", className)}
       data-testid={`${exportTestIdPrefix}-panel`}
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -338,7 +338,7 @@ export function ListSelectedExportAction({
         </div>
       </div>
 
-      <div className="mt-3 max-h-44 overflow-y-auto rounded-md border bg-background p-2">
+      <div className="mt-3 max-h-44 min-w-0 overflow-y-auto rounded-md border bg-background p-2">
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {visibleRecords.map((record) => (
             <label
@@ -386,7 +386,7 @@ export function ListSelectedExportAction({
 
         {activeExecutionAction ? (
           <>
-            <div className="grid gap-3 lg:grid-cols-[16rem_1fr_auto] lg:items-end">
+            <div className="grid min-w-0 gap-3 lg:grid-cols-[16rem_minmax(0,1fr)_auto] lg:items-end">
               <div className="space-y-2">
                 <Label htmlFor={`${executionTestIdPrefix}-action`}>
                   Action

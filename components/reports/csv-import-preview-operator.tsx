@@ -243,7 +243,7 @@ export function CsvImportPreviewOperator({
           <CardTitle>Preview Input</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4 lg:grid-cols-[18rem_1fr]">
+          <form onSubmit={handleSubmit} className="grid min-w-0 gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="csv-import-entity">Entity</Label>

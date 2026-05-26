@@ -88,9 +88,9 @@ export function CsvExportOperator({
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(18rem,22rem)_1fr]">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <div
-          className="space-y-2"
+          className="min-w-0 space-y-2"
           data-testid="csv-export-entity-list"
           aria-label="CSV export entities"
         >
@@ -103,7 +103,7 @@ export function CsvExportOperator({
           ))}
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <Card data-testid="csv-export-selected-panel">
             <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
               <div className="space-y-1.5">

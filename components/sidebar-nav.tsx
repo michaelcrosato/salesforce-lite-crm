@@ -81,7 +81,9 @@ export function SidebarNav({ mobile = false, "data-testid": testid }: SidebarNav
   return (
     <nav
       className={cn(
-        mobile ? "flex gap-1 overflow-x-auto p-2" : "flex flex-col gap-1 p-4"
+        mobile
+          ? "flex w-full max-w-full gap-1 overflow-x-auto overscroll-x-contain p-2"
+          : "flex flex-col gap-1 p-4"
       )}
       aria-label="Primary"
       data-testid={testid}
@@ -101,7 +103,7 @@ export function SidebarNav({ mobile = false, "data-testid": testid }: SidebarNav
               active
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-0.5",
-              mobile && "min-w-fit"
+              mobile && "shrink-0"
             )}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />

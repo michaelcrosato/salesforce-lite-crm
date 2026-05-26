@@ -234,7 +234,7 @@ export function WorkflowDryRunOperator({
         <CardContent className="space-y-4">
           <form
             onSubmit={handleSubmit}
-            className="grid gap-4 lg:grid-cols-[minmax(16rem,22rem)_1fr]"
+            className="grid min-w-0 gap-4 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]"
           >
             <div className="space-y-2">
               <Label htmlFor="workflow-dry-run-example">Example</Label>

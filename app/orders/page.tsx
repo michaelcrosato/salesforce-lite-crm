@@ -11,8 +11,7 @@ import {
   type DealerOrderStatus
 } from "@/lib/crm-constants";
 import {
-  expectedDeliveredByToday,
-  getPacingStatus
+  expectedDeliveredByToday
 } from "@/lib/business/dealerOps";
 import { formatDate, formatNumber } from "@/lib/formatters";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
@@ -78,9 +77,9 @@ export default async function OrdersPage() {
         <CardHeader>
           <CardTitle>Pacing Dashboard</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-w-0">
           {orders.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="max-w-full overflow-x-auto overscroll-x-contain">
               <ListSelectedExportAction
                 entity="dealer-orders"
                 entityLabel="Dealer Orders"
@@ -111,7 +110,6 @@ export default async function OrdersPage() {
                       monthlyQuota: order.monthlyQuota,
                       deliveredThisMonth
                     };
-                    const status = getPacingStatus(orderForPacing, now);
 
                     return (
                       <tr
@@ -169,7 +167,6 @@ export default async function OrdersPage() {
                         </td>
                         <td className="w-48 py-3 pr-4">
                           <PacingBar order={orderForPacing} now={now} />
-                          <span className="sr-only">{status}</span>
                         </td>
                         <td className="py-3 pr-4">
                           {formatDate(order.startDate)}
