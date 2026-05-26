@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 41
 
-Feature: S41-F2 - Campaign influence summaries
+Feature: S41-F3 - Campaign performance UI
 
 Branch: main
 
-Timestamp: 2026-05-25T22:45:11.2459124-07:00
+Timestamp: 2026-05-25T23:44:54.2821779-07:00
 
 Escalation required: NO
 
