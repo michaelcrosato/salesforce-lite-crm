@@ -15,6 +15,9 @@ test("shows seeded campaign performance summaries in list and drawer", async ({
   await expect(row.getByTestId("campaign-row-performance")).toContainText(
     "$274,000 open pipeline"
   );
+  await expect(row.getByTestId("campaign-row-performance")).toContainText(
+    "54.8x open / budget"
+  );
 
   await row.getByRole("link", { name: "Spring Fleet Lead Push" }).click();
   await expect(page).toHaveURL(/[?&]campaign=campaign-001/);
@@ -24,6 +27,12 @@ test("shows seeded campaign performance summaries in list and drawer", async ({
   );
   await expect(page.getByTestId("campaign-metric-open-pipeline")).toContainText(
     "$274,000"
+  );
+  await expect(
+    page.getByTestId("campaign-metric-influenced-budget")
+  ).toContainText("54.8x");
+  await expect(page.getByTestId("campaign-metric-won-budget")).toContainText(
+    "-$5,000 net"
   );
   await expect(page.getByTestId("campaign-metric-routed-rate")).toContainText(
     "100%"

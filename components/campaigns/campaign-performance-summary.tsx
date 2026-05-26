@@ -30,6 +30,13 @@ export function CampaignPerformanceListSummary({
         {formatCurrency(summary.opportunityMetrics.openValue)} open pipeline
       </div>
       <div className="text-muted-foreground">
+        {formatBudgetMultiple(
+          summary.roiMetrics.openPipelineToBudget,
+          summary.roiMetrics.status
+        )}{" "}
+        open / budget
+      </div>
+      <div className="text-muted-foreground">
         {formatRate(summary.influenceLite.opportunityCoverageRate)} opportunity
         coverage
       </div>
@@ -76,6 +83,28 @@ export function CampaignPerformanceCard({
             value={formatCurrency(summary.opportunityMetrics.openValue)}
             detail={`${formatNumber(summary.opportunityMetrics.openCount)} open opportunities`}
             testId="campaign-metric-open-pipeline"
+          />
+          <Metric
+            label="Influenced / budget"
+            value={formatBudgetMultiple(
+              summary.roiMetrics.totalInfluencedToBudget,
+              summary.roiMetrics.status
+            )}
+            detail={formatBudgetDetail(
+              summary.roiMetrics.totalInfluencedValue,
+              summary.roiMetrics.budget,
+              "influenced"
+            )}
+            testId="campaign-metric-influenced-budget"
+          />
+          <Metric
+            label="Won / budget"
+            value={formatBudgetMultiple(
+              summary.roiMetrics.wonValueToBudget,
+              summary.roiMetrics.status
+            )}
+            detail={`${formatCurrency(summary.roiMetrics.wonValue)} won / ${formatNetCurrency(summary.roiMetrics.netWonValue)} net`}
+            testId="campaign-metric-won-budget"
           />
           <Metric
             label="Routed lead rate"
@@ -157,6 +186,43 @@ function Metric({
 
 function formatRate(value: number): string {
   return `${Math.round(value * 100)}%`;
+}
+
+function formatBudgetMultiple(
+  value: number | null,
+  status: CampaignInfluenceSummary["roiMetrics"]["status"]
+): string {
+  if (value === null) {
+    return status === "zero_budget" ? "Zero budget" : "No budget";
+  }
+
+  return `${new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 1
+  }).format(value)}x`;
+}
+
+function formatBudgetDetail(
+  value: number,
+  budget: number | null,
+  label: string
+): string {
+  if (budget === null) {
+    return `${formatCurrency(value)} ${label}; no budget set`;
+  }
+
+  return `${formatCurrency(value)} ${label} / ${formatCurrency(budget)} budget`;
+}
+
+function formatNetCurrency(value: number | null): string {
+  if (value === null) {
+    return "No budget";
+  }
+
+  if (value < 0) {
+    return `-${formatCurrency(Math.abs(value))}`;
+  }
+
+  return formatCurrency(value);
 }
 
 function emptyMessage(

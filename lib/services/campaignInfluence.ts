@@ -105,6 +105,19 @@ export type CampaignInfluenceOpportunity = {
   contactName: string;
 };
 
+export type CampaignRoiMetrics = {
+  budget: number | null;
+  status: "budgeted" | "missing_budget" | "zero_budget";
+  totalInfluencedValue: number;
+  openPipelineValue: number;
+  wonValue: number;
+  totalInfluencedToBudget: number | null;
+  openPipelineToBudget: number | null;
+  wonValueToBudget: number | null;
+  netTotalInfluencedValue: number | null;
+  netWonValue: number | null;
+};
+
 export type CampaignInfluenceSummary = {
   campaignId: string;
   campaignName: string;
@@ -140,6 +153,7 @@ export type CampaignInfluenceSummary = {
     opportunitiesPerMember: number;
     openPipelineValuePerMember: number;
   };
+  roiMetrics: CampaignRoiMetrics;
   topOpportunities: CampaignInfluenceOpportunity[];
   emptyReason: "no_members" | "no_related_opportunities" | null;
 };
@@ -251,6 +265,7 @@ function buildCampaignInfluenceSummary(
         memberCounts.total
       )
     },
+    roiMetrics: summarizeRoiMetrics(campaign.budget, opportunityMetrics),
     topOpportunities: sortedOpportunities.slice(0, opportunityLimit),
     emptyReason: emptyReason(memberCounts.total, opportunityMetrics.totalCount)
   };
@@ -317,6 +332,54 @@ function summarizeOpportunities(
       weightedOpenValue: 0
     }
   );
+}
+
+function summarizeRoiMetrics(
+  budget: number | null,
+  opportunityMetrics: CampaignInfluenceSummary["opportunityMetrics"]
+): CampaignRoiMetrics {
+  if (budget === null) {
+    return {
+      budget,
+      status: "missing_budget",
+      totalInfluencedValue: opportunityMetrics.totalValue,
+      openPipelineValue: opportunityMetrics.openValue,
+      wonValue: opportunityMetrics.wonValue,
+      totalInfluencedToBudget: null,
+      openPipelineToBudget: null,
+      wonValueToBudget: null,
+      netTotalInfluencedValue: null,
+      netWonValue: null
+    };
+  }
+
+  if (budget === 0) {
+    return {
+      budget,
+      status: "zero_budget",
+      totalInfluencedValue: opportunityMetrics.totalValue,
+      openPipelineValue: opportunityMetrics.openValue,
+      wonValue: opportunityMetrics.wonValue,
+      totalInfluencedToBudget: null,
+      openPipelineToBudget: null,
+      wonValueToBudget: null,
+      netTotalInfluencedValue: opportunityMetrics.totalValue,
+      netWonValue: opportunityMetrics.wonValue
+    };
+  }
+
+  return {
+    budget,
+    status: "budgeted",
+    totalInfluencedValue: opportunityMetrics.totalValue,
+    openPipelineValue: opportunityMetrics.openValue,
+    wonValue: opportunityMetrics.wonValue,
+    totalInfluencedToBudget: opportunityMetrics.totalValue / budget,
+    openPipelineToBudget: opportunityMetrics.openValue / budget,
+    wonValueToBudget: opportunityMetrics.wonValue / budget,
+    netTotalInfluencedValue: opportunityMetrics.totalValue - budget,
+    netWonValue: opportunityMetrics.wonValue - budget
+  };
 }
 
 function countLabels(labels: string[]): CampaignInfluenceCount[] {

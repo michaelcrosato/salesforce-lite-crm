@@ -66,6 +66,7 @@ describe("campaign influence summaries", () => {
   it("summarizes members, related opportunities, and influence-lite metrics", async () => {
     const campaign = await createCampaign({
       name: "Campaign influence summary",
+      budget: 50_000,
       ownerId
     });
     await addCampaignMembers({
@@ -122,6 +123,18 @@ describe("campaign influence summaries", () => {
         opportunitiesPerMember: 0.75,
         openPipelineValuePerMember: 25_000
       },
+      roiMetrics: {
+        budget: 50_000,
+        status: "budgeted",
+        totalInfluencedValue: 175_000,
+        openPipelineValue: 100_000,
+        wonValue: 25_000,
+        totalInfluencedToBudget: 3.5,
+        openPipelineToBudget: 2,
+        wonValueToBudget: 0.5,
+        netTotalInfluencedValue: 125_000,
+        netWonValue: -25_000
+      },
       emptyReason: null
     });
     expect(summary.topOpportunities.map((opportunity) => opportunity.id)).toEqual([
@@ -176,8 +189,78 @@ describe("campaign influence summaries", () => {
       opportunitiesPerMember: 0,
       openPipelineValuePerMember: 0
     });
+    expect(summary.roiMetrics).toEqual({
+      budget: null,
+      status: "missing_budget",
+      totalInfluencedValue: 0,
+      openPipelineValue: 0,
+      wonValue: 0,
+      totalInfluencedToBudget: null,
+      openPipelineToBudget: null,
+      wonValueToBudget: null,
+      netTotalInfluencedValue: null,
+      netWonValue: null
+    });
     expect(summary.topOpportunities).toEqual([]);
     expect(summary.emptyReason).toBe("no_members");
+  });
+
+  it("returns budgeted zero-value rollups without dividing by members", async () => {
+    const campaign = await createCampaign({
+      name: "Campaign influence zero values",
+      budget: 2_000,
+      ownerId
+    });
+    await addCampaignMembers({
+      campaignId: campaign.id,
+      contactIds: [contactIds[2]],
+      leadIds: []
+    });
+
+    const summary = await getCampaignInfluenceSummary(campaign.id);
+
+    expect(summary.opportunityMetrics.totalValue).toBe(0);
+    expect(summary.roiMetrics).toEqual({
+      budget: 2_000,
+      status: "budgeted",
+      totalInfluencedValue: 0,
+      openPipelineValue: 0,
+      wonValue: 0,
+      totalInfluencedToBudget: 0,
+      openPipelineToBudget: 0,
+      wonValueToBudget: 0,
+      netTotalInfluencedValue: -2_000,
+      netWonValue: -2_000
+    });
+    expect(summary.emptyReason).toBe("no_related_opportunities");
+  });
+
+  it("returns zero-budget rollups without ratio inflation", async () => {
+    const campaign = await createCampaign({
+      name: "Campaign influence zero budget",
+      budget: 0,
+      ownerId
+    });
+    await addCampaignMembers({
+      campaignId: campaign.id,
+      contactIds: [contactIds[0]],
+      leadIds: []
+    });
+
+    const summary = await getCampaignInfluenceSummary(campaign.id);
+
+    expect(summary.roiMetrics).toEqual({
+      budget: 0,
+      status: "zero_budget",
+      totalInfluencedValue: 125_000,
+      openPipelineValue: 100_000,
+      wonValue: 25_000,
+      totalInfluencedToBudget: null,
+      openPipelineToBudget: null,
+      wonValueToBudget: null,
+      netTotalInfluencedValue: 125_000,
+      netWonValue: 25_000
+    });
   });
 
   it("lists bounded summaries for selected campaigns", async () => {
