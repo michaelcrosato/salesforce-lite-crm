@@ -61,9 +61,15 @@ import {
   type CsvReleaseVerificationReadFlags,
   type CsvReleaseVerificationStatusCounts
 } from "@/lib/server/csvReleaseVerificationManifests";
+import { getInFlightCsvPacket } from "@/lib/server/csvInFlightCache";
 
 export const CSV_RELEASE_READINESS_PACKET_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
+
+const readinessPacketCache = new Map<
+  string,
+  Promise<CsvReleaseReadinessPacket>
+>();
 
 export type CsvReleaseReadinessPacketOptions =
   CsvReleaseDispositionManifestOptions;
@@ -1417,119 +1423,123 @@ export function isCsvReleaseReadinessOperation(
 export async function getCsvReleaseReadinessPacket(
   options: CsvReleaseReadinessPacketOptions = {}
 ): Promise<CsvReleaseReadinessPacket> {
-  const [disposition, closure, exception] = await Promise.all([
-    getCsvReleaseDispositionManifest(options),
-    getCsvReleaseClosureScorecard(options),
-    getCsvReleaseExceptionRegister(options)
-  ]);
-  const digest = getCsvContractReleaseDigest();
-  const verification = getCsvReleaseVerificationManifest();
-  const source = buildSource({
-    disposition,
-    digest,
-    verification,
-    closure,
-    exception
-  });
-  const entities = disposition.entities.map((entity) =>
-    buildEntityPacket({
-      disposition: entity,
+  return getInFlightCsvPacket(readinessPacketCache, options, async () => {
+    const [disposition, closure, exception] = await Promise.all([
+      getCsvReleaseDispositionManifest(options),
+      getCsvReleaseClosureScorecard(options),
+      getCsvReleaseExceptionRegister(options)
+    ]);
+    const digest = getCsvContractReleaseDigest();
+    const verification = getCsvReleaseVerificationManifest();
+    const source = buildSource({
+      disposition,
+      digest,
       verification,
       closure,
-      exception,
-      digest,
-      source
-    })
-  );
-  const operations = disposition.operations.map((operation) =>
-    buildOperationPacket({
-      disposition: operation,
-      verification,
-      closure,
-      exception,
-      digest,
-      entityPackets: entities,
-      source
-    })
-  );
-  const items = entities.flatMap((entity) => entity.items);
-  const rollup = itemRollup(items);
-  const warningCodes = uniqueStrings(items.flatMap((item) => item.warningCodes));
-  const sourceCodes = uniqueStrings(items.flatMap((item) => item.sourceCodes));
-  const sourceFingerprints = source.sourceFingerprints;
-  const fingerprint = buildPacketFingerprint({
-    sourceFingerprints,
-    status: rollup.status,
-    entities,
-    operations
-  });
-
-  return {
-    contentType: CSV_RELEASE_READINESS_PACKET_CONTENT_TYPE,
-    packetVersion: 1,
-    status: rollup.status,
-    fingerprint,
-    entityCount: entities.length,
-    operationCount: operations.length,
-    readinessCount: items.length,
-    passReadinessCount: rollup.passReadinessCount,
-    watchReadinessCount: rollup.watchReadinessCount,
-    blockReadinessCount: rollup.blockReadinessCount,
-    supportedReadinessCount: rollup.supportedReadinessCount,
-    unsupportedReadinessCount: rollup.unsupportedReadinessCount,
-    missingFixtureReadinessCount: rollup.missingFixtureReadinessCount,
-    remediationAnchorCount: rollup.remediationAnchorCount,
-    watchRemediationAnchorCount: rollup.watchRemediationAnchorCount,
-    blockRemediationAnchorCount: rollup.blockRemediationAnchorCount,
-    statusCounts: rollup.statusCounts,
-    entityStatusCounts: countStatuses(entities),
-    operationStatusCounts: countStatuses(operations),
-    dispositionStatusCounts: dispositionStatusCounts(disposition.statusCounts),
-    verificationStatusCounts: verificationStatusCounts(
-      verification.entityOperationStatusCounts
-    ),
-    closureStatusCounts: closureStatusCounts(closure.statusCounts),
-    exceptionSeverityCounts: rollup.exceptionSeverityCounts,
-    warningCodes,
-    sourceCodes,
-    releaseConsumerSummary: buildConsumerSummary({
-      title: "CSV release readiness packet",
+      exception
+    });
+    const entities = disposition.entities.map((entity) =>
+      buildEntityPacket({
+        disposition: entity,
+        verification,
+        closure,
+        exception,
+        digest,
+        source
+      })
+    );
+    const operations = disposition.operations.map((operation) =>
+      buildOperationPacket({
+        disposition: operation,
+        verification,
+        closure,
+        exception,
+        digest,
+        entityPackets: entities,
+        source
+      })
+    );
+    const items = entities.flatMap((entity) => entity.items);
+    const rollup = itemRollup(items);
+    const warningCodes = uniqueStrings(
+      items.flatMap((item) => item.warningCodes)
+    );
+    const sourceCodes = uniqueStrings(items.flatMap((item) => item.sourceCodes));
+    const sourceFingerprints = source.sourceFingerprints;
+    const fingerprint = buildPacketFingerprint({
+      sourceFingerprints,
       status: rollup.status,
-      statusCounts: rollup.statusCounts,
+      entities,
+      operations
+    });
+
+    return {
+      contentType: CSV_RELEASE_READINESS_PACKET_CONTENT_TYPE,
+      packetVersion: 1,
+      status: rollup.status,
+      fingerprint,
+      entityCount: entities.length,
+      operationCount: operations.length,
+      readinessCount: items.length,
+      passReadinessCount: rollup.passReadinessCount,
+      watchReadinessCount: rollup.watchReadinessCount,
+      blockReadinessCount: rollup.blockReadinessCount,
+      supportedReadinessCount: rollup.supportedReadinessCount,
+      unsupportedReadinessCount: rollup.unsupportedReadinessCount,
+      missingFixtureReadinessCount: rollup.missingFixtureReadinessCount,
       remediationAnchorCount: rollup.remediationAnchorCount,
+      watchRemediationAnchorCount: rollup.watchRemediationAnchorCount,
+      blockRemediationAnchorCount: rollup.blockRemediationAnchorCount,
+      statusCounts: rollup.statusCounts,
+      entityStatusCounts: countStatuses(entities),
+      operationStatusCounts: countStatuses(operations),
+      dispositionStatusCounts: dispositionStatusCounts(disposition.statusCounts),
+      verificationStatusCounts: verificationStatusCounts(
+        verification.entityOperationStatusCounts
+      ),
+      closureStatusCounts: closureStatusCounts(closure.statusCounts),
+      exceptionSeverityCounts: rollup.exceptionSeverityCounts,
       warningCodes,
-      sourceCodes
-    }),
-    items,
-    entities,
-    operations,
-    sourceFingerprints,
-    sourceContentTypes: uniqueStrings([
-      CSV_RELEASE_READINESS_PACKET_CONTENT_TYPE,
-      disposition.contentType,
-      digest.contentType,
-      verification.contentType,
-      closure.contentType,
-      exception.contentType,
-      ...disposition.sourceContentTypes,
-      ...verification.sourceContentTypes,
-      ...closure.sourceContentTypes,
-      ...exception.sourceContentTypes,
-      ...entities.flatMap((entity) => entity.sourceContentTypes),
-      ...operations.flatMap((operation) => operation.sourceContentTypes)
-    ]),
-    source,
-    read: combineReads([
-      disposition.read,
-      digest.read,
-      verification.read,
-      closure.read,
-      exception.read,
-      ...entities.map((entity) => entity.read),
-      ...operations.map((operation) => operation.read)
-    ]),
-    write: noWrites()
-  };
+      sourceCodes,
+      releaseConsumerSummary: buildConsumerSummary({
+        title: "CSV release readiness packet",
+        status: rollup.status,
+        statusCounts: rollup.statusCounts,
+        remediationAnchorCount: rollup.remediationAnchorCount,
+        warningCodes,
+        sourceCodes
+      }),
+      items,
+      entities,
+      operations,
+      sourceFingerprints,
+      sourceContentTypes: uniqueStrings([
+        CSV_RELEASE_READINESS_PACKET_CONTENT_TYPE,
+        disposition.contentType,
+        digest.contentType,
+        verification.contentType,
+        closure.contentType,
+        exception.contentType,
+        ...disposition.sourceContentTypes,
+        ...verification.sourceContentTypes,
+        ...closure.sourceContentTypes,
+        ...exception.sourceContentTypes,
+        ...entities.flatMap((entity) => entity.sourceContentTypes),
+        ...operations.flatMap((operation) => operation.sourceContentTypes)
+      ]),
+      source,
+      read: combineReads([
+        disposition.read,
+        digest.read,
+        verification.read,
+        closure.read,
+        exception.read,
+        ...entities.map((entity) => entity.read),
+        ...operations.map((operation) => operation.read)
+      ]),
+      write: noWrites()
+    };
+  });
 }
 
 export async function listCsvReleaseReadinessEntityPackets(

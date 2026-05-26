@@ -32,7 +32,11 @@ export function getInFlightCsvPacket<TPacket>(
   }
 
   const pending = load().finally(() => {
-    cache.delete(key);
+    setTimeout(() => {
+      if (cache.get(key) === pending) {
+        cache.delete(key);
+      }
+    }, 0);
   });
 
   cache.set(key, pending);
