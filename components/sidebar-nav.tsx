@@ -3,6 +3,7 @@
 import {
   Activity,
   BarChart3,
+  BookOpenText,
   Building2,
   ContactRound,
   Handshake,
@@ -40,6 +41,7 @@ const baseNavItems: readonly NavItem[] = [
 ];
 
 const REGISTRY_ICONS: Record<string, LucideIcon> = {
+  BookOpenText,
   ListTodo,
   LifeBuoy,
   Megaphone,

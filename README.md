@@ -154,6 +154,8 @@ explicitly promoted.
 | `/cases/new` | Case creation. |
 | `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
 | `/campaigns/new` | Campaign creation. |
+| `/knowledge` | Read-oriented local knowledge article workspace for service-workflow case assist context. |
+| `/knowledge?article=<id>` | Knowledge article detail drawer. There is no live `/knowledge/[id]` detail route in the current contract. |
 | `/reports` | Report index with KPI cards, CSV export review/download, and read-only CSV import preview. |
 | `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
 
@@ -170,8 +172,8 @@ Primary workflows:
   campaigns.
 - Create or update tasks, cases, and campaigns through their list, new-page,
   and drawer flows.
-- Maintain local service-workflow knowledge articles and deterministic
-  case-to-article suggestion contracts for case assist surfaces.
+- Review local service-workflow knowledge articles and deterministic
+  case-to-article suggestion context for case assist surfaces.
 - Open reports from `/reports`, drill into the supported report slugs, review
   CSV export packets, and preview contact or lead CSV imports without writes.
 
@@ -302,9 +304,10 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
 - CSV export review/download and CSV import preview are surfaced on `/reports`.
   CSV import remains read-only: there is no apply flow, bulk create/update,
   routing execution, duplicate merge, file storage, or database write.
-- Knowledge articles are local service-workflow records consumed by case assist
-  contracts; there is no standalone knowledge base route or external knowledge
-  provider integration.
+- Knowledge articles are local service-workflow records surfaced in a
+  read-oriented operator workspace; there is no live `/knowledge/[id]` detail
+  route, customer knowledge portal, external knowledge provider integration,
+  RAG/vector search, or article sync.
 - No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
   leads route to dealer orders instead.
 
