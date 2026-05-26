@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 42
 
-Feature: S42-F1 - Campaign member removal and availability contracts
+Feature: S42-F2 - Campaign ROI rollup summaries
 
 Branch: main
 
-Timestamp: 2026-05-26T00:35:47.1828883-07:00
+Timestamp: 2026-05-26T01:07:32.5771915-07:00
 
 Escalation required: NO
 
