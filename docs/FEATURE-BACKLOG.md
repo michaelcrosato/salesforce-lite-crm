@@ -105,9 +105,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S42-F1 | Campaign member removal and availability contracts | Codex | done |
 | S42-F2 | Campaign ROI rollup summaries | Codex | done |
 | S42-F3 | Campaign member operator controls | Codex | done |
-| S43-F1 | Knowledge article route contract | Codex | queued |
-| S43-F2 | Knowledge article operator workspace | Codex | queued |
-| S43-F3 | Knowledge article lifecycle controls | Codex | queued |
+| S43-F1 | Knowledge article route contract | Codex | done |
+| S43-F2 | Knowledge article operator workspace | Codex | done |
+| S43-F3 | Knowledge article lifecycle controls | Codex | done |
+| S44-F1 | UI identity and key stability | Codex | queued |
+| S44-F2 | Responsive CRM surface audit | Codex | queued |
+| S44-F3 | Keyboard and accessible-state pass | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
@@ -150,6 +153,7 @@ These routes intentionally render placeholders or 404 responses:
 - `/orders/[id]/edit`
 - `/areas/new`
 - `/areas/[id]/edit`
+- `/knowledge/[id]`
 
 ## Do Not Build During Documentation Or Readiness Passes
 
