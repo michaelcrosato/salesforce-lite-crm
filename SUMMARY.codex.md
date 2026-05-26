@@ -6,33 +6,30 @@ Feature: S46-F1 — AI action readiness digest
 
 Branch: main
 
-Status: queued
+Status: done
 
 Commits this prompt:
-- 0fa3120 - [codex] sprint 46: plan codex track
-- 4c27c09 - [codex] sprint 46: backlog refresh
+- 0b2eaf3 — [codex] S46-F1: add action readiness digest
 
-Gate status: PASS - Phase 0 full local gate passed via `scripts/local-gate.ps1`: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (96 files / 487 tests), build, Playwright chromium install, and e2e (35 tests). Post-planning checks also passed: `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
+Gate status: PASS — `scripts/local-gate.ps1` exited 0: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (97 files / 491 tests), build, Playwright chromium install, and e2e (35 tests). Pre-commit checks also passed: `npx vitest run tests/ai-action-readiness-digest.test.ts --maxWorkers=1`, `npm run lint`, and `npm run typecheck`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T12:30:16.3284255-07:00
+Timestamp: 2026-05-26T12:48:24.5047994-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Sprint 46 rollover from the single-agent root worktree after confirming the full local gate was green.
-- Marked Sprint 45 Codex features S45-F1, S45-F2, and S45-F3 as `done` in `PLAN.md` using SUMMARY, commit, and local-gate evidence.
-- Appended Sprint 46 to `PLAN.md` with S46-F1, S46-F2, and S46-F3 queued for Codex and permanent non-goals carried forward.
-- Synced `docs/FEATURE-BACKLOG.md` so Sprint 45 is done and Sprint 46 is queued.
+- Added `lib/ai/actionReadinessDigest.ts`, a deterministic server-side digest composing the S45 intent-registry audit, review-packet audit, and eval-fixture audit with explicit no-write/no-execution flags.
+- Added `tests/ai-action-readiness-digest.test.ts` covering stable versions, composed audit metadata, sample proposal references, and no-write/no-execution guardrails.
 
 ### Next action
 
-Run LOOP.md to begin S46-F1.
+Run LOOP.md to begin S46-F2 — AI action review operator panel.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly scoped `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
+No cross-ownership edits: YES (single-agent root mode; implementation touched `lib/ai/` and `tests/` as one coherent server/test slice)
 
 CRM-CONTRACT.md honored: YES
