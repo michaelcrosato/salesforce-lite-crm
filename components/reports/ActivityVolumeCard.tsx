@@ -53,10 +53,10 @@ export function ActivityVolumeCard({
       </CardHeader>
       <CardContent>
         <div className="flex items-end gap-1 h-32">
-          {data.map((row, idx) => {
+          {data.map((row) => {
             const height = max > 0 ? Math.round((row.count / max) * 100) : 0;
             return (
-              <div key={idx} className="flex-1 flex flex-col items-center">
+              <div key={row.day} className="flex-1 flex flex-col items-center">
                 <div
                   className="w-full bg-primary rounded-t"
                   style={{ height: `${height}%` }}

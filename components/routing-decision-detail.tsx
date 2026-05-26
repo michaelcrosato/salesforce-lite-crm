@@ -48,10 +48,10 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
       {expanded && (
         <div className="border-t px-4 py-4 text-sm">
           <div className="space-y-3">
-            {decision.steps.map((step, index) => {
+            {decision.steps.map((step) => {
               const label = formatStep(step.step, step.result);
               return (
-                <div key={index} className="rounded border bg-muted/40 p-3">
+                <div key={routingStepKey(step)} className="rounded border bg-muted/40 p-3">
                   <div className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">
                     {step.step}
                   </div>
@@ -70,6 +70,17 @@ export function RoutingDecisionDetail({ decision, testid }: RoutingDecisionDetai
       )}
     </div>
   );
+}
+
+function routingStepKey(step: RoutingDecision["steps"][number]): string {
+  return `${step.step}:${stableKeyValue(step.result)}`;
+}
+
+function stableKeyValue(value: unknown): string {
+  if (value === null) return "null";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value) ?? "undefined";
 }
 
 function formatStep(step: string, result: unknown): string {
@@ -118,4 +129,3 @@ function formatStep(step: string, result: unknown): string {
 
   return JSON.stringify(result);
 }
-
