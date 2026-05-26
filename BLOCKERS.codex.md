@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 44
 
-Feature: Sprint rollover planning
+Feature: S44-F1 — UI identity and key stability
 
 Branch: main
 
-Timestamp: 2026-05-26T05:47:47.5930791-07:00
+Timestamp: 2026-05-26T06:08:28.7397912-07:00
 
 Escalation required: NO
 
@@ -18,7 +18,3 @@ Escalation required: NO
 ### Resolved this prompt
 
 - No active Codex blockers were open at the start of this prompt.
-
-### Notes
-
-- `LOOP.md` is not present in this checkout, but rollover was not blocked because the current prompt provided the rollover instructions and the runner context pointed to `scripts/local-gate.ps1` as validation truth.
