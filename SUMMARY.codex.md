@@ -2,32 +2,32 @@ Agent: Codex
 
 Sprint: 40
 
-Feature: S40-F1 - CSV contact import apply capability matrix
+Feature: S40-F2 - CSV contact import manual apply executor
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- 84ab54b - [codex] S40-F1: add CSV import apply capabilities
+- 2ff5823 - [codex] S40-F2: add CSV contact apply executor
 
-Gate status: PASS - `scripts/local-gate.ps1` completed npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, `npm run test` (88 files / 450 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
+Gate status: PASS - `scripts/local-gate.ps1` completed npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, `npm run test` (89 files / 453 tests), build, Playwright Chromium install, and `npm run test:e2e` (22 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-25T18:24:52.0369125-07:00
+Timestamp: 2026-05-25T19:28:39.5649972-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Added `lib/server/csvImportApplyCapabilities.ts`, a deterministic metadata-only CSV contact import apply capability matrix that maps existing import preflight row actions to contact-create eligibility and explicit blocked reasons for review/blocked rows, lead apply/routing, update/upsert, duplicate merge, file storage, external services, and Salesforce integration.
-- Added `tests/api/csv-import-apply-capabilities.test.ts` coverage for root matrix metadata, contact `create_candidate` eligibility, lead/non-goal exclusions, strict input handling, route guardrails, and unchanged contact/lead/audit counts.
-- Reconciled current coordination state: `PLAN.md` and `docs/FEATURE-BACKLOG.md` queue S40-F1/S40-F2/S40-F3; older Claude/Grok/Gemini reports remain historical and include stale Sprint 4/5 references that do not change the active Codex queue.
+- Added `lib/server/csvImportApplyExecutor.ts`, a strict operator-approved CSV contact import apply executor that runs existing contact preflight diagnostics, creates only `create_candidate` contact rows, records `record/created` audit evidence in the same transaction, and returns deterministic created/skipped/blocked row outcomes with read/write/safety guardrails.
+- Added `tests/api/csv-import-apply-executor.test.ts` coverage for approved contact creation and audit metadata, unapproved no-write blocking, review/validation row outcomes, strict unknown-key rejection, lead apply exclusion, route guardrails, and unchanged contact/lead/audit counts on blocked paths.
+- Reconciled current coordination state: `PLAN.md` still lists S40-F1/S40-F2/S40-F3 as queued, but S40-F1 and S40-F2 now have implementation commits plus green full local gate evidence on `main`; older Claude/Grok/Gemini reports remain historical and do not alter the active Codex queue.
 
 ### Next action
 
-Run LOOP.md to begin S40-F2 - CSV contact import manual apply executor.
+Run LOOP.md to begin S40-F3 - CSV import apply operator UI.
 
 ### Scope confirmation
 
