@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 43
 
-Feature: S43-F1 - Knowledge article route contract
+Feature: S43-F2 - Knowledge article operator workspace
 
 Branch: main
 
-Timestamp: 2026-05-26T02:46:12.3004173-07:00
+Timestamp: 2026-05-26T03:19:48.2778097-07:00
 
 Escalation required: NO
 
