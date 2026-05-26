@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 47
 
-Feature: Sprint rollover — plan S47 Codex track
+Feature: Local gate repair - transient e2e failure verification
 
 Branch: main
 
-Timestamp: 2026-05-26T15:21:59.8772306-07:00
+Timestamp: 2026-05-26T15:29:51.7571746-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
+- The reported `npm run test:e2e` failure with exit code `-1073740791` did not reproduce. Direct `npm run test:e2e` passed with 39 tests, and the full `scripts/local-gate.ps1` passed afterward. No active blocker remains.

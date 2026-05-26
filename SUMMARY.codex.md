@@ -2,37 +2,36 @@ Agent: Codex
 
 Sprint: 47
 
-Feature: Sprint rollover — plan S47 Codex track
+Feature: Local gate repair - transient e2e failure verification
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- d68d73d — [codex] sprint 47: plan codex track
-- c2da8d7 — [codex] sprint 47: backlog refresh
+- none
 
-Gate status: PASS — Phase 0 `scripts/local-gate.ps1` exited 0: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (98 files / 494 tests), build, Playwright chromium install, and e2e (39 tests). Phase 4 checks also passed: `npm run lint`, `npm run typecheck`, `npm run test` (98 files / 494 tests), and `npm run build`.
+Gate status: PASS - `npm run test:e2e` passed directly with 39 Playwright tests, then `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` passed: npm install, env check, Prisma generate/db push, seed, lint, typecheck, Vitest (98 files / 494 tests), build, Playwright chromium install, and e2e (39 tests).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T15:21:59.8772306-07:00
+Timestamp: 2026-05-26T15:29:51.7571746-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Verified the pre-rollover baseline with the full local gate before planning edits.
-- Confirmed Sprint 46 Codex work was complete from green report evidence and local commits, then marked S46-F1, S46-F2, and S46-F3 done in `PLAN.md`.
-- Planned Sprint 47 as the Codex-owned Approval Readiness Foundation with S47-F1, S47-F2, and S47-F3 queued, including carried-forward permanent non-goals and sprint-specific approval/execution exclusions.
-- Synced `docs/FEATURE-BACKLOG.md` so S46 is done and S47 is queued.
+- Read the required coordination, contract, report, package, and local-gate files before editing.
+- Confirmed the worktree was clean on `main` at `cb5f010` and no active Codex blockers were open.
+- Re-ran the previously failing `npm run test:e2e` command successfully with all 39 Playwright tests passing.
+- Re-ran the full `scripts/local-gate.ps1` successfully; no product-code changes were required.
 
 ### Next action
 
-Run LOOP.md to begin S47-F1.
+Run LOOP.md to begin S47-F1 or the next prompt-selected work unit.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; planning prompt explicitly scoped `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and Codex reports)
+No cross-ownership edits: YES (single-agent root mode; report-only update)
 
-CRM-CONTRACT.md honored: YES
+CRM-CONTRACT.md honored:  YES
