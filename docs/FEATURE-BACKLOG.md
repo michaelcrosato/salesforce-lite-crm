@@ -108,9 +108,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S43-F1 | Knowledge article route contract | Codex | done |
 | S43-F2 | Knowledge article operator workspace | Codex | done |
 | S43-F3 | Knowledge article lifecycle controls | Codex | done |
-| S44-F1 | UI identity and key stability | Codex | queued |
-| S44-F2 | Responsive CRM surface audit | Codex | queued |
-| S44-F3 | Keyboard and accessible-state pass | Codex | queued |
+| S44-F1 | UI identity and key stability | Codex | done |
+| S44-F2 | Responsive CRM surface audit | Codex | done |
+| S44-F3 | Keyboard and accessible-state pass | Codex | done |
+| S45-F1 | AI action intent registry | Codex | queued |
+| S45-F2 | AI action review packets | Codex | queued |
+| S45-F3 | AI action eval fixtures | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
