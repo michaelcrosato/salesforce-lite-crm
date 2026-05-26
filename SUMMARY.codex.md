@@ -2,32 +2,31 @@ Agent: Codex
 
 Sprint: 44
 
-Feature: S44-F1 — UI identity and key stability
+Feature: S44-F2 — Responsive CRM surface audit
 
 Branch: main
 
-Status: done
+Status: blocked
 
 Commits this prompt:
-- 1e88bc9 — [codex] S44-F1: stabilize CRM UI keys
+- none
 
-Gate status: PASS — `scripts/local-gate.ps1` completed successfully, including npm install, Prisma generate/db push, seed, lint, typecheck, Vitest (93 files / 471 tests), build, Playwright chromium install, and e2e (28 tests).
+Gate status: FAIL — pre-flight baseline passed through `npm run build`; implementation verification passed `npm run build` and `npx playwright install chromium`, but `npm run test:e2e` exited 1 after the bounded repair loop. See `BLOCKERS.codex.md` #1.
 
-DoD self-check: PASS
+DoD self-check: FAIL
 
-Timestamp: 2026-05-26T06:08:28.7397912-07:00
+Timestamp: 2026-05-26T06:37:52.8685372-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Replaced index-based UI keys in routing decision step rendering and the activity-volume chart with deterministic domain-derived keys.
-- Added focused Playwright coverage that listens for React duplicate-key console warnings across current CRM surfaces, expanded routing detail, and command-palette search.
-- Verified the full local gate is green after the implementation commit.
+- Selected S44-F2 responsive shell/table containment and added scoped uncommitted changes, but stopped before an implementation commit because the new responsive e2e coverage still found page-level horizontal overflow after the bounded repair loop.
+- Filed a gate blocker with the failing command, final errors, dirty implementation paths, suspected cause, and safe next action.
 
 ### Next action
 
-Run LOOP.md for S44-F2 — Responsive CRM surface audit.
+Resume S44-F2 from `BLOCKERS.codex.md` #1 by diagnosing the `/orders` mobile and `/reports` desktop overflow elements, then rerun the e2e gate.
 
 ### Scope confirmation
 
