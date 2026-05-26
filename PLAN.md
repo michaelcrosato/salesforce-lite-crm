@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.45A |
+| Version | 2.46A |
 
 | Last updated | 2026-05-25 |
 
-| Active sprint | Sprint 39 S39-F1/S39-F2/S39-F3 queued |
+| Active sprint | Sprint 40 S40-F1/S40-F2/S40-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1463,9 +1463,9 @@ Goal: promote the deterministic workflow-rule planning surface into a bounded ma
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S39-F1 — Workflow execution capability matrix | codex | queued | Server-side workflow execution capability metadata maps catalog actions to supported manual-executor paths and explicit blocked reasons. Tests prove the matrix is deterministic, catalog-backed, no-write, and excludes unsupported permanent non-goal surfaces. |
-| S39-F2 — Workflow manual executor foundation | codex | queued | An explicit operator-approved server-side manual executor applies eligible workflow actions through existing validation/catalog paths, records audit evidence for mutations, and blocks unsupported, empty, or truncated cases. No workflow persistence, scheduled sweep, background job, external delivery, webhook, provider call, or CRM-CONTRACT drift is added. |
-| S39-F3 — Workflow execution operator UI | codex | queued | The existing `/reports` workflow dry-run surface adds a confirmation-driven manual execution path with visible execution, skipped/blocked, and audit outcomes. No new route, workflow builder, saved rule model, scheduler, or global search/deal-detail expansion is added. |
+| S39-F1 — Workflow execution capability matrix | codex | done | Server-side workflow execution capability metadata maps catalog actions to supported manual-executor paths and explicit blocked reasons. Tests prove the matrix is deterministic, catalog-backed, no-write, and excludes unsupported permanent non-goal surfaces. |
+| S39-F2 — Workflow manual executor foundation | codex | done | An explicit operator-approved server-side manual executor applies eligible workflow actions through existing validation/catalog paths, records audit evidence for mutations, and blocks unsupported, empty, or truncated cases. No workflow persistence, scheduled sweep, background job, external delivery, webhook, provider call, or CRM-CONTRACT drift is added. |
+| S39-F3 — Workflow execution operator UI | codex | done | The existing `/reports` workflow dry-run surface adds a confirmation-driven manual execution path with visible execution, skipped/blocked, and audit outcomes. No new route, workflow builder, saved rule model, scheduler, or global search/deal-detail expansion is added. |
 
 \*\*Sprint 39 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1492,6 +1492,46 @@ Goal: promote the deterministic workflow-rule planning surface into a bounded ma
 \- No external message delivery, webhooks, provider secrets, external services, network calls, arbitrary JavaScript, or `eval`.
 
 \- No new CRM entities, statuses, adapter signatures, CRM-CONTRACT route/entity/status changes, routing decision changes, pacing-engine changes, CSV import apply workflow, or Salesforce integration.
+
+\*\*Sprint 40 — CSV Contact Import Apply\*\*
+
+Goal: graduate the current read-only CSV import preview into a bounded, operator-approved contact-create apply path while preserving no-routing, no-storage, and integration guardrails.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S40-F1 — CSV contact import apply capability matrix | codex | queued | Server-side metadata maps current contact import preview/readiness actions to explicit manual-apply eligibility and blocked reasons. The matrix is deterministic, no-write, and excludes lead routing, updates/upserts, duplicate merge, file storage, and Salesforce integration. |
+| S40-F2 — CSV contact import manual apply executor | codex | queued | An explicit operator-approved server-side executor creates only contact rows classified as create-safe by existing preview/preflight contracts, records audit evidence, and returns row-level created/skipped/blocked outcomes. No lead import apply, routing execution, update/upsert, duplicate merge, file storage, background job, or CRM-CONTRACT drift is added. |
+| S40-F3 — CSV import apply operator UI | codex | queued | The existing `/reports` CSV import preview surface adds a confirmation-driven contact apply path with visible apply, skipped/blocked, and audit outcomes. No new product route, mapping wizard, persistent upload history, lead routing, Salesforce integration, or global search/deal-detail expansion is added. |
+
+\*\*Sprint 40 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No lead import apply, lead routing execution, routing reassignment, dealer-order writes, or pacing-engine changes.
+
+\- No contact update/upsert, duplicate merge, account creation, mapping wizard, file storage, background import jobs, or persistent upload history.
+
+\- No database writes outside the explicit operator-approved contact-create apply path and its audit evidence.
+
+\- No Salesforce integration, external enrichment, network calls, provider secrets, or webhooks.
+
+\- No new product route or CRM-CONTRACT route/entity/status/adapter changes.
 
 
 \## 5. File Ownership Matrix
