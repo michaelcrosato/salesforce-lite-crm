@@ -153,6 +153,34 @@ Canadian codes normalize to `A1A 1A1`. US ZIP values normalize to `12345` or `12
 - `overdueTasks(now?: Date): Promise<Array<{ id: string; title: string; status: string; priority: string; dueDate: Date; route: string }>>`
   - Excludes `done` and `cancelled` tasks.
 
+## Saved Report Definition Contracts
+
+`lib/server/savedReportDefinitions.ts` exports metadata-only contracts for
+later saved-report builder surfaces:
+
+- `getSavedReportDefinitionCatalog(input?: unknown): SavedReportDefinitionCatalog`
+- `getSavedReportEntityDefinition(entity: string): SavedReportEntityDefinition | null`
+- `listSavedReportDefinitionEntities(): SavedReportDefinitionEntity[]`
+- `isSavedReportDefinitionEntity(value: string): value is SavedReportDefinitionEntity`
+- `validateSavedReportDefinitionDraft(input: unknown): SavedReportDefinitionDraft`
+
+Supported saved-report definition entities match the current CRM list/export
+objects: `accounts`, `contacts`, `opportunities`, `leads`, `activities`,
+`dealer-orders`, `areas`, `tasks`, `cases`, and `campaigns`.
+
+The catalog describes per-entity selectable fields, supported list filters,
+groupable fields, metrics, chart types (`table`, `bar`, `line`, `pie`), preview
+limits, source surfaces, and explicit read/write flags. List filter metadata is
+derived from `lib/server/listFilterSupportCatalog.ts` so saved report filters
+do not invent a second filter contract.
+
+`validateSavedReportDefinitionDraft()` normalizes a draft definition and rejects
+unsupported entities, fields, filters, grouping keys, chart dimensions, and
+chart metrics. This contract does not persist saved reports, execute report
+queries, add route handlers, add UI, expose raw SQL, create dashboard cards, run
+background jobs, call providers, write files, mutate CRM data, or change CSV
+import/apply behavior.
+
 ## Search Surfaces
 
 - Header search in `components/app-shell.tsx` submits to `/contacts` and is contacts-only.
