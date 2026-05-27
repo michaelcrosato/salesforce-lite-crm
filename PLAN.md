@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.55C |
+| Version | 2.56A |
 
 | Last updated | 2026-05-27 |
 
-| Active sprint | Sprint 49 complete; next scope not selected |
+| Active sprint | Sprint 50 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1883,6 +1883,44 @@ Goal: promote a bounded saved-report definition and preview foundation on the ex
 \- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
 
 \- No mutation-capable report actions, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, or approval enforcement.
+
+\*\*Sprint 50 — Saved Report Persistence\*\*
+
+Goal: make saved report definitions durable and operator-manageable on the existing reports surface while preserving bounded previews, current routes, and deterministic local behavior.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S50-F1 — Saved report persistence contracts | codex | queued | Persist validated saved report definitions through server-side contracts/services using the existing S49 definition schema, with deterministic tests and no raw SQL or report execution side effects. |
+| S50-F2 — Saved report management surface | codex | queued | The existing `/reports` surface can create, list, update, archive/delete, load, and preview persisted saved report definitions with focused e2e coverage, without adding a new route. |
+| S50-F3 — Saved report audit and guardrails | codex | queued | Saved-report mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, excluded-route boundaries, and no dashboard-builder/search/provider drift. |
+
+\*\*Sprint 50 non-goals\*\* (carry forward permanent scope boundaries plus saved-report-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No new product route, saved-report detail route, dashboard builder, dashboard-card persistence, or dashboard route changes.
+
+\- No custom field metadata, custom object model, arbitrary SQL, raw Prisma query builder exposure, natural-language report generation, or unrestricted query execution.
+
+\- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
+
+\- No mutation-capable report preview actions, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, approval enforcement, or auth/permission policy work.
 
 \## 5. File Ownership Matrix
 
