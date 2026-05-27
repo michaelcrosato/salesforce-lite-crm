@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: Sprint 51
 
-Feature: S51-F1 — Dashboard card definition contracts
+Feature: S51-F2 — Dashboard card preview runner
 
 Branch: main
 
-Timestamp: 2026-05-27T14:54:50.5592004-07:00
+Timestamp: 2026-05-27T15:51:30.9819313-07:00
 
 Escalation required: NO
 
