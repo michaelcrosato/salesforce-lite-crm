@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import { LeadForm } from "@/components/lead-form";
+import { LeadFollowUpReadiness } from "@/components/lead-follow-up-readiness";
 import { ListSelectedExportAction } from "@/components/list-selected-export-action";
 import { PageHeader } from "@/components/page-header";
 import { RoutingDecisionDetail } from "@/components/routing-decision-detail";
@@ -21,6 +22,8 @@ import {
 import { formatDate } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { allQueryParam } from "@/lib/queryParams";
+import { MAX_LEAD_DISPOSITION_LIMIT } from "@/lib/services/leadDispositions";
+import { listLeadSlaFollowUpPacketBatch } from "@/lib/services/leadSlaFollowUp";
 import { isLeadStatus } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
@@ -105,9 +108,14 @@ export default async function LeadsPage({
     })
   ]);
 
-  const routingDecisions = await Promise.all(
-    leads.map((lead) => getRoutingDecisionForLead(lead.id))
-  );
+  const leadIds = leads.map((lead) => lead.id);
+  const [routingDecisions, leadFollowUpBatch] = await Promise.all([
+    Promise.all(leads.map((lead) => getRoutingDecisionForLead(lead.id))),
+    listLeadSlaFollowUpPacketBatch({
+      leadIds,
+      limit: MAX_LEAD_DISPOSITION_LIMIT
+    })
+  ]);
   const decisionsByLeadId = new Map(
     leads.map((lead, index) => [lead.id, routingDecisions[index] ?? null])
   );
@@ -122,6 +130,11 @@ export default async function LeadsPage({
       <div id="create-lead">
         <LeadForm />
       </div>
+
+      <LeadFollowUpReadiness
+        batch={leadFollowUpBatch}
+        filteredLeadCount={leads.length}
+      />
 
       <Card>
         <CardHeader className="gap-4">
