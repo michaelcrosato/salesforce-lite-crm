@@ -2,36 +2,35 @@ Agent: Codex
 
 Sprint: Sprint 51
 
-Feature: Sprint 51 planning - Dashboard Card Builder
+Feature: S51-F1 — Dashboard card definition contracts
 
 Branch: main
 
 Status: done
 
-Commits this prompt: f052716 - [codex] sprint 51: plan codex track; beacb3a - [codex] sprint 51: backlog refresh
+Commits this prompt: c136561 — [codex] S51-F1: add dashboard card definition contracts
 
-Gate status: PASS - Baseline full local gate passed with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`; post-planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (106 files / 527 tests), and `npm run build`.
+Gate status: PASS — Focused test passed with `npx vitest run tests/api/dashboard-card-definitions.test.ts --maxWorkers=1`; full local gate passed with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` including lint, typecheck, 107 Vitest files / 531 tests, build, Playwright Chromium install, and 44 e2e tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-27T14:24:19.7045262-07:00
+Timestamp: 2026-05-27T14:54:50.5592004-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the full local gate was green before planning.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and recent git history.
-- Marked S50-F1, S50-F2, and S50-F3 done in `PLAN.md` based on current `main` commits, Codex report evidence, and green gate output.
-- Planned Sprint 51 as the Codex Dashboard Card Builder track with four queued features: definition contracts, preview runner, operator surface, and audit/guardrails.
-- Synced `docs/FEATURE-BACKLOG.md` so S50 is done and S51-F1 through S51-F4 are queued.
+- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline gate through build was green before selecting work.
+- Implemented `lib/server/dashboardCardDefinitions.ts` with saved-report-backed dashboard-card metadata, placement/size/visualization contracts, preview-limit validation, read/write guardrails, and no route/UI/schema/provider behavior.
+- Added `tests/api/dashboard-card-definitions.test.ts` covering deterministic catalog metadata, normalized card defaults, invalid-card rejection, and no database/audit writes during validation.
+- Verified S51-F1 with the focused test, lint, typecheck, and the full `scripts/local-gate.ps1` sequence.
 
 ### Next action
 
-Run LOOP.md to begin S51-F1
+Run LOOP.md to begin S51-F2 — Dashboard card preview runner.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (planning-only prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES
