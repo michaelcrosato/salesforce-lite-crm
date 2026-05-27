@@ -126,6 +126,9 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S49-F1 | Saved report definition contracts | Codex | done |
 | S49-F2 | Saved report preview runner | Codex | done |
 | S49-F3 | Saved reports operator surface | Codex | done |
+| S50-F1 | Saved report persistence contracts | Codex | queued |
+| S50-F2 | Saved report management surface | Codex | queued |
+| S50-F3 | Saved report audit and guardrails | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
