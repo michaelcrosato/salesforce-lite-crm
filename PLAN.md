@@ -10,7 +10,7 @@
 
 |---|---|
 
-| Version | 2.55A |
+| Version | 2.55B |
 
 | Last updated | 2026-05-27 |
 
@@ -2173,7 +2173,7 @@ typecheck        -> tsc --noEmit --pretty false
 
 seed             -> tsx prisma/seed.ts
 
-test             -> vitest run --maxWorkers=1 --minWorkers=1
+test             -> vitest run --maxWorkers=1
 
 test:e2e         -> npm run seed && playwright test
 
