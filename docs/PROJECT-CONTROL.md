@@ -6,10 +6,9 @@
 - Commit observed this pass: use `git rev-parse HEAD` for the current local
   commit; this file intentionally avoids freezing a SHA that stales after
   documentation-only commits.
-- Current pass: Sprint 33 roadmap/contract readiness review before restarting
-  the autonomous loop.
-- Product feature work: S33-F2 case knowledge suggestion contracts are
-  formalized from the existing local service/test files; S33-F3 remains queued.
+- Current pass: Sprint 49 saved-report builder foundation loop.
+- Product feature work: S48-F1, S48-F2, and S48-F3 are present in `main`;
+  S49-F1, S49-F2, and S49-F3 are queued in `PLAN.md` section 4.
 - Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
   statuses, routes, search surfaces, report services, and adapter signatures.
 - Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
@@ -31,7 +30,9 @@ The current `main` tree includes:
 - SQLite as the default runtime database with a Postgres schema-switch helper.
 - Local service-operations knowledge foundations: `KnowledgeArticle` records,
   deterministic case queue/SLA helpers, and read-only case-to-article
-  suggestion packets. There is still no standalone knowledge base route.
+  suggestion packets surfaced through the `/knowledge` operator workspace.
+  There is still no customer knowledge portal, external knowledge provider,
+  RAG/vector search, or article sync.
 
 ## Documentation Status
 
@@ -60,19 +61,19 @@ without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
 ## Current Sprint Status
 
 `main` contains the earlier Sprint 4B demo-hardening surface plus the
-subsequent CSV, audit, bulk action, list, and service-operations tracks. The
-active feature queue is Sprint 33:
+subsequent CSV, audit, bulk action, list, service-operations, AI governance,
+approval readiness, and lead follow-up tracks. The active feature queue is
+Sprint 49:
 
 | Feature | Owner | Current state |
 |---|---|---|
-| S33-F1 Knowledge article foundation | Codex | Present in `main` |
-| S33-F2 Case knowledge suggestion contracts | Codex | Formalized this pass; full local gate green |
-| S33-F3 Case knowledge assist UI | Codex | Queued; next loop target |
+| S49-F1 Saved report definition contracts | Codex | Queued; next target when the prompt allows the required CRM contract update |
+| S49-F2 Saved report preview runner | Codex | Queued; depends on S49-F1 |
+| S49-F3 Saved reports operator surface | Codex | Queued; depends on S49-F2 |
 
-`docs/ROADMAP.md` now recommends completing S33-F3 next, then considering
-B-68 dependency/security modernization before larger AI, auth, deployment, or
-integration work. This file does not activate new implementation scope beyond
-`PLAN.md` section 4.
+This file does not activate new implementation scope beyond `PLAN.md` section
+4. Work that changes entity names, routes, adapter signatures, feature flags,
+or other contract surfaces still follows `CRM-CONTRACT.md`.
 
 ## Branch And Worktree Topology
 

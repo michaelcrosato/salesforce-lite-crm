@@ -33,8 +33,9 @@ Implemented CRM areas include:
   contract.
 - Case service foundations for queue assignment, SLA timing, local
   `KnowledgeArticle` records, and deterministic case-to-article suggestion
-  contracts. Knowledge articles remain service-workflow records, not a
-  standalone knowledge-base product route.
+  contracts. Knowledge articles are surfaced in the `/knowledge` operator
+  workspace, but there is still no customer knowledge portal, external
+  knowledge provider, RAG/vector search, or article sync.
 
 Current exclusions and defaults:
 
@@ -76,21 +77,19 @@ The roadmap is governed by seven rules:
 
 ## Current Track And Next Work
 
-`PLAN.md` section 4 is the active queue. As of the 2026-05-24 readiness review,
-Sprint 33 is the current feature track:
+`PLAN.md` section 4 is the active queue. As of the 2026-05-27 Sprint 49
+planning pass, Sprint 49 is the current feature track:
 
 | Item | Status | Loop guidance |
 |---|---|---|
-| S33-F1 Knowledge article foundation | done | Present on `main` with schema, seed, service, registry, audit, contract, and tests. |
-| S33-F2 Case knowledge suggestion contracts | done | Deterministic read-only case-to-article suggestion helpers and Vitest coverage are ready for the loop baseline. |
-| S33-F3 Case knowledge assist UI | queued | Next implementation target: wire bounded suggestions into existing `/cases` list/drawer surfaces without adding a route, external provider, search expansion, or article admin UI. |
+| S49-F1 Saved report definition contracts | queued | Add validated server-side saved report definition metadata for supported CRM objects, fields, filters, grouping, and charts, with the CRM contract update required by `PLAN.md` section 4. |
+| S49-F2 Saved report preview runner | queued | Depends on S49-F1; run saved definitions read-only through existing list/report/filter services and return bounded previews without writes or new routes. |
+| S49-F3 Saved reports operator surface | queued | Depends on S49-F2; extend the existing `/reports` surface without adding a new product route, dashboard builder, provider call, or mutation side effect. |
 
-After Sprint 33, the next recommended readiness lane is a dependency/security
-modernization pass (`B-68`) before promoting larger AI, auth, deployment, or
-integration work. The local registry check shows Next, Prisma, and Playwright
-at current published versions while Vitest is behind the current major; local
-`npm audit` reports moderate transitive advisories that require a planned
-compatibility pass, not a forced audit fix during feature work.
+Future dependency/security modernization remains tracked as `B-68` before
+larger AI, auth, deployment, or integration work. Do not run
+`npm audit fix --force` during feature loops unless a prompt explicitly
+promotes a compatibility-tested modernization pass.
 
 ## Readiness Lane
 
