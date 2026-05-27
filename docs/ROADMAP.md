@@ -31,6 +31,8 @@ Implemented CRM areas include:
 - Forecast simulation and deterministic analyst recommendations.
 - Task, case, campaign, and report routes that are part of the current
   contract.
+- CSV export review/download, CSV import preview, and bounded
+  operator-confirmed contact import apply on the existing `/reports` surface.
 - Case service foundations for queue assignment, SLA timing, local
   `KnowledgeArticle` records, and deterministic case-to-article suggestion
   contracts. Knowledge articles are surfaced in the `/knowledge` operator
@@ -50,8 +52,9 @@ Current exclusions and defaults:
   There is no external AI provider integration.
 - There is no authentication, permissions model, multi-tenancy, deployment
   configuration, Salesforce integration, geocoding, territory polygons,
-  persistent forecast scenarios, CSV UI workflow, or B2B lead-conversion flow
-  in the current contract.
+  persistent forecast scenarios, lead import apply, CSV update/upsert or
+  duplicate-merge workflow, file storage, external CSV service, or B2B
+  lead-conversion flow in the current contract.
 
 ## Roadmap Principles
 

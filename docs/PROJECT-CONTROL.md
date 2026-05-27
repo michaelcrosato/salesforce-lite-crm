@@ -22,6 +22,8 @@ The current `main` tree includes:
   forecast, task, case, campaign, and report routes.
 - Drawer detail flows for opportunities, tasks, cases, and campaigns.
 - Detail pages for accounts, contacts, leads, and dealer orders.
+- Reports include CSV export review/download, CSV import preview, and a
+  bounded operator-confirmed contact-create apply path for create-safe rows.
 - Excluded placeholders for `/deals/[id]`, `/search`, `/command-palette`,
   dealer-order create/edit routes, and area create/edit routes.
 - Global Ctrl/Cmd+K command palette search across accounts, contacts, deals,

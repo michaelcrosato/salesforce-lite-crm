@@ -91,6 +91,9 @@ Vancouver orders.
 - Expected report slugs are `pipeline-by-stage`, `leads-by-source`,
   `activity-volume`, `top-accounts`, `stale-opportunities`, and
   `overdue-tasks`.
+- The reports page also shows CSV export review/download and CSV import
+  preview. Contact imports can create only create-safe rows after explicit
+  operator confirmation; lead import apply and routing stay excluded.
 
 ## Step 4:00 - Command Palette And Analyst View
 
@@ -122,7 +125,10 @@ Vancouver orders.
 - No `/deals/[id]` detail route. Deal detail uses the drawer at
   `/deals?deal=<id>`.
 - No dedicated `/search` page. Use Ctrl/Cmd+K for cross-entity search.
-- CSV import/export helper functions exist, but no CSV UI workflow ships.
+- CSV export/download, import preview, and bounded contact-create apply are
+  available on `/reports`. Lead import apply, routing execution, bulk
+  update/upsert, duplicate merge, file storage, background jobs, and external
+  services remain out of scope.
 - Lead to Account + Contact + Opportunity conversion is out of scope for this
   dealer-order routing vertical.
 

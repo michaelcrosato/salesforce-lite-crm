@@ -67,7 +67,8 @@ team:
 - Review and download bounded CSV exports from deterministic server-side
   delivery packets.
 - Preview CSV imports with deterministic validation, preflight, readiness,
-  action, and dedupe review output before any write workflow exists.
+  action, and dedupe review output, then run the bounded contact-create apply
+  path only after explicit operator confirmation.
 - Expose deterministic analyst recommendations without relying on an external
   AI provider.
 
@@ -156,7 +157,7 @@ explicitly promoted.
 | `/campaigns/new` | Campaign creation. |
 | `/knowledge` | Read-oriented local knowledge article workspace for service-workflow case assist context. |
 | `/knowledge?article=<id>` | Knowledge article detail drawer. There is no live `/knowledge/[id]` detail route in the current contract. |
-| `/reports` | Report index with KPI cards, CSV export review/download, and read-only CSV import preview. |
+| `/reports` | Report index with KPI cards, CSV export review/download, CSV import preview, and operator-confirmed contact import apply. |
 | `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
 
 Primary workflows:
@@ -175,7 +176,8 @@ Primary workflows:
 - Review local service-workflow knowledge articles and deterministic
   case-to-article suggestion context for case assist surfaces.
 - Open reports from `/reports`, drill into the supported report slugs, review
-  CSV export packets, and preview contact or lead CSV imports without writes.
+  CSV export packets, preview contact or lead CSV imports, and apply
+  create-safe contact rows only after explicit confirmation.
 
 Task, Case, and Campaign entities are now wired into the app-router pages
 listed above. Detail flows for those entities use the drawer pattern
@@ -302,8 +304,10 @@ Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
   territory polygons.
 - Forecast scenarios are transparent and deterministic, but they do not persist.
 - CSV export review/download and CSV import preview are surfaced on `/reports`.
-  CSV import remains read-only: there is no apply flow, bulk create/update,
-  routing execution, duplicate merge, file storage, or database write.
+  Contact CSV import has a bounded operator-confirmed create path for
+  create-safe rows only. Lead import apply, routing execution, bulk
+  update/upsert, duplicate merge, file storage, background jobs, and external
+  services remain out of scope.
 - Knowledge articles are local service-workflow records surfaced in a
   read-oriented operator workspace; there is no live `/knowledge/[id]` detail
   route, customer knowledge portal, external knowledge provider integration,
@@ -329,5 +333,6 @@ feature target.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
-CSV import apply workflows, and any future live `/deals/[id]` detail behavior
-require explicit promotion before implementation.
+CSV import apply workflows beyond the bounded contact-create path, and any
+future live `/deals/[id]` detail behavior require explicit promotion before
+implementation.
