@@ -82,6 +82,14 @@ function escapeRegex(value: string): string {
 }
 
 async function cleanupE2eSavedReports() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      entityType: "report",
+      summary: {
+        contains: "E2E saved report"
+      }
+    }
+  });
   await prisma.savedReportDefinition.deleteMany({
     where: {
       name: {

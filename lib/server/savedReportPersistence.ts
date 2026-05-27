@@ -2,6 +2,10 @@ import type { Prisma, SavedReportDefinition } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
+  buildAuditEventCreateData,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
+import {
   SAVED_REPORT_DEFAULT_PREVIEW_LIMIT,
   SAVED_REPORT_MAX_PREVIEW_LIMIT,
   validateSavedReportDefinitionDraft,
@@ -50,6 +54,7 @@ export type SavedReportPersistenceReadFlags = {
 export type SavedReportPersistenceWriteFlags = {
   database: true;
   mutations: true;
+  auditEvents: true;
   schemas: false;
   routes: false;
   files: false;
@@ -98,6 +103,18 @@ const savedReportDefinitionListSchema = z
   })
   .strict();
 
+type SavedReportAuditMutation = "create" | "update" | "archive" | "delete";
+
+const savedReportAuditChangedFields = [
+  "name",
+  "fields",
+  "filters",
+  "groupBy",
+  "chart",
+  "previewLimit",
+  "archivedAt"
+] as const;
+
 export type SavedReportDefinitionCreateInput = z.input<
   typeof savedReportDefinitionCreateSchema
 >;
@@ -130,9 +147,30 @@ export async function createSavedReportDefinition(
     previewLimit: parsed.previewLimit ?? SAVED_REPORT_DEFAULT_PREVIEW_LIMIT
   };
 
-  return toPersistedSavedReportDefinition(
-    await prisma.savedReportDefinition.create({ data })
-  );
+  return prisma.$transaction(async (tx) => {
+    const definition = toPersistedSavedReportDefinition(
+      await tx.savedReportDefinition.create({ data })
+    );
+
+    await tx.auditEvent.create({
+      data: buildSavedReportAuditEventCreateData({
+        action: "created",
+        mutation: "create",
+        definition,
+        changedFields: [
+          "entity",
+          "name",
+          "fields",
+          "filters",
+          "groupBy",
+          "chart",
+          "previewLimit"
+        ]
+      })
+    });
+
+    return definition;
+  });
 }
 
 export async function listSavedReportDefinitions(
@@ -194,34 +232,77 @@ export async function updateSavedReportDefinition(
     data.previewLimit = parsed.previewLimit;
   }
 
-  return toPersistedSavedReportDefinition(
-    await prisma.savedReportDefinition.update({
-      where: { id: definitionId },
-      data
-    })
-  );
+  return prisma.$transaction(async (tx) => {
+    const updated = toPersistedSavedReportDefinition(
+      await tx.savedReportDefinition.update({
+        where: { id: definitionId },
+        data
+      })
+    );
+
+    await tx.auditEvent.create({
+      data: buildSavedReportAuditEventCreateData({
+        action: "updated",
+        mutation: "update",
+        definition: updated,
+        changedFields: changedSavedReportFields(existingSnapshot, updated)
+      })
+    });
+
+    return updated;
+  });
 }
 
 export async function archiveSavedReportDefinition(
   id: string,
   archivedAt = new Date()
 ): Promise<PersistedSavedReportDefinition> {
-  return toPersistedSavedReportDefinition(
-    await prisma.savedReportDefinition.update({
-      where: { id: idSchema.parse(id) },
-      data: { archivedAt }
-    })
-  );
+  const definitionId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const archived = toPersistedSavedReportDefinition(
+      await tx.savedReportDefinition.update({
+        where: { id: definitionId },
+        data: { archivedAt }
+      })
+    );
+
+    await tx.auditEvent.create({
+      data: buildSavedReportAuditEventCreateData({
+        action: "updated",
+        mutation: "archive",
+        definition: archived,
+        changedFields: ["archivedAt"]
+      })
+    });
+
+    return archived;
+  });
 }
 
 export async function deleteSavedReportDefinition(
   id: string
 ): Promise<PersistedSavedReportDefinition> {
-  return toPersistedSavedReportDefinition(
-    await prisma.savedReportDefinition.delete({
-      where: { id: idSchema.parse(id) }
-    })
-  );
+  const definitionId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const deleted = toPersistedSavedReportDefinition(
+      await tx.savedReportDefinition.delete({
+        where: { id: definitionId }
+      })
+    );
+
+    await tx.auditEvent.create({
+      data: buildSavedReportAuditEventCreateData({
+        action: "deleted",
+        mutation: "delete",
+        definition: deleted,
+        changedFields: []
+      })
+    });
+
+    return deleted;
+  });
 }
 
 export function toSavedReportDefinitionSnapshot(
@@ -323,6 +404,7 @@ function persistenceWrites(): SavedReportPersistenceWriteFlags {
   return {
     database: true,
     mutations: true,
+    auditEvents: true,
     schemas: false,
     routes: false,
     files: false,
@@ -335,6 +417,110 @@ function persistenceWrites(): SavedReportPersistenceWriteFlags {
 
 function serializeJson(value: unknown): string {
   return JSON.stringify(value);
+}
+
+function buildSavedReportAuditEventCreateData(input: {
+  action: "created" | "updated" | "deleted";
+  mutation: SavedReportAuditMutation;
+  definition: PersistedSavedReportDefinition;
+  changedFields: readonly string[];
+}): Prisma.AuditEventUncheckedCreateInput {
+  return buildAuditEventCreateData({
+    category: "record",
+    action: input.action,
+    entityType: "report",
+    entityId: input.definition.id,
+    summary: savedReportAuditSummary(input.mutation, input.definition.name),
+    metadata: savedReportAuditMetadata(
+      input.mutation,
+      input.definition,
+      input.changedFields
+    )
+  });
+}
+
+function savedReportAuditSummary(
+  mutation: SavedReportAuditMutation,
+  name: string
+): string {
+  const verbs: Record<SavedReportAuditMutation, string> = {
+    create: "created",
+    update: "updated",
+    archive: "archived",
+    delete: "deleted"
+  };
+
+  return `Saved report ${verbs[mutation]}: ${name}.`;
+}
+
+function savedReportAuditMetadata(
+  mutation: SavedReportAuditMutation,
+  definition: PersistedSavedReportDefinition,
+  changedFields: readonly string[]
+): { [key: string]: AuditMetadataValue } {
+  return {
+    source: "saved_report_persistence",
+    persistenceModule: "lib/server/savedReportPersistence.ts",
+    mutation,
+    definitionId: definition.id,
+    entity: definition.entity,
+    name: definition.name,
+    fields: [...definition.fields],
+    filters: { ...definition.filters },
+    groupBy: [...definition.groupBy],
+    chart:
+      definition.chart === null
+        ? null
+        : {
+            type: definition.chart.type,
+            dimensionKey: definition.chart.dimensionKey,
+            metricKey: definition.chart.metricKey
+          },
+    previewLimit: definition.previewLimit,
+    archivedAt: definition.archivedAt?.toISOString() ?? null,
+    changedFields: [...changedFields]
+  };
+}
+
+function changedSavedReportFields(
+  before: PersistedSavedReportDefinition,
+  after: PersistedSavedReportDefinition
+): string[] {
+  return savedReportAuditChangedFields.filter(
+    (field) =>
+      JSON.stringify(savedReportAuditComparableValue(before, field)) !==
+      JSON.stringify(savedReportAuditComparableValue(after, field))
+  );
+}
+
+function savedReportAuditComparableValue(
+  definition: PersistedSavedReportDefinition,
+  field: (typeof savedReportAuditChangedFields)[number]
+): AuditMetadataValue {
+  switch (field) {
+    case "name":
+      return definition.name;
+    case "fields":
+      return [...definition.fields];
+    case "filters":
+      return { ...definition.filters };
+    case "groupBy":
+      return [...definition.groupBy];
+    case "chart":
+      return definition.chart === null
+        ? null
+        : {
+            type: definition.chart.type,
+            dimensionKey: definition.chart.dimensionKey,
+            metricKey: definition.chart.metricKey
+          };
+    case "previewLimit":
+      return definition.previewLimit;
+    case "archivedAt":
+      return definition.archivedAt?.toISOString() ?? null;
+    default:
+      return assertNever(field);
+  }
 }
 
 function parseJson(serialized: string, label: string): unknown {
@@ -389,6 +575,10 @@ function isStringRecord(value: unknown): value is Record<string, string> {
     !Array.isArray(value) &&
     Object.values(value).every((entry) => typeof entry === "string")
   );
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unexpected saved report audit field: ${String(value)}`);
 }
 
 function optionalBooleanSchema() {

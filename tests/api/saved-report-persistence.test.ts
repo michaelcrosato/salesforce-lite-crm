@@ -1,15 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
+import { serializeAuditMetadata } from "@/lib/services/auditEvents";
 import {
   archiveSavedReportDefinition,
   createSavedReportDefinition,
   deleteSavedReportDefinition,
   getSavedReportDefinition,
   listSavedReportDefinitions,
-  updateSavedReportDefinition
+  updateSavedReportDefinition,
+  type PersistedSavedReportDefinition
 } from "@/lib/server/savedReportPersistence";
 
 const testNamePrefix = "Test saved report";
+type ExpectedSavedReportAuditMutation = "create" | "update" | "archive" | "delete";
 
 describe("saved report persistence contracts", () => {
   beforeEach(async () => {
@@ -79,6 +82,7 @@ describe("saved report persistence contracts", () => {
       write: {
         database: true,
         mutations: true,
+        auditEvents: true,
         schemas: false,
         routes: false,
         files: false,
@@ -95,6 +99,23 @@ describe("saved report persistence contracts", () => {
       '{"type":"bar","dimensionKey":"stage","metricKey":"value.sum"}'
     );
     expect(listed.map((definition) => definition.id)).toContain(created.id);
+
+    const audit = await findSavedReportAudit({
+      definitionId: created.id,
+      action: "created",
+      summary: `Saved report created: ${created.name}.`
+    });
+    expect(audit.metadata).toBe(
+      expectedSavedReportAuditMetadata(created, "create", [
+        "entity",
+        "name",
+        "fields",
+        "filters",
+        "groupBy",
+        "chart",
+        "previewLimit"
+      ])
+    );
   });
 
   it("updates, fetches, archives, and deletes definitions by id", async () => {
@@ -163,10 +184,42 @@ describe("saved report persistence contracts", () => {
     );
     expect(deleted.id).toBe(savedReport.id);
     await expect(getSavedReportDefinition(savedReport.id)).resolves.toBeNull();
+
+    const updateAudit = await findSavedReportAudit({
+      definitionId: savedReport.id,
+      action: "updated",
+      summary: `Saved report updated: ${updated.name}.`
+    });
+    const archiveAudit = await findSavedReportAudit({
+      definitionId: savedReport.id,
+      action: "updated",
+      summary: `Saved report archived: ${archived.name}.`
+    });
+    const deleteAudit = await findSavedReportAudit({
+      definitionId: savedReport.id,
+      action: "deleted",
+      summary: `Saved report deleted: ${deleted.name}.`
+    });
+
+    expect(updateAudit.metadata).toBe(
+      expectedSavedReportAuditMetadata(updated, "update", [
+        "name",
+        "fields",
+        "filters",
+        "chart",
+        "previewLimit"
+      ])
+    );
+    expect(archiveAudit.metadata).toBe(
+      expectedSavedReportAuditMetadata(archived, "archive", ["archivedAt"])
+    );
+    expect(deleteAudit.metadata).toBe(
+      expectedSavedReportAuditMetadata(deleted, "delete", [])
+    );
   });
 
   it("rejects unsupported metadata without database writes", async () => {
-    const countBefore = await prisma.savedReportDefinition.count();
+    const countsBefore = await savedReportPersistenceCounts();
 
     await expect(
       createSavedReportDefinition({
@@ -194,13 +247,19 @@ describe("saved report persistence contracts", () => {
       })
     ).rejects.toThrow("Preview limit cannot exceed 100.");
 
-    await expect(prisma.savedReportDefinition.count()).resolves.toBe(
-      countBefore
-    );
+    await expect(savedReportPersistenceCounts()).resolves.toEqual(countsBefore);
   });
 });
 
 async function cleanupSavedReportDefinitions() {
+  await prisma.auditEvent.deleteMany({
+    where: {
+      entityType: "report",
+      summary: {
+        contains: testNamePrefix
+      }
+    }
+  });
   await prisma.savedReportDefinition.deleteMany({
     where: {
       name: {
@@ -208,4 +267,67 @@ async function cleanupSavedReportDefinitions() {
       }
     }
   });
+}
+
+async function findSavedReportAudit(input: {
+  definitionId: string;
+  action: string;
+  summary: string;
+}) {
+  return prisma.auditEvent.findFirstOrThrow({
+    where: {
+      entityType: "report",
+      entityId: input.definitionId,
+      action: input.action,
+      summary: input.summary
+    }
+  });
+}
+
+function expectedSavedReportAuditMetadata(
+  definition: PersistedSavedReportDefinition,
+  mutation: ExpectedSavedReportAuditMutation,
+  changedFields: readonly string[]
+): string | null {
+  return serializeAuditMetadata({
+    source: "saved_report_persistence",
+    persistenceModule: "lib/server/savedReportPersistence.ts",
+    mutation,
+    definitionId: definition.id,
+    entity: definition.entity,
+    name: definition.name,
+    fields: [...definition.fields],
+    filters: { ...definition.filters },
+    groupBy: [...definition.groupBy],
+    chart:
+      definition.chart === null
+        ? null
+        : {
+            type: definition.chart.type,
+            dimensionKey: definition.chart.dimensionKey,
+            metricKey: definition.chart.metricKey
+          },
+    previewLimit: definition.previewLimit,
+    archivedAt: definition.archivedAt?.toISOString() ?? null,
+    changedFields: [...changedFields]
+  });
+}
+
+async function savedReportPersistenceCounts() {
+  const [savedReportDefinitions, savedReportAuditEvents] = await Promise.all([
+    prisma.savedReportDefinition.count(),
+    prisma.auditEvent.count({
+      where: {
+        entityType: "report",
+        summary: {
+          contains: testNamePrefix
+        }
+      }
+    })
+  ]);
+
+  return {
+    savedReportDefinitions,
+    savedReportAuditEvents
+  };
 }

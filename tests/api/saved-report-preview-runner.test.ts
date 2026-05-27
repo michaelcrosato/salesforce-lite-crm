@@ -260,6 +260,7 @@ async function currentCounts() {
     cases,
     campaigns,
     auditEvents,
+    savedReportDefinitions,
     savedListViews
   ] = await Promise.all([
     prisma.account.count(),
@@ -273,6 +274,7 @@ async function currentCounts() {
     prisma.case.count(),
     prisma.campaign.count(),
     prisma.auditEvent.count(),
+    prisma.savedReportDefinition.count(),
     prisma.savedListView.count()
   ]);
 
@@ -288,6 +290,7 @@ async function currentCounts() {
     cases,
     campaigns,
     auditEvents,
+    savedReportDefinitions,
     savedListViews
   };
 }
