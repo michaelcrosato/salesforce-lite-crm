@@ -43,6 +43,7 @@ import {
   type AuditEventExplorerInput
 } from "@/lib/services/auditEvents";
 import { getSavedReportDefinitionCatalog } from "@/lib/server/savedReportDefinitions";
+import { getDashboardCardDefinitionCatalog } from "@/lib/server/dashboardCardDefinitions";
 import {
   listSavedReportDefinitions,
   toSavedReportDefinitionSnapshot
@@ -89,6 +90,7 @@ export default async function ReportsPage({
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();
   const savedReportCatalog = getSavedReportDefinitionCatalog();
+  const dashboardCardCatalog = getDashboardCardDefinitionCatalog();
   const bulkDryRunDefinitions = listBulkActionDryRunReviewPacketDefinitions();
   const workflowRuleExampleCatalog = getWorkflowRuleExampleCatalog();
   const aiActionReadinessDigest = getAiActionReadinessDigest();
@@ -125,6 +127,7 @@ export default async function ReportsPage({
 
       <SavedReportOperator
         catalog={savedReportCatalog}
+        dashboardCardCatalog={dashboardCardCatalog}
         initialSavedReports={persistedSavedReports.map(
           toSavedReportDefinitionSnapshot
         )}

@@ -32,6 +32,7 @@ import {
   type SavedReportManagementActionResult,
   type SavedReportPreviewActionResult
 } from "@/app/reports/actions";
+import { DashboardCardOperator } from "@/components/reports/dashboard-card-operator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,6 +54,7 @@ import type {
   SavedReportDefinitionCatalog,
   SavedReportEntityDefinition
 } from "@/lib/server/savedReportDefinitions";
+import type { DashboardCardDefinitionCatalog } from "@/lib/server/dashboardCardDefinitions";
 import type {
   SavedReportPreviewResult,
   SavedReportPreviewWriteFlags
@@ -61,6 +63,7 @@ import type { SavedReportDefinitionSnapshot } from "@/lib/server/savedReportPers
 
 type SavedReportOperatorProps = {
   catalog: SavedReportDefinitionCatalog;
+  dashboardCardCatalog: DashboardCardDefinitionCatalog;
   initialSavedReports: SavedReportDefinitionSnapshot[];
 };
 
@@ -88,6 +91,7 @@ const writeFlagLabels = [
 
 export function SavedReportOperator({
   catalog,
+  dashboardCardCatalog,
   initialSavedReports
 }: SavedReportOperatorProps) {
   const { showToast } = useToast();
@@ -412,6 +416,12 @@ export function SavedReportOperator({
           testId="saved-report-summary-previewed"
         />
       </div>
+
+      <DashboardCardOperator
+        surface="reports"
+        catalog={dashboardCardCatalog}
+        savedReports={savedReports}
+      />
 
       <Card>
         <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">

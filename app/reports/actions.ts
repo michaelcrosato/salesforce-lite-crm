@@ -43,6 +43,14 @@ import {
   type SavedReportPreviewResult
 } from "@/lib/server/savedReportPreviewRunner";
 import {
+  isDashboardCardPlacement,
+  type DashboardCardPlacement
+} from "@/lib/server/dashboardCardDefinitions";
+import {
+  runDashboardCardPreview,
+  type DashboardCardPreviewResult
+} from "@/lib/server/dashboardCardPreviewRunner";
+import {
   archiveSavedReportDefinition,
   createSavedReportDefinition,
   deleteSavedReportDefinition,
@@ -187,6 +195,23 @@ export type SavedReportManagementActionResult =
         entity?: string[];
         fields?: string[];
         name?: string[];
+        target?: string[];
+      };
+    };
+
+export type DashboardCardPreviewActionResult =
+  | {
+      ok: true;
+      message: string;
+      preview: DashboardCardPreviewResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      preview?: DashboardCardPreviewResult;
+      fieldErrors?: {
+        definitionId?: string[];
+        placement?: string[];
         target?: string[];
       };
     };
@@ -770,6 +795,75 @@ export async function deleteSavedReportDefinitionAction(
   }
 }
 
+export async function previewDashboardCardAction(
+  formData: FormData
+): Promise<DashboardCardPreviewActionResult> {
+  const definitionId = formString(formData, "definitionId").trim();
+  const placement = formString(formData, "placement").trim();
+
+  if (!definitionId) {
+    return {
+      ok: false,
+      message: "Choose a saved report before pinning a dashboard card.",
+      fieldErrors: {
+        definitionId: ["Choose a saved report before pinning a dashboard card."]
+      }
+    };
+  }
+
+  if (!isDashboardCardPlacement(placement)) {
+    return {
+      ok: false,
+      message: "Choose a supported dashboard card surface.",
+      fieldErrors: {
+        placement: ["Choose a supported dashboard card surface."]
+      }
+    };
+  }
+
+  try {
+    const definition = await getSavedReportDefinition(definitionId);
+
+    if (!definition || definition.archivedAt !== null) {
+      return {
+        ok: false,
+        message: "The saved report definition could not be found.",
+        fieldErrors: {
+          definitionId: ["The saved report definition could not be found."]
+        }
+      };
+    }
+
+    const preview = await runDashboardCardPreview(
+      dashboardCardInputFromForm(formData, definition.id, placement),
+      definition
+    );
+
+    if (preview.status === "invalid") {
+      return {
+        ok: false,
+        message:
+          preview.errors[0]?.message ?? "Dashboard card preview validation failed.",
+        preview
+      };
+    }
+
+    return {
+      ok: true,
+      message: `${preview.card?.title ?? definition.name} card preview: ${preview.rowCount} rows.`,
+      preview
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The dashboard card preview could not be built.",
+      fieldErrors: {
+        target: ["Review the selected saved report and card surface."]
+      }
+    };
+  }
+}
+
 function savedReportInputFromForm(formData: FormData) {
   const entity = formString(formData, "entity").trim();
   const name = optionalActionString(formString(formData, "name"));
@@ -804,6 +898,41 @@ function savedReportInputFromForm(formData: FormData) {
         : undefined,
     limit: limit.length > 0 ? limit : undefined
   };
+}
+
+function dashboardCardInputFromForm(
+  formData: FormData,
+  definitionId: string,
+  placement: DashboardCardPlacement
+) {
+  const title = optionalActionString(formString(formData, "title"));
+  const position = optionalActionString(formString(formData, "position"));
+  const size = optionalActionString(formString(formData, "size"));
+  const previewLimit = optionalActionString(
+    formString(formData, "previewLimit")
+  );
+  const input: Record<string, unknown> = {
+    savedReportDefinitionId: definitionId,
+    placement
+  };
+
+  if (title !== undefined) {
+    input.title = title;
+  }
+
+  if (position !== undefined) {
+    input.position = position;
+  }
+
+  if (size !== undefined) {
+    input.size = size;
+  }
+
+  if (previewLimit !== undefined) {
+    input.previewLimit = previewLimit;
+  }
+
+  return input;
 }
 
 async function activeSavedReportSnapshots(): Promise<

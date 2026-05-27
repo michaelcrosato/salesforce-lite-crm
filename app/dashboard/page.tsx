@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCharts, type StageChartDatum } from "@/components/dashboard-charts";
+import { DashboardCardOperator } from "@/components/reports/dashboard-card-operator";
 import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
 import { DEAL_STAGES, STAGE_LABELS } from "@/lib/crm-constants";
@@ -13,6 +14,11 @@ import { calculateDealerOpsKpis, rankDealerOpsFocus } from "@/lib/business/deale
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
+import { getDashboardCardDefinitionCatalog } from "@/lib/server/dashboardCardDefinitions";
+import {
+  listSavedReportDefinitions,
+  toSavedReportDefinitionSnapshot
+} from "@/lib/server/savedReportPersistence";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +36,8 @@ export default async function DashboardPage() {
     activities,
     leadsThisMonth,
     dealerLeads,
-    dealerOrders
+    dealerOrders,
+    persistedSavedReports
   ] = await Promise.all([
     prisma.contact.count(),
     prisma.account.findMany({
@@ -117,7 +124,8 @@ export default async function DashboardPage() {
           }
         }
       }
-    })
+    }),
+    listSavedReportDefinitions()
   ]);
 
   const dashboardDeals = deals.map((deal) => ({
@@ -197,6 +205,10 @@ export default async function DashboardPage() {
     })),
     now
   });
+  const dashboardCardCatalog = getDashboardCardDefinitionCatalog();
+  const savedReportSnapshots = persistedSavedReports.map(
+    toSavedReportDefinitionSnapshot
+  );
 
   const chartData: StageChartDatum[] = DEAL_STAGES.map((stage) => {
     const stageDeals = deals.filter((deal) => deal.stage === stage);
@@ -233,6 +245,12 @@ export default async function DashboardPage() {
       </div>
 
       <DashboardCharts data={chartData} />
+
+      <DashboardCardOperator
+        surface="dashboard"
+        catalog={dashboardCardCatalog}
+        savedReports={savedReportSnapshots}
+      />
 
       <Card data-testid="dashboard-analyst-panel">
         <CardHeader>
