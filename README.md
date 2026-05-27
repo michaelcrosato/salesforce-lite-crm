@@ -327,9 +327,9 @@ from `CRM-CONTRACT.md`, `PLAN.md`, and repo-local evidence.
 The current tree includes the Sprint 4B demo-hardening surface, the CSV
 handoff/operator tracks, audit/list/bulk action foundations, service knowledge
 and AI governance tracks, approval and lead follow-up readiness work, and the
-queued Sprint 49 saved-report builder foundation. `PLAN.md` section 4 is the
-current queue; S49-F1 saved report definition contracts are the next planned
-feature target.
+Sprint 49 saved-report builder foundation. `PLAN.md` section 4 records Sprint
+49 as complete; the next feature track requires an explicit planning/rollover
+update before implementation.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,

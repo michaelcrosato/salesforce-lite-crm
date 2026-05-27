@@ -6,9 +6,9 @@
 - Commit observed this pass: use `git rev-parse HEAD` for the current local
   commit; this file intentionally avoids freezing a SHA that stales after
   documentation-only commits.
-- Current pass: Sprint 49 saved-report builder foundation loop.
-- Product feature work: S48-F1, S48-F2, and S48-F3 are present in `main`;
-  S49-F1, S49-F2, and S49-F3 are queued in `PLAN.md` section 4.
+- Current pass: post-Sprint 49 repo review and routing-decision optimization.
+- Product feature work: S48-F1 through S48-F3 and S49-F1 through S49-F3 are
+  present in `main`; the next feature track is not selected.
 - Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
   statuses, routes, search surfaces, report services, and adapter signatures.
 - Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
@@ -22,8 +22,9 @@ The current `main` tree includes:
   forecast, task, case, campaign, and report routes.
 - Drawer detail flows for opportunities, tasks, cases, and campaigns.
 - Detail pages for accounts, contacts, leads, and dealer orders.
-- Reports include CSV export review/download, CSV import preview, and a
-  bounded operator-confirmed contact-create apply path for create-safe rows.
+- Reports include CSV export review/download, CSV import preview, saved report
+  definition build/preview controls, and a bounded operator-confirmed
+  contact-create apply path for create-safe rows.
 - Excluded placeholders for `/deals/[id]`, `/search`, `/command-palette`,
   dealer-order create/edit routes, and area create/edit routes.
 - Global Ctrl/Cmd+K command palette search across accounts, contacts, deals,
@@ -38,7 +39,7 @@ The current `main` tree includes:
 
 ## Documentation Status
 
-This documentation pass updates durable project documentation:
+Durable project documentation currently includes:
 
 - `README.md`
 - `DEMO.md`
@@ -49,7 +50,7 @@ This documentation pass updates durable project documentation:
 - `prompts/README.md`
 - `REVIEW.CODEX.md`
 
-It also aligns supporting non-product files with those docs:
+Supporting non-product files aligned by prior documentation passes include:
 
 - `app/layout.tsx`
 - `components/command-palette.tsx`
@@ -64,18 +65,19 @@ without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
 
 `main` contains the earlier Sprint 4B demo-hardening surface plus the
 subsequent CSV, audit, bulk action, list, service-operations, AI governance,
-approval readiness, and lead follow-up tracks. The active feature queue is
-Sprint 49:
+approval readiness, lead follow-up, and saved-report builder tracks. Sprint 49
+is complete; a future prompt or planning pass must select the next feature
+track before new product work starts:
 
 | Feature | Owner | Current state |
 |---|---|---|
-| S49-F1 Saved report definition contracts | Codex | Queued; next target when the prompt allows the required CRM contract update |
-| S49-F2 Saved report preview runner | Codex | Queued; depends on S49-F1 |
-| S49-F3 Saved reports operator surface | Codex | Queued; depends on S49-F2 |
+| S49-F1 Saved report definition contracts | Codex | Done |
+| S49-F2 Saved report preview runner | Codex | Done |
+| S49-F3 Saved reports operator surface | Codex | Done |
 
-This file does not activate new implementation scope beyond `PLAN.md` section
-4. Work that changes entity names, routes, adapter signatures, feature flags,
-or other contract surfaces still follows `CRM-CONTRACT.md`.
+This file does not activate new implementation scope. Work that changes entity
+names, routes, adapter signatures, feature flags, or other contract surfaces
+still follows `CRM-CONTRACT.md`.
 
 ## Branch And Worktree Topology
 

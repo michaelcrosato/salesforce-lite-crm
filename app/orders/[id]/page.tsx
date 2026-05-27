@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/page-header";
 import { RoutingDecisionDetail } from "@/components/routing-decision-detail";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getRoutingDecisionForLead } from "@/lib/crm/crmClient";
 import {
   DEALER_ORDER_STATUS_LABELS,
   type DealerOrderStatus
@@ -16,6 +15,7 @@ import { expectedDeliveredByToday } from "@/lib/business/dealerOps";
 import { formatDate, formatNumber } from "@/lib/formatters";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { prisma } from "@/lib/prisma";
+import { getRoutingDecisionsForLeads } from "@/lib/services/leads";
 
 export const dynamic = "force-dynamic";
 
@@ -122,14 +122,8 @@ export default async function OrderDetailPage({
     deliveredThisMonth
   };
 
-  const leadRoutingDecisions = await Promise.all(
-    order.leads.map((lead) => getRoutingDecisionForLead(lead.id))
-  );
-  const decisionsByLeadId = new Map(
-    order.leads.map((lead, index) => [
-      lead.id,
-      leadRoutingDecisions[index] ?? null
-    ])
+  const decisionsByLeadId = await getRoutingDecisionsForLeads(
+    order.leads.map((lead) => lead.id)
   );
 
   return (

@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.55B |
+| Version | 2.55C |
 
 | Last updated | 2026-05-27 |
 
-| Active sprint | Sprint 49 S49-F1/S49-F2/S49-F3 queued |
+| Active sprint | Sprint 49 complete; next scope not selected |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1852,9 +1852,9 @@ Goal: promote a bounded saved-report definition and preview foundation on the ex
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S49-F1 — Saved report definition contracts | codex | queued | Add validated server-side saved report-definition contracts for supported CRM objects, fields, filters, grouping, and chart metadata, with deterministic tests and a CRM-CONTRACT update during implementation. No UI, arbitrary SQL, custom fields, dashboard builder, new report route, external BI, scheduled delivery, or integrations are added. |
-| S49-F2 — Saved report preview runner | codex | queued | Run saved definitions read-only through existing list/report/filter services and return bounded rows, aggregates, chart-ready data, and validation errors. The runner depends on S49-F1 and must not write data, use raw SQL, schedule jobs, expand search, add routes, or create import/export delivery workflows. |
-| S49-F3 — Saved reports operator surface | codex | queued | Extend the existing `/reports` surface with list, build, and preview controls for saved report definitions plus focused tests/e2e coverage. The surface depends on S49-F2 and must not add a new product route, dashboard builder, custom object model, permissions workflow, provider call, or mutation side effect. |
+| S49-F1 — Saved report definition contracts | codex | done | Added validated server-side saved report-definition contracts for supported CRM objects, fields, filters, grouping, and chart metadata, with deterministic tests and a CRM-CONTRACT update. No UI, arbitrary SQL, custom fields, dashboard builder, new report route, external BI, scheduled delivery, or integrations were added. |
+| S49-F2 — Saved report preview runner | codex | done | Added a read-only saved definition preview runner through existing list/report/filter services with bounded rows, aggregates, chart-ready data, and validation errors. The runner does not write data, use raw SQL, schedule jobs, expand search, add routes, or create import/export delivery workflows. |
+| S49-F3 — Saved reports operator surface | codex | done | Extended the existing `/reports` surface with list, build, and preview controls for saved report definitions plus focused tests/e2e coverage. The surface did not add a new product route, dashboard builder, custom object model, permissions workflow, provider call, or mutation side effect. |
 
 \*\*Sprint 49 non-goals\*\* (carry forward permanent scope boundaries plus saved-report-specific exclusions):
 
@@ -2820,6 +2820,19 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+\### 2026-05-27 — Run decision (Sprint 49 completion)
+
+\*\*Decision:\*\* Mark S49-F1, S49-F2, and S49-F3 as done on `main` and set the active sprint field to "Sprint 49 complete; next scope not selected."
+
+\*\*Rationale:\*\* The current `main` history contains the saved report definition, preview runner, and operator surface implementation/report commits, and the latest Codex report records a green full local gate for Sprint 49. Keeping Sprint 49 listed as queued caused coordination drift during repo review.
+
+\*\*Alternatives rejected:\*\* Leaving Sprint 49 queued until a later prompt, because repo-local evidence and the local gate already establish completion; selecting a new sprint in this review pass, because the prompt asked for repo review/optimization rather than new feature promotion.
+
+\*\*Sections changed:\*\* §1, §4, §17; `README.md`; `docs/ROADMAP.md`; `docs/FEATURE-BACKLOG.md`; `docs/PROJECT-CONTROL.md`.
+
+\*\*Open questions handled:\*\* Current Sprint 49 status and whether this optimization pass should activate a new feature scope.
+
 
 \### 2026-05-24 — Run decision (Sprint 33 and roadmap readiness)
 

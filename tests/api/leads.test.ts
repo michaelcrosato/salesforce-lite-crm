@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { getRoutingDecisionForLead } from "@/lib/services/leads";
+import {
+  getRoutingDecisionForLead,
+  getRoutingDecisionsForLeads
+} from "@/lib/services/leads";
 import { prisma } from "@/lib/prisma";
 
 const testLeadId = "test-lead-routing-1";
+const testLeadIdTwo = "test-lead-routing-2";
 const testAreaId = "test-area-routing-1";
 const testOrderId = "test-order-routing-1";
 
@@ -150,6 +154,62 @@ describe("leads service - getRoutingDecisionForLead", () => {
     const decision = await getRoutingDecisionForLead(testLeadId);
     expect(decision?.prefix).toBe("10001");
   });
+
+  it("returns batched routing decisions using the latest event per lead", async () => {
+    await createTestLead({
+      id: testLeadId,
+      areaId: testAreaId,
+      assignedOrderId: testOrderId,
+      postalCode: "V5K 1A1"
+    });
+    await createTestLead({
+      id: testLeadIdTwo,
+      areaId: testAreaId,
+      assignedOrderId: testOrderId,
+      postalCode: "10001"
+    });
+
+    await prisma.activity.createMany({
+      data: [
+        {
+          id: "routing-activity-batch-old",
+          leadId: testLeadId,
+          type: "routing_event",
+          title: "Older lead route",
+          summary: "Older route",
+          createdAt: new Date("2026-05-01T10:00:00Z")
+        },
+        {
+          id: "routing-activity-batch-latest",
+          leadId: testLeadId,
+          type: "routing_event",
+          title: "Latest lead route",
+          summary: "Latest route (pace gap 3)",
+          createdAt: new Date("2026-05-01T11:00:00Z")
+        },
+        {
+          id: "routing-activity-batch-second",
+          leadId: testLeadIdTwo,
+          type: "routing_event",
+          title: "Second lead route",
+          summary: "Second route",
+          createdAt: new Date("2026-05-01T09:00:00Z")
+        }
+      ]
+    });
+
+    const decisions = await getRoutingDecisionsForLeads([
+      testLeadId,
+      testLeadIdTwo,
+      "missing-lead-routing"
+    ]);
+
+    expect(decisions.size).toBe(3);
+    expect(decisions.get(testLeadId)?.summary).toBe("Latest route (pace gap 3)");
+    expect(decisions.get(testLeadId)?.candidateOrders[0].paceGap).toBe(3);
+    expect(decisions.get(testLeadIdTwo)?.leadId).toBe(testLeadIdTwo);
+    expect(decisions.get("missing-lead-routing")).toBeNull();
+  });
 });
 
 async function createTestLead(data: TestLeadFixture) {
@@ -169,12 +229,16 @@ async function createTestLead(data: TestLeadFixture) {
 async function cleanup() {
   await prisma.activity.deleteMany({
     where: {
-      leadId: testLeadId
+      leadId: {
+        in: [testLeadId, testLeadIdTwo]
+      }
     }
   });
   await prisma.lead.deleteMany({
     where: {
-      id: testLeadId
+      id: {
+        in: [testLeadId, testLeadIdTwo]
+      }
     }
   });
   await prisma.dealerOrder.deleteMany({

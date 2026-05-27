@@ -40,25 +40,37 @@ export type RoutingDecision = {
 type LeadWithRoutingContext = NonNullable<
   Awaited<ReturnType<typeof findLeadWithRoutingContext>>
 >;
+type RoutingEvent = NonNullable<
+  Awaited<ReturnType<typeof findLatestRoutingEventForLead>>
+>;
+
+const leadRoutingContextInclude = {
+  area: {
+    select: {
+      name: true
+    }
+  },
+  assignedOrder: {
+    select: {
+      id: true,
+      name: true
+    }
+  }
+} as const;
+
+const routingEventSelect = {
+  id: true,
+  leadId: true,
+  rawText: true,
+  summary: true,
+  createdAt: true
+} as const;
 
 export async function getRoutingDecisionForLead(
   leadId: string
 ): Promise<RoutingDecision | null> {
   const parsedLeadId = idSchema.parse(leadId);
-  const routingEvent = await prisma.activity.findFirst({
-    where: {
-      leadId: parsedLeadId,
-      type: "routing_event"
-    },
-    orderBy: [
-      {
-        createdAt: "desc"
-      },
-      {
-        id: "desc"
-      }
-    ]
-  });
+  const routingEvent = await findLatestRoutingEventForLead(parsedLeadId);
 
   if (!routingEvent) {
     return null;
@@ -70,6 +82,98 @@ export async function getRoutingDecisionForLead(
     return null;
   }
 
+  return buildRoutingDecision(parsedLeadId, lead, routingEvent);
+}
+
+export async function getRoutingDecisionsForLeads(
+  leadIds: string[]
+): Promise<Map<string, RoutingDecision | null>> {
+  const parsedLeadIds = leadIds.map((leadId) => idSchema.parse(leadId));
+  const decisionsByLeadId = new Map<string, RoutingDecision | null>(
+    parsedLeadIds.map((leadId) => [leadId, null] as const)
+  );
+  const uniqueLeadIds = Array.from(new Set(parsedLeadIds));
+
+  if (uniqueLeadIds.length === 0) {
+    return decisionsByLeadId;
+  }
+
+  const [routingEvents, leads] = await Promise.all([
+    findRoutingEventsForLeads(uniqueLeadIds),
+    findLeadsWithRoutingContext(uniqueLeadIds)
+  ]);
+  const latestRoutingEventByLeadId = new Map<string, RoutingEvent>();
+  const leadsById = new Map(leads.map((lead) => [lead.id, lead]));
+
+  for (const routingEvent of routingEvents) {
+    if (
+      routingEvent.leadId &&
+      !latestRoutingEventByLeadId.has(routingEvent.leadId)
+    ) {
+      latestRoutingEventByLeadId.set(routingEvent.leadId, routingEvent);
+    }
+  }
+
+  for (const leadId of uniqueLeadIds) {
+    const routingEvent = latestRoutingEventByLeadId.get(leadId);
+    const lead = leadsById.get(leadId);
+
+    if (!routingEvent || !lead) {
+      continue;
+    }
+
+    decisionsByLeadId.set(
+      leadId,
+      buildRoutingDecision(leadId, lead, routingEvent)
+    );
+  }
+
+  return decisionsByLeadId;
+}
+
+function findLatestRoutingEventForLead(leadId: string) {
+  return prisma.activity.findFirst({
+    where: {
+      leadId,
+      type: "routing_event"
+    },
+    orderBy: [
+      {
+        createdAt: "desc"
+      },
+      {
+        id: "desc"
+      }
+    ],
+    select: routingEventSelect
+  });
+}
+
+function findRoutingEventsForLeads(leadIds: string[]) {
+  return prisma.activity.findMany({
+    where: {
+      leadId: {
+        in: leadIds
+      },
+      type: "routing_event"
+    },
+    orderBy: [
+      {
+        createdAt: "desc"
+      },
+      {
+        id: "desc"
+      }
+    ],
+    select: routingEventSelect
+  });
+}
+
+function buildRoutingDecision(
+  parsedLeadId: string,
+  lead: LeadWithRoutingContext,
+  routingEvent: RoutingEvent
+): RoutingDecision {
   const postal = resolvePostal(lead.postalCode);
   const parsedPayload = parseRoutingPayload(
     routingEvent.rawText ?? routingEvent.summary
@@ -98,19 +202,18 @@ function findLeadWithRoutingContext(leadId: string) {
     where: {
       id: leadId
     },
-    include: {
-      area: {
-        select: {
-          name: true
-        }
-      },
-      assignedOrder: {
-        select: {
-          id: true,
-          name: true
-        }
+    include: leadRoutingContextInclude
+  });
+}
+
+function findLeadsWithRoutingContext(leadIds: string[]) {
+  return prisma.lead.findMany({
+    where: {
+      id: {
+        in: leadIds
       }
-    }
+    },
+    include: leadRoutingContextInclude
   });
 }
 

@@ -217,6 +217,7 @@ model Activity {
   @@index([caseId])
   @@index([userId])
   @@index([type])
+  @@index([leadId, type, createdAt])
   @@index([createdAt])
 }
 

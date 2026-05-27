@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
-import { getRoutingDecisionForLead } from "@/lib/crm/crmClient";
 import {
   ASSIGNMENT_REASON_LABELS,
   LEAD_STATUSES,
@@ -23,6 +22,7 @@ import { formatDate } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { allQueryParam } from "@/lib/queryParams";
 import { MAX_LEAD_DISPOSITION_LIMIT } from "@/lib/services/leadDispositions";
+import { getRoutingDecisionsForLeads } from "@/lib/services/leads";
 import { listLeadSlaFollowUpPacketBatch } from "@/lib/services/leadSlaFollowUp";
 import { isLeadStatus } from "@/lib/validation";
 
@@ -109,16 +109,13 @@ export default async function LeadsPage({
   ]);
 
   const leadIds = leads.map((lead) => lead.id);
-  const [routingDecisions, leadFollowUpBatch] = await Promise.all([
-    Promise.all(leads.map((lead) => getRoutingDecisionForLead(lead.id))),
+  const [decisionsByLeadId, leadFollowUpBatch] = await Promise.all([
+    getRoutingDecisionsForLeads(leadIds),
     listLeadSlaFollowUpPacketBatch({
       leadIds,
       limit: MAX_LEAD_DISPOSITION_LIMIT
     })
   ]);
-  const decisionsByLeadId = new Map(
-    leads.map((lead, index) => [lead.id, routingDecisions[index] ?? null])
-  );
 
   return (
     <div className="crm-page" data-testid="page-leads">

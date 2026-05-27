@@ -123,9 +123,9 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S48-F1 | Lead disposition contracts | Codex | done |
 | S48-F2 | Lead SLA follow-up packets | Codex | done |
 | S48-F3 | Lead follow-up operator surface | Codex | done |
-| S49-F1 | Saved report definition contracts | Codex | queued |
-| S49-F2 | Saved report preview runner | Codex | queued |
-| S49-F3 | Saved reports operator surface | Codex | queued |
+| S49-F1 | Saved report definition contracts | Codex | done |
+| S49-F2 | Saved report preview runner | Codex | done |
+| S49-F3 | Saved reports operator surface | Codex | done |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
