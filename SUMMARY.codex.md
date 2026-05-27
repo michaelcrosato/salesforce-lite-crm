@@ -1,43 +1,37 @@
 Agent: Codex
 
-Sprint: Sprint 50
+Sprint: Sprint 51
 
-Feature: S50-F3 - Saved report audit and guardrails
+Feature: Sprint 51 planning - Dashboard Card Builder
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 7fe7c77 - [codex] S50-F3: add saved report audit guardrails
+Commits this prompt: f052716 - [codex] sprint 51: plan codex track; beacb3a - [codex] sprint 51: backlog refresh
 
-Gate status: PASS - Full local gate passed with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` (`npm install`, env bootstrap, `npx prisma generate`, `npx prisma db push`, `npm run seed`, `npm run lint`, `npm run typecheck`, `npm run test` with 106 files / 527 tests, `npm run build`, `npx playwright install chromium`, and `npm run test:e2e` with 44 tests).
+Gate status: PASS - Baseline full local gate passed with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`; post-planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (106 files / 527 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-27T13:32:54.4556400-07:00
+Timestamp: 2026-05-27T14:24:19.7045262-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline full local gate was green before selecting work.
-- Implemented S50-F3 by recording deterministic `AuditEvent` rows for saved-report create, update, archive, and delete mutations in the same transaction as the saved-report write.
-- Added saved-report audit metadata covering source, mutation, definition id, entity, name, fields, filters, grouping, chart, preview limit, archive timestamp, and changed fields.
-- Added focused Vitest guardrail coverage for saved-report audit evidence, invalid-definition no-write behavior, preview read-only counts including saved-report definitions, excluded search/detail route flags, and no dashboard-builder/provider drift.
-- Updated the saved-report e2e cleanup to remove saved-report audit events created by the management-flow test.
-
-### Discovered this prompt
-
-- PLAN.md section 4 still lists `S50-F1`, `S50-F2`, and `S50-F3` as queued, but `main` now contains implementation commits and green full-gate evidence for all three.
-- `SUMMARY.gemini.md` still references a historical "Sprint 5 - E2E Visual Snapshot Baseline" that does not match PLAN.md section 4's Sprint 5 data-portability track.
-- `docs/PROJECT-CONTROL.md`, `docs/ROADMAP.md`, and `docs/FEATURE-BACKLOG.md` still describe Sprint 49 / early Sprint 50 state and have not yet been refreshed for completed S50-F1/S50-F2/S50-F3.
+- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the full local gate was green before planning.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and recent git history.
+- Marked S50-F1, S50-F2, and S50-F3 done in `PLAN.md` based on current `main` commits, Codex report evidence, and green gate output.
+- Planned Sprint 51 as the Codex Dashboard Card Builder track with four queued features: definition contracts, preview runner, operator surface, and audit/guardrails.
+- Synced `docs/FEATURE-BACKLOG.md` so S50 is done and S51-F1 through S51-F4 are queued.
 
 ### Next action
 
-Run `SPRINT-ROLLOVER.md` to mark Sprint 50 complete and select the next Codex scope.
+Run LOOP.md to begin S51-F1
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; scoped server persistence, Vitest, and e2e cleanup edits for S50-F3)
+No cross-ownership edits: YES (planning-only prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
 
 CRM-CONTRACT.md honored: YES
