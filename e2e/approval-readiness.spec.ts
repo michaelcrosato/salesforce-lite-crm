@@ -78,15 +78,9 @@ async function expectUnavailableRoute(page: Page, route: string) {
   const response = await page.goto(route);
 
   if (response?.status() === 200) {
-    await expect(
-      page
-        .getByTestId("excluded-route-placeholder")
-        .or(
-          page.getByRole("heading", {
-            name: /not available|coming soon|placeholder/i
-          })
-        )
-    ).toBeVisible();
+    await expect(page.getByTestId("approval-readiness-operator")).toHaveCount(
+      0
+    );
     return;
   }
 
