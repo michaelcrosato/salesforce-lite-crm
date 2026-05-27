@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.56A |
+| Version | 2.57A |
 
 | Last updated | 2026-05-27 |
 
-| Active sprint | Sprint 50 queued for codex |
+| Active sprint | Sprint 51 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1890,9 +1890,9 @@ Goal: make saved report definitions durable and operator-manageable on the exist
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S50-F1 — Saved report persistence contracts | codex | queued | Persist validated saved report definitions through server-side contracts/services using the existing S49 definition schema, with deterministic tests and no raw SQL or report execution side effects. |
-| S50-F2 — Saved report management surface | codex | queued | The existing `/reports` surface can create, list, update, archive/delete, load, and preview persisted saved report definitions with focused e2e coverage, without adding a new route. |
-| S50-F3 — Saved report audit and guardrails | codex | queued | Saved-report mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, excluded-route boundaries, and no dashboard-builder/search/provider drift. |
+| S50-F1 — Saved report persistence contracts | codex | done | Persist validated saved report definitions through server-side contracts/services using the existing S49 definition schema, with deterministic tests and no raw SQL or report execution side effects. |
+| S50-F2 — Saved report management surface | codex | done | The existing `/reports` surface can create, list, update, archive/delete, load, and preview persisted saved report definitions with focused e2e coverage, without adding a new route. |
+| S50-F3 — Saved report audit and guardrails | codex | done | Saved-report mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, excluded-route boundaries, and no dashboard-builder/search/provider drift. |
 
 \*\*Sprint 50 non-goals\*\* (carry forward permanent scope boundaries plus saved-report-specific exclusions):
 
@@ -1921,6 +1921,47 @@ Goal: make saved report definitions durable and operator-manageable on the exist
 \- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
 
 \- No mutation-capable report preview actions, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, approval enforcement, or auth/permission policy work.
+
+\*\*Sprint 51 — Dashboard Card Builder\*\*
+
+Goal: promote saved reports into bounded dashboard cards on existing CRM surfaces without adding routes, provider integrations, or unrestricted query behavior.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S51-F1 — Dashboard card definition contracts | codex | queued | Add validated server-side contracts for dashboard cards backed by persisted saved reports, including placement, chart/table card metadata, preview limits, and explicit guardrails. No new routes, dashboard layout designer, custom SQL, or external BI/provider integration is added. |
+| S51-F2 — Dashboard card preview runner | codex | queued | Build a read-only runner that turns dashboard card definitions into bounded card preview data using existing saved-report preview services, with deterministic ordering and validation errors. The runner does not mutate CRM records, schedule refreshes, run background jobs, or expose unrestricted query execution. |
+| S51-F3 — Dashboard card operator surface | codex | queued | Existing `/reports` and `/dashboard` surfaces can pin, list, reorder, archive/delete, and render saved-report-backed dashboard cards with focused e2e coverage. No new product route, dashboard-builder route, card sharing/permissions, or global search expansion is added. |
+| S51-F4 — Dashboard audit and guardrails | codex | queued | Dashboard-card mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, route boundaries, and no provider/search/dashboard-route drift. No auth/permissions enforcement, external telemetry, approvals, routing, or pacing changes are added. |
+
+\*\*Sprint 51 non-goals\*\* (carry forward permanent scope boundaries plus dashboard-card-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No new product route, dashboard-builder route, saved-report detail route, or dashboard route changes.
+
+\- No dashboard layout designer, arbitrary drag canvas, card sharing, card permissions, user/tenant scoping, or multi-dashboard workspace.
+
+\- No custom field metadata, custom object model, arbitrary SQL, raw Prisma query builder exposure, natural-language dashboard/report generation, or unrestricted query execution.
+
+\- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
+
+\- No CRM record mutations from dashboard previews, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, approval enforcement, or auth/permission policy work.
 
 \## 5. File Ownership Matrix
 
