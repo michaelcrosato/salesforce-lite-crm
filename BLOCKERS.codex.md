@@ -2,11 +2,11 @@ Agent: Codex
 
 Sprint: 47
 
-Feature: S47-F1 — Approval policy registry
+Feature: S47-F2 — Approval review packets
 
 Branch: main
 
-Timestamp: 2026-05-26T15:46:52.0760928-07:00
+Timestamp: 2026-05-26T17:02:57.0787690-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- None. No active Codex blockers were open, and S47-F1 completed with a green full local gate.
+- None. No active Codex blockers were open, and S47-F2 completed with a green full local gate.
