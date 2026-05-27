@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.53A |
+| Version | 2.54A |
 
 | Last updated | 2026-05-26 |
 
-| Active sprint | Sprint 47 S47-F1/S47-F2/S47-F3 queued |
+| Active sprint | Sprint 48 S48-F1/S48-F2/S48-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1776,9 +1776,9 @@ Goal: add deterministic no-write approval readiness contracts for high-risk CRM 
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S47-F1 — Approval policy registry | codex | queued | A metadata-only approval policy registry defines supported approval subjects, risk levels, reviewer labels, evidence requirements, audit expectations, and explicit blocked capabilities for high-risk CRM and AI-action proposal classes. No authentication, role model, persistence, approval enforcement, executor, route, UI, external provider, or database write is added. |
-| S47-F2 — Approval review packets | codex | queued | Server-side review packets evaluate representative CRM and AI-action proposals against the S47-F1 registry, returning deterministic approval-needed, blocked, and not-needed summaries with evidence and audit expectations. Packets are no-write and do not approve, reject, execute, mutate records, persist approvals, call providers, or schedule jobs. |
-| S47-F3 — Approval readiness operator surface | codex | queued | The existing `/reports` surface exposes a no-write approval readiness view with registry coverage, sample review-packet outcomes, and guardrail messaging, backed by focused tests/e2e coverage. The surface must not add routes, approve/reject controls, mutation controls, provider calls, auth/permission behavior, or database writes. |
+| S47-F1 — Approval policy registry | codex | done | A metadata-only approval policy registry defines supported approval subjects, risk levels, reviewer labels, evidence requirements, audit expectations, and explicit blocked capabilities for high-risk CRM and AI-action proposal classes. No authentication, role model, persistence, approval enforcement, executor, route, UI, external provider, or database write is added. |
+| S47-F2 — Approval review packets | codex | done | Server-side review packets evaluate representative CRM and AI-action proposals against the S47-F1 registry, returning deterministic approval-needed, blocked, and not-needed summaries with evidence and audit expectations. Packets are no-write and do not approve, reject, execute, mutate records, persist approvals, call providers, or schedule jobs. |
+| S47-F3 — Approval readiness operator surface | codex | done | The existing `/reports` surface exposes a no-write approval readiness view with registry coverage, sample review-packet outcomes, and guardrail messaging, backed by focused tests/e2e coverage. The surface must not add routes, approve/reject controls, mutation controls, provider calls, auth/permission behavior, or database writes. |
 
 \*\*Sprint 47 non-goals\*\* (carry forward permanent scope boundaries plus sprint-specific exclusions):
 
@@ -1805,6 +1805,46 @@ Goal: add deterministic no-write approval readiness contracts for high-risk CRM 
 \- No AI action executor, agentic writes, silent writes, autonomous actions, provider calls, transactional email provider, calendar sync, Salesforce integration, RAG/vector search, web crawling, provider credentials, network calls, or background jobs.
 
 \- No new product routes, route handlers, feature-flag promotions, search expansion, routing execution, routing reassignment, pacing-engine changes, dealer capacity rules, lead disposition state expansion, or area/order CRUD.
+
+\*\*Sprint 48 — Lead Follow-Up Readiness\*\*
+
+Goal: add deterministic lead disposition and SLA follow-up readiness for consumer dealer-routed leads without changing routing, lead conversion, or integration scope.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S48-F1 — Lead disposition contracts | codex | queued | Server-side helpers classify existing consumer leads into deterministic disposition states using current `Lead` statuses, assignment fields, timestamps, and routing-event evidence. Output is bounded and test-covered, with no lead conversion flow, lead status expansion, routing execution, reassignment, product UI, route change, external enrichment, or database writes. |
+| S48-F2 — Lead SLA follow-up packets | codex | queued | Server-side packets identify stale, unrouted, routed-but-uncontacted, contacted, closed, and dead lead situations with reason codes, urgency labels, clock-injected age calculations, and suggested next-action metadata for later UI. Packets depend on S48-F1 and do not create tasks, send notifications, run routing, mutate records, persist SLA policy, call providers, or schedule jobs. |
+| S48-F3 — Lead follow-up operator surface | codex | queued | Existing CRM surfaces expose lead disposition/SLA summary counts and representative follow-up packets with focused tests/e2e coverage. The surface depends on S48-F2 and must not add new product routes, lead mutation controls, B2B lead conversion, global search expansion, routing reassignment, pacing-engine changes, task creation, provider calls, or background jobs. |
+
+\*\*Sprint 48 non-goals\*\* (carry forward permanent scope boundaries plus lead-follow-up-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No B2B `Lead` conversion to Account, Contact, and Opportunity records.
+
+\- No lead status enum expansion or new lifecycle states beyond `CRM-CONTRACT.md`.
+
+\- No routing execution, routing reassignment, route-decision ranking changes, pacing-engine changes, dealer capacity windows, area coverage changes, or order quota changes.
+
+\- No task creation, notification/email/calendar sync, background jobs, escalation automation, or persistent SLA policy configuration.
+
+\- No new product routes, dedicated SLA/admin pages, external enrichment, Salesforce integration, RAG/vector search, web crawling, provider credentials, or network calls.
 
 \## 5. File Ownership Matrix
 
