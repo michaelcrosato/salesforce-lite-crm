@@ -18,3 +18,4 @@ Backfilled current baseline:
 - `2026-05-24 | codex | [S32-F2] | add seeded case SLA timing examples for service operations`
 - `2026-05-24 | codex | [S33-F1] | add KnowledgeArticle schema, service workflow metadata, and seeded article examples`
 - `2026-05-27 | codex | [REPO HEALTH] | add Activity composite index for lead routing-event lookup by lead, type, and createdAt`
+- `2026-05-27 | codex | [S50-F1] | add SavedReportDefinition schema for persisted saved report definition contracts`

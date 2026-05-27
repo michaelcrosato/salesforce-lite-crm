@@ -176,10 +176,27 @@ do not invent a second filter contract.
 
 `validateSavedReportDefinitionDraft()` normalizes a draft definition and rejects
 unsupported entities, fields, filters, grouping keys, chart dimensions, and
-chart metrics. This contract does not persist saved reports, execute report
+chart metrics.
+
+`lib/server/savedReportPersistence.ts` persists validated saved-report
+definitions through server-side services:
+
+- `createSavedReportDefinition(input: unknown): Promise<PersistedSavedReportDefinition>`
+- `listSavedReportDefinitions(input?: unknown): Promise<PersistedSavedReportDefinition[]>`
+- `getSavedReportDefinition(id: string): Promise<PersistedSavedReportDefinition | null>`
+- `updateSavedReportDefinition(id: string, input: unknown): Promise<PersistedSavedReportDefinition>`
+- `archiveSavedReportDefinition(id: string, archivedAt?: Date): Promise<PersistedSavedReportDefinition>`
+- `deleteSavedReportDefinition(id: string): Promise<PersistedSavedReportDefinition>`
+
+Persisted definitions use the `SavedReportDefinition` Prisma model and the same
+draft validation rules as `validateSavedReportDefinitionDraft()`. Records store
+entity, name, selected fields, filters, groupings, optional chart metadata,
+bounded preview limit, archive timestamp, and create/update timestamps.
+
+Saved-report persistence does not execute report previews, execute report
 queries, add route handlers, add UI, expose raw SQL, create dashboard cards, run
-background jobs, call providers, write files, mutate CRM data, or change CSV
-import/apply behavior.
+background jobs, call providers, write files, mutate CRM records outside the
+saved-report definition model, or change CSV import/apply behavior.
 
 ## Search Surfaces
 

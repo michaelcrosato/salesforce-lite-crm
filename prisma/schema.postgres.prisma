@@ -41,6 +41,25 @@ model SavedListView {
   @@index([updatedAt])
 }
 
+model SavedReportDefinition {
+  id           String    @id @default(cuid()) @db.Text
+  entity       String    @db.VarChar(80)
+  name         String    @db.VarChar(120)
+  fields       String    @default("[]") @db.Text
+  filters      String    @default("{}") @db.Text
+  groupBy      String    @default("[]") @db.Text
+  chart        String?   @db.Text
+  previewLimit Int       @default(25) @db.Integer
+  archivedAt   DateTime? @db.Timestamp(3)
+  createdAt    DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamp(3)
+
+  @@unique([entity, name])
+  @@index([entity])
+  @@index([archivedAt])
+  @@index([updatedAt])
+}
+
 model Account {
   id          String     @id @default(cuid()) @db.Text
   name        String     @db.VarChar(255)
