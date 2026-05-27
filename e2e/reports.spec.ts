@@ -138,6 +138,56 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     page.getByTestId("list-filter-support-write-flags")
   ).toContainText("Routes off");
 
+  await expect(page.getByTestId("saved-report-operator")).toBeVisible();
+  await expect(page.getByTestId("saved-report-summary-entities")).toContainText(
+    "10"
+  );
+  await expect(page.getByTestId("saved-report-summary-fields")).toContainText(
+    /\d+/
+  );
+  await expect(page.getByTestId("saved-report-summary-charts")).toContainText(
+    /\d+/
+  );
+  await expect(page.getByTestId("saved-report-definition-table")).toContainText(
+    "Opportunities"
+  );
+  await page.getByTestId("saved-report-entity-select").selectOption(
+    "opportunities"
+  );
+  await expect(page.getByTestId("saved-report-field-name")).toBeChecked();
+  await expect(page.getByTestId("saved-report-field-stage")).toBeChecked();
+  await expect(page.getByTestId("saved-report-field-value")).toBeChecked();
+  await page.getByTestId("saved-report-filter-select").selectOption("stage");
+  await page.getByTestId("saved-report-filter-value").fill("proposal");
+  await page.getByTestId("saved-report-group-select").selectOption("stage");
+  await page.getByTestId("saved-report-chart-type").selectOption("bar");
+  await page.getByTestId("saved-report-chart-dimension").selectOption("stage");
+  await page.getByTestId("saved-report-chart-metric").selectOption("value.sum");
+  await page.getByTestId("saved-report-limit-input").fill("4");
+  await page.getByTestId("saved-report-preview-submit").click();
+  await expect(page.getByTestId("saved-report-result-panel")).toBeVisible();
+  await expect(page.getByTestId("saved-report-result-rows")).toContainText(
+    /[1-9]/
+  );
+  await expect(page.getByTestId("saved-report-row-table")).toContainText(
+    "proposal"
+  );
+  await expect(page.getByTestId("saved-report-aggregate-table")).toContainText(
+    "Total Value"
+  );
+  await expect(page.getByTestId("saved-report-chart-table")).toContainText(
+    "proposal"
+  );
+  await expect(page.getByTestId("saved-report-write-flags")).toContainText(
+    "Database off"
+  );
+  await expect(page.getByTestId("saved-report-write-flags")).toContainText(
+    "Routes off"
+  );
+  await expect(page.getByTestId("saved-report-write-flags")).toContainText(
+    "Raw SQL off"
+  );
+
   await expect(page.getByTestId("bulk-dry-run-review-operator")).toBeVisible();
   await expect(
     page.getByTestId("bulk-dry-run-summary-entities")

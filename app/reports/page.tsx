@@ -9,6 +9,7 @@ import { BulkDryRunReviewOperator } from "@/components/reports/bulk-dry-run-revi
 import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
+import { SavedReportOperator } from "@/components/reports/saved-report-operator";
 import { WorkflowDryRunOperator } from "@/components/reports/workflow-dry-run-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -41,6 +42,7 @@ import {
   type AuditEventCategory,
   type AuditEventExplorerInput
 } from "@/lib/services/auditEvents";
+import { getSavedReportDefinitionCatalog } from "@/lib/server/savedReportDefinitions";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +78,7 @@ export default async function ReportsPage({
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();
+  const savedReportCatalog = getSavedReportDefinitionCatalog();
   const bulkDryRunDefinitions = listBulkActionDryRunReviewPacketDefinitions();
   const workflowRuleExampleCatalog = getWorkflowRuleExampleCatalog();
   const aiActionReadinessDigest = getAiActionReadinessDigest();
@@ -109,6 +112,8 @@ export default async function ReportsPage({
       <AuditEventExplorer snapshot={auditEventExplorer} />
 
       <ListFilterSupportExplorer catalog={listFilterSupportCatalog} />
+
+      <SavedReportOperator catalog={savedReportCatalog} />
 
       <BulkDryRunReviewOperator
         definitions={bulkDryRunDefinitions}

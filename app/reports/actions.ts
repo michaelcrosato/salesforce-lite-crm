@@ -38,6 +38,10 @@ import {
   executeWorkflowRuleManually,
   type WorkflowRuleManualExecutionResult
 } from "@/lib/server/workflowRuleManualExecutor";
+import {
+  runSavedReportPreview,
+  type SavedReportPreviewResult
+} from "@/lib/server/savedReportPreviewRunner";
 
 export type CsvImportPreviewActionResult =
   | {
@@ -138,6 +142,23 @@ export type WorkflowRuleExecutionActionResult =
       };
     };
 
+export type SavedReportPreviewActionResult =
+  | {
+      ok: true;
+      message: string;
+      preview: SavedReportPreviewResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      preview?: SavedReportPreviewResult;
+      fieldErrors?: {
+        entity?: string[];
+        fields?: string[];
+        target?: string[];
+      };
+    };
+
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
 const CSV_IMPORT_APPLY_CONFIRMATION_VALUE = "confirmed";
 const CSV_IMPORT_APPLY_ACTOR_USER_ID = "user-ava";
@@ -149,6 +170,14 @@ function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
 
   return typeof value === "string" ? value : "";
+}
+
+function formStrings(formData: FormData, key: string): string[] {
+  return formData
+    .getAll(key)
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
 }
 
 function isBulkActionDryRunReviewPacketAction(
@@ -164,6 +193,12 @@ function parseRecordIds(value: string): string[] {
     .split(/[\s,]+/)
     .map((recordId) => recordId.trim())
     .filter((recordId) => recordId.length > 0);
+}
+
+function optionalActionString(value: string): string | undefined {
+  const normalized = value.trim();
+
+  return normalized.length > 0 ? normalized : undefined;
 }
 
 type BulkActionDryRunReviewInput = {
@@ -382,6 +417,110 @@ export async function previewCsvImportReviewAction(
       message: "The CSV preview could not be built."
     };
   }
+}
+
+export async function previewSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportPreviewActionResult> {
+  const entity = formString(formData, "entity").trim();
+  const name = optionalActionString(formString(formData, "name"));
+  const fields = formStrings(formData, "fields");
+  const filterKey = formString(formData, "filterKey").trim();
+  const filterValue = formString(formData, "filterValue").trim();
+  const groupBy = formStrings(formData, "groupBy");
+  const chartType = formString(formData, "chartType").trim();
+  const chartDimension = optionalActionString(
+    formString(formData, "chartDimension")
+  );
+  const chartMetric = optionalActionString(formString(formData, "chartMetric"));
+  const limit = formString(formData, "limit").trim();
+
+  if (!entity) {
+    return {
+      ok: false,
+      message: "Choose a saved report entity.",
+      fieldErrors: {
+        entity: ["Choose a saved report entity."]
+      }
+    };
+  }
+
+  if (fields.length === 0) {
+    return {
+      ok: false,
+      message: "Choose at least one saved report field.",
+      fieldErrors: {
+        fields: ["Choose at least one saved report field."]
+      }
+    };
+  }
+
+  const filters: Record<string, string> = {};
+
+  if (filterKey.length > 0 && filterValue.length > 0) {
+    filters[filterKey] = filterValue;
+  }
+
+  const chart = chartType.length > 0 ? buildChartInput(chartType, {
+    dimensionKey: chartDimension,
+    metricKey: chartMetric
+  }) : undefined;
+
+  try {
+    const preview = await runSavedReportPreview({
+      entity,
+      name,
+      fields,
+      filters,
+      groupBy,
+      chart,
+      limit: limit.length > 0 ? limit : undefined
+    });
+
+    if (preview.status === "invalid") {
+      return {
+        ok: false,
+        message: "Saved report preview validation failed.",
+        preview
+      };
+    }
+
+    return {
+      ok: true,
+      message: `${preview.definition?.label ?? "Saved report"} preview: ${preview.rowCount} rows, ${preview.aggregates.length} aggregates.`,
+      preview
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report preview could not be built.",
+      fieldErrors: {
+        target: ["Review the selected entity, fields, filters, and chart."]
+      }
+    };
+  }
+}
+
+function buildChartInput(
+  type: string,
+  options: {
+    dimensionKey?: string;
+    metricKey?: string;
+  }
+): Record<string, string> {
+  const chart: Record<string, string> = {
+    type
+  };
+
+  if (options.dimensionKey) {
+    chart.dimensionKey = options.dimensionKey;
+  }
+
+  if (options.metricKey) {
+    chart.metricKey = options.metricKey;
+  }
+
+  return chart;
 }
 
 export async function executeCsvImportApplyOperatorAction(
