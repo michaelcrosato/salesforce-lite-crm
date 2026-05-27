@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.54A |
+| Version | 2.55A |
 
-| Last updated | 2026-05-26 |
+| Last updated | 2026-05-27 |
 
-| Active sprint | Sprint 48 S48-F1/S48-F2/S48-F3 queued |
+| Active sprint | Sprint 49 S49-F1/S49-F2/S49-F3 queued |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1812,9 +1812,9 @@ Goal: add deterministic lead disposition and SLA follow-up readiness for consume
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S48-F1 — Lead disposition contracts | codex | queued | Server-side helpers classify existing consumer leads into deterministic disposition states using current `Lead` statuses, assignment fields, timestamps, and routing-event evidence. Output is bounded and test-covered, with no lead conversion flow, lead status expansion, routing execution, reassignment, product UI, route change, external enrichment, or database writes. |
-| S48-F2 — Lead SLA follow-up packets | codex | queued | Server-side packets identify stale, unrouted, routed-but-uncontacted, contacted, closed, and dead lead situations with reason codes, urgency labels, clock-injected age calculations, and suggested next-action metadata for later UI. Packets depend on S48-F1 and do not create tasks, send notifications, run routing, mutate records, persist SLA policy, call providers, or schedule jobs. |
-| S48-F3 — Lead follow-up operator surface | codex | queued | Existing CRM surfaces expose lead disposition/SLA summary counts and representative follow-up packets with focused tests/e2e coverage. The surface depends on S48-F2 and must not add new product routes, lead mutation controls, B2B lead conversion, global search expansion, routing reassignment, pacing-engine changes, task creation, provider calls, or background jobs. |
+| S48-F1 — Lead disposition contracts | codex | done | Server-side helpers classify existing consumer leads into deterministic disposition states using current `Lead` statuses, assignment fields, timestamps, and routing-event evidence. Output is bounded and test-covered, with no lead conversion flow, lead status expansion, routing execution, reassignment, product UI, route change, external enrichment, or database writes. |
+| S48-F2 — Lead SLA follow-up packets | codex | done | Server-side packets identify stale, unrouted, routed-but-uncontacted, contacted, closed, and dead lead situations with reason codes, urgency labels, clock-injected age calculations, and suggested next-action metadata for later UI. Packets depend on S48-F1 and do not create tasks, send notifications, run routing, mutate records, persist SLA policy, call providers, or schedule jobs. |
+| S48-F3 — Lead follow-up operator surface | codex | done | Existing CRM surfaces expose lead disposition/SLA summary counts and representative follow-up packets with focused tests/e2e coverage. The surface depends on S48-F2 and must not add new product routes, lead mutation controls, B2B lead conversion, global search expansion, routing reassignment, pacing-engine changes, task creation, provider calls, or background jobs. |
 
 \*\*Sprint 48 non-goals\*\* (carry forward permanent scope boundaries plus lead-follow-up-specific exclusions):
 
@@ -1845,6 +1845,44 @@ Goal: add deterministic lead disposition and SLA follow-up readiness for consume
 \- No task creation, notification/email/calendar sync, background jobs, escalation automation, or persistent SLA policy configuration.
 
 \- No new product routes, dedicated SLA/admin pages, external enrichment, Salesforce integration, RAG/vector search, web crawling, provider credentials, or network calls.
+
+\*\*Sprint 49 — Saved Report Builder Foundation\*\*
+
+Goal: promote a bounded saved-report definition and preview foundation on the existing reports surface without adding routes, auth, provider integrations, or unrestricted query behavior.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S49-F1 — Saved report definition contracts | codex | queued | Add validated server-side saved report-definition contracts for supported CRM objects, fields, filters, grouping, and chart metadata, with deterministic tests and a CRM-CONTRACT update during implementation. No UI, arbitrary SQL, custom fields, dashboard builder, new report route, external BI, scheduled delivery, or integrations are added. |
+| S49-F2 — Saved report preview runner | codex | queued | Run saved definitions read-only through existing list/report/filter services and return bounded rows, aggregates, chart-ready data, and validation errors. The runner depends on S49-F1 and must not write data, use raw SQL, schedule jobs, expand search, add routes, or create import/export delivery workflows. |
+| S49-F3 — Saved reports operator surface | codex | queued | Extend the existing `/reports` surface with list, build, and preview controls for saved report definitions plus focused tests/e2e coverage. The surface depends on S49-F2 and must not add a new product route, dashboard builder, custom object model, permissions workflow, provider call, or mutation side effect. |
+
+\*\*Sprint 49 non-goals\*\* (carry forward permanent scope boundaries plus saved-report-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No dashboard builder, dashboard-card persistence, or dashboard route changes.
+
+\- No custom field metadata, custom object model, arbitrary SQL, raw Prisma query builder exposure, or natural-language report generation.
+
+\- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
+
+\- No mutation-capable report actions, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, or approval enforcement.
 
 \## 5. File Ownership Matrix
 
