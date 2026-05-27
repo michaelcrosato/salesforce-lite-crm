@@ -1,23 +1,35 @@
 "use client";
 
 import {
+  Archive,
   BarChart3,
+  Eye,
   FileText,
+  FolderOpen,
   PieChart,
   Play,
+  Save,
   Settings2,
   ShieldCheck,
   Table2,
+  Trash2,
   type LucideIcon
 } from "lucide-react";
 import {
   type FormEvent,
   useMemo,
+  useRef,
   useState,
   useTransition
 } from "react";
 import {
+  archiveSavedReportDefinitionAction,
+  createSavedReportDefinitionAction,
+  deleteSavedReportDefinitionAction,
+  previewPersistedSavedReportDefinitionAction,
   previewSavedReportDefinitionAction,
+  updateSavedReportDefinitionAction,
+  type SavedReportManagementActionResult,
   type SavedReportPreviewActionResult
 } from "@/app/reports/actions";
 import { Badge } from "@/components/ui/badge";
@@ -45,10 +57,16 @@ import type {
   SavedReportPreviewResult,
   SavedReportPreviewWriteFlags
 } from "@/lib/server/savedReportPreviewRunner";
+import type { SavedReportDefinitionSnapshot } from "@/lib/server/savedReportPersistence";
 
 type SavedReportOperatorProps = {
   catalog: SavedReportDefinitionCatalog;
+  initialSavedReports: SavedReportDefinitionSnapshot[];
 };
+
+type SavedReportActionResult =
+  | SavedReportPreviewActionResult
+  | SavedReportManagementActionResult;
 
 type SavedReportWriteFlags =
   | SavedReportDefinitionCatalog["write"]
@@ -68,16 +86,29 @@ const writeFlagLabels = [
   label: string;
 }>;
 
-export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
+export function SavedReportOperator({
+  catalog,
+  initialSavedReports
+}: SavedReportOperatorProps) {
   const { showToast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
   const initialDefinition = catalog.entities[0] ?? null;
+  const defaultLimit = String(
+    initialDefinition?.limits.previewRows.defaultLimit ?? 25
+  );
+  const [savedReports, setSavedReports] = useState(initialSavedReports);
+  const [activeDefinitionId, setActiveDefinitionId] = useState<string | null>(
+    null
+  );
   const [selectedEntity, setSelectedEntity] = useState(
     initialDefinition?.entity ?? ""
   );
+  const [reportName, setReportName] = useState("Pipeline health preview");
   const [selectedFields, setSelectedFields] = useState<string[]>(
     defaultFieldKeys(initialDefinition)
   );
+  const [previewLimit, setPreviewLimit] = useState(defaultLimit);
   const [filterKey, setFilterKey] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [groupBy, setGroupBy] = useState(defaultGroupBy(initialDefinition));
@@ -89,9 +120,7 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
   const [chartMetric, setChartMetric] = useState(
     initialChart?.defaultMetricKey ?? "recordCount"
   );
-  const [result, setResult] = useState<SavedReportPreviewActionResult | null>(
-    null
-  );
+  const [result, setResult] = useState<SavedReportActionResult | null>(null);
 
   const selectedDefinition = useMemo(
     () =>
@@ -105,6 +134,11 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
   );
   const activePreview = result?.preview ?? null;
   const activeWriteFlags = activePreview?.write ?? catalog.write;
+  const activeSavedReport =
+    activeDefinitionId === null
+      ? null
+      : savedReports.find((definition) => definition.id === activeDefinitionId) ??
+        null;
 
   if (!initialDefinition || !selectedDefinition) {
     return (
@@ -115,6 +149,108 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
         />
       </section>
     );
+  }
+
+  function applyDefinitionState(input: {
+    entity: string;
+    name: string;
+    fields: readonly string[];
+    filters: Record<string, string>;
+    groupBy: readonly string[];
+    chart: { type: string; dimensionKey: string | null; metricKey: string } | null;
+    previewLimit: number;
+  }) {
+    const nextDefinition = catalog.entities.find(
+      (definition) => definition.entity === input.entity
+    );
+
+    if (!nextDefinition) {
+      return;
+    }
+
+    const [nextFilterKey, nextFilterValue] =
+      Object.entries(input.filters)[0] ?? ["", ""];
+    const fallbackChart = defaultChart(nextDefinition);
+
+    setSelectedEntity(nextDefinition.entity);
+    setReportName(input.name);
+    setSelectedFields([...input.fields]);
+    setPreviewLimit(String(input.previewLimit));
+    setFilterKey(nextFilterKey);
+    setFilterValue(nextFilterValue);
+    setGroupBy(input.groupBy[0] ?? "");
+    setChartType(input.chart?.type ?? fallbackChart?.type ?? "");
+    setChartDimension(
+      input.chart?.dimensionKey ?? fallbackChart?.defaultDimensionKey ?? ""
+    );
+    setChartMetric(input.chart?.metricKey ?? fallbackChart?.defaultMetricKey ?? "recordCount");
+    setResult(null);
+  }
+
+  function formDataFromBuilder(): FormData | null {
+    if (!formRef.current) {
+      return null;
+    }
+
+    const formData = new FormData(formRef.current);
+
+    if (activeDefinitionId) {
+      formData.set("definitionId", activeDefinitionId);
+    }
+
+    return formData;
+  }
+
+  function runManagementAction(
+    action: (formData: FormData) => Promise<SavedReportManagementActionResult>,
+    options: {
+      formData?: FormData;
+      successTitle: string;
+      errorTitle: string;
+      nextActiveDefinitionId?: string | null;
+    }
+  ) {
+    const formData = options.formData ?? formDataFromBuilder();
+
+    if (!formData) {
+      return;
+    }
+
+    startTransition(() => {
+      void (async () => {
+        const actionResult = await action(formData);
+
+        if (actionResult.definitions) {
+          setSavedReports(actionResult.definitions);
+        }
+
+        if (actionResult.ok && actionResult.definition) {
+          const nextActiveDefinitionId =
+            options.nextActiveDefinitionId === undefined
+              ? actionResult.definition.id
+              : options.nextActiveDefinitionId;
+
+          setActiveDefinitionId(nextActiveDefinitionId);
+        } else if (options.nextActiveDefinitionId !== undefined) {
+          setActiveDefinitionId(options.nextActiveDefinitionId);
+        }
+
+        setResult(actionResult);
+        showToast({
+          title: actionResult.ok ? options.successTitle : options.errorTitle,
+          description: actionResult.message,
+          variant: actionResult.ok ? "success" : "error"
+        });
+      })();
+    });
+  }
+
+  function actionFormData(definitionId: string): FormData {
+    const formData = new FormData();
+
+    formData.set("definitionId", definitionId);
+
+    return formData;
   }
 
   function handleEntityChange(nextEntity: string) {
@@ -128,8 +264,11 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
 
     const nextChart = defaultChart(nextDefinition);
 
+    setActiveDefinitionId(null);
     setSelectedEntity(nextDefinition.entity);
+    setReportName(`${nextDefinition.label} saved report`);
     setSelectedFields(defaultFieldKeys(nextDefinition));
+    setPreviewLimit(String(nextDefinition.limits.previewRows.defaultLimit));
     setFilterKey("");
     setFilterValue("");
     setGroupBy(defaultGroupBy(nextDefinition));
@@ -178,6 +317,58 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
     });
   }
 
+  function handleCreateSavedReport() {
+    runManagementAction(createSavedReportDefinitionAction, {
+      successTitle: "Saved report created",
+      errorTitle: "Saved report create failed"
+    });
+  }
+
+  function handleUpdateSavedReport() {
+    runManagementAction(updateSavedReportDefinitionAction, {
+      successTitle: "Saved report updated",
+      errorTitle: "Saved report update failed"
+    });
+  }
+
+  function handleLoadSavedReport(definition: SavedReportDefinitionSnapshot) {
+    setActiveDefinitionId(definition.id);
+    applyDefinitionState(definition);
+    showToast({
+      title: "Saved report loaded",
+      description: `${definition.name} is ready to edit or preview.`,
+      variant: "success"
+    });
+  }
+
+  function handlePreviewSavedReport(definitionId: string) {
+    runManagementAction(previewPersistedSavedReportDefinitionAction, {
+      formData: actionFormData(definitionId),
+      successTitle: "Saved report preview ready",
+      errorTitle: "Saved report preview failed"
+    });
+  }
+
+  function handleArchiveSavedReport(definitionId: string) {
+    runManagementAction(archiveSavedReportDefinitionAction, {
+      formData: actionFormData(definitionId),
+      successTitle: "Saved report archived",
+      errorTitle: "Saved report archive failed",
+      nextActiveDefinitionId:
+        activeDefinitionId === definitionId ? null : activeDefinitionId
+    });
+  }
+
+  function handleDeleteSavedReport(definitionId: string) {
+    runManagementAction(deleteSavedReportDefinitionAction, {
+      formData: actionFormData(definitionId),
+      successTitle: "Saved report deleted",
+      errorTitle: "Saved report delete failed",
+      nextActiveDefinitionId:
+        activeDefinitionId === definitionId ? null : activeDefinitionId
+    });
+  }
+
   return (
     <section className="space-y-4" data-testid="saved-report-operator">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -221,6 +412,110 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
           testId="saved-report-summary-previewed"
         />
       </div>
+
+      <Card>
+        <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle>Saved Definitions</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Manage persisted report definitions on the current reports surface.
+            </p>
+          </div>
+          <Badge variant="outline" data-testid="saved-report-persisted-count">
+            {formatNumber(savedReports.length)} saved
+          </Badge>
+        </CardHeader>
+        <CardContent>
+          {savedReports.length === 0 ? (
+            <EmptyState
+              title="No saved reports yet"
+              description="Save a builder definition to make it available for loading and previewing."
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <Table data-testid="saved-report-persisted-list">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Entity</TableHead>
+                    <TableHead>Fields</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {savedReports.map((definition) => (
+                    <TableRow
+                      key={definition.id}
+                      data-testid={`saved-report-row-${testIdToken(definition.name)}`}
+                    >
+                      <TableCell className="font-medium">
+                        {definition.name}
+                        {activeDefinitionId === definition.id ? (
+                          <span className="mt-1 block text-xs text-muted-foreground">
+                            loaded in builder
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>{entityLabel(catalog, definition.entity)}</TableCell>
+                      <TableCell>{definition.fields.length}</TableCell>
+                      <TableCell>{formatDate(definition.updatedAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLoadSavedReport(definition)}
+                            disabled={isPending}
+                            data-testid="saved-report-saved-load"
+                          >
+                            <FolderOpen className="h-4 w-4" aria-hidden="true" />
+                            Load
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePreviewSavedReport(definition.id)}
+                            loading={isPending}
+                            data-testid="saved-report-saved-preview"
+                          >
+                            <Eye className="h-4 w-4" aria-hidden="true" />
+                            Preview saved
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleArchiveSavedReport(definition.id)}
+                            disabled={isPending}
+                            data-testid="saved-report-saved-archive"
+                          >
+                            <Archive className="h-4 w-4" aria-hidden="true" />
+                            Archive
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteSavedReport(definition.id)}
+                            disabled={isPending}
+                            data-testid="saved-report-saved-delete"
+                          >
+                            <Trash2 className="h-4 w-4" aria-hidden="true" />
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]">
         <Card>
@@ -268,7 +563,14 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
             <Badge variant="outline">{selectedDefinition.sourceSurface}</Badge>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+              {activeDefinitionId ? (
+                <input
+                  type="hidden"
+                  name="definitionId"
+                  value={activeDefinitionId}
+                />
+              ) : null}
               <div className="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -303,8 +605,13 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
                     <Input
                       id="saved-report-name"
                       name="name"
-                      defaultValue="Pipeline health preview"
+                      value={reportName}
+                      onChange={(event) => {
+                        setReportName(event.target.value);
+                        setResult(null);
+                      }}
                       maxLength={120}
+                      data-testid="saved-report-name-input"
                     />
                   </div>
 
@@ -316,7 +623,11 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
                       type="number"
                       min={1}
                       max={selectedDefinition.limits.previewRows.maxLimit}
-                      defaultValue={selectedDefinition.limits.previewRows.defaultLimit}
+                      value={previewLimit}
+                      onChange={(event) => {
+                        setPreviewLimit(event.target.value);
+                        setResult(null);
+                      }}
                       data-testid="saved-report-limit-input"
                     />
                   </div>
@@ -495,16 +806,40 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-muted-foreground">
                   {formatNumber(selectedFields.length)} fields selected for{" "}
-                  {selectedDefinition.label}.
+                  {selectedDefinition.label}
+                  {activeSavedReport ? ` from ${activeSavedReport.name}.` : "."}
                 </p>
-                <Button
-                  type="submit"
-                  loading={isPending}
-                  data-testid="saved-report-preview-submit"
-                >
-                  <Play className="h-4 w-4" aria-hidden="true" />
-                  {isPending ? "Previewing..." : "Preview report"}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    loading={isPending}
+                    onClick={handleCreateSavedReport}
+                    data-testid="saved-report-create-submit"
+                  >
+                    <Save className="h-4 w-4" aria-hidden="true" />
+                    Save new
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    loading={isPending}
+                    onClick={handleUpdateSavedReport}
+                    disabled={!activeDefinitionId || isPending}
+                    data-testid="saved-report-update-submit"
+                  >
+                    <Save className="h-4 w-4" aria-hidden="true" />
+                    Update saved
+                  </Button>
+                  <Button
+                    type="submit"
+                    loading={isPending}
+                    data-testid="saved-report-preview-submit"
+                  >
+                    <Play className="h-4 w-4" aria-hidden="true" />
+                    {isPending ? "Previewing..." : "Preview report"}
+                  </Button>
+                </div>
               </div>
             </form>
           </CardContent>
@@ -534,7 +869,7 @@ export function SavedReportOperator({ catalog }: SavedReportOperatorProps) {
   );
 }
 
-function PreviewErrors({ result }: { result: SavedReportPreviewActionResult }) {
+function PreviewErrors({ result }: { result: SavedReportActionResult }) {
   if (result.ok) {
     return null;
   }
@@ -819,6 +1154,16 @@ function metricLabel(
   );
 }
 
+function entityLabel(
+  catalog: SavedReportDefinitionCatalog,
+  entity: string
+): string {
+  return (
+    catalog.entities.find((definition) => definition.entity === entity)?.label ??
+    entity
+  );
+}
+
 function filterPlaceholder(
   definition: SavedReportEntityDefinition,
   key: string
@@ -854,6 +1199,14 @@ function formatCellValue(value: string | number | null): string {
 
 function formatToken(value: string): string {
   return value.replaceAll("_", " ").replaceAll("-", " ");
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(value));
 }
 
 function testIdToken(value: string): string {

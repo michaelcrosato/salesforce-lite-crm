@@ -42,6 +42,16 @@ import {
   runSavedReportPreview,
   type SavedReportPreviewResult
 } from "@/lib/server/savedReportPreviewRunner";
+import {
+  archiveSavedReportDefinition,
+  createSavedReportDefinition,
+  deleteSavedReportDefinition,
+  getSavedReportDefinition,
+  listSavedReportDefinitions,
+  toSavedReportDefinitionSnapshot,
+  updateSavedReportDefinition,
+  type SavedReportDefinitionSnapshot
+} from "@/lib/server/savedReportPersistence";
 
 export type CsvImportPreviewActionResult =
   | {
@@ -155,6 +165,28 @@ export type SavedReportPreviewActionResult =
       fieldErrors?: {
         entity?: string[];
         fields?: string[];
+        target?: string[];
+      };
+    };
+
+export type SavedReportManagementActionResult =
+  | {
+      ok: true;
+      message: string;
+      definition?: SavedReportDefinitionSnapshot;
+      definitions: SavedReportDefinitionSnapshot[];
+      preview?: SavedReportPreviewResult;
+    }
+  | {
+      ok: false;
+      message: string;
+      definitions?: SavedReportDefinitionSnapshot[];
+      preview?: SavedReportPreviewResult;
+      fieldErrors?: {
+        definitionId?: string[];
+        entity?: string[];
+        fields?: string[];
+        name?: string[];
         target?: string[];
       };
     };
@@ -422,20 +454,9 @@ export async function previewCsvImportReviewAction(
 export async function previewSavedReportDefinitionAction(
   formData: FormData
 ): Promise<SavedReportPreviewActionResult> {
-  const entity = formString(formData, "entity").trim();
-  const name = optionalActionString(formString(formData, "name"));
-  const fields = formStrings(formData, "fields");
-  const filterKey = formString(formData, "filterKey").trim();
-  const filterValue = formString(formData, "filterValue").trim();
-  const groupBy = formStrings(formData, "groupBy");
-  const chartType = formString(formData, "chartType").trim();
-  const chartDimension = optionalActionString(
-    formString(formData, "chartDimension")
-  );
-  const chartMetric = optionalActionString(formString(formData, "chartMetric"));
-  const limit = formString(formData, "limit").trim();
+  const input = savedReportInputFromForm(formData);
 
-  if (!entity) {
+  if (!input.entity) {
     return {
       ok: false,
       message: "Choose a saved report entity.",
@@ -445,7 +466,7 @@ export async function previewSavedReportDefinitionAction(
     };
   }
 
-  if (fields.length === 0) {
+  if (input.fields.length === 0) {
     return {
       ok: false,
       message: "Choose at least one saved report field.",
@@ -455,27 +476,8 @@ export async function previewSavedReportDefinitionAction(
     };
   }
 
-  const filters: Record<string, string> = {};
-
-  if (filterKey.length > 0 && filterValue.length > 0) {
-    filters[filterKey] = filterValue;
-  }
-
-  const chart = chartType.length > 0 ? buildChartInput(chartType, {
-    dimensionKey: chartDimension,
-    metricKey: chartMetric
-  }) : undefined;
-
   try {
-    const preview = await runSavedReportPreview({
-      entity,
-      name,
-      fields,
-      filters,
-      groupBy,
-      chart,
-      limit: limit.length > 0 ? limit : undefined
-    });
+    const preview = await runSavedReportPreview(input);
 
     if (preview.status === "invalid") {
       return {
@@ -499,6 +501,317 @@ export async function previewSavedReportDefinitionAction(
       }
     };
   }
+}
+
+export async function createSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportManagementActionResult> {
+  const input = savedReportInputFromForm(formData);
+
+  if (!input.entity) {
+    return {
+      ok: false,
+      message: "Choose a saved report entity.",
+      fieldErrors: {
+        entity: ["Choose a saved report entity."]
+      }
+    };
+  }
+
+  if (!input.name) {
+    return {
+      ok: false,
+      message: "Name the saved report before saving.",
+      fieldErrors: {
+        name: ["Name the saved report before saving."]
+      }
+    };
+  }
+
+  if (input.fields.length === 0) {
+    return {
+      ok: false,
+      message: "Choose at least one saved report field.",
+      fieldErrors: {
+        fields: ["Choose at least one saved report field."]
+      }
+    };
+  }
+
+  try {
+    const definition = await createSavedReportDefinition({
+      entity: input.entity,
+      name: input.name,
+      fields: input.fields,
+      filters: input.filters,
+      groupBy: input.groupBy,
+      chart: input.chart,
+      previewLimit: input.limit
+    });
+
+    return {
+      ok: true,
+      message: `Saved report '${definition.name}' was created.`,
+      definition: toSavedReportDefinitionSnapshot(definition),
+      definitions: await activeSavedReportSnapshots()
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report could not be created.",
+      definitions: await activeSavedReportSnapshots(),
+      fieldErrors: {
+        target: ["Review the saved report name, fields, filters, and chart."]
+      }
+    };
+  }
+}
+
+export async function updateSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportManagementActionResult> {
+  const definitionId = formString(formData, "definitionId").trim();
+  const input = savedReportInputFromForm(formData);
+
+  if (!definitionId) {
+    return {
+      ok: false,
+      message: "Load a saved report before updating it.",
+      fieldErrors: {
+        definitionId: ["Load a saved report before updating it."]
+      }
+    };
+  }
+
+  if (!input.name) {
+    return {
+      ok: false,
+      message: "Name the saved report before updating.",
+      fieldErrors: {
+        name: ["Name the saved report before updating."]
+      }
+    };
+  }
+
+  if (input.fields.length === 0) {
+    return {
+      ok: false,
+      message: "Choose at least one saved report field.",
+      fieldErrors: {
+        fields: ["Choose at least one saved report field."]
+      }
+    };
+  }
+
+  try {
+    const definition = await updateSavedReportDefinition(definitionId, {
+      name: input.name,
+      fields: input.fields,
+      filters: input.filters,
+      groupBy: input.groupBy,
+      chart: input.chart,
+      previewLimit: input.limit
+    });
+
+    return {
+      ok: true,
+      message: `Saved report '${definition.name}' was updated.`,
+      definition: toSavedReportDefinitionSnapshot(definition),
+      definitions: await activeSavedReportSnapshots()
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report could not be updated.",
+      definitions: await activeSavedReportSnapshots(),
+      fieldErrors: {
+        target: ["Review the loaded saved report and selected options."]
+      }
+    };
+  }
+}
+
+export async function previewPersistedSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportManagementActionResult> {
+  const definitionId = formString(formData, "definitionId").trim();
+
+  if (!definitionId) {
+    return {
+      ok: false,
+      message: "Choose a saved report to preview.",
+      fieldErrors: {
+        definitionId: ["Choose a saved report to preview."]
+      }
+    };
+  }
+
+  try {
+    const definition = await getSavedReportDefinition(definitionId);
+
+    if (!definition || definition.archivedAt !== null) {
+      return {
+        ok: false,
+        message: "The saved report definition could not be found.",
+        definitions: await activeSavedReportSnapshots(),
+        fieldErrors: {
+          definitionId: ["The saved report definition could not be found."]
+        }
+      };
+    }
+
+    const preview = await runSavedReportPreview({
+      entity: definition.entity,
+      name: definition.name,
+      fields: definition.fields,
+      filters: definition.filters,
+      groupBy: definition.groupBy,
+      chart: definition.chart,
+      limit: definition.previewLimit
+    });
+
+    if (preview.status === "invalid") {
+      return {
+        ok: false,
+        message: "Saved report preview validation failed.",
+        definitions: await activeSavedReportSnapshots(),
+        preview
+      };
+    }
+
+    return {
+      ok: true,
+      message: `${definition.name} preview: ${preview.rowCount} rows, ${preview.aggregates.length} aggregates.`,
+      definition: toSavedReportDefinitionSnapshot(definition),
+      definitions: await activeSavedReportSnapshots(),
+      preview
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report preview could not be built.",
+      definitions: await activeSavedReportSnapshots(),
+      fieldErrors: {
+        target: ["Review the saved report definition."]
+      }
+    };
+  }
+}
+
+export async function archiveSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportManagementActionResult> {
+  const definitionId = formString(formData, "definitionId").trim();
+
+  if (!definitionId) {
+    return {
+      ok: false,
+      message: "Choose a saved report to archive.",
+      fieldErrors: {
+        definitionId: ["Choose a saved report to archive."]
+      }
+    };
+  }
+
+  try {
+    const definition = await archiveSavedReportDefinition(definitionId);
+
+    return {
+      ok: true,
+      message: `Saved report '${definition.name}' was archived.`,
+      definition: toSavedReportDefinitionSnapshot(definition),
+      definitions: await activeSavedReportSnapshots()
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report could not be archived.",
+      definitions: await activeSavedReportSnapshots(),
+      fieldErrors: {
+        target: ["Review the selected saved report."]
+      }
+    };
+  }
+}
+
+export async function deleteSavedReportDefinitionAction(
+  formData: FormData
+): Promise<SavedReportManagementActionResult> {
+  const definitionId = formString(formData, "definitionId").trim();
+
+  if (!definitionId) {
+    return {
+      ok: false,
+      message: "Choose a saved report to delete.",
+      fieldErrors: {
+        definitionId: ["Choose a saved report to delete."]
+      }
+    };
+  }
+
+  try {
+    const definition = await deleteSavedReportDefinition(definitionId);
+
+    return {
+      ok: true,
+      message: `Saved report '${definition.name}' was deleted.`,
+      definition: toSavedReportDefinitionSnapshot(definition),
+      definitions: await activeSavedReportSnapshots()
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "The saved report could not be deleted.",
+      definitions: await activeSavedReportSnapshots(),
+      fieldErrors: {
+        target: ["Review the selected saved report."]
+      }
+    };
+  }
+}
+
+function savedReportInputFromForm(formData: FormData) {
+  const entity = formString(formData, "entity").trim();
+  const name = optionalActionString(formString(formData, "name"));
+  const fields = formStrings(formData, "fields");
+  const filterKey = formString(formData, "filterKey").trim();
+  const filterValue = formString(formData, "filterValue").trim();
+  const groupBy = formStrings(formData, "groupBy");
+  const chartType = formString(formData, "chartType").trim();
+  const chartDimension = optionalActionString(
+    formString(formData, "chartDimension")
+  );
+  const chartMetric = optionalActionString(formString(formData, "chartMetric"));
+  const limit = formString(formData, "limit").trim();
+  const filters: Record<string, string> = {};
+
+  if (filterKey.length > 0 && filterValue.length > 0) {
+    filters[filterKey] = filterValue;
+  }
+
+  return {
+    entity,
+    name,
+    fields,
+    filters,
+    groupBy,
+    chart:
+      chartType.length > 0
+        ? buildChartInput(chartType, {
+            dimensionKey: chartDimension,
+            metricKey: chartMetric
+          })
+        : undefined,
+    limit: limit.length > 0 ? limit : undefined
+  };
+}
+
+async function activeSavedReportSnapshots(): Promise<
+  SavedReportDefinitionSnapshot[]
+> {
+  const definitions = await listSavedReportDefinitions();
+
+  return definitions.map(toSavedReportDefinitionSnapshot);
 }
 
 function buildChartInput(

@@ -43,6 +43,10 @@ import {
   type AuditEventExplorerInput
 } from "@/lib/services/auditEvents";
 import { getSavedReportDefinitionCatalog } from "@/lib/server/savedReportDefinitions";
+import {
+  listSavedReportDefinitions,
+  toSavedReportDefinitionSnapshot
+} from "@/lib/server/savedReportPersistence";
 
 export const dynamic = "force-dynamic";
 
@@ -70,10 +74,16 @@ export default async function ReportsPage({
     resolvedSearchParams.csvExport
   );
   const auditFilters = resolveAuditFilters(resolvedSearchParams);
-  const [csvPackets, selectedCsvPacket, auditEventExplorer] = await Promise.all([
+  const [
+    csvPackets,
+    selectedCsvPacket,
+    auditEventExplorer,
+    persistedSavedReports
+  ] = await Promise.all([
     listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
     getCsvExportDeliveryPacket(selectedCsvEntity),
-    getAuditEventExplorer(auditFilters)
+    getAuditEventExplorer(auditFilters),
+    listSavedReportDefinitions()
   ]);
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
@@ -113,7 +123,12 @@ export default async function ReportsPage({
 
       <ListFilterSupportExplorer catalog={listFilterSupportCatalog} />
 
-      <SavedReportOperator catalog={savedReportCatalog} />
+      <SavedReportOperator
+        catalog={savedReportCatalog}
+        initialSavedReports={persistedSavedReports.map(
+          toSavedReportDefinitionSnapshot
+        )}
+      />
 
       <BulkDryRunReviewOperator
         definitions={bulkDryRunDefinitions}

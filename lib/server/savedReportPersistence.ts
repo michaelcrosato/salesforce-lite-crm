@@ -31,6 +31,15 @@ export type PersistedSavedReportDefinition = {
   write: SavedReportPersistenceWriteFlags;
 };
 
+export type SavedReportDefinitionSnapshot = Omit<
+  PersistedSavedReportDefinition,
+  "archivedAt" | "createdAt" | "updatedAt"
+> & {
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SavedReportPersistenceReadFlags = {
   metadata: true;
   database: true;
@@ -213,6 +222,17 @@ export async function deleteSavedReportDefinition(
       where: { id: idSchema.parse(id) }
     })
   );
+}
+
+export function toSavedReportDefinitionSnapshot(
+  definition: PersistedSavedReportDefinition
+): SavedReportDefinitionSnapshot {
+  return {
+    ...definition,
+    archivedAt: definition.archivedAt?.toISOString() ?? null,
+    createdAt: definition.createdAt.toISOString(),
+    updatedAt: definition.updatedAt.toISOString()
+  };
 }
 
 function requireNamedDraft(input: {
