@@ -2,37 +2,40 @@ Agent: Codex
 
 Sprint: 48
 
-Feature: Sprint rollover planning - S48-F1/S48-F2/S48-F3
+Feature: S48-F1 — Lead disposition contracts
 
 Branch: main
 
 Status: done
 
 Commits this prompt:
-- f21b93e - [codex] sprint 48: plan codex track
-- 5831775 - [codex] sprint 48: backlog refresh
+- 5392be7 - [codex] S48-F1: add lead disposition contracts
 
-Gate status: PASS - Baseline `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` passed before planning: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (100 files / 505 tests), build, Playwright chromium install, and e2e (42 tests). Post-planning verification also passed: `npm run lint`, `npm run typecheck`, `npm run test` (100 files / 505 tests), and `npm run build`.
+Gate status: PASS - `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1` passed after implementation: npm install, env bootstrap, Prisma generate/db push, seed, lint, typecheck, Vitest (101 files / 510 tests), build, Playwright chromium install, and e2e (42 tests).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-26T20:15:55.3929504-07:00
+Timestamp: 2026-05-26T20:34:19.4981798-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Completed sprint rollover planning after confirming the full local baseline was green and Sprint 47 Codex work had report-backed `done` evidence for S47-F1, S47-F2, and S47-F3.
-- Updated `PLAN.md` document control to version 2.54A and active Sprint 48, marked S47-F1/S47-F2/S47-F3 done, and appended Sprint 48 - Lead Follow-Up Readiness with S48-F1, S48-F2, and S48-F3 queued.
-- Synced `docs/FEATURE-BACKLOG.md` so Sprint 47 is done and Sprint 48 is queued.
-- Preserved the permanent non-goals: no auth, deployment, external AI, geocoding, Postgres default switch, persistent forecast scenarios, dealer-order/area CRUD, live `/deals/[id]`, or global search expansion.
+- Added `lib/services/leadDispositions.ts`, a read-only server-side lead disposition contract that classifies existing consumer dealer-routed leads into bounded deterministic snapshots.
+- Classification uses current `Lead` statuses, assignment reason/order fields, created/updated timestamps, and latest routing-event evidence without expanding lead statuses, running routing, reassigning orders, mutating records, adding UI, adding routes, or calling external providers.
+- Added DB-backed `getLeadDispositionSnapshot` and bounded `listLeadDispositionSnapshots` helpers plus pure builder helpers with an injected clock for deterministic downstream use.
+- Added `tests/api/lead-dispositions.test.ts` covering routed evidence, terminal statuses, routing failures, missing evidence, unrouted/legacy fallbacks, clock-based ages, and bounded read-only get/list helpers.
+
+### Discovered this prompt
+
+- Older Claude/Gemini/Grok root report files still reference historical Sprint 4/5 parallel branch state. Current `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and the green local gate on `main` supersede those reports for this root-mode run.
 
 ### Next action
 
-Run LOOP.md to begin S48-F1.
+Run LOOP.md to begin S48-F2 — Lead SLA follow-up packets.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (single-agent root mode; prompt explicitly authorized `PLAN.md`, `docs/FEATURE-BACKLOG.md`, and Codex report files)
+No cross-ownership edits: YES (single-agent root mode; implementation was limited to `lib/services/` and focused tests)
 
 CRM-CONTRACT.md honored:  YES
