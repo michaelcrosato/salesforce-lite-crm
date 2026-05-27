@@ -150,7 +150,7 @@ export function DashboardCardOperator({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-normal">
-            Dashboard Cards
+            Pinned Cards
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {placement?.label ?? formatSurface(surface)} cards from persisted saved
@@ -169,7 +169,7 @@ export function DashboardCardOperator({
         />
         <SummaryCard
           icon={Table2}
-          label="Saved reports"
+          label="Definitions"
           value={formatNumber(savedReports.length)}
           testId="dashboard-card-summary-available"
         />
@@ -190,7 +190,7 @@ export function DashboardCardOperator({
       <Card>
         <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
           <div className="space-y-1.5">
-            <CardTitle>Available Saved Reports</CardTitle>
+            <CardTitle>Available Definitions</CardTitle>
             <p className="text-sm text-muted-foreground">
               Active saved report definitions eligible for this surface.
             </p>
