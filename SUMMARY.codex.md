@@ -2,36 +2,36 @@ Agent: Codex
 
 Sprint: Sprint 52
 
-Feature: Sprint 52 planning - Routing Simulation Foundation
+Feature: S52-F1 - Routing simulator input contracts
 
 Branch: main
 
 Status: done
 
-Commits this prompt: ff8646a - [codex] sprint 52: plan codex track; 873d3c8 - [codex] sprint 52: backlog refresh
+Commits this prompt: 3da935d - [codex] S52-F1: add routing simulator input contracts
 
-Gate status: PASS - Baseline LOOP pre-flight passed through `npm install`, Prisma generate/db push, seed, lint, typecheck, `npm run test` (108 files / 534 tests), and build; post-planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (108 files / 534 tests), and `npm run build`.
+Gate status: PASS - Baseline LOOP pre-flight passed through `npm install`, Prisma generate/db push, seed, lint, typecheck, `npm run test` (108 files / 534 tests), and build. Implementation verification passed with `npm run test -- tests/api/routing-simulator-contracts.test.ts` (1 file / 5 tests), `npm run lint`, `npm run typecheck`, and the full `scripts/local-gate.ps1` sequence including 109 Vitest files / 539 tests, build, Playwright Chromium install, and 45 e2e tests.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-27T20:34:22.3358515-07:00
+Timestamp: 2026-05-27T20:52:09.4179906-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline gate was green before planning.
-- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and recent git history.
-- Verified Sprint 51 completion from current and historical Codex summaries, implementation/report commits, green full-gate evidence, and zero active Codex blockers.
-- Marked S51-F1, S51-F2, S51-F3, and S51-F4 done in `PLAN.md` and planned Sprint 52 as the Codex Routing Simulation Foundation track.
-- Synced `docs/FEATURE-BACKLOG.md` so S51 is done and S52-F1 through S52-F2 are queued.
+- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline gate was green before selecting work.
+- Reconciled `PLAN.md`, `CRM-CONTRACT.md`, README, agent SUMMARY/BLOCKERS files, referenced docs/prompts, and recent git history. Historical Claude/Grok/Gemini reports still reference older Sprint 4/5 states, but no active blocker currently impacts Codex on `main`.
+- Implemented `lib/server/routingSimulatorContracts.ts` with server-side simulator input metadata, supported country helpers, batch/field limits, deterministic fixture batch generation, postal normalization, and explicit no-write guardrails for hypothetical consumer leads.
+- Added `tests/api/routing-simulator-contracts.test.ts` covering catalog metadata, fixture output, input normalization, strict invalid-input rejection, batch limits, and no CRM record writes.
+- Verified S52-F1 with focused tests, lint, typecheck, and the full local gate script.
 
 ### Next action
 
-Run LOOP.md to begin S52-F1
+Run LOOP.md to begin S52-F2 - Routing simulator read-only evaluator.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES (planning-only prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
+No cross-ownership edits: YES
 
 CRM-CONTRACT.md honored: YES
