@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.59A |
+| Version | 2.60A |
 
 | Last updated | 2026-05-28 |
 
-| Active sprint | Sprint 53 queued for codex |
+| Active sprint | Sprint 54 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -2004,9 +2004,9 @@ Goal: expose the completed read-only routing simulator through bounded review pa
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S53-F1 — Routing simulator review packets | codex | queued | Server-side review packets compose S52 simulator inputs and evaluator output into deterministic assigned/blocked summaries, capacity-impact notes, issue counts, and bounded row samples. Packets remain no-write and do not add UI/routes, mutate live leads/orders, persist scenarios, alter routing decisions, or call external services. |
-| S53-F2 — Routing simulator operator surface | codex | queued | Existing CRM surfaces expose a small read-only hypothetical lead batch preview backed by S53-F1 packets, with clear assignment/blocker results and step-trace detail for operators. The surface adds no new product route and must not create leads, routing events, dealer-order delivery records, dashboard widgets, command-palette actions, or pacing-engine changes. |
-| S53-F3 — Routing simulator guardrail coverage | codex | queued | Focused unit and e2e coverage proves simulator previews stay read-only, preserve excluded-route boundaries, and do not regress live routing or dealer-order state. Coverage adds no broad visual redesign, global search expansion, external services, scenario persistence, or routing/fairness algorithm changes. |
+| S53-F1 — Routing simulator review packets | codex | done | Server-side review packets compose S52 simulator inputs and evaluator output into deterministic assigned/blocked summaries, capacity-impact notes, issue counts, and bounded row samples. Packets remain no-write and do not add UI/routes, mutate live leads/orders, persist scenarios, alter routing decisions, or call external services. |
+| S53-F2 — Routing simulator operator surface | codex | done | Existing CRM surfaces expose a small read-only hypothetical lead batch preview backed by S53-F1 packets, with clear assignment/blocker results and step-trace detail for operators. The surface adds no new product route and must not create leads, routing events, dealer-order delivery records, dashboard widgets, command-palette actions, or pacing-engine changes. |
+| S53-F3 — Routing simulator guardrail coverage | codex | done | Focused unit and e2e coverage proves simulator previews stay read-only, preserve excluded-route boundaries, and do not regress live routing or dealer-order state. Coverage adds no broad visual redesign, global search expansion, external services, scenario persistence, or routing/fairness algorithm changes. |
 
 \*\*Sprint 53 non-goals\*\* (carry forward permanent scope boundaries plus routing-simulator-specific exclusions):
 
@@ -2033,6 +2033,42 @@ Goal: expose the completed read-only routing simulator through bounded review pa
 \- No simulator product route, dashboard widget, command-palette action, CSV import/apply integration, background batch job, or scenario persistence.
 
 \- No routing reassignment, fairness weighting changes, dealer capacity calendar/window model, AI narrative generation, geocoding, or external enrichment.
+
+\*\*Sprint 54 — Routing Fairness Readiness\*\*
+
+Goal: add deterministic read-only routing fairness and explanation packets for existing routing/simulator data without changing live assignment, pacing, or route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S54-F1 — Routing fairness metric contracts | codex | queued | Server-side contracts define deterministic fairness/explanation metrics for existing routing and simulator data, including pace gap, quota saturation, lead-quality proxy, SLA-risk indicators, and explicit no-write/no-engine-change safety flags. Metrics do not mutate records, alter live routing, persist scenarios or snapshots, call providers, or add UI/routes. |
+| S54-F2 — Routing fairness review packets | codex | queued | Review packets compose S54-F1 metrics into bounded aggregate and row-level summaries with deterministic issue counts, explanation reasons, and representative samples for later operator use. Packets remain read-only and do not change routing decisions, dealer-order delivery, pacing calculations, lead statuses, or external enrichment. |
+| S54-F3 — Routing fairness operator surface | codex | queued | Existing CRM surfaces expose the S54-F2 fairness summary and representative detail with focused unit/e2e coverage. The surface adds no new product route and must not add mutation controls, dashboard widgets, command-palette actions, global search expansion, routing execution, or pacing-engine changes. |
+
+\*\*Sprint 54 non-goals\*\* (carry forward permanent scope boundaries plus routing-fairness-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No routing algorithm changes, reassignment behavior changes, fairness weighting changes, or pacing-engine mutation.
+
+\- No dealer capacity calendar/window model, order quota edits, area coverage edits, lead status expansion, or B2B lead conversion flow.
+
+\- No persistent routing/pacing snapshots, saved fairness history, scenario persistence, background jobs, external enrichment, Salesforce integration, RAG/vector search, AI narrative generation, provider credentials, or network calls.
 
 \## 5. File Ownership Matrix
 
@@ -2970,6 +3006,19 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+\### 2026-05-28 — Run decision (Sprint 53 completion and Sprint 54 planning)
+
+\*\*Decision:\*\* Mark S53-F1, S53-F2, and S53-F3 as done on `main`, set the active sprint field to "Sprint 54 queued for codex," and queue S54-F1 through S54-F3 as the next Codex track.
+
+\*\*Rationale:\*\* The current `main` history contains the routing simulator review-packet, operator-surface, and guardrail-coverage implementation/report commits, and the latest Codex report records green full local-gate evidence with zero active Codex blockers. PLAN.md and the backlog still listed Sprint 53 as queued, so this rollover reconciles completion and promotes the next read-only B-54 routing fairness/explanation scope without changing routing or pacing behavior.
+
+\*\*Alternatives rejected:\*\* Leaving Sprint 53 queued, because repo-local commits and the local gate already establish completion; promoting permanent non-goal items from README Known Limitations, because the current rollover explicitly excludes auth, deployment, external AI, geocoding, Postgres default, persistent forecast scenarios, dealer-order/area CRUD, live `/deals/[id]`, and global search expansion.
+
+\*\*Sections changed:\*\* §1, §4, §17.
+
+\*\*Open questions handled:\*\* Current Sprint 53 Codex status and the next Codex sprint scope.
+
 
 \### 2026-05-28 — Run decision (Sprint 52 completion)
 
