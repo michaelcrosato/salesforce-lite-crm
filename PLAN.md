@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.58A |
+| Version | 2.58B |
 
-| Last updated | 2026-05-27 |
+| Last updated | 2026-05-28 |
 
-| Active sprint | Sprint 52 queued for codex |
+| Active sprint | Sprint 52 complete; next scope not selected |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1969,8 +1969,8 @@ Goal: add a read-only simulator foundation for hypothetical consumer-lead routin
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S52-F1 — Routing simulator input contracts | codex | queued | Publish server-side simulator input, limit, fixture, and no-write guardrail contracts for hypothetical consumer leads. The contracts validate countries/postal inputs, batch limits, and explicit safety metadata without evaluating assignments, mutating records, adding UI/routes, or changing live routing behavior. |
-| S52-F2 — Routing simulator read-only evaluator | codex | queued | Add a deterministic read-only evaluator that uses existing postal normalization, area matching, order eligibility, and pace-gap ranking to explain where hypothetical leads would route. The evaluator returns assignment/blocker summaries and step traces without creating leads, routing events, dealer-order changes, forecast persistence, UI/routes, geocoding, or external calls. |
+| S52-F1 — Routing simulator input contracts | codex | done | Publish server-side simulator input, limit, fixture, and no-write guardrail contracts for hypothetical consumer leads. The contracts validate countries/postal inputs, batch limits, and explicit safety metadata without evaluating assignments, mutating records, adding UI/routes, or changing live routing behavior. |
+| S52-F2 — Routing simulator read-only evaluator | codex | done | Add a deterministic read-only evaluator that uses existing postal normalization, area matching, order eligibility, and pace-gap ranking to explain where hypothetical leads would route. The evaluator returns assignment/blocker summaries and step traces without creating leads, routing events, dealer-order changes, forecast persistence, UI/routes, geocoding, or external calls. |
 
 \*\*Sprint 52 non-goals\*\* (carry forward permanent scope boundaries plus routing-simulator-specific exclusions):
 
@@ -2934,6 +2934,19 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+\### 2026-05-28 — Run decision (Sprint 52 completion)
+
+\*\*Decision:\*\* Mark S52-F1 and S52-F2 as done on `main` and set the active sprint field to "Sprint 52 complete; next scope not selected."
+
+\*\*Rationale:\*\* The current `main` history contains the routing simulator input-contract and read-only evaluator implementation/report commits, and the latest Codex reports record green local-gate evidence for both Sprint 52 features. Keeping Sprint 52 listed as queued caused coordination drift for the next autonomous loop.
+
+\*\*Alternatives rejected:\*\* Leaving Sprint 52 queued, because repo-local commits and the local gate already establish completion; adding a Sprint 53 entry in this reconciliation pass, because new sprint activation still requires explicit planning scope.
+
+\*\*Sections changed:\*\* §1, §4, §17; `README.md`; `docs/ROADMAP.md`; `docs/FEATURE-BACKLOG.md`; `docs/PROJECT-CONTROL.md`.
+
+\*\*Open questions handled:\*\* Current Sprint 52 status and whether this reconciliation pass should activate a new feature scope.
+
 
 \### 2026-05-27 — Run decision (Sprint 49 completion)
 

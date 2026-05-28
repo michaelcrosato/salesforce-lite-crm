@@ -81,13 +81,15 @@ The roadmap is governed by seven rules:
 ## Current Track And Next Work
 
 `PLAN.md` section 4 records the latest completed feature track. As of the
-2026-05-27 repo review pass, Sprint 49 is complete on `main`:
+2026-05-28 completion reconciliation pass, Sprint 52 is complete on `main`:
 
 | Item | Status | Loop guidance |
 |---|---|---|
-| S49-F1 Saved report definition contracts | done | Added validated server-side saved report definition metadata for supported CRM objects, fields, filters, grouping, and charts, with the CRM contract update required by `PLAN.md` section 4. |
-| S49-F2 Saved report preview runner | done | Added read-only saved definition previews through existing list/report/filter services with bounded previews, aggregates, and chart-ready data without writes or new routes. |
-| S49-F3 Saved reports operator surface | done | Extended the existing `/reports` surface with saved report list, build, and preview controls without adding a new product route, dashboard builder, provider call, or mutation side effect. |
+| S52-F1 Routing simulator input contracts | done | Added server-side simulator input, limit, fixture, and no-write guardrail contracts for hypothetical consumer leads without evaluating assignments, mutating records, adding UI/routes, or changing live routing. |
+| S52-F2 Routing simulator read-only evaluator | done | Added a deterministic read-only evaluator that uses existing postal normalization, area matching, order eligibility, and pace-gap ranking to explain hypothetical routing outcomes without writes, UI/routes, geocoding, or external calls. |
+
+No next feature track is active until a future prompt or planning pass updates
+`PLAN.md` section 4.
 
 Future dependency/security modernization remains tracked as `B-68` before
 larger AI, auth, deployment, or integration work. Do not run

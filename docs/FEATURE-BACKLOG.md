@@ -133,8 +133,8 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S51-F2 | Dashboard card preview runner | Codex | done |
 | S51-F3 | Dashboard card operator surface | Codex | done |
 | S51-F4 | Dashboard audit and guardrails | Codex | done |
-| S52-F1 | Routing simulator input contracts | Codex | queued |
-| S52-F2 | Routing simulator read-only evaluator | Codex | queued |
+| S52-F1 | Routing simulator input contracts | Codex | done |
+| S52-F2 | Routing simulator read-only evaluator | Codex | done |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and

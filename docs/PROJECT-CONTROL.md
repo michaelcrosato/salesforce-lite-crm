@@ -6,9 +6,9 @@
 - Commit observed this pass: use `git rev-parse HEAD` for the current local
   commit; this file intentionally avoids freezing a SHA that stales after
   documentation-only commits.
-- Current pass: post-Sprint 49 repo review and routing-decision optimization.
-- Product feature work: S48-F1 through S48-F3 and S49-F1 through S49-F3 are
-  present in `main`; the next feature track is not selected.
+- Current pass: post-Sprint 52 completion reconciliation.
+- Product feature work: S48-F1 through S52-F2 is present in `main`; the next
+  feature track is not selected.
 - Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
   statuses, routes, search surfaces, report services, and adapter signatures.
 - Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
@@ -65,15 +65,14 @@ without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
 
 `main` contains the earlier Sprint 4B demo-hardening surface plus the
 subsequent CSV, audit, bulk action, list, service-operations, AI governance,
-approval readiness, lead follow-up, and saved-report builder tracks. Sprint 49
-is complete; a future prompt or planning pass must select the next feature
-track before new product work starts:
+approval readiness, lead follow-up, saved-report, dashboard-card, and routing
+simulation tracks. Sprint 52 is complete; a future prompt or planning pass must
+select the next feature track before new product work starts:
 
 | Feature | Owner | Current state |
 |---|---|---|
-| S49-F1 Saved report definition contracts | Codex | Done |
-| S49-F2 Saved report preview runner | Codex | Done |
-| S49-F3 Saved reports operator surface | Codex | Done |
+| S52-F1 Routing simulator input contracts | Codex | Done |
+| S52-F2 Routing simulator read-only evaluator | Codex | Done |
 
 This file does not activate new implementation scope. Work that changes entity
 names, routes, adapter signatures, feature flags, or other contract surfaces
@@ -121,8 +120,8 @@ Do not paste raw chat history into repo files.
 
 ## Roadmap Sources
 
-- `docs/ROADMAP.md`: canonical product roadmap, deferred promotion
-  candidates, recommended Sprint 5 scope, and roadmap-source artifact link.
+- `docs/ROADMAP.md`: canonical product roadmap, latest completed feature
+  track, deferred promotion candidates, and roadmap-source artifact link.
 - `docs/AI-ROADMAP.md`: AI platform sequencing, non-goals, safety rules, and
   persona feature order.
 - `docs/ARCHITECTURE.md`: current architecture boundaries and roadmap
