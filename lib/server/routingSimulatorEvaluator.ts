@@ -15,12 +15,18 @@ import {
   type RoutingSimulatorInputRow,
   type RoutingSimulatorWriteFlags
 } from "@/lib/server/routingSimulatorContracts";
+import {
+  validateDealerCapacityWindowDraft,
+  type DealerCapacityWindowDraft,
+  type DealerCapacityWindowInputRow
+} from "@/lib/server/dealerCapacityWindowContracts";
 
 export const ROUTING_SIMULATOR_EVALUATION_VERSION =
-  "2026-05-27.s52-f2" as const;
+  "2026-05-28.s55-f2" as const;
 
 export type RoutingSimulatorEvaluationOptions = {
   now?: Date;
+  capacityWindows?: unknown;
 };
 
 export type RoutingSimulatorEvaluationJson =
@@ -38,6 +44,7 @@ export type RoutingSimulatorEvaluationStep = {
     | "match_area"
     | "filter_orders"
     | "rank_pace_gap"
+    | "apply_capacity_windows"
     | "select";
   result: RoutingSimulatorEvaluationJson;
 };
@@ -45,6 +52,7 @@ export type RoutingSimulatorEvaluationStep = {
 export type RoutingSimulatorEvaluationReadFlags = {
   metadata: true;
   hypotheticalInput: true;
+  hypotheticalCapacityWindows: boolean;
   database: true;
   crmRecords: true;
   areas: true;
@@ -61,12 +69,15 @@ export type RoutingSimulatorEvaluationSafety = {
   validatesInputs: true;
   fixtureOnly: false;
   assignmentEvaluation: true;
+  capacityPlanning: boolean;
   liveRouting: false;
   leadCreation: false;
   routingEventWrites: false;
   dealerOrderMutation: false;
   pacingMutation: false;
+  capacityPersistence: false;
   forecastPersistence: false;
+  scenarioPersistence: false;
   geocoding: false;
   externalAi: false;
   network: false;
@@ -86,6 +97,7 @@ export type RoutingSimulatorFilteredOrder = {
   accountName: string;
   monthlyQuota: number;
   deliveredThisMonth: number;
+  deliveredOnCapacityDate: number;
   remainingQuota: number;
   status: "active";
 };
@@ -93,6 +105,48 @@ export type RoutingSimulatorFilteredOrder = {
 export type RoutingSimulatorRankedOrder = RoutingSimulatorFilteredOrder & {
   paceGap: number;
   rank: number;
+};
+
+export type RoutingSimulatorCapacityCheckOutcome =
+  | "not_configured"
+  | "outside_window"
+  | "blackout_date"
+  | "daily_cap_reached"
+  | "available";
+
+export type RoutingSimulatorCapacityCheck = {
+  readonly orderId: string;
+  readonly dealerName: string;
+  readonly evaluatedOn: string;
+  readonly eligible: boolean;
+  readonly outcome: RoutingSimulatorCapacityCheckOutcome;
+  readonly windowRowNumber: number | null;
+  readonly windowLabel: string | null;
+  readonly dailyCap: number | null;
+  readonly deliveredOnDate: number;
+  readonly simulatedAssignedOnDate: number;
+  readonly availableSlots: number | null;
+  readonly blackout: boolean;
+};
+
+export type RoutingSimulatorRowCapacity = {
+  readonly applied: boolean;
+  readonly evaluatedOn: string;
+  readonly candidateChecks: readonly RoutingSimulatorCapacityCheck[];
+  readonly selectedCheck: RoutingSimulatorCapacityCheck | null;
+  readonly blockedByCapacity: boolean;
+  readonly overflowed: boolean;
+  readonly overflowedFromOrderIds: readonly string[];
+};
+
+export type RoutingSimulatorCapacitySummary = {
+  readonly applied: boolean;
+  readonly evaluatedOn: string;
+  readonly windowCount: number;
+  readonly blockedCount: number;
+  readonly overflowCount: number;
+  readonly assignedWithCapacityCount: number;
+  readonly outcomeCounts: Record<RoutingSimulatorCapacityCheckOutcome, number>;
 };
 
 export type RoutingSimulatorEvaluationRow = {
@@ -107,6 +161,7 @@ export type RoutingSimulatorEvaluationRow = {
   status: "assigned" | "blocked";
   reason: AssignmentReason;
   summary: string;
+  capacity: RoutingSimulatorRowCapacity;
   steps: readonly RoutingSimulatorEvaluationStep[];
 };
 
@@ -130,10 +185,12 @@ export type RoutingSimulatorEvaluationPacket = {
   leadCount: number;
   rows: readonly RoutingSimulatorEvaluationRow[];
   summary: RoutingSimulatorEvaluationSummary;
+  capacitySummary: RoutingSimulatorCapacitySummary;
   guardrails: RoutingSimulatorGuardrails;
   source: {
     evaluatorModule: "lib/server/routingSimulatorEvaluator.ts";
     inputContractModule: "lib/server/routingSimulatorContracts.ts";
+    capacityContractModule: "lib/server/dealerCapacityWindowContracts.ts";
     routingModule: "lib/routing/leadRouter.ts";
     evaluationScope: "read-only-hypothetical-routing";
   };
@@ -147,6 +204,22 @@ type ActiveDealerOrder = Prisma.DealerOrderGetPayload<{
   include: typeof activeDealerOrderInclude;
 }> & {
   deliveredThisMonth: number;
+  deliveredOnCapacityDate: number;
+};
+
+type CapacityContext = {
+  readonly draft: DealerCapacityWindowDraft | null;
+  readonly evaluatedOn: string;
+  readonly windowsByOrderId: ReadonlyMap<
+    string,
+    readonly DealerCapacityWindowInputRow[]
+  >;
+  readonly simulatedAssignmentsByOrderId: Map<string, number>;
+};
+
+type CapacitySelection = {
+  readonly selectedOrder: RoutingSimulatorRankedOrder | null;
+  readonly capacity: RoutingSimulatorRowCapacity;
 };
 
 const activeDealerOrderInclude = {
@@ -169,6 +242,11 @@ export async function evaluateRoutingSimulatorBatch(
 ): Promise<RoutingSimulatorEvaluationPacket> {
   const now = options.now ?? new Date();
   const draft = validateRoutingSimulatorInputDraft(input);
+  const capacityDraft =
+    options.capacityWindows === undefined
+      ? null
+      : validateDealerCapacityWindowDraft(options.capacityWindows);
+  const capacityContext = buildCapacityContext(capacityDraft, now);
   const [areas, activeOrders] = await Promise.all([
     prisma.area.findMany({
       select: {
@@ -185,10 +263,10 @@ export async function evaluateRoutingSimulatorBatch(
         }
       ]
     }),
-    loadActiveDealerOrders(now)
+    loadActiveDealerOrders(now, capacityContext.evaluatedOn)
   ]);
   const rows = draft.leads.map((lead) =>
-    evaluateLead(lead, areas, activeOrders, now)
+    evaluateLead(lead, areas, activeOrders, now, capacityContext)
   );
 
   return {
@@ -199,21 +277,24 @@ export async function evaluateRoutingSimulatorBatch(
     leadCount: rows.length,
     rows,
     summary: summarizeRows(rows),
+    capacitySummary: summarizeCapacity(rows, capacityContext),
     guardrails: getRoutingSimulatorGuardrails(),
     source: {
       evaluatorModule: "lib/server/routingSimulatorEvaluator.ts",
       inputContractModule: "lib/server/routingSimulatorContracts.ts",
+      capacityContractModule: "lib/server/dealerCapacityWindowContracts.ts",
       routingModule: "lib/routing/leadRouter.ts",
       evaluationScope: "read-only-hypothetical-routing"
     },
-    read: evaluationReadFlags(),
+    read: evaluationReadFlags(capacityDraft !== null),
     write: noWriteFlags(),
-    safety: evaluationSafetyFlags()
+    safety: evaluationSafetyFlags(capacityDraft !== null)
   };
 }
 
 async function loadActiveDealerOrders(
-  now: Date
+  now: Date,
+  capacityDate: string
 ): Promise<ActiveDealerOrder[]> {
   const orders = await prisma.dealerOrder.findMany({
     where: {
@@ -231,10 +312,18 @@ async function loadActiveDealerOrders(
   });
 
   return Promise.all(
-    orders.map(async (order) => ({
-      ...order,
-      deliveredThisMonth: await countCurrentMonthLeads(order.id, now)
-    }))
+    orders.map(async (order) => {
+      const [deliveredThisMonth, deliveredOnCapacityDate] = await Promise.all([
+        countCurrentMonthLeads(order.id, now),
+        countCapacityDateLeads(order.id, capacityDate)
+      ]);
+
+      return {
+        ...order,
+        deliveredThisMonth,
+        deliveredOnCapacityDate
+      };
+    })
   );
 }
 
@@ -252,11 +341,27 @@ async function countCurrentMonthLeads(orderId: string, now: Date) {
   });
 }
 
+async function countCapacityDateLeads(orderId: string, capacityDate: string) {
+  const start = calendarDateStart(capacityDate);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+  return prisma.lead.count({
+    where: {
+      assignedOrderId: orderId,
+      createdAt: {
+        gte: start,
+        lt: end
+      }
+    }
+  });
+}
+
 function evaluateLead(
   lead: RoutingSimulatorInputRow,
   areas: RoutingArea[],
   activeOrders: ActiveDealerOrder[],
-  now: Date
+  now: Date,
+  capacityContext: CapacityContext
 ): RoutingSimulatorEvaluationRow {
   const area = resolveAreaForLead(
     {
@@ -270,11 +375,25 @@ function evaluateLead(
   const rankedOrders = rankEligibleOrders(filteredOrders, now).map(
     (order, index) => rankedOrderSummary(order, index + 1, now)
   );
-  const selectedOrder = rankedOrders[0] ?? null;
-  const reason = resolveReason(area, filteredOrders, rankedOrders);
+  const capacitySelection = selectCapacityEligibleOrder(
+    rankedOrders,
+    capacityContext
+  );
+  const selectedOrder = capacitySelection.selectedOrder;
+  const reason = resolveReason(
+    area,
+    filteredOrders,
+    rankedOrders,
+    capacitySelection.capacity
+  );
   const status = reason === "routed" ? "assigned" : "blocked";
   const matchedArea = area ? matchedAreaSummary(area) : null;
-  const summary = evaluationSummary(reason, matchedArea, selectedOrder);
+  const summary = evaluationSummary(
+    reason,
+    matchedArea,
+    selectedOrder,
+    capacitySelection.capacity
+  );
 
   return {
     rowNumber: lead.rowNumber,
@@ -288,7 +407,14 @@ function evaluateLead(
     status,
     reason,
     summary,
-    steps: evaluationSteps(lead, matchedArea, filteredOrders, rankedOrders)
+    capacity: capacitySelection.capacity,
+    steps: evaluationSteps(
+      lead,
+      matchedArea,
+      filteredOrders,
+      rankedOrders,
+      capacitySelection.capacity
+    )
   };
 }
 
@@ -299,7 +425,8 @@ function orderCoversArea(order: ActiveDealerOrder, areaId: string) {
 function resolveReason(
   area: RoutingArea | null,
   filteredOrders: readonly ActiveDealerOrder[],
-  rankedOrders: readonly RoutingSimulatorRankedOrder[]
+  rankedOrders: readonly RoutingSimulatorRankedOrder[],
+  capacity: RoutingSimulatorRowCapacity
 ): AssignmentReason {
   if (!area) {
     return "no_area_match";
@@ -310,6 +437,10 @@ function resolveReason(
   }
 
   if (rankedOrders.length === 0) {
+    return "all_orders_at_quota";
+  }
+
+  if (capacity.applied && !capacity.selectedCheck) {
     return "all_orders_at_quota";
   }
 
@@ -333,6 +464,7 @@ function filteredOrderSummary(
     accountName: order.account.name,
     monthlyQuota: order.monthlyQuota,
     deliveredThisMonth: order.deliveredThisMonth,
+    deliveredOnCapacityDate: order.deliveredOnCapacityDate,
     remainingQuota: Math.max(0, order.monthlyQuota - order.deliveredThisMonth),
     status: "active"
   };
@@ -355,9 +487,26 @@ function rankedOrderSummary(
 function evaluationSummary(
   reason: AssignmentReason,
   area: RoutingSimulatorMatchedArea | null,
-  selectedOrder: RoutingSimulatorRankedOrder | null
+  selectedOrder: RoutingSimulatorRankedOrder | null,
+  capacity: RoutingSimulatorRowCapacity
 ) {
+  if (capacity.applied && capacity.blockedByCapacity) {
+    return `All ranked dealer orders are blocked by hypothetical capacity windows for ${capacity.evaluatedOn}.`;
+  }
+
   if (reason === "routed" && area && selectedOrder) {
+    if (capacity.applied && capacity.overflowed) {
+      const overflowedOrderCount = capacity.overflowedFromOrderIds.length;
+
+      return `Resolved ${area.name}; selected ${selectedOrder.dealerName} for ${selectedOrder.accountName} after capacity overflow from ${overflowedOrderCount} higher-ranked ${orderNoun(overflowedOrderCount)}.`;
+    }
+
+    if (capacity.applied && capacity.selectedCheck?.outcome === "available") {
+      const availableSlots = capacity.selectedCheck.availableSlots ?? 0;
+
+      return `Resolved ${area.name}; selected ${selectedOrder.dealerName} for ${selectedOrder.accountName} with ${availableSlots} capacity ${slotNoun(availableSlots)} available on ${capacity.evaluatedOn}.`;
+    }
+
     return `Resolved ${area.name}; selected ${selectedOrder.dealerName} for ${selectedOrder.accountName} with ${selectedOrder.deliveredThisMonth}/${selectedOrder.monthlyQuota} leads delivered and pace gap ${selectedOrder.paceGap.toFixed(2)}.`;
   }
 
@@ -376,11 +525,12 @@ function evaluationSteps(
   lead: RoutingSimulatorInputRow,
   matchedArea: RoutingSimulatorMatchedArea | null,
   filteredOrders: readonly ActiveDealerOrder[],
-  rankedOrders: readonly RoutingSimulatorRankedOrder[]
+  rankedOrders: readonly RoutingSimulatorRankedOrder[],
+  capacity: RoutingSimulatorRowCapacity
 ): RoutingSimulatorEvaluationStep[] {
   const selectedOrder = rankedOrders[0] ?? null;
 
-  return [
+  const baseSteps: RoutingSimulatorEvaluationStep[] = [
     {
       step: "normalize",
       result: lead.normalizedPostalCode
@@ -403,14 +553,257 @@ function evaluationSteps(
     {
       step: "rank_pace_gap",
       result: rankedOrders
-    },
+    }
+  ];
+
+  if (capacity.applied) {
+    baseSteps.push({
+      step: "apply_capacity_windows",
+      result: {
+        evaluatedOn: capacity.evaluatedOn,
+        selectedOrderId: capacity.selectedCheck?.orderId ?? null,
+        blockedByCapacity: capacity.blockedByCapacity,
+        overflowedFromOrderIds: capacity.overflowedFromOrderIds,
+        checks: capacity.candidateChecks.map(capacityCheckStep)
+      }
+    });
+  }
+
+  baseSteps.push(
     {
       step: "select",
       result: {
-        orderId: selectedOrder?.orderId ?? null
+        orderId: capacity.applied
+          ? capacity.selectedCheck?.orderId ?? null
+          : selectedOrder?.orderId ?? null
       }
     }
-  ];
+  );
+
+  return baseSteps;
+}
+
+function buildCapacityContext(
+  draft: DealerCapacityWindowDraft | null,
+  now: Date
+): CapacityContext {
+  const windowsByOrderId = new Map<
+    string,
+    DealerCapacityWindowInputRow[]
+  >();
+
+  if (draft) {
+    for (const window of draft.windows) {
+      const existing = windowsByOrderId.get(window.dealerOrderId);
+
+      if (existing) {
+        existing.push(window);
+      } else {
+        windowsByOrderId.set(window.dealerOrderId, [window]);
+      }
+    }
+  }
+
+  return {
+    draft,
+    evaluatedOn: calendarDateKey(now),
+    windowsByOrderId,
+    simulatedAssignmentsByOrderId: new Map<string, number>()
+  };
+}
+
+function selectCapacityEligibleOrder(
+  rankedOrders: readonly RoutingSimulatorRankedOrder[],
+  context: CapacityContext
+): CapacitySelection {
+  if (!context.draft) {
+    return {
+      selectedOrder: rankedOrders[0] ?? null,
+      capacity: {
+        applied: false,
+        evaluatedOn: context.evaluatedOn,
+        candidateChecks: [],
+        selectedCheck: null,
+        blockedByCapacity: false,
+        overflowed: false,
+        overflowedFromOrderIds: []
+      }
+    };
+  }
+
+  const candidateChecks = rankedOrders.map((order) =>
+    capacityCheckForOrder(order, context)
+  );
+  const selectedCheckIndex = candidateChecks.findIndex(
+    (check) => check.eligible
+  );
+  const selectedCheck =
+    selectedCheckIndex === -1 ? null : candidateChecks[selectedCheckIndex];
+  const selectedOrder = selectedCheck
+    ? rankedOrders.find((order) => order.orderId === selectedCheck.orderId) ??
+      null
+    : null;
+
+  if (selectedCheck?.outcome === "available") {
+    const currentAssignments =
+      context.simulatedAssignmentsByOrderId.get(selectedCheck.orderId) ?? 0;
+    context.simulatedAssignmentsByOrderId.set(
+      selectedCheck.orderId,
+      currentAssignments + 1
+    );
+  }
+
+  const overflowedFromOrderIds =
+    selectedCheckIndex > 0
+      ? candidateChecks
+          .slice(0, selectedCheckIndex)
+          .filter((check) => !check.eligible)
+          .map((check) => check.orderId)
+      : [];
+
+  return {
+    selectedOrder,
+    capacity: {
+      applied: true,
+      evaluatedOn: context.evaluatedOn,
+      candidateChecks,
+      selectedCheck,
+      blockedByCapacity: rankedOrders.length > 0 && !selectedCheck,
+      overflowed: overflowedFromOrderIds.length > 0,
+      overflowedFromOrderIds
+    }
+  };
+}
+
+function capacityCheckForOrder(
+  order: RoutingSimulatorRankedOrder,
+  context: CapacityContext
+): RoutingSimulatorCapacityCheck {
+  const simulatedAssignedOnDate =
+    context.simulatedAssignmentsByOrderId.get(order.orderId) ?? 0;
+  const windows = context.windowsByOrderId.get(order.orderId) ?? [];
+
+  if (windows.length === 0) {
+    return capacityCheck({
+      order,
+      context,
+      eligible: true,
+      outcome: "not_configured",
+      window: null,
+      simulatedAssignedOnDate,
+      availableSlots: null,
+      blackout: false
+    });
+  }
+
+  const activeWindow =
+    windows.find(
+      (window) =>
+        window.startsOn <= context.evaluatedOn &&
+        context.evaluatedOn <= window.endsOn
+    ) ?? null;
+
+  if (!activeWindow) {
+    return capacityCheck({
+      order,
+      context,
+      eligible: false,
+      outcome: "outside_window",
+      window: null,
+      simulatedAssignedOnDate,
+      availableSlots: 0,
+      blackout: false
+    });
+  }
+
+  const blackout = activeWindow.blackoutDates.includes(context.evaluatedOn);
+
+  if (blackout) {
+    return capacityCheck({
+      order,
+      context,
+      eligible: false,
+      outcome: "blackout_date",
+      window: activeWindow,
+      simulatedAssignedOnDate,
+      availableSlots: 0,
+      blackout
+    });
+  }
+
+  const availableSlots = Math.max(
+    0,
+    activeWindow.dailyCap -
+      order.deliveredOnCapacityDate -
+      simulatedAssignedOnDate
+  );
+
+  if (availableSlots === 0) {
+    return capacityCheck({
+      order,
+      context,
+      eligible: false,
+      outcome: "daily_cap_reached",
+      window: activeWindow,
+      simulatedAssignedOnDate,
+      availableSlots,
+      blackout: false
+    });
+  }
+
+  return capacityCheck({
+    order,
+    context,
+    eligible: true,
+    outcome: "available",
+    window: activeWindow,
+    simulatedAssignedOnDate,
+    availableSlots,
+    blackout: false
+  });
+}
+
+function capacityCheck(input: {
+  readonly order: RoutingSimulatorRankedOrder;
+  readonly context: CapacityContext;
+  readonly eligible: boolean;
+  readonly outcome: RoutingSimulatorCapacityCheckOutcome;
+  readonly window: DealerCapacityWindowInputRow | null;
+  readonly simulatedAssignedOnDate: number;
+  readonly availableSlots: number | null;
+  readonly blackout: boolean;
+}): RoutingSimulatorCapacityCheck {
+  return {
+    orderId: input.order.orderId,
+    dealerName: input.order.dealerName,
+    evaluatedOn: input.context.evaluatedOn,
+    eligible: input.eligible,
+    outcome: input.outcome,
+    windowRowNumber: input.window?.rowNumber ?? null,
+    windowLabel: input.window?.label ?? null,
+    dailyCap: input.window?.dailyCap ?? null,
+    deliveredOnDate: input.order.deliveredOnCapacityDate,
+    simulatedAssignedOnDate: input.simulatedAssignedOnDate,
+    availableSlots: input.availableSlots,
+    blackout: input.blackout
+  };
+}
+
+function capacityCheckStep(
+  check: RoutingSimulatorCapacityCheck
+): RoutingSimulatorEvaluationJson {
+  return {
+    orderId: check.orderId,
+    dealerName: check.dealerName,
+    eligible: check.eligible,
+    outcome: check.outcome,
+    windowRowNumber: check.windowRowNumber,
+    dailyCap: check.dailyCap,
+    deliveredOnDate: check.deliveredOnDate,
+    simulatedAssignedOnDate: check.simulatedAssignedOnDate,
+    availableSlots: check.availableSlots,
+    blackout: check.blackout
+  };
 }
 
 function summarizeRows(
@@ -475,10 +868,64 @@ function emptyReasonCounts(): Record<AssignmentReason, number> {
   );
 }
 
-function evaluationReadFlags(): RoutingSimulatorEvaluationReadFlags {
+function summarizeCapacity(
+  rows: readonly RoutingSimulatorEvaluationRow[],
+  context: CapacityContext
+): RoutingSimulatorCapacitySummary {
+  const outcomeCounts = emptyCapacityOutcomeCounts();
+  let blockedCount = 0;
+  let overflowCount = 0;
+  let assignedWithCapacityCount = 0;
+
+  for (const row of rows) {
+    if (row.capacity.blockedByCapacity) {
+      blockedCount += 1;
+    }
+
+    if (row.capacity.overflowed) {
+      overflowCount += 1;
+    }
+
+    if (row.capacity.selectedCheck?.outcome === "available") {
+      assignedWithCapacityCount += 1;
+    }
+
+    for (const check of row.capacity.candidateChecks) {
+      outcomeCounts[check.outcome] += 1;
+    }
+  }
+
+  return {
+    applied: context.draft !== null,
+    evaluatedOn: context.evaluatedOn,
+    windowCount: context.draft?.windowCount ?? 0,
+    blockedCount,
+    overflowCount,
+    assignedWithCapacityCount,
+    outcomeCounts
+  };
+}
+
+function emptyCapacityOutcomeCounts(): Record<
+  RoutingSimulatorCapacityCheckOutcome,
+  number
+> {
+  return {
+    not_configured: 0,
+    outside_window: 0,
+    blackout_date: 0,
+    daily_cap_reached: 0,
+    available: 0
+  };
+}
+
+function evaluationReadFlags(
+  hypotheticalCapacityWindows: boolean
+): RoutingSimulatorEvaluationReadFlags {
   return {
     metadata: true,
     hypotheticalInput: true,
+    hypotheticalCapacityWindows,
     database: true,
     crmRecords: true,
     areas: true,
@@ -507,23 +954,46 @@ function noWriteFlags(): RoutingSimulatorWriteFlags {
   };
 }
 
-function evaluationSafetyFlags(): RoutingSimulatorEvaluationSafety {
+function evaluationSafetyFlags(
+  capacityPlanning: boolean
+): RoutingSimulatorEvaluationSafety {
   return {
     deterministic: true,
     readOnly: true,
     validatesInputs: true,
     fixtureOnly: false,
     assignmentEvaluation: true,
+    capacityPlanning,
     liveRouting: false,
     leadCreation: false,
     routingEventWrites: false,
     dealerOrderMutation: false,
     pacingMutation: false,
+    capacityPersistence: false,
     forecastPersistence: false,
+    scenarioPersistence: false,
     geocoding: false,
     externalAi: false,
     network: false,
     productUi: false,
     routeHandlers: false
   };
+}
+
+function calendarDateKey(value: Date): string {
+  return value.toISOString().slice(0, 10);
+}
+
+function calendarDateStart(value: string): Date {
+  const [year, month, day] = value.split("-").map(Number);
+
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function slotNoun(count: number): string {
+  return count === 1 ? "slot" : "slots";
+}
+
+function orderNoun(count: number): string {
+  return count === 1 ? "order" : "orders";
 }

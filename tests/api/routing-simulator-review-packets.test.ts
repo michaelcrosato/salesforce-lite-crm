@@ -163,6 +163,21 @@ describe("routing simulator review packets", () => {
         }
       ]
     });
+    expect(packet.capacitySummary).toEqual({
+      applied: false,
+      evaluatedOn: "2026-05-16",
+      windowCount: 0,
+      blockedCount: 0,
+      overflowCount: 0,
+      assignedWithCapacityCount: 0,
+      outcomeCounts: {
+        not_configured: 0,
+        outside_window: 0,
+        blackout_date: 0,
+        daily_cap_reached: 0,
+        available: 0
+      }
+    });
     expect(packet.issues).toEqual([
       {
         code: "no_area_match",
@@ -247,6 +262,94 @@ describe("routing simulator review packets", () => {
       status: "blocked",
       reason: "no_area_match"
     });
+  });
+
+  it("passes capacity windows through to review packet evaluation", async () => {
+    const before = await currentCounts();
+
+    const packet = await buildRoutingSimulatorReviewPacket(
+      {
+        leads: [
+          {
+            referenceId: "capacity-review-one",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          },
+          {
+            referenceId: "capacity-review-two",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          }
+        ]
+      },
+      {
+        now,
+        sampleLimit: 2,
+        capacityWindows: {
+          windows: [
+            {
+              dealerOrderId: routedOrderTwoId,
+              label: "Review order two cap",
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 1
+            },
+            {
+              dealerOrderId: routedOrderOneId,
+              label: "Review order one cap",
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 1
+            }
+          ]
+        }
+      }
+    );
+
+    expect(packet.summary).toMatchObject({
+      leadCount: 2,
+      assignedCount: 2,
+      blockedCount: 0,
+      assignmentRate: 1,
+      reviewStatus: "all_assigned",
+      capacityImpactNoteCount: 2,
+      sampleCount: 2
+    });
+    expect(packet.evaluationSummary.selectedOrderCounts).toEqual([
+      {
+        orderId: routedOrderOneId,
+        dealerName: "Routing Review Order One",
+        count: 1
+      },
+      {
+        orderId: routedOrderTwoId,
+        dealerName: "Routing Review Order Two",
+        count: 1
+      }
+    ]);
+    expect(packet.capacitySummary).toEqual({
+      applied: true,
+      evaluatedOn: "2026-05-16",
+      windowCount: 2,
+      blockedCount: 0,
+      overflowCount: 1,
+      assignedWithCapacityCount: 2,
+      outcomeCounts: {
+        not_configured: 0,
+        outside_window: 0,
+        blackout_date: 0,
+        daily_cap_reached: 1,
+        available: 3
+      }
+    });
+    expect(packet.read.hypotheticalCapacityWindows).toBe(true);
+    expect(packet.rowSamples[1]?.steps.map((step) => step.step)).toContain(
+      "apply_capacity_windows"
+    );
+    expect(packet.rowSamples[1]?.summary).toBe(
+      "Resolved Routing Review Routed Area; selected Routing Review Order One for Routing Review Account after capacity overflow from 1 higher-ranked order."
+    );
+    expect(await currentCounts()).toEqual(before);
   });
 
   it("does not write CRM records while building review packets", async () => {

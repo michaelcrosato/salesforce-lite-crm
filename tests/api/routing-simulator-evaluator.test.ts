@@ -130,6 +130,21 @@ describe("routing simulator read-only evaluator", () => {
         }
       ]
     });
+    expect(packet.capacitySummary).toEqual({
+      applied: false,
+      evaluatedOn: "2026-05-16",
+      windowCount: 0,
+      blockedCount: 0,
+      overflowCount: 0,
+      assignedWithCapacityCount: 0,
+      outcomeCounts: {
+        not_configured: 0,
+        outside_window: 0,
+        blackout_date: 0,
+        daily_cap_reached: 0,
+        available: 0
+      }
+    });
 
     const routed = packet.rows.find((row) => row.referenceId === "route-me");
     expect(routed).toMatchObject({
@@ -141,6 +156,15 @@ describe("routing simulator read-only evaluator", () => {
       },
       status: "assigned",
       reason: "routed",
+      capacity: {
+        applied: false,
+        evaluatedOn: "2026-05-16",
+        candidateChecks: [],
+        selectedCheck: null,
+        blockedByCapacity: false,
+        overflowed: false,
+        overflowedFromOrderIds: []
+      },
       selectedOrder: {
         orderId: routedOrderTwoId,
         dealerName: "Simulator Routed Order Two",
@@ -233,6 +257,278 @@ describe("routing simulator read-only evaluator", () => {
     });
   });
 
+  it("applies capacity windows for batch overflow and blocking", async () => {
+    const packet = await evaluateRoutingSimulatorBatch(
+      {
+        leads: [
+          {
+            referenceId: "capacity-one",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          },
+          {
+            referenceId: "capacity-two",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          },
+          {
+            referenceId: "capacity-three",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          }
+        ]
+      },
+      {
+        now,
+        capacityWindows: {
+          windows: [
+            {
+              dealerOrderId: routedOrderTwoId,
+              label: "Order two daily cap",
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 1
+            },
+            {
+              dealerOrderId: routedOrderOneId,
+              label: "Order one daily cap",
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 1
+            }
+          ]
+        }
+      }
+    );
+
+    expect(packet.summary).toEqual({
+      leadCount: 3,
+      assignedCount: 2,
+      blockedCount: 1,
+      reasonCounts: {
+        routed: 2,
+        no_area_match: 0,
+        no_matching_active_order: 0,
+        all_orders_at_quota: 1
+      },
+      selectedOrderCounts: [
+        {
+          orderId: routedOrderOneId,
+          dealerName: "Simulator Routed Order One",
+          count: 1
+        },
+        {
+          orderId: routedOrderTwoId,
+          dealerName: "Simulator Routed Order Two",
+          count: 1
+        }
+      ]
+    });
+    expect(packet.capacitySummary).toEqual({
+      applied: true,
+      evaluatedOn: "2026-05-16",
+      windowCount: 2,
+      blockedCount: 1,
+      overflowCount: 1,
+      assignedWithCapacityCount: 2,
+      outcomeCounts: {
+        not_configured: 0,
+        outside_window: 0,
+        blackout_date: 0,
+        daily_cap_reached: 3,
+        available: 3
+      }
+    });
+
+    const first = packet.rows.find(
+      (row) => row.referenceId === "capacity-one"
+    );
+    expect(first).toMatchObject({
+      status: "assigned",
+      reason: "routed",
+      selectedOrder: {
+        orderId: routedOrderTwoId
+      },
+      capacity: {
+        applied: true,
+        selectedCheck: {
+          orderId: routedOrderTwoId,
+          outcome: "available",
+          availableSlots: 1
+        },
+        blockedByCapacity: false,
+        overflowed: false,
+        overflowedFromOrderIds: []
+      },
+      summary:
+        "Resolved Simulator Routed Area; selected Simulator Routed Order Two for Routing Simulator Account with 1 capacity slot available on 2026-05-16."
+    });
+    expect(first?.capacity.candidateChecks.map((check) => check.outcome)).toEqual([
+      "available",
+      "available"
+    ]);
+
+    const second = packet.rows.find(
+      (row) => row.referenceId === "capacity-two"
+    );
+    expect(second).toMatchObject({
+      status: "assigned",
+      reason: "routed",
+      selectedOrder: {
+        orderId: routedOrderOneId,
+        rank: 2
+      },
+      capacity: {
+        applied: true,
+        selectedCheck: {
+          orderId: routedOrderOneId,
+          outcome: "available",
+          simulatedAssignedOnDate: 0,
+          availableSlots: 1
+        },
+        blockedByCapacity: false,
+        overflowed: true,
+        overflowedFromOrderIds: [routedOrderTwoId]
+      },
+      summary:
+        "Resolved Simulator Routed Area; selected Simulator Routed Order One for Routing Simulator Account after capacity overflow from 1 higher-ranked order."
+    });
+    expect(second?.capacity.candidateChecks.map((check) => check.outcome)).toEqual([
+      "daily_cap_reached",
+      "available"
+    ]);
+    expect(second?.steps.map((step) => step.step)).toEqual([
+      "normalize",
+      "extract_prefix",
+      "match_area",
+      "filter_orders",
+      "rank_pace_gap",
+      "apply_capacity_windows",
+      "select"
+    ]);
+    expect(second?.steps.at(-2)).toMatchObject({
+      step: "apply_capacity_windows",
+      result: {
+        evaluatedOn: "2026-05-16",
+        selectedOrderId: routedOrderOneId,
+        blockedByCapacity: false,
+        overflowedFromOrderIds: [routedOrderTwoId]
+      }
+    });
+
+    const third = packet.rows.find(
+      (row) => row.referenceId === "capacity-three"
+    );
+    expect(third).toMatchObject({
+      status: "blocked",
+      reason: "all_orders_at_quota",
+      selectedOrder: null,
+      capacity: {
+        applied: true,
+        selectedCheck: null,
+        blockedByCapacity: true,
+        overflowed: false,
+        overflowedFromOrderIds: []
+      },
+      summary:
+        "All ranked dealer orders are blocked by hypothetical capacity windows for 2026-05-16."
+    });
+    expect(third?.capacity.candidateChecks.map((check) => check.outcome)).toEqual([
+      "daily_cap_reached",
+      "daily_cap_reached"
+    ]);
+    expect(third?.steps.at(-1)).toEqual({
+      step: "select",
+      result: {
+        orderId: null
+      }
+    });
+  });
+
+  it("reports blackout and outside-window capacity checks", async () => {
+    const packet = await evaluateRoutingSimulatorBatch(
+      {
+        leads: [
+          {
+            referenceId: "capacity-blackout",
+            postalCode: "t7t 7t7",
+            country: "CA"
+          }
+        ]
+      },
+      {
+        now,
+        capacityWindows: {
+          windows: [
+            {
+              dealerOrderId: routedOrderTwoId,
+              label: "Order two blackout",
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 10,
+              blackoutDates: ["2026-05-16"]
+            },
+            {
+              dealerOrderId: routedOrderOneId,
+              label: "Order one future window",
+              startsOn: "2026-05-17",
+              endsOn: "2026-05-18",
+              dailyCap: 10
+            }
+          ]
+        }
+      }
+    );
+
+    expect(packet.summary).toMatchObject({
+      leadCount: 1,
+      assignedCount: 0,
+      blockedCount: 1,
+      reasonCounts: {
+        routed: 0,
+        no_area_match: 0,
+        no_matching_active_order: 0,
+        all_orders_at_quota: 1
+      }
+    });
+    expect(packet.capacitySummary).toMatchObject({
+      applied: true,
+      evaluatedOn: "2026-05-16",
+      windowCount: 2,
+      blockedCount: 1,
+      overflowCount: 0,
+      assignedWithCapacityCount: 0,
+      outcomeCounts: {
+        not_configured: 0,
+        outside_window: 1,
+        blackout_date: 1,
+        daily_cap_reached: 0,
+        available: 0
+      }
+    });
+
+    const row = packet.rows[0];
+    expect(row?.capacity.candidateChecks).toEqual([
+      expect.objectContaining({
+        orderId: routedOrderTwoId,
+        outcome: "blackout_date",
+        blackout: true,
+        eligible: false,
+        dailyCap: 10
+      }),
+      expect.objectContaining({
+        orderId: routedOrderOneId,
+        outcome: "outside_window",
+        blackout: false,
+        eligible: false,
+        dailyCap: null
+      })
+    ]);
+    expect(row?.summary).toBe(
+      "All ranked dealer orders are blocked by hypothetical capacity windows for 2026-05-16."
+    );
+  });
+
   it("does not write CRM records while evaluating hypothetical leads", async () => {
     const before = await currentCounts();
 
@@ -246,7 +542,19 @@ describe("routing simulator read-only evaluator", () => {
           }
         ]
       },
-      { now }
+      {
+        now,
+        capacityWindows: {
+          windows: [
+            {
+              dealerOrderId: routedOrderTwoId,
+              startsOn: "2026-05-16",
+              endsOn: "2026-05-16",
+              dailyCap: 1
+            }
+          ]
+        }
+      }
     );
 
     expect(await currentCounts()).toEqual(before);

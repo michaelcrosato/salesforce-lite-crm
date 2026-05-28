@@ -9,7 +9,8 @@ import {
   type RoutingSimulatorEvaluationStep,
   type RoutingSimulatorMatchedArea,
   type RoutingSimulatorRankedOrder,
-  type RoutingSimulatorEvaluationSummary
+  type RoutingSimulatorEvaluationSummary,
+  type RoutingSimulatorCapacitySummary
 } from "@/lib/server/routingSimulatorEvaluator";
 import {
   ROUTING_SIMULATOR_INPUT_CONTENT_TYPE,
@@ -144,6 +145,7 @@ export type RoutingSimulatorReviewPacket = {
   readonly leadCount: number;
   readonly rowSampleLimit: number;
   readonly evaluationSummary: RoutingSimulatorEvaluationSummary;
+  readonly capacitySummary: RoutingSimulatorCapacitySummary;
   readonly summary: RoutingSimulatorReviewSummary;
   readonly issues: readonly RoutingSimulatorReviewIssue[];
   readonly capacityImpact: readonly RoutingSimulatorCapacityImpact[];
@@ -164,11 +166,13 @@ export type RoutingSimulatorReviewPacket = {
 export type RoutingSimulatorReviewOptions = {
   readonly now?: Date;
   readonly sampleLimit?: number;
+  readonly capacityWindows?: unknown;
 };
 
 type ParsedRoutingSimulatorReviewOptions = {
   readonly now?: Date;
   readonly sampleLimit: number;
+  readonly capacityWindows?: unknown;
 };
 
 type MutableCapacityImpact = {
@@ -190,7 +194,8 @@ const reviewOptionsSchema = z
       .int()
       .min(1)
       .max(ROUTING_SIMULATOR_REVIEW_MAX_SAMPLE_LIMIT)
-      .optional()
+      .optional(),
+    capacityWindows: z.unknown().optional()
   })
   .strict();
 
@@ -206,7 +211,8 @@ export async function buildRoutingSimulatorReviewPacket(
 ): Promise<RoutingSimulatorReviewPacket> {
   const parsedOptions = parseReviewOptions(options);
   const evaluation = await evaluateRoutingSimulatorBatch(input, {
-    now: parsedOptions.now
+    now: parsedOptions.now,
+    capacityWindows: parsedOptions.capacityWindows
   });
   const issues = buildIssues(evaluation.rows);
   const capacityImpact = buildCapacityImpact(evaluation.rows);
@@ -224,6 +230,7 @@ export async function buildRoutingSimulatorReviewPacket(
     leadCount: evaluation.leadCount,
     rowSampleLimit: parsedOptions.sampleLimit,
     evaluationSummary: evaluation.summary,
+    capacitySummary: evaluation.capacitySummary,
     summary: buildReviewSummary(
       evaluation,
       issues,
@@ -242,7 +249,7 @@ export async function buildRoutingSimulatorReviewPacket(
       routingModule: "lib/routing/leadRouter.ts",
       packetScope: "read-only-routing-simulator-review-packet"
     },
-    read: readFlags(),
+    read: readFlags(evaluation.read.hypotheticalCapacityWindows),
     write: noWrites(),
     safety: safetyFlags()
   };
@@ -256,7 +263,8 @@ function parseReviewOptions(
   return {
     now: parsed.now,
     sampleLimit:
-      parsed.sampleLimit ?? ROUTING_SIMULATOR_REVIEW_DEFAULT_SAMPLE_LIMIT
+      parsed.sampleLimit ?? ROUTING_SIMULATOR_REVIEW_DEFAULT_SAMPLE_LIMIT,
+    capacityWindows: parsed.capacityWindows
   };
 }
 
@@ -476,10 +484,13 @@ function rate(count: number, total: number): number {
   return Number((count / total).toFixed(2));
 }
 
-function readFlags(): RoutingSimulatorReviewReadFlags {
+function readFlags(
+  hypotheticalCapacityWindows: boolean
+): RoutingSimulatorReviewReadFlags {
   return {
     metadata: true,
     hypotheticalInput: true,
+    hypotheticalCapacityWindows,
     database: true,
     crmRecords: true,
     areas: true,
