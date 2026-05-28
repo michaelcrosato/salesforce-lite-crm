@@ -31,6 +31,7 @@ import {
 import { useToast } from "@/components/ui/toast";
 import type {
   DashboardCardDefinitionCatalog,
+  DashboardCardMutation,
   DashboardCardPlacement
 } from "@/lib/server/dashboardCardDefinitions";
 import type { DashboardCardPreviewResult } from "@/lib/server/dashboardCardPreviewRunner";
@@ -49,6 +50,18 @@ type OperatorCard = {
   pinnedAt: number;
 };
 
+type OperatorAuditEvent = {
+  sequence: number;
+  mutation: DashboardCardMutation;
+  summary: string;
+  cardTitle: string;
+  placement: DashboardCardPlacement;
+  savedReportDefinitionId: string;
+  previousPosition: number | null;
+  nextPosition: number | null;
+  metadata: string;
+};
+
 export function DashboardCardOperator({
   surface,
   catalog,
@@ -57,6 +70,7 @@ export function DashboardCardOperator({
   const { showToast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [cards, setCards] = useState<OperatorCard[]>([]);
+  const [auditEvents, setAuditEvents] = useState<OperatorAuditEvent[]>([]);
   const [lastResult, setLastResult] =
     useState<DashboardCardPreviewActionResult | null>(null);
   const activeCards = cards.filter((card) => !card.archived);
@@ -85,6 +99,12 @@ export function DashboardCardOperator({
 
         if (actionResult.ok) {
           setCards((current) => upsertPreviewCard(current, actionResult.preview));
+          appendAuditEvent({
+            mutation: "pin",
+            preview: actionResult.preview,
+            previousPosition: null,
+            nextPosition: actionResult.preview.card?.position ?? null
+          });
         }
 
         showToast({
@@ -99,6 +119,27 @@ export function DashboardCardOperator({
   }
 
   function moveCard(cardKey: string, direction: "up" | "down") {
+    const activeIndex = activeCards.findIndex((card) => card.key === cardKey);
+    const targetActiveIndex =
+      direction === "up" ? activeIndex - 1 : activeIndex + 1;
+    const movingCard = activeCards[activeIndex];
+
+    if (
+      activeIndex < 0 ||
+      targetActiveIndex < 0 ||
+      targetActiveIndex >= activeCards.length ||
+      movingCard === undefined
+    ) {
+      return;
+    }
+
+    appendAuditEvent({
+      mutation: "reorder",
+      preview: movingCard.preview,
+      previousPosition: activeIndex + 1,
+      nextPosition: targetActiveIndex + 1
+    });
+
     setCards((current) => {
       const activeIndexes = current.flatMap((card, index) =>
         card.archived ? [] : [index]
@@ -134,6 +175,18 @@ export function DashboardCardOperator({
   }
 
   function archiveCard(cardKey: string) {
+    const activeIndex = activeCards.findIndex((card) => card.key === cardKey);
+    const card = activeCards[activeIndex];
+
+    if (card) {
+      appendAuditEvent({
+        mutation: "archive",
+        preview: card.preview,
+        previousPosition: activeIndex + 1,
+        nextPosition: null
+      });
+    }
+
     setCards((current) =>
       current.map((card) =>
         card.key === cardKey ? { ...card, archived: true } : card
@@ -142,7 +195,52 @@ export function DashboardCardOperator({
   }
 
   function deleteCard(cardKey: string) {
+    const card = cards.find((candidate) => candidate.key === cardKey);
+    const activeIndex = activeCards.findIndex((candidate) => candidate.key === cardKey);
+
+    if (card) {
+      appendAuditEvent({
+        mutation: "delete",
+        preview: card.preview,
+        previousPosition: activeIndex >= 0 ? activeIndex + 1 : null,
+        nextPosition: null
+      });
+    }
+
     setCards((current) => current.filter((card) => card.key !== cardKey));
+  }
+
+  function appendAuditEvent(input: {
+    mutation: DashboardCardMutation;
+    preview: DashboardCardPreviewResult;
+    previousPosition: number | null;
+    nextPosition: number | null;
+  }) {
+    const definition = input.preview.card;
+
+    if (!definition) {
+      return;
+    }
+
+    setAuditEvents((current) => [
+      ...current,
+      {
+        sequence: current.length + 1,
+        mutation: input.mutation,
+        summary: dashboardCardAuditSummary(input.mutation, definition.title),
+        cardTitle: definition.title,
+        placement: definition.placement,
+        savedReportDefinitionId: definition.savedReportDefinitionId,
+        previousPosition: input.previousPosition,
+        nextPosition: input.nextPosition,
+        metadata: dashboardCardAuditMetadata({
+          placement: definition.placement,
+          entity: definition.savedReport.entity,
+          previousPosition: input.previousPosition,
+          nextPosition: input.nextPosition
+        })
+      }
+    ]);
   }
 
   return (
@@ -253,6 +351,57 @@ export function DashboardCardOperator({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-destructive">{lastResult.message}</p>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {auditEvents.length > 0 ? (
+        <Card data-testid="dashboard-card-audit-log">
+          <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+            <div className="space-y-1.5">
+              <CardTitle>Card Audit Evidence</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Session evidence for dashboard card pin, order, archive, and delete actions.
+              </p>
+            </div>
+            <Badge variant="outline">
+              {formatNumber(auditEvents.length)} events
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Card</TableHead>
+                    <TableHead>Evidence</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {auditEvents.map((event) => (
+                    <TableRow
+                      key={event.sequence}
+                      data-testid="dashboard-card-audit-row"
+                    >
+                      <TableCell
+                        className="font-medium"
+                        data-testid="dashboard-card-audit-mutation"
+                      >
+                        {formatNumber(event.sequence)}.{" "}
+                        {formatMutation(event.mutation)}
+                      </TableCell>
+                      <TableCell data-testid="dashboard-card-audit-summary">
+                        {event.summary}
+                      </TableCell>
+                      <TableCell data-testid="dashboard-card-audit-metadata">
+                        {event.metadata}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       ) : null}
@@ -536,6 +685,50 @@ function upsertPreviewCard(
 
 function formatSurface(surface: DashboardCardPlacement): string {
   return surface.charAt(0).toUpperCase() + surface.slice(1);
+}
+
+function formatMutation(mutation: DashboardCardMutation): string {
+  const labels: Record<DashboardCardMutation, string> = {
+    pin: "Pinned",
+    reorder: "Reordered",
+    archive: "Archived",
+    delete: "Deleted"
+  };
+
+  return labels[mutation];
+}
+
+function dashboardCardAuditSummary(
+  mutation: DashboardCardMutation,
+  title: string
+): string {
+  const verbs: Record<DashboardCardMutation, string> = {
+    pin: "pinned",
+    reorder: "reordered",
+    archive: "archived",
+    delete: "deleted"
+  };
+
+  return `Dashboard card ${verbs[mutation]}: ${title}.`;
+}
+
+function dashboardCardAuditMetadata(input: {
+  placement: DashboardCardPlacement;
+  entity: string;
+  previousPosition: number | null;
+  nextPosition: number | null;
+}): string {
+  return [
+    formatSurface(input.placement),
+    `position ${formatAuditPosition(input.previousPosition)} -> ${formatAuditPosition(
+      input.nextPosition
+    )}`,
+    formatToken(input.entity)
+  ].join(" | ");
+}
+
+function formatAuditPosition(position: number | null): string {
+  return position === null ? "none" : formatNumber(position);
 }
 
 function formatToken(value: string): string {

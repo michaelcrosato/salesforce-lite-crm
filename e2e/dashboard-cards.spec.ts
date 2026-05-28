@@ -37,6 +37,9 @@ test("saved reports can be pinned as dashboard cards on reports and dashboard", 
   await expect(reportsOperator.getByTestId("dashboard-card-list-active")).toContainText(
     firstName
   );
+  await expect(reportsOperator.getByTestId("dashboard-card-audit-log")).toContainText(
+    "Dashboard card pinned"
+  );
   await expect(reportsOperator.getByTestId("dashboard-card-row-table")).toContainText(
     "proposal"
   );
@@ -51,12 +54,18 @@ test("saved reports can be pinned as dashboard cards on reports and dashboard", 
     .filter({ hasText: secondName })
     .getByTestId("dashboard-card-move-up")
     .click();
+  await expect(reportsOperator.getByTestId("dashboard-card-audit-log")).toContainText(
+    "Dashboard card reordered"
+  );
   await expect(reportsCards.nth(0)).toContainText(secondName);
 
   await reportsCards
     .filter({ hasText: secondName })
     .getByTestId("dashboard-card-archive")
     .click();
+  await expect(reportsOperator.getByTestId("dashboard-card-audit-log")).toContainText(
+    "Dashboard card archived"
+  );
   await expect(page.getByTestId("dashboard-card-archived-list")).toContainText(
     secondName
   );
@@ -64,6 +73,12 @@ test("saved reports can be pinned as dashboard cards on reports and dashboard", 
     .getByTestId("dashboard-card-archived-list")
     .getByTestId("dashboard-card-delete")
     .click();
+  await expect(reportsOperator.getByTestId("dashboard-card-audit-log")).toContainText(
+    "Dashboard card deleted"
+  );
+  await expect(reportsOperator.getByTestId("dashboard-card-audit-row")).toHaveCount(
+    5
+  );
   await expect(page.getByTestId("dashboard-card-archived-list")).toHaveCount(0);
   await expect(reportsOperator.getByTestId("dashboard-card-summary-active")).toContainText(
     "1"
@@ -81,6 +96,9 @@ test("saved reports can be pinned as dashboard cards on reports and dashboard", 
     .getByTestId("dashboard-card-pin-dashboard")
     .click();
 
+  await expect(
+    dashboardOperator.getByTestId("dashboard-card-audit-log")
+  ).toContainText("Dashboard card pinned");
   await expect(
     dashboardOperator.getByTestId("dashboard-card-preview-card")
   ).toContainText(firstName);

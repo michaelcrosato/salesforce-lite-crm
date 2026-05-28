@@ -1,16 +1,23 @@
 import { describe, expect, it } from "vitest";
+import { EXCLUDED_ROUTES, FEATURE_FLAGS } from "@/lib/featureFlags";
 import { prisma } from "@/lib/prisma";
 import {
   DASHBOARD_CARD_DEFINITION_CONTENT_TYPE,
   DASHBOARD_CARD_MAX_PREVIEW_LIMIT,
+  buildDashboardCardMutationAuditEvidence,
   buildDashboardCardDefinition,
   getDashboardCardDefinitionCatalog,
+  getDashboardCardGuardrails,
+  getDashboardCardMutationAuditContract,
   getDashboardCardPlacement,
+  isDashboardCardMutation,
   isDashboardCardPlacement,
+  listDashboardCardMutations,
   listDashboardCardPlacements,
   validateDashboardCardDefinitionDraft
 } from "@/lib/server/dashboardCardDefinitions";
 import type { PersistedSavedReportDefinition } from "@/lib/server/savedReportPersistence";
+import { serializeAuditMetadata } from "@/lib/services/auditEvents";
 
 const noWriteFlags = {
   database: false,
@@ -87,8 +94,85 @@ describe("dashboard card definition contracts", () => {
       { type: "line", label: "Line chart", surface: "chart" },
       { type: "pie", label: "Pie chart", surface: "chart" }
     ]);
+    expect(listDashboardCardMutations()).toEqual([
+      "pin",
+      "reorder",
+      "archive",
+      "delete"
+    ]);
+    expect(isDashboardCardMutation("reorder")).toBe(true);
+    expect(isDashboardCardMutation("refresh")).toBe(false);
+    expect(catalog.audit).toMatchObject({
+      evidenceScope: "dashboard-card-client-session",
+      mutationCount: 4,
+      persistedAuditEvents: false,
+      externalTelemetry: false,
+      source: {
+        definitionModule: "lib/server/dashboardCardDefinitions.ts",
+        operatorSurface: "components/reports/dashboard-card-operator.tsx",
+        auditTaxonomyModule: "lib/services/auditEvents.ts"
+      },
+      read: auditReadFlags(),
+      write: auditNoWriteFlags()
+    });
+    expect(
+      catalog.audit.mutations.map(({ mutation, action, summaryTemplate }) => ({
+        mutation,
+        action,
+        summaryTemplate
+      }))
+    ).toEqual([
+      {
+        mutation: "pin",
+        action: "created",
+        summaryTemplate: "Dashboard card pinned: {title}."
+      },
+      {
+        mutation: "reorder",
+        action: "updated",
+        summaryTemplate: "Dashboard card reordered: {title}."
+      },
+      {
+        mutation: "archive",
+        action: "updated",
+        summaryTemplate: "Dashboard card archived: {title}."
+      },
+      {
+        mutation: "delete",
+        action: "deleted",
+        summaryTemplate: "Dashboard card deleted: {title}."
+      }
+    ]);
+    expect(catalog.guardrails).toEqual(getDashboardCardGuardrails());
+    expect(catalog.guardrails).toMatchObject({
+      allowedPlacementRoutes: ["/dashboard", "/reports"],
+      excludedRoutes: [...EXCLUDED_ROUTES],
+      featureFlags: {
+        dealDetailRoute: FEATURE_FLAGS.dealDetailRoute,
+        globalSearchUi: FEATURE_FLAGS.globalSearchUi,
+        commandPalette: FEATURE_FLAGS.commandPalette
+      },
+      providerIntegrations: {
+        externalAi: false,
+        externalBi: false,
+        salesforce: false,
+        webhooks: false
+      },
+      dashboardRouteChanges: false,
+      dashboardBuilderRoute: false,
+      dashboardCardPersistence: false,
+      searchExpansion: false,
+      routeWrites: false
+    });
+    expect(catalog.guardrails.excludedRoutes).toContain("/search");
+    expect(catalog.guardrails.excludedRoutes).toContain("/command-palette");
+    expect(catalog.guardrails.excludedRoutes).toContain("/deals/[id]");
+    expect(catalog.guardrails.allowedPlacementRoutes.map(String)).not.toContain(
+      "/search"
+    );
     expect(getDashboardCardPlacement("reports")?.route).toBe("/reports");
     expect(getDashboardCardPlacement("search")).toBeNull();
+    expect(getDashboardCardMutationAuditContract("refresh")).toBeNull();
     expect(() =>
       getDashboardCardDefinitionCatalog({ includeRoutes: true })
     ).toThrow("Unrecognized key(s) in object: 'includeRoutes'");
@@ -169,6 +253,18 @@ describe("dashboard card definition contracts", () => {
         savedReportDefinitionModule: "lib/server/savedReportDefinitions.ts",
         executionScope: "saved-report-dashboard-card-contract"
       },
+      audit: {
+        evidenceScope: "dashboard-card-client-session",
+        persistedAuditEvents: false,
+        externalTelemetry: false
+      },
+      guardrails: {
+        allowedPlacementRoutes: ["/dashboard", "/reports"],
+        dashboardRouteChanges: false,
+        dashboardBuilderRoute: false,
+        dashboardCardPersistence: false,
+        searchExpansion: false
+      },
       read: {
         metadata: true,
         persistedSavedReport: true,
@@ -178,6 +274,69 @@ describe("dashboard card definition contracts", () => {
       },
       write: noWriteFlags
     });
+  });
+
+  it("builds deterministic mutation audit evidence without persistence", () => {
+    const savedReport = savedReportDefinition();
+    const card = buildDashboardCardDefinition(
+      {
+        savedReportDefinitionId: savedReport.id,
+        placement: "dashboard",
+        position: 2,
+        size: "wide"
+      },
+      savedReport
+    );
+    const evidence = buildDashboardCardMutationAuditEvidence(
+      {
+        mutation: "reorder",
+        previousPosition: 2,
+        nextPosition: 1
+      },
+      card
+    );
+
+    expect(evidence).toMatchObject({
+      category: "record",
+      action: "updated",
+      entityType: "report",
+      entityId: savedReport.id,
+      summary: "Dashboard card reordered: Pipeline by stage.",
+      persistedAuditEvent: false,
+      externalTelemetry: false,
+      source: {
+        definitionModule: "lib/server/dashboardCardDefinitions.ts",
+        operatorSurface: "components/reports/dashboard-card-operator.tsx",
+        evidenceScope: "dashboard-card-client-session"
+      },
+      read: auditReadFlags(),
+      write: auditNoWriteFlags()
+    });
+    expect(evidence.metadata).toBe(
+      serializeAuditMetadata({
+        source: "dashboard_card_operator",
+        mutation: "reorder",
+        savedReportDefinitionId: savedReport.id,
+        title: "Pipeline by stage",
+        placement: "dashboard",
+        entity: "opportunities",
+        route: "/deals",
+        position: 2,
+        size: "wide",
+        visualization: {
+          type: "bar",
+          dimensionKey: "stage",
+          metricKey: "value.sum"
+        },
+        previewLimit: 10,
+        previousPosition: 2,
+        nextPosition: 1,
+        changedFields: ["position"]
+      })
+    );
+    expect(() =>
+      buildDashboardCardMutationAuditEvidence({ mutation: "refresh" }, card)
+    ).toThrow();
   });
 
   it("rejects invalid card metadata without database writes", async () => {
@@ -320,5 +479,26 @@ async function dashboardCardDefinitionCounts() {
   return {
     savedReportDefinitions,
     auditEvents
+  };
+}
+
+function auditReadFlags() {
+  return {
+    metadata: true,
+    database: false,
+    auditEvents: false,
+    externalTelemetry: false
+  };
+}
+
+function auditNoWriteFlags() {
+  return {
+    database: false,
+    mutations: false,
+    auditEvents: false,
+    requestLogs: false,
+    externalTelemetry: false,
+    externalServices: false,
+    backgroundJobs: false
   };
 }

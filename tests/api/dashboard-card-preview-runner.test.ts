@@ -168,6 +168,26 @@ describe("dashboard card preview runner", () => {
       },
       write: noWriteFlags
     });
+    expect(preview.card?.audit).toMatchObject({
+      evidenceScope: "dashboard-card-client-session",
+      persistedAuditEvents: false,
+      externalTelemetry: false
+    });
+    expect(preview.card?.guardrails).toMatchObject({
+      allowedPlacementRoutes: ["/dashboard", "/reports"],
+      dashboardRouteChanges: false,
+      dashboardBuilderRoute: false,
+      dashboardCardPersistence: false,
+      searchExpansion: false,
+      routeWrites: false,
+      providerIntegrations: {
+        externalAi: false,
+        externalBi: false,
+        salesforce: false,
+        webhooks: false
+      }
+    });
+    expect(preview.card?.guardrails.excludedRoutes).toContain("/search");
     expect(preview.savedReportPreview?.source.executionScope).toBe(
       "bounded-read-only-preview"
     );

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EXCLUDED_ROUTES, FEATURE_FLAGS } from "@/lib/featureFlags";
 import {
   SAVED_REPORT_CHART_TYPES,
   SAVED_REPORT_MAX_PREVIEW_LIMIT,
@@ -10,6 +11,10 @@ import {
   type SavedReportEntityDefinition
 } from "@/lib/server/savedReportDefinitions";
 import type { PersistedSavedReportDefinition } from "@/lib/server/savedReportPersistence";
+import {
+  serializeAuditMetadata,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
 import { idSchema } from "@/lib/validation";
 
 export const DASHBOARD_CARD_DEFINITION_CONTENT_TYPE =
@@ -17,6 +22,12 @@ export const DASHBOARD_CARD_DEFINITION_CONTENT_TYPE =
 export const DASHBOARD_CARD_PLACEMENTS = ["dashboard", "reports"] as const;
 export const DASHBOARD_CARD_SIZES = ["compact", "standard", "wide"] as const;
 export const DASHBOARD_CARD_VISUALIZATION_TYPES = SAVED_REPORT_CHART_TYPES;
+export const DASHBOARD_CARD_MUTATIONS = [
+  "pin",
+  "reorder",
+  "archive",
+  "delete"
+] as const;
 export const DASHBOARD_CARD_DEFAULT_PREVIEW_LIMIT = 10;
 export const DASHBOARD_CARD_MAX_PREVIEW_LIMIT = 25;
 export const DASHBOARD_CARD_MAX_POSITION = 24;
@@ -24,6 +35,7 @@ export const DASHBOARD_CARD_MAX_POSITION = 24;
 export type DashboardCardPlacement = (typeof DASHBOARD_CARD_PLACEMENTS)[number];
 export type DashboardCardSize = (typeof DASHBOARD_CARD_SIZES)[number];
 export type DashboardCardVisualizationType = SavedReportChartType;
+export type DashboardCardMutation = (typeof DASHBOARD_CARD_MUTATIONS)[number];
 
 export type DashboardCardReadFlags = {
   metadata: boolean;
@@ -62,6 +74,76 @@ export type DashboardCardVisualizationContract = {
   surface: "table" | "chart";
 };
 
+export type DashboardCardAuditReadFlags = {
+  metadata: true;
+  database: false;
+  auditEvents: false;
+  externalTelemetry: false;
+};
+
+export type DashboardCardAuditWriteFlags = {
+  database: false;
+  mutations: false;
+  auditEvents: false;
+  requestLogs: false;
+  externalTelemetry: false;
+  externalServices: false;
+  backgroundJobs: false;
+};
+
+export type DashboardCardMutationAuditContract = {
+  mutation: DashboardCardMutation;
+  action: "created" | "updated" | "deleted";
+  label: string;
+  summaryTemplate: string;
+  sourceSurface: "components/reports/dashboard-card-operator.tsx";
+  evidenceScope: "dashboard-card-client-session";
+  metadataFields: readonly string[];
+  changedFields: readonly string[];
+  persistedAuditEvent: false;
+  externalTelemetry: false;
+  read: DashboardCardAuditReadFlags;
+  write: DashboardCardAuditWriteFlags;
+};
+
+export type DashboardCardAuditContract = {
+  evidenceScope: "dashboard-card-client-session";
+  mutationCount: number;
+  mutations: readonly DashboardCardMutationAuditContract[];
+  persistedAuditEvents: false;
+  externalTelemetry: false;
+  source: {
+    definitionModule: "lib/server/dashboardCardDefinitions.ts";
+    operatorSurface: "components/reports/dashboard-card-operator.tsx";
+    auditTaxonomyModule: "lib/services/auditEvents.ts";
+  };
+  read: DashboardCardAuditReadFlags;
+  write: DashboardCardAuditWriteFlags;
+};
+
+export type DashboardCardGuardrailSnapshot = {
+  allowedPlacementRoutes: ReadonlyArray<"/dashboard" | "/reports">;
+  excludedRoutes: readonly string[];
+  featureFlags: {
+    dealDetailRoute: false;
+    globalSearchUi: false;
+    commandPalette: false;
+  };
+  providerIntegrations: {
+    externalAi: false;
+    externalBi: false;
+    salesforce: false;
+    webhooks: false;
+  };
+  dashboardRouteChanges: false;
+  dashboardBuilderRoute: false;
+  dashboardCardPersistence: false;
+  searchExpansion: false;
+  routeWrites: false;
+  read: DashboardCardAuditReadFlags;
+  write: DashboardCardAuditWriteFlags;
+};
+
 export type DashboardCardDefinitionCatalog = {
   contentType: typeof DASHBOARD_CARD_DEFINITION_CONTENT_TYPE;
   catalogType: "dashboard-card-definition-catalog";
@@ -93,6 +175,8 @@ export type DashboardCardDefinitionCatalog = {
     savedReportDefinitionModule: "lib/server/savedReportDefinitions.ts";
     catalogScope: "dashboard-card-definition-contracts";
   };
+  audit: DashboardCardAuditContract;
+  guardrails: DashboardCardGuardrailSnapshot;
   read: DashboardCardReadFlags;
   write: DashboardCardWriteFlags;
 };
@@ -130,8 +214,28 @@ export type DashboardCardDefinition = DashboardCardDefinitionDraft & {
     savedReportDefinitionModule: "lib/server/savedReportDefinitions.ts";
     executionScope: "saved-report-dashboard-card-contract";
   };
+  audit: DashboardCardAuditContract;
+  guardrails: DashboardCardGuardrailSnapshot;
   read: DashboardCardReadFlags;
   write: DashboardCardWriteFlags;
+};
+
+export type DashboardCardMutationAuditEvidence = {
+  category: "record";
+  action: "created" | "updated" | "deleted";
+  entityType: "report";
+  entityId: string;
+  summary: string;
+  metadata: string | null;
+  persistedAuditEvent: false;
+  externalTelemetry: false;
+  source: {
+    definitionModule: "lib/server/dashboardCardDefinitions.ts";
+    operatorSurface: "components/reports/dashboard-card-operator.tsx";
+    evidenceScope: "dashboard-card-client-session";
+  };
+  read: DashboardCardAuditReadFlags;
+  write: DashboardCardAuditWriteFlags;
 };
 
 type ParsedDashboardCardVisualizationInput = z.infer<
@@ -206,6 +310,13 @@ const dashboardCardDraftSchema = z
       .optional()
   })
   .strict();
+const dashboardCardMutationAuditInputSchema = z
+  .object({
+    mutation: z.enum(DASHBOARD_CARD_MUTATIONS),
+    previousPosition: z.number().int().min(1).nullable().optional(),
+    nextPosition: z.number().int().min(1).nullable().optional()
+  })
+  .strict();
 
 const placementContracts = [
   {
@@ -225,6 +336,88 @@ const placementContracts = [
     maxCards: 8
   }
 ] as const satisfies readonly DashboardCardPlacementContract[];
+
+const mutationMetadataFields = [
+  "source",
+  "mutation",
+  "savedReportDefinitionId",
+  "title",
+  "placement",
+  "entity",
+  "route",
+  "position",
+  "size",
+  "visualization",
+  "previewLimit",
+  "previousPosition",
+  "nextPosition",
+  "changedFields"
+] as const;
+
+const mutationAuditContracts = [
+  {
+    mutation: "pin",
+    action: "created",
+    label: "Pin card",
+    summaryTemplate: "Dashboard card pinned: {title}.",
+    sourceSurface: "components/reports/dashboard-card-operator.tsx",
+    evidenceScope: "dashboard-card-client-session",
+    metadataFields: mutationMetadataFields,
+    changedFields: [
+      "placement",
+      "position",
+      "size",
+      "visualization",
+      "previewLimit"
+    ],
+    persistedAuditEvent: false,
+    externalTelemetry: false,
+    read: auditReads(),
+    write: auditNoWrites()
+  },
+  {
+    mutation: "reorder",
+    action: "updated",
+    label: "Reorder card",
+    summaryTemplate: "Dashboard card reordered: {title}.",
+    sourceSurface: "components/reports/dashboard-card-operator.tsx",
+    evidenceScope: "dashboard-card-client-session",
+    metadataFields: mutationMetadataFields,
+    changedFields: ["position"],
+    persistedAuditEvent: false,
+    externalTelemetry: false,
+    read: auditReads(),
+    write: auditNoWrites()
+  },
+  {
+    mutation: "archive",
+    action: "updated",
+    label: "Archive card",
+    summaryTemplate: "Dashboard card archived: {title}.",
+    sourceSurface: "components/reports/dashboard-card-operator.tsx",
+    evidenceScope: "dashboard-card-client-session",
+    metadataFields: mutationMetadataFields,
+    changedFields: ["archived"],
+    persistedAuditEvent: false,
+    externalTelemetry: false,
+    read: auditReads(),
+    write: auditNoWrites()
+  },
+  {
+    mutation: "delete",
+    action: "deleted",
+    label: "Delete card",
+    summaryTemplate: "Dashboard card deleted: {title}.",
+    sourceSurface: "components/reports/dashboard-card-operator.tsx",
+    evidenceScope: "dashboard-card-client-session",
+    metadataFields: mutationMetadataFields,
+    changedFields: [],
+    persistedAuditEvent: false,
+    externalTelemetry: false,
+    read: auditReads(),
+    write: auditNoWrites()
+  }
+] as const satisfies readonly DashboardCardMutationAuditContract[];
 
 export function getDashboardCardDefinitionCatalog(
   input: unknown = {}
@@ -250,6 +443,8 @@ export function getDashboardCardDefinitionCatalog(
       savedReportDefinitionModule: "lib/server/savedReportDefinitions.ts",
       catalogScope: "dashboard-card-definition-contracts"
     },
+    audit: dashboardCardAuditContract(),
+    guardrails: dashboardCardGuardrails(),
     read: catalogReads(),
     write: noWrites()
   };
@@ -273,6 +468,65 @@ export function getDashboardCardPlacement(
   }
 
   return copyPlacementContract(requirePlacementContract(placement));
+}
+
+export function listDashboardCardMutations(): DashboardCardMutation[] {
+  return [...DASHBOARD_CARD_MUTATIONS];
+}
+
+export function isDashboardCardMutation(
+  value: string
+): value is DashboardCardMutation {
+  return DASHBOARD_CARD_MUTATIONS.includes(value as DashboardCardMutation);
+}
+
+export function getDashboardCardMutationAuditContract(
+  mutation: string
+): DashboardCardMutationAuditContract | null {
+  if (!isDashboardCardMutation(mutation)) {
+    return null;
+  }
+
+  return copyMutationAuditContract(requireMutationAuditContract(mutation));
+}
+
+export function getDashboardCardGuardrails(): DashboardCardGuardrailSnapshot {
+  return dashboardCardGuardrails();
+}
+
+export function buildDashboardCardMutationAuditEvidence(
+  input: unknown,
+  card: DashboardCardDefinition
+): DashboardCardMutationAuditEvidence {
+  const parsed = dashboardCardMutationAuditInputSchema.parse(input);
+  const contract = requireMutationAuditContract(parsed.mutation);
+  const previousPosition = parsed.previousPosition ?? null;
+  const nextPosition = parsed.nextPosition ?? card.position;
+
+  return {
+    category: "record",
+    action: contract.action,
+    entityType: "report",
+    entityId: card.savedReportDefinitionId,
+    summary: contract.summaryTemplate.replace("{title}", card.title),
+    metadata: serializeAuditMetadata(
+      dashboardCardMutationAuditMetadata(
+        parsed.mutation,
+        card,
+        previousPosition,
+        nextPosition
+      )
+    ),
+    persistedAuditEvent: false,
+    externalTelemetry: false,
+    source: {
+      definitionModule: "lib/server/dashboardCardDefinitions.ts",
+      operatorSurface: "components/reports/dashboard-card-operator.tsx",
+      evidenceScope: "dashboard-card-client-session"
+    },
+    read: auditReads(),
+    write: auditNoWrites()
+  };
 }
 
 export function validateDashboardCardDefinitionDraft(
@@ -347,6 +601,8 @@ export function buildDashboardCardDefinition(
       savedReportDefinitionModule: "lib/server/savedReportDefinitions.ts",
       executionScope: "saved-report-dashboard-card-contract"
     },
+    audit: dashboardCardAuditContract(),
+    guardrails: dashboardCardGuardrails(),
     read: cardReads(),
     write: noWrites()
   };
@@ -491,6 +747,18 @@ function copyPlacementContract(
   };
 }
 
+function copyMutationAuditContract(
+  contract: DashboardCardMutationAuditContract
+): DashboardCardMutationAuditContract {
+  return {
+    ...contract,
+    metadataFields: [...contract.metadataFields],
+    changedFields: [...contract.changedFields],
+    read: auditReads(),
+    write: auditNoWrites()
+  };
+}
+
 function requirePlacementContract(
   placement: DashboardCardPlacement
 ): DashboardCardPlacementContract {
@@ -500,6 +768,20 @@ function requirePlacementContract(
 
   if (!contract) {
     throw new Error(`Unsupported dashboard card placement: ${placement}`);
+  }
+
+  return contract;
+}
+
+function requireMutationAuditContract(
+  mutation: DashboardCardMutation
+): DashboardCardMutationAuditContract {
+  const contract = mutationAuditContracts.find(
+    (candidate) => candidate.mutation === mutation
+  );
+
+  if (!contract) {
+    throw new Error(`Unsupported dashboard card mutation: ${mutation}`);
   }
 
   return contract;
@@ -543,6 +825,78 @@ function dashboardCardLimits(): DashboardCardDefinitionCatalog["limits"] {
   };
 }
 
+function dashboardCardAuditContract(): DashboardCardAuditContract {
+  return {
+    evidenceScope: "dashboard-card-client-session",
+    mutationCount: mutationAuditContracts.length,
+    mutations: mutationAuditContracts.map(copyMutationAuditContract),
+    persistedAuditEvents: false,
+    externalTelemetry: false,
+    source: {
+      definitionModule: "lib/server/dashboardCardDefinitions.ts",
+      operatorSurface: "components/reports/dashboard-card-operator.tsx",
+      auditTaxonomyModule: "lib/services/auditEvents.ts"
+    },
+    read: auditReads(),
+    write: auditNoWrites()
+  };
+}
+
+function dashboardCardGuardrails(): DashboardCardGuardrailSnapshot {
+  return {
+    allowedPlacementRoutes: placementContracts.map((placement) => placement.route),
+    excludedRoutes: [...EXCLUDED_ROUTES],
+    featureFlags: {
+      dealDetailRoute: FEATURE_FLAGS.dealDetailRoute,
+      globalSearchUi: FEATURE_FLAGS.globalSearchUi,
+      commandPalette: FEATURE_FLAGS.commandPalette
+    },
+    providerIntegrations: {
+      externalAi: false,
+      externalBi: false,
+      salesforce: false,
+      webhooks: false
+    },
+    dashboardRouteChanges: false,
+    dashboardBuilderRoute: false,
+    dashboardCardPersistence: false,
+    searchExpansion: false,
+    routeWrites: false,
+    read: auditReads(),
+    write: auditNoWrites()
+  };
+}
+
+function dashboardCardMutationAuditMetadata(
+  mutation: DashboardCardMutation,
+  card: DashboardCardDefinition,
+  previousPosition: number | null,
+  nextPosition: number | null
+): { [key: string]: AuditMetadataValue } {
+  const contract = requireMutationAuditContract(mutation);
+
+  return {
+    source: "dashboard_card_operator",
+    mutation,
+    savedReportDefinitionId: card.savedReportDefinitionId,
+    title: card.title,
+    placement: card.placement,
+    entity: card.savedReport.entity,
+    route: card.savedReport.route,
+    position: card.position,
+    size: card.size,
+    visualization: {
+      type: card.visualization.type,
+      dimensionKey: card.visualization.dimensionKey,
+      metricKey: card.visualization.metricKey
+    },
+    previewLimit: card.previewLimit,
+    previousPosition,
+    nextPosition,
+    changedFields: [...contract.changedFields]
+  };
+}
+
 function catalogReads(): DashboardCardReadFlags {
   return {
     metadata: true,
@@ -576,5 +930,26 @@ function noWrites(): DashboardCardWriteFlags {
     backgroundJobs: false,
     rawSql: false,
     dashboardLayouts: false
+  };
+}
+
+function auditReads(): DashboardCardAuditReadFlags {
+  return {
+    metadata: true,
+    database: false,
+    auditEvents: false,
+    externalTelemetry: false
+  };
+}
+
+function auditNoWrites(): DashboardCardAuditWriteFlags {
+  return {
+    database: false,
+    mutations: false,
+    auditEvents: false,
+    requestLogs: false,
+    externalTelemetry: false,
+    externalServices: false,
+    backgroundJobs: false
   };
 }
