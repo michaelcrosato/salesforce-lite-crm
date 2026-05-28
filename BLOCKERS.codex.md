@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: Repair iteration 27
+Sprint: Sprint 55
 
-Feature: local-gate e2e recovery
+Feature: S55-F3 - Capacity window operator surface
 
 Branch: main
 
-Timestamp: 2026-05-28T15:49:57.5834094-07:00
+Timestamp: 2026-05-28T16:23:25.6441920-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Baseline gate failure resolved: `npm run test:e2e` passed with 49 tests, and the full `scripts/local-gate.ps1` sequence completed successfully after hardening the dashboard-card saved-report e2e helper.
+- No active Codex blockers were open at the start of this prompt.
