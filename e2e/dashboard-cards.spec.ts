@@ -115,6 +115,12 @@ async function createOpportunitySavedReport(
   await page.getByTestId("saved-report-entity-select").selectOption(
     "opportunities"
   );
+  await expect(page.getByTestId("saved-report-field-stage")).toBeChecked();
+  await expect(
+    page
+      .getByTestId("saved-report-filter-select")
+      .locator("option[value='stage']")
+  ).toHaveCount(1);
   await page.getByTestId("saved-report-name-input").fill(name);
   await page.getByTestId("saved-report-filter-select").selectOption("stage");
   await page.getByTestId("saved-report-filter-value").fill(stage);
