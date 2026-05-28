@@ -236,6 +236,7 @@ export type RoutingSimulatorReviewActionResult =
       message: string;
       fieldErrors?: {
         input?: string[];
+        capacity?: string[];
         target?: string[];
       };
     };
@@ -909,6 +910,10 @@ export async function previewRoutingSimulatorReviewAction(
   formData: FormData
 ): Promise<RoutingSimulatorReviewActionResult> {
   const rawInput = formString(formData, "routingSimulatorInput");
+  const rawCapacityInput = formString(
+    formData,
+    "routingSimulatorCapacityInput"
+  );
 
   if (rawInput.trim().length === 0) {
     return {
@@ -934,9 +939,26 @@ export async function previewRoutingSimulatorReviewAction(
     };
   }
 
+  let parsedCapacityInput: unknown;
+
+  if (rawCapacityInput.trim().length > 0) {
+    try {
+      parsedCapacityInput = JSON.parse(rawCapacityInput);
+    } catch {
+      return {
+        ok: false,
+        message: "Capacity window input must be valid JSON.",
+        fieldErrors: {
+          capacity: ["Use JSON shaped like { \"windows\": [...] }."]
+        }
+      };
+    }
+  }
+
   try {
     const packet = await buildRoutingSimulatorReviewPacket(parsedInput, {
-      sampleLimit: ROUTING_SIMULATOR_REVIEW_SAMPLE_LIMIT
+      sampleLimit: ROUTING_SIMULATOR_REVIEW_SAMPLE_LIMIT,
+      capacityWindows: parsedCapacityInput
     });
 
     return {
@@ -947,14 +969,26 @@ export async function previewRoutingSimulatorReviewAction(
   } catch (error) {
     const firstIssue =
       error instanceof ZodError ? error.issues[0]?.message : undefined;
+    const firstPath =
+      error instanceof ZodError ? error.issues[0]?.path[0] : undefined;
+    const targetMessage =
+      firstIssue ?? "Review the hypothetical lead batch and postal values.";
+
+    if (firstPath === "windows") {
+      return {
+        ok: false,
+        message: "The routing simulator review packet could not be built.",
+        fieldErrors: {
+          capacity: [targetMessage]
+        }
+      };
+    }
 
     return {
       ok: false,
       message: "The routing simulator review packet could not be built.",
       fieldErrors: {
-        target: [
-          firstIssue ?? "Review the hypothetical lead batch and postal values."
-        ]
+        target: [targetMessage]
       }
     };
   }

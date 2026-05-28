@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
+import type { DealerCapacityWindowCatalog } from "@/lib/server/dealerCapacityWindowContracts";
 import type { RoutingSimulatorInputCatalog } from "@/lib/server/routingSimulatorContracts";
 import type {
   RoutingSimulatorReviewPacket,
@@ -36,6 +37,7 @@ import type {
 
 type RoutingSimulatorOperatorProps = {
   catalog: RoutingSimulatorInputCatalog;
+  capacityCatalog: DealerCapacityWindowCatalog;
 };
 
 const writeFlagLabels = [
@@ -59,10 +61,12 @@ const writeFlagLabels = [
 }>;
 
 export function RoutingSimulatorOperator({
-  catalog
+  catalog,
+  capacityCatalog
 }: RoutingSimulatorOperatorProps) {
   const { showToast } = useToast();
   const [input, setInput] = useState("");
+  const [capacityInput, setCapacityInput] = useState("");
   const [result, setResult] =
     useState<RoutingSimulatorReviewActionResult | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -77,11 +81,27 @@ export function RoutingSimulatorOperator({
       ),
     [catalog.fixtures]
   );
+  const capacityFixtureInput = useMemo(
+    () =>
+      JSON.stringify(
+        {
+          windows: capacityCatalog.fixtures
+        },
+        null,
+        2
+      ),
+    [capacityCatalog.fixtures]
+  );
   const packet = result?.ok ? result.packet : null;
   const fieldErrors = result && !result.ok ? result.fieldErrors : null;
 
   function useFixtures() {
     setInput(fixtureInput);
+    setResult(null);
+  }
+
+  function useCapacityFixtures() {
+    setCapacityInput(capacityFixtureInput);
     setResult(null);
   }
 
@@ -187,30 +207,78 @@ export function RoutingSimulatorOperator({
                   Use fixtures
                 </Button>
               </div>
+
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Capacity fields</div>
+                <div className="flex flex-wrap gap-2">
+                  {capacityCatalog.fields.map((field) => (
+                    <Badge
+                      key={field.key}
+                      variant={field.required ? "warning" : "outline"}
+                    >
+                      {field.label}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {formatNumber(capacityCatalog.fixtures.length)} sample
+                  capacity windows use the published input contract.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={useCapacityFixtures}
+                  data-testid="routing-simulator-use-capacity-fixtures"
+                >
+                  <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                  Use capacity fixtures
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="routing-simulator-input">JSON</Label>
-                <Textarea
-                  id="routing-simulator-input"
-                  name="routingSimulatorInput"
-                  value={input}
-                  onChange={(event) => {
-                    setInput(event.target.value);
-                    setResult(null);
-                  }}
-                  placeholder={'{ "leads": [{ "postalCode": "V5K 0A1", "country": "CA" }] }'}
-                  className="min-h-[14rem] font-mono"
-                  data-testid="routing-simulator-input"
-                />
-                <FieldError message={fieldErrors?.input?.[0]} />
-                <FieldError message={fieldErrors?.target?.[0]} />
+              <div className="grid gap-3 xl:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="routing-simulator-input">Lead batch JSON</Label>
+                  <Textarea
+                    id="routing-simulator-input"
+                    name="routingSimulatorInput"
+                    value={input}
+                    onChange={(event) => {
+                      setInput(event.target.value);
+                      setResult(null);
+                    }}
+                    placeholder={'{ "leads": [{ "postalCode": "V5K 0A1", "country": "CA" }] }'}
+                    className="min-h-[14rem] font-mono"
+                    data-testid="routing-simulator-input"
+                  />
+                  <FieldError message={fieldErrors?.input?.[0]} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="routing-simulator-capacity-input">
+                    Capacity windows JSON
+                  </Label>
+                  <Textarea
+                    id="routing-simulator-capacity-input"
+                    name="routingSimulatorCapacityInput"
+                    value={capacityInput}
+                    onChange={(event) => {
+                      setCapacityInput(event.target.value);
+                      setResult(null);
+                    }}
+                    placeholder={'{ "windows": [{ "dealerOrderId": "order-id", "startsOn": "2026-05-16", "endsOn": "2026-05-16", "dailyCap": 1 }] }'}
+                    className="min-h-[14rem] font-mono"
+                    data-testid="routing-simulator-capacity-input"
+                  />
+                  <FieldError message={fieldErrors?.capacity?.[0]} />
+                </div>
               </div>
+              <FieldError message={fieldErrors?.target?.[0]} />
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-muted-foreground">
                   {input.trim().length > 0
-                    ? `${formatNumber(input.length)} characters ready`
+                    ? `${formatNumber(input.length + capacityInput.length)} characters ready`
                     : "No batch entered"}
                 </p>
                 <Button
@@ -297,6 +365,49 @@ function RoutingSimulatorResult({
             />
             <Metric label="Packet" value={packet.packetVersion} />
           </div>
+
+          <div
+            className="grid gap-3 md:grid-cols-4"
+            data-testid="routing-simulator-capacity-summary"
+          >
+            <Metric
+              label="Capacity"
+              value={packet.capacitySummary.applied ? "Applied" : "Not applied"}
+            />
+            <Metric
+              label="Windows"
+              value={formatNumber(packet.capacitySummary.windowCount)}
+            />
+            <Metric
+              label="Blocked by capacity"
+              value={formatNumber(packet.capacitySummary.blockedCount)}
+            />
+            <Metric
+              label="Overflowed"
+              value={formatNumber(packet.capacitySummary.overflowCount)}
+            />
+          </div>
+
+          <Table data-testid="routing-simulator-capacity-outcome-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Capacity outcome</TableHead>
+                <TableHead>Count</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Object.entries(packet.capacitySummary.outcomeCounts).map(
+                ([outcome, count]) => (
+                  <TableRow key={outcome}>
+                    <TableCell className="font-medium">
+                      {formatToken(outcome)}
+                    </TableCell>
+                    <TableCell>{formatNumber(count)}</TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
 
           <Table data-testid="routing-simulator-issue-table">
             <TableHeader>

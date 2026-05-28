@@ -148,6 +148,105 @@ test("routing simulator preview preserves live routing state and excluded routes
   }
 });
 
+test("routing simulator preview applies hypothetical capacity windows", async ({
+  page
+}) => {
+  const before = await liveRoutingState();
+  const capacityDate = todayCalendarDate();
+
+  await page.goto("/reports");
+
+  const panel = page.getByTestId("routing-simulator-operator");
+  await panel.getByTestId("routing-simulator-input").fill(
+    JSON.stringify(
+      {
+        leads: [
+          {
+            referenceId: "capacity-overflow",
+            firstName: "Mara",
+            lastName: "Singh",
+            postalCode: "V5K 0A1",
+            country: "CA",
+            source: "e2e-routing-simulator"
+          },
+          {
+            referenceId: "capacity-blocked",
+            firstName: "Riley",
+            lastName: "Hart",
+            postalCode: "V5K 0A1",
+            country: "CA",
+            source: "e2e-routing-simulator"
+          }
+        ]
+      },
+      null,
+      2
+    )
+  );
+  await panel.getByTestId("routing-simulator-capacity-input").fill(
+    JSON.stringify(
+      {
+        windows: [
+          {
+            dealerOrderId: "dealer-order-vancouver-northstar",
+            label: "Northstar closed today",
+            startsOn: capacityDate,
+            endsOn: capacityDate,
+            dailyCap: 0
+          },
+          {
+            dealerOrderId: "dealer-order-vancouver-cascade",
+            label: "Cascade one lead today",
+            startsOn: capacityDate,
+            endsOn: capacityDate,
+            dailyCap: 1
+          }
+        ]
+      },
+      null,
+      2
+    )
+  );
+  await panel.getByTestId("routing-simulator-submit").click();
+
+  await expect(panel.getByTestId("routing-simulator-result-panel")).toBeVisible();
+  await expect(
+    panel.getByTestId("routing-simulator-capacity-summary")
+  ).toContainText("Applied");
+  await expect(
+    panel.getByTestId("routing-simulator-capacity-summary")
+  ).toContainText("Windows");
+  await expect(
+    panel.getByTestId("routing-simulator-capacity-summary")
+  ).toContainText("Blocked by capacity");
+  await expect(
+    panel.getByTestId("routing-simulator-capacity-outcome-table")
+  ).toContainText("daily cap reached");
+  await expect(
+    panel.getByTestId("routing-simulator-capacity-table")
+  ).toContainText("Vancouver robotics dealer program");
+  await expect(panel.getByTestId("routing-simulator-row-table")).toContainText(
+    "capacity-overflow"
+  );
+  await expect(panel.getByTestId("routing-simulator-row-table")).toContainText(
+    "capacity-blocked"
+  );
+  await expect(panel.getByTestId("routing-simulator-step-table")).toContainText(
+    "apply capacity windows"
+  );
+  await expect(panel.getByTestId("routing-simulator-write-flags")).toContainText(
+    "Leads off"
+  );
+  await expect(panel.getByTestId("routing-simulator-write-flags")).toContainText(
+    "Dealer orders off"
+  );
+  await expect(panel.getByTestId("routing-simulator-write-flags")).toContainText(
+    "Pacing engine off"
+  );
+
+  expect(await liveRoutingState()).toEqual(before);
+});
+
 async function liveRoutingState() {
   const [counts, dealerOrders, currentMonthAssignments] = await Promise.all([
     Promise.all([
@@ -200,6 +299,10 @@ async function liveRoutingState() {
     dealerOrders,
     currentMonthAssignments
   };
+}
+
+function todayCalendarDate() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 function currentMonthWhere() {

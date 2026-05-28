@@ -50,6 +50,7 @@ import {
   listSavedReportDefinitions,
   toSavedReportDefinitionSnapshot
 } from "@/lib/server/savedReportPersistence";
+import { getDealerCapacityWindowCatalog } from "@/lib/server/dealerCapacityWindowContracts";
 import { getRoutingSimulatorInputCatalog } from "@/lib/server/routingSimulatorContracts";
 
 export const dynamic = "force-dynamic";
@@ -101,6 +102,7 @@ export default async function ReportsPage({
   const approvalReviewPacketBatch = buildApprovalReviewSamplePacketBatch();
   const approvalReviewPacketAudit = auditApprovalReviewPackets();
   const routingSimulatorCatalog = getRoutingSimulatorInputCatalog();
+  const capacityWindowCatalog = getDealerCapacityWindowCatalog();
   const bulkDryRunSampleRecordIds = csvPackets.map((packet) => ({
     entity: packet.entity,
     ids: packet.review.preview.rows.flatMap((row) => {
@@ -152,7 +154,10 @@ export default async function ReportsPage({
         audit={approvalReviewPacketAudit}
       />
 
-      <RoutingSimulatorOperator catalog={routingSimulatorCatalog} />
+      <RoutingSimulatorOperator
+        catalog={routingSimulatorCatalog}
+        capacityCatalog={capacityWindowCatalog}
+      />
 
       <RoutingFairnessOperator catalog={routingSimulatorCatalog} />
 
