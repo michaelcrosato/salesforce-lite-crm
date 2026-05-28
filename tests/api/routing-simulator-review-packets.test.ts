@@ -267,6 +267,82 @@ describe("routing simulator review packets", () => {
 
     expect(await currentCounts()).toEqual(before);
   });
+
+  it("keeps live routing and dealer-order state unchanged while reporting guardrails", async () => {
+    const before = await liveRoutingState();
+
+    const packet = await buildRoutingSimulatorReviewPacket(
+      {
+        leads: [
+          {
+            referenceId: "guard-assigned",
+            postalCode: "T7T 7T7",
+            country: "CA"
+          },
+          {
+            referenceId: "guard-blocked",
+            postalCode: "Z9Z 9Z9",
+            country: "CA"
+          }
+        ]
+      },
+      { now }
+    );
+
+    expect(packet.summary).toMatchObject({
+      leadCount: 2,
+      assignedCount: 1,
+      blockedCount: 1,
+      reviewStatus: "partially_blocked"
+    });
+    expect(packet.capacityImpact).toEqual([
+      expect.objectContaining({
+        orderId: routedOrderTwoId,
+        deliveredThisMonth: 1,
+        simulatedAssignedLeadCount: 1,
+        projectedDeliveredThisMonth: 2,
+        projectedRemainingQuota: 6
+      })
+    ]);
+    expect(packet.guardrails).toMatchObject({
+      noLiveLeadCreation: true,
+      noLeadStatusChanges: true,
+      noRoutingEventWrites: true,
+      noDealerOrderQuotaOrDeliveryMutation: true,
+      noPacingEngineMutation: true,
+      noForecastPersistence: true,
+      noProductRoutesOrUi: true,
+      noExternalCalls: true
+    });
+    expect(packet.write).toEqual({
+      database: false,
+      leads: false,
+      activities: false,
+      routingEvents: false,
+      dealerOrders: false,
+      areas: false,
+      pacingEngine: false,
+      forecasts: false,
+      routes: false,
+      files: false,
+      externalServices: false,
+      backgroundJobs: false,
+      scenarioPersistence: false,
+      simulatorRuns: false
+    });
+    expect(packet.safety).toMatchObject({
+      readOnly: true,
+      reviewOnly: true,
+      liveRouting: false,
+      leadCreation: false,
+      routingEventWrites: false,
+      dealerOrderMutation: false,
+      routeHandlers: false,
+      backgroundJobs: false
+    });
+
+    expect(await liveRoutingState()).toEqual(before);
+  });
 });
 
 async function createFixtures() {
@@ -445,5 +521,53 @@ async function currentCounts() {
     activities,
     dealerOrders,
     areas
+  };
+}
+
+async function liveRoutingState() {
+  const [counts, dealerOrders, deliveredLeads] = await Promise.all([
+    currentCounts(),
+    prisma.dealerOrder.findMany({
+      where: {
+        id: {
+          in: [
+            routedOrderOneId,
+            routedOrderTwoId,
+            pausedOrderId,
+            quotaOrderId
+          ]
+        }
+      },
+      select: {
+        id: true,
+        monthlyQuota: true,
+        status: true
+      },
+      orderBy: {
+        id: "asc"
+      }
+    }),
+    prisma.lead.findMany({
+      where: {
+        assignedOrderId: {
+          in: [routedOrderOneId, routedOrderTwoId, pausedOrderId, quotaOrderId]
+        }
+      },
+      select: {
+        id: true,
+        assignedOrderId: true,
+        status: true,
+        assignmentReason: true
+      },
+      orderBy: {
+        id: "asc"
+      }
+    })
+  ]);
+
+  return {
+    counts,
+    dealerOrders,
+    deliveredLeads
   };
 }
