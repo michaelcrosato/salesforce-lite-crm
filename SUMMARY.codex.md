@@ -1,45 +1,37 @@
 Agent: Codex
 
-Sprint: Sprint 51
+Sprint: Sprint 52
 
-Feature: S51-F4 — Dashboard audit and guardrails
+Feature: Sprint 52 planning - Routing Simulation Foundation
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 093665a — [codex] S51-F4: add dashboard card audit guardrails
+Commits this prompt: ff8646a - [codex] sprint 52: plan codex track; 873d3c8 - [codex] sprint 52: backlog refresh
 
-Gate status: PASS — Full local gate passed with `powershell -ExecutionPolicy Bypass -File scripts/local-gate.ps1`, including npm install, Prisma generate/db push, seed, lint, typecheck, 108 Vitest files / 534 tests, build, Playwright Chromium install, and 45 e2e tests.
+Gate status: PASS - Baseline LOOP pre-flight passed through `npm install`, Prisma generate/db push, seed, lint, typecheck, `npm run test` (108 files / 534 tests), and build; post-planning gate passed with `npm run lint`, `npm run typecheck`, `npm run test` (108 files / 534 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-27T19:14:38.0636462-07:00
+Timestamp: 2026-05-27T20:34:22.3358515-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline gate was green through lint, typecheck, tests, and build before selecting work.
-- Added dashboard-card mutation audit contracts for pin, reorder, archive, and delete actions, plus deterministic audit-evidence construction for saved-report-backed cards.
-- Added dashboard-card guardrail metadata for allowed placement routes, excluded route boundaries, provider/search/dashboard-route drift controls, and no persisted dashboard-card or external telemetry behavior.
-- Extended the dashboard-card operator surface with session-local audit evidence rows for pin, reorder, archive, and delete actions without adding persistence, route handlers, schema changes, providers, auth/permissions, approvals, routing, or pacing behavior.
-- Added focused Vitest coverage for dashboard-card mutation audit contracts, deterministic evidence, invalid mutation handling, route boundaries, provider/search/dashboard-route guardrails, and preview no-write metadata.
-- Extended `e2e/dashboard-cards.spec.ts` to verify pin/reorder/archive/delete audit evidence on the existing `/reports` and `/dashboard` dashboard-card surfaces.
-- Verified with the full `scripts/local-gate.ps1` sequence.
-
-### Discovered this prompt
-
-- `PLAN.md` §4 and `docs/FEATURE-BACKLOG.md` still list S51-F1, S51-F2, S51-F3, and S51-F4 as `queued`, but recent Codex implementation/report commits plus green full local gates support treating all Sprint 51 features as complete on `main`.
-- `SUMMARY.gemini.md` still references a Sprint 5 visual snapshot track that does not match the current PLAN.md §4 Sprint 5 CSV scope; treated as historical cross-agent report drift, not active Codex scope.
-- `CRM-CONTRACT.md` still says saved-report persistence does not create dashboard cards. This Sprint 51 implementation stays within that boundary by keeping dashboard cards session-scoped and non-persisted.
+- Ran Phase 0 from the single-agent root worktree on `main` and confirmed the baseline gate was green before planning.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and recent git history.
+- Verified Sprint 51 completion from current and historical Codex summaries, implementation/report commits, green full-gate evidence, and zero active Codex blockers.
+- Marked S51-F1, S51-F2, S51-F3, and S51-F4 done in `PLAN.md` and planned Sprint 52 as the Codex Routing Simulation Foundation track.
+- Synced `docs/FEATURE-BACKLOG.md` so S51 is done and S52-F1 through S52-F2 are queued.
 
 ### Next action
 
-Run `SPRINT-ROLLOVER.md` to mark Sprint 51 complete in planning files and select the next valid Codex scope.
+Run LOOP.md to begin S52-F1
 
 ### Scope confirmation
 
-No cross-ownership edits: YES
+No cross-ownership edits: YES (planning-only prompt explicitly allowed `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`)
 
 CRM-CONTRACT.md honored: YES
