@@ -135,9 +135,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S51-F4 | Dashboard audit and guardrails | Codex | done |
 | S52-F1 | Routing simulator input contracts | Codex | done |
 | S52-F2 | Routing simulator read-only evaluator | Codex | done |
-| S53-F1 | Routing simulator review packets | Codex | queued |
-| S53-F2 | Routing simulator operator surface | Codex | queued |
-| S53-F3 | Routing simulator guardrail coverage | Codex | queued |
+| S53-F1 | Routing simulator review packets | Codex | done |
+| S53-F2 | Routing simulator operator surface | Codex | done |
+| S53-F3 | Routing simulator guardrail coverage | Codex | done |
+| S54-F1 | Routing fairness metric contracts | Codex | queued |
+| S54-F2 | Routing fairness review packets | Codex | queued |
+| S54-F3 | Routing fairness operator surface | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
