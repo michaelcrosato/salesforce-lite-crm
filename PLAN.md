@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.57A |
+| Version | 2.58A |
 
 | Last updated | 2026-05-27 |
 
-| Active sprint | Sprint 51 queued for codex |
+| Active sprint | Sprint 52 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1928,10 +1928,10 @@ Goal: promote saved reports into bounded dashboard cards on existing CRM surface
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S51-F1 — Dashboard card definition contracts | codex | queued | Add validated server-side contracts for dashboard cards backed by persisted saved reports, including placement, chart/table card metadata, preview limits, and explicit guardrails. No new routes, dashboard layout designer, custom SQL, or external BI/provider integration is added. |
-| S51-F2 — Dashboard card preview runner | codex | queued | Build a read-only runner that turns dashboard card definitions into bounded card preview data using existing saved-report preview services, with deterministic ordering and validation errors. The runner does not mutate CRM records, schedule refreshes, run background jobs, or expose unrestricted query execution. |
-| S51-F3 — Dashboard card operator surface | codex | queued | Existing `/reports` and `/dashboard` surfaces can pin, list, reorder, archive/delete, and render saved-report-backed dashboard cards with focused e2e coverage. No new product route, dashboard-builder route, card sharing/permissions, or global search expansion is added. |
-| S51-F4 — Dashboard audit and guardrails | codex | queued | Dashboard-card mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, route boundaries, and no provider/search/dashboard-route drift. No auth/permissions enforcement, external telemetry, approvals, routing, or pacing changes are added. |
+| S51-F1 — Dashboard card definition contracts | codex | done | Add validated server-side contracts for dashboard cards backed by persisted saved reports, including placement, chart/table card metadata, preview limits, and explicit guardrails. No new routes, dashboard layout designer, custom SQL, or external BI/provider integration is added. |
+| S51-F2 — Dashboard card preview runner | codex | done | Build a read-only runner that turns dashboard card definitions into bounded card preview data using existing saved-report preview services, with deterministic ordering and validation errors. The runner does not mutate CRM records, schedule refreshes, run background jobs, or expose unrestricted query execution. |
+| S51-F3 — Dashboard card operator surface | codex | done | Existing `/reports` and `/dashboard` surfaces can pin, list, reorder, archive/delete, and render saved-report-backed dashboard cards with focused e2e coverage. No new product route, dashboard-builder route, card sharing/permissions, or global search expansion is added. |
+| S51-F4 — Dashboard audit and guardrails | codex | done | Dashboard-card mutations produce deterministic audit evidence, and tests cover invalid definitions, preview read-only behavior, route boundaries, and no provider/search/dashboard-route drift. No auth/permissions enforcement, external telemetry, approvals, routing, or pacing changes are added. |
 
 \*\*Sprint 51 non-goals\*\* (carry forward permanent scope boundaries plus dashboard-card-specific exclusions):
 
@@ -1962,6 +1962,41 @@ Goal: promote saved reports into bounded dashboard cards on existing CRM surface
 \- No external BI integration, scheduled report delivery, email/calendar/provider calls, webhooks, Salesforce integration, file storage, or background jobs.
 
 \- No CRM record mutations from dashboard previews, bulk actions, CSV import/apply changes, routing execution, routing reassignment, pacing-engine changes, approval enforcement, or auth/permission policy work.
+
+\*\*Sprint 52 — Routing Simulation Foundation\*\*
+
+Goal: add a read-only simulator foundation for hypothetical consumer-lead routing while preserving existing live routing, pacing, and route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S52-F1 — Routing simulator input contracts | codex | queued | Publish server-side simulator input, limit, fixture, and no-write guardrail contracts for hypothetical consumer leads. The contracts validate countries/postal inputs, batch limits, and explicit safety metadata without evaluating assignments, mutating records, adding UI/routes, or changing live routing behavior. |
+| S52-F2 — Routing simulator read-only evaluator | codex | queued | Add a deterministic read-only evaluator that uses existing postal normalization, area matching, order eligibility, and pace-gap ranking to explain where hypothetical leads would route. The evaluator returns assignment/blocker summaries and step traces without creating leads, routing events, dealer-order changes, forecast persistence, UI/routes, geocoding, or external calls. |
+
+\*\*Sprint 52 non-goals\*\* (carry forward permanent scope boundaries plus routing-simulator-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No live lead creation, lead status changes, routing-event writes, dealer-order quota/delivery mutation, or pacing-engine mutation from simulator runs.
+
+\- No simulator product route, dashboard widget, command-palette action, CSV import/apply integration, or background batch job.
+
+\- No routing reassignment, fairness weighting changes, dealer capacity calendar/window model, or AI narrative generation.
 
 \## 5. File Ownership Matrix
 
