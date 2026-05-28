@@ -56,6 +56,10 @@ import {
   type RoutingSimulatorReviewPacket
 } from "@/lib/server/routingSimulatorReviewPackets";
 import {
+  buildRoutingFairnessReviewPacket,
+  type RoutingFairnessReviewPacket
+} from "@/lib/server/routingFairnessReviewPackets";
+import {
   archiveSavedReportDefinition,
   createSavedReportDefinition,
   deleteSavedReportDefinition,
@@ -236,6 +240,21 @@ export type RoutingSimulatorReviewActionResult =
       };
     };
 
+export type RoutingFairnessReviewActionResult =
+  | {
+      ok: true;
+      message: string;
+      packet: RoutingFairnessReviewPacket;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        input?: string[];
+        target?: string[];
+      };
+    };
+
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
 const CSV_IMPORT_APPLY_CONFIRMATION_VALUE = "confirmed";
 const CSV_IMPORT_APPLY_ACTOR_USER_ID = "user-ava";
@@ -243,6 +262,7 @@ const BULK_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_ACTOR_USER_ID = "user-ava";
 const ROUTING_SIMULATOR_REVIEW_SAMPLE_LIMIT = 5;
+const ROUTING_FAIRNESS_REVIEW_SAMPLE_LIMIT = 5;
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -931,6 +951,61 @@ export async function previewRoutingSimulatorReviewAction(
     return {
       ok: false,
       message: "The routing simulator review packet could not be built.",
+      fieldErrors: {
+        target: [
+          firstIssue ?? "Review the hypothetical lead batch and postal values."
+        ]
+      }
+    };
+  }
+}
+
+export async function previewRoutingFairnessReviewAction(
+  formData: FormData
+): Promise<RoutingFairnessReviewActionResult> {
+  const rawInput = formString(formData, "routingFairnessInput");
+
+  if (rawInput.trim().length === 0) {
+    return {
+      ok: false,
+      message: "Enter a hypothetical lead batch before reviewing fairness.",
+      fieldErrors: {
+        input: ["Enter a hypothetical lead batch before reviewing fairness."]
+      }
+    };
+  }
+
+  let parsedInput: unknown;
+
+  try {
+    parsedInput = JSON.parse(rawInput);
+  } catch {
+    return {
+      ok: false,
+      message: "Routing fairness input must be valid JSON.",
+      fieldErrors: {
+        input: ["Use JSON shaped like { \"leads\": [...] }."]
+      }
+    };
+  }
+
+  try {
+    const packet = await buildRoutingFairnessReviewPacket(parsedInput, {
+      sampleLimit: ROUTING_FAIRNESS_REVIEW_SAMPLE_LIMIT
+    });
+
+    return {
+      ok: true,
+      message: `Fairness review: ${packet.summary.issueCount} issues across ${packet.summary.issueCategoryCount} categories.`,
+      packet
+    };
+  } catch (error) {
+    const firstIssue =
+      error instanceof ZodError ? error.issues[0]?.message : undefined;
+
+    return {
+      ok: false,
+      message: "The routing fairness review packet could not be built.",
       fieldErrors: {
         target: [
           firstIssue ?? "Review the hypothetical lead batch and postal values."

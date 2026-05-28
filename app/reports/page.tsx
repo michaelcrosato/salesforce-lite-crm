@@ -10,6 +10,7 @@ import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
 import { SavedReportOperator } from "@/components/reports/saved-report-operator";
+import { RoutingFairnessOperator } from "@/components/reports/routing-fairness-operator";
 import { RoutingSimulatorOperator } from "@/components/reports/routing-simulator-operator";
 import { WorkflowDryRunOperator } from "@/components/reports/workflow-dry-run-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -152,6 +153,8 @@ export default async function ReportsPage({
       />
 
       <RoutingSimulatorOperator catalog={routingSimulatorCatalog} />
+
+      <RoutingFairnessOperator catalog={routingSimulatorCatalog} />
 
       <CsvExportOperator
         packets={csvPackets}
