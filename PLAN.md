@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.58B |
+| Version | 2.59A |
 
 | Last updated | 2026-05-28 |
 
-| Active sprint | Sprint 52 complete; next scope not selected |
+| Active sprint | Sprint 53 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -1997,6 +1997,42 @@ Goal: add a read-only simulator foundation for hypothetical consumer-lead routin
 \- No simulator product route, dashboard widget, command-palette action, CSV import/apply integration, or background batch job.
 
 \- No routing reassignment, fairness weighting changes, dealer capacity calendar/window model, or AI narrative generation.
+
+\*\*Sprint 53 — Routing Simulator Operator Preview\*\*
+
+Goal: expose the completed read-only routing simulator through bounded review packets and existing operator surfaces without changing live routing, pacing, or route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S53-F1 — Routing simulator review packets | codex | queued | Server-side review packets compose S52 simulator inputs and evaluator output into deterministic assigned/blocked summaries, capacity-impact notes, issue counts, and bounded row samples. Packets remain no-write and do not add UI/routes, mutate live leads/orders, persist scenarios, alter routing decisions, or call external services. |
+| S53-F2 — Routing simulator operator surface | codex | queued | Existing CRM surfaces expose a small read-only hypothetical lead batch preview backed by S53-F1 packets, with clear assignment/blocker results and step-trace detail for operators. The surface adds no new product route and must not create leads, routing events, dealer-order delivery records, dashboard widgets, command-palette actions, or pacing-engine changes. |
+| S53-F3 — Routing simulator guardrail coverage | codex | queued | Focused unit and e2e coverage proves simulator previews stay read-only, preserve excluded-route boundaries, and do not regress live routing or dealer-order state. Coverage adds no broad visual redesign, global search expansion, external services, scenario persistence, or routing/fairness algorithm changes. |
+
+\*\*Sprint 53 non-goals\*\* (carry forward permanent scope boundaries plus routing-simulator-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No live lead creation, lead status changes, routing-event writes, dealer-order quota/delivery mutation, or pacing-engine mutation from simulator previews.
+
+\- No simulator product route, dashboard widget, command-palette action, CSV import/apply integration, background batch job, or scenario persistence.
+
+\- No routing reassignment, fairness weighting changes, dealer capacity calendar/window model, AI narrative generation, geocoding, or external enrichment.
 
 \## 5. File Ownership Matrix
 
