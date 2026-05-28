@@ -10,6 +10,7 @@ import { CsvExportOperator } from "@/components/reports/csv-export-operator";
 import { CsvImportPreviewOperator } from "@/components/reports/csv-import-preview-operator";
 import { ListFilterSupportExplorer } from "@/components/reports/list-filter-support-explorer";
 import { SavedReportOperator } from "@/components/reports/saved-report-operator";
+import { RoutingSimulatorOperator } from "@/components/reports/routing-simulator-operator";
 import { WorkflowDryRunOperator } from "@/components/reports/workflow-dry-run-operator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -48,6 +49,7 @@ import {
   listSavedReportDefinitions,
   toSavedReportDefinitionSnapshot
 } from "@/lib/server/savedReportPersistence";
+import { getRoutingSimulatorInputCatalog } from "@/lib/server/routingSimulatorContracts";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +99,7 @@ export default async function ReportsPage({
   const approvalPolicyRegistry = getApprovalPolicyRegistry();
   const approvalReviewPacketBatch = buildApprovalReviewSamplePacketBatch();
   const approvalReviewPacketAudit = auditApprovalReviewPackets();
+  const routingSimulatorCatalog = getRoutingSimulatorInputCatalog();
   const bulkDryRunSampleRecordIds = csvPackets.map((packet) => ({
     entity: packet.entity,
     ids: packet.review.preview.rows.flatMap((row) => {
@@ -147,6 +150,8 @@ export default async function ReportsPage({
         packetBatch={approvalReviewPacketBatch}
         audit={approvalReviewPacketAudit}
       />
+
+      <RoutingSimulatorOperator catalog={routingSimulatorCatalog} />
 
       <CsvExportOperator
         packets={csvPackets}
