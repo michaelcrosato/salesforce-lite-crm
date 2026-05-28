@@ -129,10 +129,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S50-F1 | Saved report persistence contracts | Codex | done |
 | S50-F2 | Saved report management surface | Codex | done |
 | S50-F3 | Saved report audit and guardrails | Codex | done |
-| S51-F1 | Dashboard card definition contracts | Codex | queued |
-| S51-F2 | Dashboard card preview runner | Codex | queued |
-| S51-F3 | Dashboard card operator surface | Codex | queued |
-| S51-F4 | Dashboard audit and guardrails | Codex | queued |
+| S51-F1 | Dashboard card definition contracts | Codex | done |
+| S51-F2 | Dashboard card preview runner | Codex | done |
+| S51-F3 | Dashboard card operator surface | Codex | done |
+| S51-F4 | Dashboard audit and guardrails | Codex | done |
+| S52-F1 | Routing simulator input contracts | Codex | queued |
+| S52-F2 | Routing simulator read-only evaluator | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
