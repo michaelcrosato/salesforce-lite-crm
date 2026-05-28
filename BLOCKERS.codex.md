@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: Repair iteration 26
+Sprint: Repair iteration 27
 
 Feature: local-gate e2e recovery
 
 Branch: main
 
-Timestamp: 2026-05-28T15:31:00.5347396-07:00
+Timestamp: 2026-05-28T15:49:57.5834094-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Supplied gate failure resolved: the previously failing `npm run test:e2e` command passed directly with 49 tests, and the full `scripts/local-gate.ps1` sequence completed successfully without implementation changes.
+- Baseline gate failure resolved: `npm run test:e2e` passed with 49 tests, and the full `scripts/local-gate.ps1` sequence completed successfully after hardening the dashboard-card saved-report e2e helper.
