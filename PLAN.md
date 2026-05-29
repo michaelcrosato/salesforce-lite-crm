@@ -10,11 +10,11 @@
 
 |---|---|
 
-| Version | 2.61A |
+| Version | 2.62A |
 
 | Last updated | 2026-05-28 |
 
-| Active sprint | Sprint 55 queued for codex |
+| Active sprint | Sprint 56 queued for codex |
 
 | CRM-CONTRACT.md version | Present at repo root on this branch. Until merged everywhere, branches without it treat `README.md`, `PLAN.md`, and `docs/decisions.md` as interim references and must not invent a replacement product contract. |
 
@@ -2076,9 +2076,9 @@ Goal: add deterministic read-only dealer capacity window planning for routing si
 
 | Feature | Owner | Status | Acceptance summary |
 |---|---|---|---|
-| S55-F1 — Dealer capacity window contracts | codex | queued | Server-side contracts define deterministic hypothetical dealer capacity windows, blackout dates, and daily caps for routing simulation inputs with validation metadata and explicit no-write/no-live-routing safety flags. Contracts add no persistence, schema changes, routes, UI, dealer-order edits, area edits, or external services. |
-| S55-F2 — Capacity-aware routing simulation evaluator | codex | queued | The existing read-only routing simulator can apply hypothetical capacity windows to lead batches and explain capacity-related eligibility, blocking, and overflow outcomes. Evaluation must not mutate live routing decisions, dealer-order delivery, pacing calculations, lead statuses, persisted scenarios, or routing events. |
-| S55-F3 — Capacity window operator surface | codex | queued | Existing CRM surfaces expose the S55-F2 capacity-aware simulation result with focused unit/e2e coverage and clear no-write flags. The surface adds no new product route and must not add mutation controls, dashboard widgets, command-palette actions, global search expansion, routing execution, or pacing-engine changes. |
+| S55-F1 — Dealer capacity window contracts | codex | done | Server-side contracts define deterministic hypothetical dealer capacity windows, blackout dates, and daily caps for routing simulation inputs with validation metadata and explicit no-write/no-live-routing safety flags. Contracts add no persistence, schema changes, routes, UI, dealer-order edits, area edits, or external services. |
+| S55-F2 — Capacity-aware routing simulation evaluator | codex | done | The existing read-only routing simulator can apply hypothetical capacity windows to lead batches and explain capacity-related eligibility, blocking, and overflow outcomes. Evaluation must not mutate live routing decisions, dealer-order delivery, pacing calculations, lead statuses, persisted scenarios, or routing events. |
+| S55-F3 — Capacity window operator surface | codex | done | Existing CRM surfaces expose the S55-F2 capacity-aware simulation result with focused unit/e2e coverage and clear no-write flags. The surface adds no new product route and must not add mutation controls, dashboard widgets, command-palette actions, global search expansion, routing execution, or pacing-engine changes. |
 
 \*\*Sprint 55 non-goals\*\* (carry forward permanent scope boundaries plus dealer-capacity-specific exclusions):
 
@@ -2105,6 +2105,42 @@ Goal: add deterministic read-only dealer capacity window planning for routing si
 \- No live routing algorithm changes, routing reassignment behavior changes, dealer-order quota/delivery mutation, lead status expansion, routing-event writes, or pacing-engine mutation.
 
 \- No Salesforce integration, external enrichment, provider credentials, network calls, RAG/vector search, AI narrative generation, CSV import/apply integration, dashboard widgets, command-palette actions, or dedicated capacity product route.
+
+\*\*Sprint 56 — Pacing Snapshot Readiness\*\*
+
+Goal: add deterministic read-only pacing snapshot planning contracts for dealer routing trend review without adding persistence, live routing changes, or new route boundaries.
+
+| Feature | Owner | Status | Acceptance summary |
+|---|---|---|---|
+| S56-F1 — Pacing snapshot contracts | codex | queued | Server-side contracts define deterministic read-only monthly/daily routing and dealer-order pacing snapshot inputs, metric keys, fixtures, limits, and explicit no-write safety flags. Contracts add no persistence, schema changes, routes, UI, dealer-order edits, area edits, or external services. |
+| S56-F2 — Read-only pacing snapshot builder | codex | queued | A deterministic read-only builder derives snapshot summaries from existing dealer orders, leads, and routing activity evidence with month/day bucket metrics. The builder must not mutate live routing decisions, dealer-order delivery, pacing calculations, lead statuses, persisted scenarios, snapshot history, or routing events. |
+| S56-F3 — Pacing snapshot review packets | codex | queued | Server-side review packets package S56-F2 output for later trend-report UI, including metric definitions, empty-state reasons, freshness metadata, source counts, and no-write flags. Packets add no new product route, dashboard widget, command-palette action, global search expansion, CSV/import/apply integration, or external service. |
+
+\*\*Sprint 56 non-goals\*\* (carry forward permanent scope boundaries plus pacing-snapshot-specific exclusions):
+
+\- No authentication, permissions, or multi-tenancy.
+
+\- No deployment configuration.
+
+\- No external AI provider integration.
+
+\- No geocoding or territory polygons.
+
+\- No default switch from SQLite to Postgres.
+
+\- No persistent forecast scenarios.
+
+\- No dealer order or routing area create/edit flows.
+
+\- No new live `/deals/\[id]` detail route.
+
+\- No global search expansion.
+
+\- No persistent routing/pacing snapshot model, saved trend history, saved simulator scenarios, schema changes, seed data changes, or background jobs.
+
+\- No live routing algorithm changes, routing reassignment behavior changes, dealer-order quota/delivery mutation, lead status expansion, routing-event writes, or pacing-engine mutation.
+
+\- No Salesforce integration, external enrichment, provider credentials, network calls, RAG/vector search, AI narrative generation, CSV import/apply integration, dashboard widgets, command-palette actions, or dedicated pacing snapshot product route.
 
 \## 5. File Ownership Matrix
 
@@ -3042,6 +3078,19 @@ Older decisions move to `docs/decisions.md` at the close of each sprint, when a 
 
 
 \---
+
+\### 2026-05-28 — Run decision (Sprint 55 completion and Sprint 56 planning)
+
+\*\*Decision:\*\* Mark S55-F1, S55-F2, and S55-F3 as done on `main`, set the active sprint field to "Sprint 56 queued for codex," and queue S56-F1 through S56-F3 as the next Codex track.
+
+\*\*Rationale:\*\* The current `main` history contains the dealer-capacity contract, capacity-aware simulator, and capacity-window operator-surface implementation/report commits, and the current rollover baseline full local gate is green with zero active Codex blockers. PLAN.md and the backlog still listed Sprint 55 as queued, so this rollover reconciles completion and promotes a read-only B-57 pacing snapshot readiness scope without adding persistence, live routing changes, or new route boundaries.
+
+\*\*Alternatives rejected:\*\* Leaving Sprint 55 queued, because repo-local commits and the local gate already establish completion; promoting permanent non-goal items from README Known Limitations, because the current rollover explicitly excludes auth, deployment, external AI, geocoding, Postgres default, persistent forecast scenarios, dealer-order/area CRUD, live `/deals/[id]`, and global search expansion; promoting persistent routing/pacing snapshot storage, because read-only snapshot contracts and packets can prepare the trend-review surface without schema or background-job risk.
+
+\*\*Sections changed:\*\* §1, §4, §17.
+
+\*\*Open questions handled:\*\* Current Sprint 55 Codex status and the next Codex sprint scope.
+
 
 \### 2026-05-28 — Run decision (Sprint 54 completion and Sprint 55 planning)
 
