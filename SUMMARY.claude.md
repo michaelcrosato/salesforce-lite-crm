@@ -1,71 +1,88 @@
 Agent: claude
-Sprint: 4 (S4-F2 — Route visual QA, queued in PLAN.md §4)
-Feature: S4-F2 route visual QA — detail-page empty-state tonal parity
-Branch: claude/autonomy
-Status: active
-Commits this prompt: d18d348 — [claude] S4-F2: add 'yet' to account detail empty fallbacks for tonal parity
-Gate status: PASS — npm run test (162/162) + npm run build (clean, 32 routes)
-DoD self-check: PASS
-Timestamp: 2026-05-19T07:53:00-08:00
+Mode: high-autonomy blueprint execution (/plan/ specs)
+Branch: phase-0-quick-wins
+Status: paused at a clean checkpoint — remaining blueprint work is human-gated
+Gate status: PASS — `npx tsc --noEmit` + `npm run test` (559) + `npm run build` + `node scripts/check-reachability.mjs` (20/20)
+Timestamp: 2026-05-29
 
-### Completed this prompt
+## What shipped this session — spec 011 (Reachability gate + retire CSV tower)
 
-- Aligned the Account detail page sub-list empty-state copy with its
-  Contact detail page sibling. Prior wording was:
-  - `/accounts/[id]` Related Contacts: "No contacts are linked."
-  - `/accounts/[id]` Related Deals: "No deals are linked."
-  - `/contacts/[id]` Related Deals: "No deals are linked yet."
-  The "yet" qualifier on the Contact detail empty signals that the
-  state is open to change (the user can link more); the Account
-  detail empties lacked that qualifier, creating a minor tonal
-  inconsistency between the two sibling detail pages.
-- Added "yet" to both Account detail sub-list fallbacks. Final
-  state:
-  - `/accounts/[id]` Related Contacts: "No contacts are linked yet."
-  - `/accounts/[id]` Related Deals: "No deals are linked yet."
-  - `/contacts/[id]` Related Deals: "No deals are linked yet." (unchanged)
-- The `/orders/[id]` Assigned Leads This Month empty fallback
-  ("No leads have been delivered to this order this month.") stays
-  as-is — the "this month" qualifier already gives the message a
-  time-bounded scope that doesn't benefit from "yet".
+Two parts, all on `phase-0-quick-wins`:
 
-### Verification
+1. **Gate** (`5aaa9b3`, landed prior session): `scripts/check-reachability.mjs`
+   (static import-graph BFS from `app/**`+`components/**`; `lib/server/*.ts`
+   outside the closure = test-only orphan) + `scripts/reachability-baseline.json`
+   shrink-only ratchet + CI `gate` wiring + retirement plan in
+   `docs/ai/csv-contract-assessment.md`.
 
-- `npm run build` → SUCCESS (32 routes).
-- `npm run test`  → 162 passed / 162 total (Vitest, 25 files).
+2. **First retirement batch — CSV release tower, 5 atomic cuts.** Each commit
+   deletes one module + its sole test and lowers the ratchet; full gate green at
+   every step. Deletion order was **mechanically verified terminal-at-cut** via a
+   reverse-import map (only modules with an empty importer list were removed → no
+   dangling import was ever possible):
+   - `8c27185` csvReleaseReadinessPackets (apex)
+   - `8581c69` csvReleaseDispositionManifests
+   - `448f91f` csvReleaseHandoffCatalog
+   - `64610ac` csvReleaseExceptionRegisters
+   - `6ebf052` csvReleaseClosureScorecards
+   - `c89d485` docs: mark 011 Done + log the batch
 
-### S4-F2 cumulative progress on `claude/autonomy`
+   **Result: orphans 25→20, test 579→559 (−20 dead contract cases), ~8.5k LOC
+   removed, zero live regressions.** All 5 spec-011 DoD criteria satisfied.
 
-Latest implementation commit:
-- `d18d348` add 'yet' to account detail empty fallbacks
+## Why I stopped the tower at 5 (did NOT go wholesale)
 
-Total Claude-zone S4-F2 implementation commits on this branch: 33
-across 16 LOOP iterations.
+- The operator and contract layers are **interleaved** in the import graph
+  (e.g. `csvContractDriftSnapshots` both imports and is imported by operator
+  modules), so there is **no clean bounded "operator-only" batch** — continuing
+  means retiring the whole remaining CSV tower in one sweep.
+- The repo's own `docs/ai/csv-contract-assessment.md` (§ near L137) explicitly
+  flags **wholesale** tower retirement as a roadmap-owner / product-scope
+  decision, not a cleanup-pass call. Spec 011's DoD asks only for "at least the
+  first batch" + "series of small PRs, never one mega-deletion."
+- So the release-tower batch is the correct, DoD-satisfying, owner-safe stopping
+  point. The remaining retirement order (operator → contract/QA → `csvInFlightCache`
+  last → 4 non-CSV orphans) is documented in the assessment doc for owner-approved
+  follow-up PRs.
 
-### Reconciliation note
+## Blueprint state: 9 / 24 done
 
-`origin/main` is 12 commits ahead of this branch's base. Trial
-merge produces one conflict on `app/layout.tsx` (competing
-description updates). Merge is operator scope per
-`prompts/shared/MERGE.md`.
+Done: 001, 002, 003, 004, 005, 007, 008, 009 (prior sessions) + **011** (this).
 
-### Outstanding cross-agent dependency
+### Structural finding (flagging for the human)
 
-Gemini BLOCKERS #3 still tracks remaining `components/**`-side testids
-that gate un-skipping `e2e/demo-path.spec.ts`. Those live in Grok's
-zone; no action from Claude this prompt.
+The blueprint **cannot be driven to "absolute completion" by an unattended
+agent.** The critical path is gated on actions only a human/admin can take:
 
-### Next action
+- **New-dependency approvals** (CLAUDE.md §14): 006, 010, 017, 023 — and these
+  cascade to 018 (dep 006), 020/022/024 (dep 018/010), etc.
+- **Branch-protection / `enforce_admins` flips** (admin, only-after-green): 013,
+  016 — cascade to 014 (dep 013) and the Wave-2 list features (dep 019←014).
+- **Infra-entangled, can't validate unattended:** 012 rewires the `npm run test`
+  harness the Stop gate depends on (per-worker SQLite, needs a 3× flake-check);
+  015 must edit `scripts/autonomy-loop.ps1` (it reads `prompts/{AGENT}/LOOP.md`
+  at L699-704 and throws if missing, substituting `{AGENT}` at dispatch) to
+  collapse the 5 near-identical templates, and wants a dispatch dry-run a human
+  can watch. Both are technically unblocked but should be **human-attended**.
 
-This iteration is the last clean copy-parity fix I can identify in
-Claude's zone. Subsequent iters would be either bikeshed-risk
-micro-polish or require coordination with other agents'
-zones. Best next move: operator merge to main + Gemini's PLAN.md
-status promotion, or SPRINT-ROLLOVER prompt to queue the next
-Claude-owned feature.
+Wave 2 (019–024) is entirely blocked behind the above.
 
-### Scope confirmation
+## Next actions (for the human / next session)
 
-No cross-ownership edits: YES (single file edited in `app/**`).
-CRM-CONTRACT.md honored: YES (pure copy adjustment — no schema,
-route, status, or adapter signature changes).
+1. **Push + PR (Task #29) — awaiting confirmation.** `phase-0-quick-wins` holds
+   all of Phase 0 + spec 011 (clean tree, gate green). Push affects shared state,
+   so I did not push unattended. Suggested: open the PR, let CI `gate` (now incl.
+   the reachability step) prove green, squash-merge.
+2. **Unblock the dep chain:** approve the new-dep promotion requests for 006/010
+   (then 017/023), which frees 018 → 020/022/024.
+3. **Do the admin flips when green:** 013 then 016 (and 014 after 013).
+4. **Human-attended:** execute 012 and 015 with a gate/dispatch dry-run in view.
+5. **Owner call:** decide whether to continue retiring the rest of the CSV tower
+   (operator/contract layers) — order is pre-computed in the assessment doc.
+
+## Scope confirmation
+
+- Zones: spec 011 spans `lib/server` (codex), `tests/api` (gemini),
+  `scripts/` (gemini) — each cut narrated `[CROSS-ZONE OK]` per CLAUDE.md §3.
+- No schema/seed changes. No new deps. No scope expansion. No forced git, no
+  branch-protection changes, no push.

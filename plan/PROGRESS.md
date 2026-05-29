@@ -56,6 +56,10 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - **006, 010, 017, 023** — new dependency required (CLAUDE.md §14). File a promotion request first.
 - **019** — confirm against `PLAN.md` §4 (list-view expansion) before building.
 - **016, 013** — branch-protection / `enforce_admins` flips are the closing, only-after-green step.
+- **013** further needs the 3 CI-only e2e failures reproduced + a 3× green CI streak (push + CI observation) — not reproducible unattended on a local Windows box.
+- **014** — hard dep on **013** (e2e must guard data-freshness before retiring `force-dynamic`); also flips Next 16 `cacheComponents` (experimental).
+- **018** — blueprint dep **006** (coverage reporting) is itself dep-gated on a new-dep approval.
+- **012, 015** — *technically unblocked* but each edits the autonomous loop's own lifelines and cannot be validated unattended: **012** rewires the `npm run test` harness the Stop gate runs (per-worker SQLite isolation → 3× flake-check); **015** must edit `scripts/autonomy-loop.ps1` (reads `prompts/{AGENT}/LOOP.md` at L699-704, throws if missing, substitutes `{AGENT}` at dispatch) to collapse the 5 templates, so it needs a dispatch dry-run a human can watch. Recommend **human-attended**, not unattended. (Full analysis: `SUMMARY.claude.md`.)
 
 ## Log
 
