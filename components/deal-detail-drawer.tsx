@@ -274,7 +274,7 @@ export function DealDetailDrawer({
                 <Badge variant="secondary">
                   {formatCurrency(activeDeal.value)}
                 </Badge>
-                <Badge variant={activeDeal.stale ? "danger" : "outline"}>
+                <Badge variant={activeDeal.stale ? "danger" : "outline-solid"}>
                   {activeDeal.stale ? "Stale" : "Current"}
                 </Badge>
               </div>

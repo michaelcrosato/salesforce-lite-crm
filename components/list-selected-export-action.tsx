@@ -380,7 +380,7 @@ export function ListSelectedExportAction({
                 : "Bulk execution is unavailable for this list."}
             </p>
           </div>
-          <Badge variant={actionOptions.length > 0 ? "warning" : "outline"}>
+          <Badge variant={actionOptions.length > 0 ? "warning" : "outline-solid"}>
             {actionOptions.length > 0 ? "confirmation required" : "no actions"}
           </Badge>
         </div>
@@ -859,7 +859,7 @@ function bulkExecutionFieldErrors(
 function dryRunStatusVariant(status: BulkActionDryRunReviewPacketStatus) {
   switch (status) {
     case "empty":
-      return "outline";
+      return "outline-solid";
     case "ready":
       return "success";
     case "partial":
@@ -872,7 +872,7 @@ function dryRunStatusVariant(status: BulkActionDryRunReviewPacketStatus) {
 function executionStatusVariant(status: BulkActionExecutionStatus) {
   switch (status) {
     case "empty":
-      return "outline";
+      return "outline-solid";
     case "completed":
       return "success";
     case "partial":

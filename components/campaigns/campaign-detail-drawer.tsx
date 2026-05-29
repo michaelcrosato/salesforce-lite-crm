@@ -32,7 +32,7 @@ import type {
 type BadgeVariant =
   | "default"
   | "secondary"
-  | "outline"
+  | "outline-solid"
   | "success"
   | "warning"
   | "danger";
@@ -61,7 +61,7 @@ const STATUS_VARIANT: Record<CampaignStatus, BadgeVariant> = {
   planned: "secondary",
   active: "default",
   completed: "success",
-  cancelled: "outline"
+  cancelled: "outline-solid"
 };
 
 const EMPTY_CAMPAIGN_MEMBERS: CampaignMember[] = [];

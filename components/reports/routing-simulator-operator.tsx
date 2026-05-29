@@ -197,7 +197,7 @@ export function RoutingSimulatorOperator({
                   {catalog.fields.map((field) => (
                     <Badge
                       key={field.key}
-                      variant={field.required ? "warning" : "outline"}
+                      variant={field.required ? "warning" : "outline-solid"}
                     >
                       {field.label}
                     </Badge>
@@ -229,7 +229,7 @@ export function RoutingSimulatorOperator({
                   {capacityCatalog.fields.map((field) => (
                     <Badge
                       key={field.key}
-                      variant={field.required ? "warning" : "outline"}
+                      variant={field.required ? "warning" : "outline-solid"}
                     >
                       {field.label}
                     </Badge>
@@ -265,7 +265,7 @@ export function RoutingSimulatorOperator({
                       setResult(null);
                     }}
                     placeholder={'{ "leads": [{ "postalCode": "V5K 0A1", "country": "CA" }] }'}
-                    className="min-h-[14rem] font-mono"
+                    className="min-h-56 font-mono"
                     data-testid="routing-simulator-input"
                   />
                   <FieldError message={fieldErrors?.input?.[0]} />
@@ -283,7 +283,7 @@ export function RoutingSimulatorOperator({
                       setResult(null);
                     }}
                     placeholder={'{ "windows": [{ "dealerOrderId": "order-id", "startsOn": "2026-05-16", "endsOn": "2026-05-16", "dailyCap": 1 }] }'}
-                    className="min-h-[14rem] font-mono"
+                    className="min-h-56 font-mono"
                     data-testid="routing-simulator-capacity-input"
                   />
                   <FieldError message={fieldErrors?.capacity?.[0]} />
@@ -443,7 +443,7 @@ function RoutingSimulatorResult({
                     <TableCell>{formatNumber(issue.count)}</TableCell>
                     <TableCell>{issue.rowNumbers.join(", ")}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[32rem] truncate">
+                      <span className="block max-w-lg truncate">
                         {issue.message}
                       </span>
                     </TableCell>
@@ -484,7 +484,7 @@ function RoutingSimulatorResult({
                       {formatNumber(impact.monthlyQuota)}
                     </TableCell>
                     <TableCell>
-                      <span className="block max-w-[36rem] truncate">
+                      <span className="block max-w-xl truncate">
                         {impact.note}
                       </span>
                     </TableCell>
@@ -533,7 +533,7 @@ function RoutingSimulatorResult({
                       {formatToken(step.step)}
                     </TableCell>
                     <TableCell>
-                      <span className="block max-w-[42rem] truncate font-mono text-xs">
+                      <span className="block max-w-2xl truncate font-mono text-xs">
                         {formatStepResult(step.result)}
                       </span>
                     </TableCell>
@@ -574,7 +574,7 @@ function RoutingSimulatorRow({
     <TableRow>
       <TableCell className="font-medium">
         {row.rowNumber}
-        <span className="mt-1 block max-w-[10rem] truncate text-xs text-muted-foreground">
+        <span className="mt-1 block max-w-40 truncate text-xs text-muted-foreground">
           {row.referenceId ?? "No reference"}
         </span>
       </TableCell>
@@ -599,7 +599,7 @@ function RoutingSimulatorRow({
         </span>
       </TableCell>
       <TableCell>
-        <span className="block max-w-[36rem] truncate">{row.summary}</span>
+        <span className="block max-w-xl truncate">{row.summary}</span>
       </TableCell>
     </TableRow>
   );

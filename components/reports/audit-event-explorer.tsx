@@ -261,7 +261,7 @@ function AuditEventRow({ event }: { event: AuditEventExplorerEvent }) {
         )}
       </TableCell>
       <TableCell>
-        <span className="block max-w-[28rem] truncate">{event.summary}</span>
+        <span className="block max-w-md truncate">{event.summary}</span>
       </TableCell>
       <TableCell>
         {event.recordLink ? (

@@ -26,7 +26,7 @@ import { formatDate } from "@/lib/formatters";
 type BadgeVariant =
   | "default"
   | "secondary"
-  | "outline"
+  | "outline-solid"
   | "success"
   | "warning"
   | "danger";
@@ -55,7 +55,7 @@ const STATUS_LABELS: Record<KnowledgeArticleStatus, string> = {
 const STATUS_VARIANT: Record<KnowledgeArticleStatus, BadgeVariant> = {
   draft: "secondary",
   published: "success",
-  archived: "outline"
+  archived: "outline-solid"
 };
 
 const AUDIENCE_LABELS: Record<KnowledgeArticleAudience, string> = {

@@ -133,7 +133,7 @@ export function ContactsTable({ contacts, "data-testid": testid }: ContactsTable
             <TableCell>{contact.email ?? "No email"}</TableCell>
             <TableCell>{contact.phone ?? "No phone"}</TableCell>
             <TableCell>
-              <Badge variant={contact.status === "active" ? "success" : "outline"}>
+              <Badge variant={contact.status === "active" ? "success" : "outline-solid"}>
                 {contact.status === "active"
                   ? CONTACT_STATUS_LABELS.active
                   : CONTACT_STATUS_LABELS.inactive}

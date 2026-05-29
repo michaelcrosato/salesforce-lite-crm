@@ -29,7 +29,7 @@ import type { CaseSlaState } from "@/lib/services/caseSlas";
 type BadgeVariant =
   | "default"
   | "secondary"
-  | "outline"
+  | "outline-solid"
   | "success"
   | "warning"
   | "danger";
@@ -73,7 +73,7 @@ const STATUS_VARIANT: Record<CaseStatus, BadgeVariant> = {
   in_progress: "warning",
   waiting: "secondary",
   resolved: "success",
-  closed: "outline"
+  closed: "outline-solid"
 };
 
 const PRIORITY_LABELS: Record<CasePriority, string> = {
@@ -84,7 +84,7 @@ const PRIORITY_LABELS: Record<CasePriority, string> = {
 };
 
 const PRIORITY_VARIANT: Record<CasePriority, BadgeVariant> = {
-  low: "outline",
+  low: "outline-solid",
   normal: "secondary",
   high: "warning",
   urgent: "danger"
@@ -122,7 +122,7 @@ const SLA_STATE_VARIANT: Record<CaseSlaState, BadgeVariant> = {
   on_track: "success",
   due_soon: "warning",
   overdue: "danger",
-  stopped_on_time: "outline",
+  stopped_on_time: "outline-solid",
   stopped_overdue: "danger"
 };
 

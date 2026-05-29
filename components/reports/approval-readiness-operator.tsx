@@ -263,7 +263,7 @@ function RegistrySubjectRow({
       </TableCell>
       <TableCell>
         {subject.reviewer.displayName}
-        <span className="mt-1 block max-w-[14rem] truncate text-xs text-muted-foreground">
+        <span className="mt-1 block max-w-56 truncate text-xs text-muted-foreground">
           {subject.reviewer.label}
         </span>
       </TableCell>
@@ -288,7 +288,7 @@ function PacketRow({ packet }: { packet: ApprovalReviewPacket }) {
       </TableCell>
       <TableCell>
         {packet.proposal.target?.entity ?? "Unknown"}
-        <span className="mt-1 block max-w-[12rem] truncate text-xs text-muted-foreground">
+        <span className="mt-1 block max-w-48 truncate text-xs text-muted-foreground">
           {formatNumber(packet.proposal.target?.recordCount ?? 0)} records
         </span>
       </TableCell>
@@ -370,7 +370,7 @@ function packetStatusVariant(status: ApprovalReviewPacketStatus) {
 function riskVariant(riskLevel: ApprovalPolicySubject["riskLevel"]) {
   switch (riskLevel) {
     case "medium":
-      return "outline";
+      return "outline-solid";
     case "high":
       return "warning";
     case "critical":

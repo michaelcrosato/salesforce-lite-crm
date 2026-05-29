@@ -46,12 +46,12 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
 
 const STATUS_VARIANT: Record<
   TaskStatus,
-  "default" | "secondary" | "outline" | "success" | "warning" | "danger"
+  "default" | "secondary" | "outline-solid" | "success" | "warning" | "danger"
 > = {
   open: "default",
   in_progress: "warning",
   done: "success",
-  cancelled: "outline"
+  cancelled: "outline-solid"
 };
 
 const PRIORITY_LABELS: Record<TaskPriority, string> = {
@@ -63,9 +63,9 @@ const PRIORITY_LABELS: Record<TaskPriority, string> = {
 
 const PRIORITY_VARIANT: Record<
   TaskPriority,
-  "default" | "secondary" | "outline" | "success" | "warning" | "danger"
+  "default" | "secondary" | "outline-solid" | "success" | "warning" | "danger"
 > = {
-  low: "outline",
+  low: "outline-solid",
   normal: "secondary",
   high: "warning",
   urgent: "danger"

@@ -175,7 +175,7 @@ export function RoutingFairnessOperator({
                   {catalog.fields.map((field) => (
                     <Badge
                       key={field.key}
-                      variant={field.required ? "warning" : "outline"}
+                      variant={field.required ? "warning" : "outline-solid"}
                     >
                       {field.label}
                     </Badge>
@@ -214,7 +214,7 @@ export function RoutingFairnessOperator({
                     setResult(null);
                   }}
                   placeholder={'{ "leads": [{ "postalCode": "V5K 0A1", "country": "CA" }] }'}
-                  className="min-h-[14rem] font-mono"
+                  className="min-h-56 font-mono"
                   data-testid="routing-fairness-input"
                 />
                 <FieldError message={fieldErrors?.input?.[0]} />
@@ -346,10 +346,10 @@ function RoutingFairnessResult({
                     <TableCell>{formatNumber(issue.count)}</TableCell>
                     <TableCell>{issue.rowNumbers.join(", ")}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[34rem] truncate">
+                      <span className="block max-w-136 truncate">
                         {issue.message}
                       </span>
-                      <span className="mt-1 block max-w-[34rem] truncate text-xs text-muted-foreground">
+                      <span className="mt-1 block max-w-136 truncate text-xs text-muted-foreground">
                         {issue.explanations.join("; ") || "No extra context"}
                       </span>
                     </TableCell>
@@ -408,7 +408,7 @@ function RoutingFairnessResult({
                     </TableCell>
                     <TableCell>{formatToken(metric.band)}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[38rem] truncate">
+                      <span className="block max-w-152 truncate">
                         {metric.explanation}
                       </span>
                     </TableCell>
@@ -449,7 +449,7 @@ function RoutingFairnessRow({
     <TableRow>
       <TableCell className="font-medium">
         {row.rowNumber}
-        <span className="mt-1 block max-w-[10rem] truncate text-xs text-muted-foreground">
+        <span className="mt-1 block max-w-40 truncate text-xs text-muted-foreground">
           {row.referenceId ?? "No reference"}
         </span>
       </TableCell>
@@ -482,7 +482,7 @@ function RoutingFairnessRow({
           : "None"}
       </TableCell>
       <TableCell>
-        <span className="block max-w-[36rem] truncate">
+        <span className="block max-w-xl truncate">
           {row.explanationReasons.join("; ")}
         </span>
       </TableCell>

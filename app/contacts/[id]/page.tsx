@@ -153,7 +153,7 @@ export default async function ContactDetailPage({
                 value={
                   <Badge
                     variant={
-                      contact.status === "active" ? "success" : "outline"
+                      contact.status === "active" ? "success" : "outline-solid"
                     }
                   >
                     {contact.status === "active"

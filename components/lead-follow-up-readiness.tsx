@@ -107,16 +107,16 @@ export function LeadFollowUpReadiness({
           className="flex flex-wrap gap-2 text-xs text-muted-foreground"
           data-testid="lead-follow-up-write-flags"
         >
-          <Badge variant={batch.write.databaseWrites ? "danger" : "outline"}>
+          <Badge variant={batch.write.databaseWrites ? "danger" : "outline-solid"}>
             Database {batch.write.databaseWrites ? "on" : "off"}
           </Badge>
-          <Badge variant={batch.write.taskCreation ? "danger" : "outline"}>
+          <Badge variant={batch.write.taskCreation ? "danger" : "outline-solid"}>
             Tasks {batch.write.taskCreation ? "on" : "off"}
           </Badge>
-          <Badge variant={batch.write.routingExecution ? "danger" : "outline"}>
+          <Badge variant={batch.write.routingExecution ? "danger" : "outline-solid"}>
             Routing {batch.write.routingExecution ? "on" : "off"}
           </Badge>
-          <Badge variant={batch.write.providerCalls ? "danger" : "outline"}>
+          <Badge variant={batch.write.providerCalls ? "danger" : "outline-solid"}>
             Provider calls {batch.write.providerCalls ? "on" : "off"}
           </Badge>
         </div>
@@ -164,7 +164,7 @@ function FollowUpPacketCard({
         <Badge variant={urgencyVariant(packet.urgency)}>
           {urgencyLabel(packet.urgency)}
         </Badge>
-        <Badge variant={packet.requiresOperatorReview ? "warning" : "outline"}>
+        <Badge variant={packet.requiresOperatorReview ? "warning" : "outline-solid"}>
           {situationLabels[packet.situation]}
         </Badge>
       </div>
@@ -210,7 +210,7 @@ function urgencyVariant(
       return "secondary";
     case "low":
     case "none":
-      return "outline";
+      return "outline-solid";
   }
 }
 

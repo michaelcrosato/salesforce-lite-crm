@@ -220,7 +220,7 @@ function ProposalRow({
       </TableCell>
       <TableCell>
         {sample.intentId ?? "Unknown intent"}
-        <span className="mt-1 block max-w-[14rem] truncate text-xs text-muted-foreground">
+        <span className="mt-1 block max-w-56 truncate text-xs text-muted-foreground">
           {sample.targetEntity ?? "No target"}
           {sample.targetRoute ? ` - ${sample.targetRoute}` : ""}
         </span>
@@ -304,7 +304,7 @@ function payloadStatusVariant(status: AiActionReviewPayloadValidationStatus) {
     case "invalid":
       return "danger";
     case "skipped":
-      return "outline";
+      return "outline-solid";
   }
 }
 

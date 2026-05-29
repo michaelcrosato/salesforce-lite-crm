@@ -231,7 +231,7 @@ export default async function AccountDetailPage({
                       <TableCell>{contact.title ?? "No title"}</TableCell>
                       <TableCell>{contact.email ?? "No email"}</TableCell>
                       <TableCell>
-                        <Badge variant={contact.status === "active" ? "success" : "outline"}>
+                        <Badge variant={contact.status === "active" ? "success" : "outline-solid"}>
                           {CONTACT_STATUS_LABELS[contact.status as ContactStatus] ?? contact.status}
                         </Badge>
                       </TableCell>

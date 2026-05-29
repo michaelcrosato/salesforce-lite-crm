@@ -177,7 +177,7 @@ function ReportCard({ report }: { report: ReportDefinition }) {
   return (
     <Link
       href={`/reports/${report.slug}`}
-      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+      className="block focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
     >
       <Card className="h-full transition-colors hover:bg-muted/30">
         <CardHeader>

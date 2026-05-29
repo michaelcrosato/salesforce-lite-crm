@@ -54,7 +54,7 @@ export function AuditHistoryPanel({ events, "data-testid": testId }: AuditHistor
           return (
             <article
               key={event.id}
-              className="rounded-md border bg-card p-4 transition-all hover:shadow-sm"
+              className="rounded-md border bg-card p-4 transition-all hover:shadow-xs"
               data-testid="audit-history-row"
             >
               <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2">

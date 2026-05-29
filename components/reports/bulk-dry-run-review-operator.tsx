@@ -441,7 +441,7 @@ export function BulkDryRunReviewOperator({
                     clearRunState();
                   }}
                   placeholder="acct-apex&#10;acct-harbor"
-                  className="min-h-[14rem] font-mono"
+                  className="min-h-56 font-mono"
                   data-testid="bulk-dry-run-record-input"
                 />
                 <FieldError message={fieldErrors?.recordIds?.[0]} />
@@ -695,7 +695,7 @@ function BulkDryRunReviewResult({
                   <TableCell>{record.currentValue ?? "Not set"}</TableCell>
                   <TableCell>{record.targetValue ?? "Not set"}</TableCell>
                   <TableCell>
-                    <span className="block max-w-[28rem] truncate">
+                    <span className="block max-w-md truncate">
                       {record.message}
                     </span>
                   </TableCell>
@@ -785,7 +785,7 @@ function BulkExecutionConfirmation({
             {" "}eligible records. Execution writes mutations and audit events.
           </p>
         </div>
-        <Badge variant={packet.rollup.eligibleCount > 0 ? "warning" : "outline"}>
+        <Badge variant={packet.rollup.eligibleCount > 0 ? "warning" : "outline-solid"}>
           {packet.rollup.eligibleCount > 0 ? "ready" : "blocked"}
         </Badge>
       </CardHeader>
@@ -927,7 +927,7 @@ function BulkExecutionResult({
                   </TableCell>
                   <TableCell>{record.auditEventId ?? "Not recorded"}</TableCell>
                   <TableCell>
-                    <span className="block max-w-[28rem] truncate">
+                    <span className="block max-w-md truncate">
                       {record.error ?? record.message}
                     </span>
                   </TableCell>
@@ -970,7 +970,7 @@ function ReasonRow({
       <TableCell>{formatNumber(reason.count)}</TableCell>
       <TableCell>{reason.eligible ? "eligible" : "blocked"}</TableCell>
       <TableCell>
-        <span className="block max-w-[32rem] truncate">
+        <span className="block max-w-lg truncate">
           {reason.representativeRecords
             .map((record) => `${record.label ?? record.id}: ${record.message}`)
             .join(" ")}
@@ -1038,7 +1038,7 @@ function parseRecordCount(value: string): number {
 function statusVariant(status: BulkActionDryRunReviewPacketStatus) {
   switch (status) {
     case "empty":
-      return "outline";
+      return "outline-solid";
     case "ready":
       return "success";
     case "partial":
@@ -1051,7 +1051,7 @@ function statusVariant(status: BulkActionDryRunReviewPacketStatus) {
 function executionStatusVariant(status: BulkActionExecutionStatus) {
   switch (status) {
     case "empty":
-      return "outline";
+      return "outline-solid";
     case "completed":
       return "success";
     case "partial":

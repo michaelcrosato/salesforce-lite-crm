@@ -92,3 +92,13 @@
 - Enabled `reactCompiler: true` in `next.config.mjs` and observed Next.js attempting to resolve `babel-plugin-react-compiler` under the hood.
 - Build failed with a hard resolution error because the dependency `babel-plugin-react-compiler` is not present in `node_modules` and is a gated dependency change requiring human/operator promotion approval per CLAUDE.md §14.
 - Decided to **DEFER** the adoption of the React Compiler to a future sprint. Reverted all config modifications to keep the `main` branch completely clean and avoid introducing unapproved dependencies or breaking compilation pipelines.
+
+## Tailwind v4 Oxide Migration (Spec 023)
+
+- Upgraded the styling toolchain in `salesforce-lite-crm` from **Tailwind v3.4.19** to **Tailwind v4.3.0** with the native Rust **Oxide** engine.
+- Configured CSS-first setup via `@import "tailwindcss";` and `@theme` block directives in `app/globals.css`, removing the legacy JavaScript `tailwind.config.ts`.
+- Integrated `@tailwindcss/postcss` plugin in `postcss.config.mjs` (while preserving the `postcss` override version `8.5.15`) and removed the obsolete `autoprefixer` dependency.
+- Added a compatibility variant `"outline-solid"` in `components/ui/badge.tsx` cva config to resolve the template renames introduced by the `@tailwindcss/upgrade` codemod.
+- Documented the browser support posture change: Tailwind v4 drops support for older browsers, targeting **Safari 16.4+, Chrome 111+, Firefox 128+**.
+- Created comprehensive component unit tests at `tests/components/button.test.tsx` to assert button styling variants and prevent theme drift.
+- Verified that all gates are completely green: ESLint linting passes, TypeScript type checking passes, all 597 Vitest tests pass cleanly, Next.js Turbopack compiles a production build successfully, and all 52 Playwright E2E browser tests pass flawlessly.

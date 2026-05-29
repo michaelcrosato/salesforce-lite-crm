@@ -130,7 +130,7 @@ export function CommandPalette() {
   );
 
   return (
-    <div className="fixed inset-0 z-[70]">
+    <div className="fixed inset-0 z-70">
       <button
         type="button"
         aria-label="Close command palette"

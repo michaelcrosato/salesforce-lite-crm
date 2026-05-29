@@ -395,7 +395,7 @@ function WorkflowDryRunResult({ packet }: { packet: WorkflowRuleReviewPacket }) 
                     <TableCell>{formatToken(action.category)}</TableCell>
                     <TableCell>{formatNumber(action.recordCount)}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[36rem] truncate">
+                      <span className="block max-w-xl truncate">
                         {action.summary}
                       </span>
                     </TableCell>
@@ -451,7 +451,7 @@ function WorkflowDryRunResult({ packet }: { packet: WorkflowRuleReviewPacket }) 
                         {record.matchedConditionKeys.map(formatToken).join(", ")}
                       </TableCell>
                       <TableCell>
-                        <span className="block max-w-[36rem] truncate">
+                        <span className="block max-w-xl truncate">
                           {record.values
                             .map(
                               (value) =>
@@ -530,7 +530,7 @@ function WorkflowExecutionConfirmation({
         </div>
         <Badge
           variant={
-            packet.affectedObjects.matchedRecordCount > 0 ? "warning" : "outline"
+            packet.affectedObjects.matchedRecordCount > 0 ? "warning" : "outline-solid"
           }
         >
           {packet.affectedObjects.matchedRecordCount > 0 ? "ready" : "blocked"}
@@ -707,7 +707,7 @@ function WorkflowExecutionResult({
                     </TableCell>
                     <TableCell>{record.auditEventId ?? "Not recorded"}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[28rem] truncate">
+                      <span className="block max-w-md truncate">
                         {record.error ?? record.message}
                       </span>
                     </TableCell>
@@ -755,7 +755,7 @@ function WarningCard({
     <div className="rounded-md border bg-muted/20 px-3 py-3 text-sm">
       <div className="flex items-center justify-between gap-3">
         <span className="font-medium">{formatToken(warning.code)}</span>
-        <Badge variant={warning.severity === "watch" ? "warning" : "outline"}>
+        <Badge variant={warning.severity === "watch" ? "warning" : "outline-solid"}>
           {warning.severity}
         </Badge>
       </div>
@@ -812,7 +812,7 @@ function FieldError({ message }: { message?: string | null }) {
 function statusVariant(status: WorkflowRuleReviewPacketStatus) {
   switch (status) {
     case "empty":
-      return "outline";
+      return "outline-solid";
     case "ready":
       return "success";
     case "review":
@@ -827,7 +827,7 @@ function executionStatusVariant(status: WorkflowRuleManualExecutionStatus) {
     case "partial":
       return "warning";
     case "blocked":
-      return "outline";
+      return "outline-solid";
     case "failed":
       return "danger";
   }
