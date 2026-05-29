@@ -17,7 +17,9 @@ agents extend while preserving the shared contract and local gate.
 
 - Full local gate green (2026-05-28): `lint`, `typecheck`, `test` (565/565),
   `build`, and `test:e2e` (50/50 Playwright). See `tickets/TICKET001.md`.
-- Sprint 52 complete; no next feature track selected (`docs/PROJECT-CONTROL.md`).
+- Active sprint is tracked in `PLAN.md` §1/§4 — do not hardcode it here. As of
+  2026-05-28 that is Sprint 56 (Pacing Snapshot Readiness, in progress); Sprints
+  4–55 are complete, with detail archived in `docs/PLAN-ARCHIVE.md`.
 - No auth, deployment, external AI, or Salesforce integration.
 
 ## Desired end state

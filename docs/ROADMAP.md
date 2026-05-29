@@ -80,16 +80,22 @@ The roadmap is governed by seven rules:
 
 ## Current Track And Next Work
 
-`PLAN.md` section 4 records the latest completed feature track. As of the
-2026-05-28 completion reconciliation pass, Sprint 52 is complete on `main`:
+`PLAN.md` §1/§4 is the authority for the active sprint and per-feature status;
+this section records the track, not live per-feature state. Sprints 52–56 have
+executed roadmap Phase 3 (Dealer Revenue Command Center expansion):
 
-| Item | Status | Loop guidance |
+| Sprint | Roadmap item | Status (see `PLAN.md` for detail) |
 |---|---|---|
-| S52-F1 Routing simulator input contracts | done | Added server-side simulator input, limit, fixture, and no-write guardrail contracts for hypothetical consumer leads without evaluating assignments, mutating records, adding UI/routes, or changing live routing. |
-| S52-F2 Routing simulator read-only evaluator | done | Added a deterministic read-only evaluator that uses existing postal normalization, area matching, order eligibility, and pace-gap ranking to explain hypothetical routing outcomes without writes, UI/routes, geocoding, or external calls. |
+| 52 Routing Simulation Foundation | `B-53` | complete |
+| 53 Routing Simulator Operator Preview | `B-53` | complete |
+| 54 Routing Fairness Readiness | `B-54` | complete |
+| 55 Dealer Capacity Readiness | `B-55` | complete |
+| 56 Pacing Snapshot Readiness | `B-57` | active (in progress) |
 
-No next feature track is active until a future prompt or planning pass updates
-`PLAN.md` section 4.
+All of these stayed read-only/no-write by design (no persistence, live routing
+change, or new route boundary). Remaining Phase 3 candidate `B-56` (lead
+disposition/SLA) is not yet started. Confirm the live sprint state in `PLAN.md`
+before planning the next track.
 
 Future dependency/security modernization remains tracked as `B-68` before
 larger AI, auth, deployment, or integration work. Do not run

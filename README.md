@@ -332,9 +332,11 @@ from `CRM-CONTRACT.md`, `PLAN.md`, and repo-local evidence.
 The current tree includes the Sprint 4B demo-hardening surface, the CSV
 handoff/operator tracks, audit/list/bulk action foundations, service knowledge
 and AI governance tracks, approval and lead follow-up readiness work, saved
-report and dashboard-card foundations, and the Sprint 52 routing simulation
-foundation. `PLAN.md` section 4 records Sprint 52 as complete; the next feature
-track requires an explicit planning/rollover update before implementation.
+report and dashboard-card foundations, and the routing simulation / fairness /
+dealer-capacity / pacing-snapshot tracks (Sprints 52–56, executing roadmap
+Phase 3 items B-53 through B-57). The active sprint and its per-feature status
+live in `PLAN.md` §1/§4 — that is the authority, not this paragraph. Completed
+sprint detail is archived in `docs/PLAN-ARCHIVE.md`.
 
 Deferred items such as auth, deployment, external AI, global search expansion,
 Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,

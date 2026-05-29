@@ -6,9 +6,10 @@
 - Commit observed this pass: use `git rev-parse HEAD` for the current local
   commit; this file intentionally avoids freezing a SHA that stales after
   documentation-only commits.
-- Current pass: post-Sprint 52 completion reconciliation.
-- Product feature work: S48-F1 through S52-F2 is present in `main`; the next
-  feature track is not selected.
+- Current pass: doc alignment + AFK-readiness maintenance (2026-05-28).
+- Product feature work: through Sprint 55 is present in `main`; Sprint 56
+  (Pacing Snapshot Readiness) is the active track. `PLAN.md` §1/§4 is
+  authoritative for the live sprint and its per-feature status.
 - Contract: `CRM-CONTRACT.md` is the source of truth for entity names,
   statuses, routes, search surfaces, report services, and adapter signatures.
 - Local gate: `docs/LOCAL-GATE.md` and `scripts/local-gate.ps1` are the
@@ -65,14 +66,11 @@ without checking `PLAN.md`, `CRM-CONTRACT.md`, and the working tree.
 
 `main` contains the earlier Sprint 4B demo-hardening surface plus the
 subsequent CSV, audit, bulk action, list, service-operations, AI governance,
-approval readiness, lead follow-up, saved-report, dashboard-card, and routing
-simulation tracks. Sprint 52 is complete; a future prompt or planning pass must
-select the next feature track before new product work starts:
-
-| Feature | Owner | Current state |
-|---|---|---|
-| S52-F1 Routing simulator input contracts | Codex | Done |
-| S52-F2 Routing simulator read-only evaluator | Codex | Done |
+approval readiness, lead follow-up, saved-report, dashboard-card, and the
+routing-simulation / fairness / dealer-capacity / pacing-snapshot tracks
+(Sprints 52–56). Sprints 4–55 are complete; Sprint 56 (Pacing Snapshot
+Readiness) is in progress. `PLAN.md` §1/§4 is the authority for the live sprint
+and per-feature status — this file intentionally does not duplicate it.
 
 This file does not activate new implementation scope. Work that changes entity
 names, routes, adapter signatures, feature flags, or other contract surfaces
