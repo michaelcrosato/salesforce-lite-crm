@@ -1,0 +1,40 @@
+# Paths AI coding agents should skip — generated, vendored, or low-signal noise.
+# This file is advisory context-hygiene, not a security or build boundary.
+
+# Dependencies / build output
+node_modules/
+.next/
+dist/
+coverage/
+
+# Test + trace artifacts
+playwright-report/
+test-results/
+traces/
+e2e/**/*-snapshots/
+
+# Agent run logs and archives (large, regenerated each run)
+agent-runs/
+failure-archives/
+status/
+dev-server.log
+dev-server.err.log
+*.log
+
+# Local database (generated; never committed)
+prisma/dev.db
+prisma/dev.db-journal
+prisma/dev.db-wal
+prisma/dev.db-shm
+*.db
+
+# Generated TypeScript / build metadata
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Large lockfile (read package.json instead for dependency intent)
+package-lock.json
+
+# Screenshots
+_screenshots/

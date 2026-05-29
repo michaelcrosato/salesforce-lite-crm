@@ -26,6 +26,11 @@ npm run seed
 
 Start with these files before changing code or documentation:
 
+- `GOAL.md` - single-page orientation: purpose, current state, non-goals,
+  key commands, and definition of done (defers to `PLAN.md`/`CRM-CONTRACT.md`).
+- `docs/ai/REPO_MAP.md` - where core logic, tests, entry points, and config
+  live, and what to skip.
+- `tickets/` - atomic, session-sized maintenance tickets.
 - `PLAN.md` - execution rules, source-of-truth hierarchy, ownership zones,
   current prompt/sprint scope, local gate, report schema, and anti-drift rules.
 - `CRM-CONTRACT.md` - entity names, route contract, status values, registry
