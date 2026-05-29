@@ -26,7 +26,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 009 | Structured logging | — | |
 | [ ] Todo | 010 | Component unit tests | 006 | ⚠️ |
 | [x] Done | 011 | Reachability gate + retire CSV tower | — | |
-| [ ] Todo | 012 | Parallel-safe tests | — | |
+| [x] Done | 012 | Parallel-safe tests | — | |
 | [x] Done | 013 | Fix e2e + promote to required | — | |
 | [x] Done | 014 | Targeted caching + revalidation | 013 | |
 | [x] Done | 015 | Consolidate agent prompts | — | |

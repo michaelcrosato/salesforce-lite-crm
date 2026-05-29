@@ -1,7 +1,7 @@
 # 012 — Parallel-safe tests: per-worker SQLite isolation (TICKET007)
 
 - **Wave:** Phase 1 — Core Upgrades
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 3/5 · Feasibility 2/5 · Risk Med · Codebase Fit 4/5
 - **Depends on:** none
 - **Scope gate:** In-scope (test infra; **`prisma/seed.ts` is sacred** — do not change seed logic, only how tests provision DBs)
@@ -13,11 +13,11 @@ Tests run `vitest run --maxWorkers=1` because all 116 files share a single `pris
 Impact: faster gate → faster overnight iterations; removes a known scaling ceiling.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Each Vitest worker uses an **isolated** database (e.g. `file:./prisma/.test-dbs/worker-${VITEST_POOL_ID}.db` or `:memory:`), created + `prisma db push`'d in a global/setup hook.
-- [ ] `--maxWorkers=1` is removed (or raised) and the **full suite passes repeatedly** (run 3×) with no flakiness.
-- [ ] Wall-clock test time drops meaningfully versus the 46s serial baseline.
-- [ ] Determinism preserved (routing/forecast tests still produce identical output).
-- [ ] Test DB files are gitignored; no artifacts committed.
+- [x] Each Vitest worker uses an **isolated** database (e.g. `file:./prisma/.test-dbs/worker-${VITEST_POOL_ID}.db` or `:memory:`), created + `prisma db push`'d in a global/setup hook.
+- [x] `--maxWorkers=1` is removed (or raised) and the **full suite passes repeatedly** (run 3×) with no flakiness.
+- [x] Wall-clock test time drops meaningfully versus the 46s serial baseline.
+- [x] Determinism preserved (routing/forecast tests still produce identical output).
+- [x] Test DB files are gitignored; no artifacts committed.
 
 ## Implementation Approach
 **Files to touch:** `vitest.config.ts` (pool config + `globalSetup`/`setupFiles`), new `tests/setup/db.ts`, `package.json` (edit the existing `test` script — allowed; do **not** add a new script), `.gitignore`.
