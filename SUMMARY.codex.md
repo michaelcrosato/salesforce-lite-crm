@@ -1,39 +1,37 @@
 Agent: Codex
 
-Sprint: Spec 024 repair
+Sprint: Sprint 56
 
-Feature: Audit history local-gate repair
+Feature: S56-F3 - Pacing snapshot review packets
 
-Branch: gemini/spec-024-audit-history
+Branch: codex/sprint-56-pacing-snapshot-review-packets
 
 Status: done
 
-Commits this prompt: 35e5454 — [codex] spec-024: stabilize audit history gate
+Commits this prompt: 3d11761 - [codex] S56-F3: add pacing snapshot review packets
 
-Gate status: PASS — `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (116 files / 575 tests), build, Playwright Chromium install, and `npm run test:e2e` (52 passed). Earlier in this prompt, the same full gate failed at `npm run test:e2e` on `e2e/reports.spec.ts`; the failure was repaired and the full gate was rerun green.
+Gate status: PASS - `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (117 files / 577 tests), build, Playwright Chromium install, and `npm run test:e2e` (52 passed).
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-29T10:24:27.3263489-07:00
+Timestamp: 2026-05-29T10:57:07-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran the required orientation and status checks from the single-agent root on `gemini/spec-024-audit-history`; `STOP` was absent and ownership zones were advisory.
-- Preserved the existing Spec 024 audit-history work on the branch and committed only the focused repair delta.
-- Removed the deal drawer render-time state update path by deriving visible audit events from the focused deal id and reusing the shared detail timeline tabs.
-- Cleaned audit-history panel formatting and preserved stage-change display using existing `previousStatus` audit metadata.
-- Invalidated the cached reports surface after task mutations so `/reports` audit explorer data refreshes after the reports e2e creates its marker task.
-- Aligned stale reports e2e count assertions to the existing server contracts already covered by unit tests (`listFilterSupport` filter count 38; bulk dry-run action count 6).
-- Observed untracked `pnpm-lock.yaml` after the green gate and left it unstaged as out-of-scope package-manager output.
+- Ran Phase 0 baseline from the single-agent root on `main`; worktree was clean and lint/typecheck/test/build were green before edits.
+- Reconciled local Sprint 56 evidence: `bcf279b` and `e69dcad` already added S56-F1 and S56-F2 server/test files while `PLAN.md` §4 still lists all S56 rows as queued, so this prompt selected S56-F3 rather than duplicating already-present contracts/builders.
+- Added `lib/server/pacingSnapshotReviewPackets.ts`, a deterministic read-only review packet layer over the existing pacing snapshot builder with freshness metadata, request source counts, empty-state reasons, representative bucket samples, metric definitions, and explicit no-write/no-route/no-external flags.
+- Added `tests/api/pacing-snapshot-review-packets.test.ts` covering packet shape, partial/empty evidence states, freshness/source metadata, representative samples, option validation, and unchanged CRM counts.
+- Stashed an out-of-scope untracked `pnpm-lock.yaml` as `loop-recovery-20260529-105707`; it was not staged or committed.
 
 ### Next action
 
-Push `gemini/spec-024-audit-history` and continue the protected PR/CI gate path.
+Open the protected PR for `codex/sprint-56-pacing-snapshot-review-packets`, wait for the required `gate` check, and merge only through the green PR flow.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES — single-agent root mode; repair touched app actions, components, validation, and e2e coverage needed to make the current branch gate green.
+No cross-ownership edits: YES - single-agent root mode; historical zones were advisory and the implementation was limited to server contract logic plus focused Vitest coverage.
 
-CRM-CONTRACT.md honored: YES — no schema changes, no new routes, no `/deals/[id]` live detail behavior, no auth/deployment/Salesforce/external-AI integration, and no dealer-order or area CRUD.
+CRM-CONTRACT.md honored: YES - no schema, seed, route, UI, dealer-order/area CRUD, live routing, persistent snapshot history, command-palette action, CSV apply, external service, or external AI integration was added.
