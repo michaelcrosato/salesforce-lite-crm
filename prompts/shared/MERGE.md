@@ -1,9 +1,13 @@
 # MERGE.md — integrate green agent branches into main
 
 You are the operator (or whichever agent owns the merge per the current
-sprint's coordination). This prompt does ONE integration pass: merge
-green branches into main, run the full §9 gate on main, update
-coordination state.
+sprint's coordination). This prompt does ONE integration pass: open a pull
+request per green branch, let the required `gate` CI check approve it, merge
+with `gh pr merge --squash --delete-branch`, and update coordination state.
+
+`main` is protected: it accepts changes only through a PR whose required
+`gate` check is green. Never push to `main` directly; never merge with
+`--admin` or any force/override. The bypass habit is what this flow retires.
 
 PLAN.md §2 source-of-truth: local gate output > current prompt >
 PLAN.md / CRM-CONTRACT.md > SUMMARY/BLOCKERS > docs/decisions.md.
@@ -59,32 +63,44 @@ Codex's logic diff, merge Gemini first against a snapshot of Codex's
 branch).
 
 ============================================================
-PHASE 2 — MERGE EACH BRANCH
+PHASE 2 — OPEN A PR PER BRANCH, MERGE VIA THE GATE
 ============================================================
 
 For each branch in order:
-  git checkout main
-  git pull --ff-only
-  git merge --no-ff <branch> -m "merge: <branch> — <one-line summary>"
-  git status
+  git push origin <branch>                         # publish the branch
+  gh pr create --base main --head <branch> --fill  # or --title/--body
+  gh pr checks <branch> --watch                    # wait for required `gate`
 
-Conflicts handling:
-  - Conflicts in the owning agent's zone: resolve preserving the agent's
-    intent (the agent's HEAD wins).
-  - Conflicts in shared coordination zone (PLAN.md §5): resolve
-    preserving §17 latest decisions and the higher-version document.
-  - Conflicts in another agent's zone: `git merge --abort` immediately,
-    file an `ownership` blocker on the offending agent with the conflict
-    paths, continue with other branches.
+  If `gate` is green:
+    gh pr merge <branch> --squash --delete-branch  # NO --admin, NO force
 
-Per PLAN.md §7 hard rules: no force-push to main, no `git push --force`,
-no amending pushed commits, no rebasing main.
+  If `gate` is red:
+    Leave the PR open. File a `gate` blocker (PLAN.md §10) against the owning
+    agent with the failing check name and the PR/run link. Move on to the next
+    branch. Do NOT bypass, do NOT `--admin`, do NOT push to `main`.
+
+Conflicts (GitHub marks the PR "not mergeable" / needs rebase):
+  - Owning agent's zone: the owning agent rebases on their branch via
+    LOOP.md and re-pushes; `gate` re-runs automatically on the PR.
+  - Shared coordination zone (PLAN.md §5): resolve on the branch preserving
+    §17 latest decisions and the higher-version document, then re-push.
+  - Another agent's zone: do NOT resolve. File an `ownership` blocker on the
+    offending agent with the conflict paths and skip that branch.
+
+Per PLAN.md §7 hard rules: no direct push to `main`, no `--admin`/force merge,
+no `git push --force`, no amending pushed commits, no rebasing `main`.
 
 ============================================================
-PHASE 3 — RUN FULL §9 GATE ON MAIN
+PHASE 3 — VERIFY THE GATE (per PR, on CI)
 ============================================================
 
-After all intended merges:
+The required `gate` check (lint + typecheck + test + build) runs on CI for
+each PR and IS the merge gate — the same deterministic sequence as the local
+gate minus the advisory `e2e` job (`continue-on-error`, non-blocking; tracked
+in TICKET008). A PR merges only when `gate` is green.
+
+Optionally run the full local §9 sequence (incl. e2e) on the branch BEFORE
+opening the PR to catch issues early:
   npm install
   if (-not (Test-Path .env)) { Copy-Item .env.example .env }
   npx prisma generate
@@ -96,23 +112,14 @@ After all intended merges:
   npm run build
   npx playwright install chromium
   npm run test:e2e
+The CI `gate` is authoritative for the merge decision.
 
-If green:
-  git push origin main
-  Continue to Phase 4.
-
-If red:
-  - Identify which merge introduced the failure. Use `git bisect` on the
-    merge commits if not obvious from output.
-  - Revert the offending merge: `git revert -m 1 <merge-sha>`.
-  - Push the revert.
-  - File a `gate` blocker against the responsible agent in their
-    BLOCKERS.<agent>.md (you may edit another agent's BLOCKERS file
-    when filing a cross-agent blocker; document the cross-zone reason).
-    [NOTE — operator: see UNRESOLVED CLAIMS in chat for the suggested
-    correction to this bullet, which makes blocker filing zone-clean.]
-  - Do NOT attempt to fix the issue in main; the agent fixes in their
-    branch via LOOP.md and re-attempts merge next cycle.
+If a PR's `gate` is red:
+  - Read the failing CI step in `gh pr checks <branch>` / the run log.
+  - The owning agent fixes on their branch via LOOP.md and re-pushes; the PR
+    re-runs `gate` automatically.
+  - File a `gate` blocker (§10) if it cannot be fixed this pass.
+  - Do NOT merge, do NOT `--admin`, do NOT push to `main` to "fix it on main".
 
 ============================================================
 PHASE 4 — UPDATE COORDINATION DOCS
@@ -120,13 +127,12 @@ PHASE 4 — UPDATE COORDINATION DOCS
 
 If documentation drift surfaced during the merge (e.g., README claims a
 route that the merged code didn't ship, PLAN.md status doesn't reflect
-the merge), commit a single `docs(merge):` commit fixing the smallest
-documented drift.
+the merge), make a single `docs(merge):` commit fixing the smallest
+documented drift — on its own short-lived branch, integrated through the
+same gated PR flow (Phase 2). Never push it straight to `main`.
 
 Do NOT rewrite agent SUMMARY/BLOCKERS files here — owning agents update
 their own files in their next LOOP.md iteration.
-
-Push.
 
 ============================================================
 FINAL CHAT OUTPUT

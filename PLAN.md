@@ -445,6 +445,11 @@ A report-only commit may include only that agent's `SUMMARY.<agent>.md` and `BLO
 
 \- Rebase or force-push `main` or any branch you do not own.
 
+\- Push directly to `main`, or merge a PR with `--admin` / force / any branch-
+  protection override. `main` is protected and accepts changes only through a
+  PR whose required `gate` check is green; integrate with
+  `gh pr merge --squash --delete-branch`. See `prompts/shared/MERGE.md`.
+
 \- Amend a commit you have already pushed.
 
 \- In parallel mode, edit a file outside your zone (§5) without documenting the

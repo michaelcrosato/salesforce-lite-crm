@@ -240,8 +240,16 @@ Commit reports separately (PLAN.md §7 report-only commit format):
   git add SUMMARY.{AGENT}.md BLOCKERS.{AGENT}.md
   git commit -m "[{AGENT}] <feature-id>: update reports"
 
-Push:
-  git push origin <branch>
+Push — via a branch and a gated PR, never directly to `main`:
+  # If you are on `main`, move this iteration's work to a branch first:
+  #   git switch -c {AGENT}/<feature-slug>
+  git push origin HEAD
+
+Integrate to `main` only through the protected PR flow (prompts/shared/MERGE.md):
+open a PR, wait for the required `gate` check, then
+`gh pr merge --squash --delete-branch`. NEVER `--admin`, NEVER force, NEVER a
+direct push to `main`. If `gate` is red, leave the PR open, file a `gate`
+blocker per §10, and stop — do not bypass.
 
 ============================================================
 FINAL CHAT OUTPUT (last lines)
