@@ -1,7 +1,14 @@
 # TICKET003 — Assess CSV server-contract layer for consolidation / dead code
 
-- **Status:** Open
+- **Status:** Done — assessment phase (2026-05-28)
 - **Priority:** Medium
+- **Result:** Import/consumer graph captured in
+  `docs/ai/csv-contract-assessment.md`. 34 `csv*` modules, all test-covered (no
+  strict dead code). **13** are UI-reachable (import/export blocks behind
+  `/reports`); **21** are a test-only operator/release "handoff" tower with no
+  route/component reader. `csvReleaseReadinessPackets` is terminal + test-only
+  (cleanest first cut). Phased, test-first consolidation proposal written.
+  Nothing deleted/merged; baseline `npm run test` 565/565 green.
 
 ## Goal
 
@@ -39,10 +46,10 @@ but ripping it out is a broad refactor and must be deliberate and test-backed.
 
 ## Acceptance criteria
 
-- [ ] Import/consumer graph captured for the CSV contract layer.
-- [ ] Modules with no external consumer explicitly listed (or "none found").
-- [ ] Phased consolidation proposal written; nothing deleted in this ticket.
-- [ ] No behavior, contract, or test change.
+- [x] Import/consumer graph captured for the CSV contract layer.
+- [x] Modules with no external consumer explicitly listed (21 test-only; UI set of 13).
+- [x] Phased consolidation proposal written; nothing deleted in this ticket.
+- [x] No behavior, contract, or test change.
 
 ## Commands
 

@@ -54,7 +54,10 @@ handoff records — skip unless coordinating a multi-agent run.
 - `PLAN.md` is ~3.4k lines documenting 56 sprints; most of the bulk is
   near-duplicate read-only CSV "handoff contract" prose. Read §1–4 and the
   current sprint, not the whole file. Consolidation is tracked in `tickets/`.
-- `lib/server/csv*` (~36 files) is a deep read-only contract stack built over
-  Sprints 5–23. It is no-write by design; consolidation is a tracked ticket.
+- `lib/server/csv*` (34 files) is a deep read-only contract stack built over
+  Sprints 5–23. It is no-write by design. Mapped in
+  `docs/ai/csv-contract-assessment.md`: 13 modules are UI-reachable (behind
+  `/reports`), 21 are a test-only operator/release tower. Consolidation is
+  tracked (TICKET003 assessment done; TICKET004 = Phase-1 execution).
 - Full local gate (incl. Playwright e2e, 50 tests) was confirmed green on
   2026-05-28. E2E is heavy (needs `npx playwright install chromium`).
