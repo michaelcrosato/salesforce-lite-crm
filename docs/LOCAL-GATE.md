@@ -4,6 +4,7 @@ Run from the repo root in PowerShell:
 
 ```powershell
 npm install
+npm audit --audit-level=high   # security gate: blocks High/Critical (matches CI)
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 npx prisma generate
 npx prisma db push

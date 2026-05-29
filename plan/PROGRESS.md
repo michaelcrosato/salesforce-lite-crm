@@ -2,15 +2,15 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 0 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅.
+**Overall: 1 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅.
 
 ---
 
-## Wave 0 — Quick Wins & Safety (0 / 8)
+## Wave 0 — Quick Wins & Safety (1 / 8)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
-| [ ] Todo | 001 | CI `npm audit` gate | — | |
+| [x] Done | 001 | CI `npm audit` gate | — | |
 | [ ] Todo | 002 | Zod v4 imports (`zod/v4`) | — | |
 | [ ] Todo | 003 | Portable case-insensitive search | — | |
 | [ ] Todo | 004 | Surface server-action errors | 009 | |
@@ -60,3 +60,4 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 ## Log
 
 - 2026-05-28 — Blueprint generated (24 specs + ROADMAP + AGENTS + PROGRESS). Nothing executed yet; all specs `Todo`. Baseline green.
+- 2026-05-28 — **001 Done** (branch `phase-0-quick-wins`). Files: `.github/workflows/ci.yml` (+`npm audit --audit-level=high` step in `gate`), `docs/LOCAL-GATE.md` (+audit line). Validated: `npm audit --audit-level=high` → 0 vulns, exit 0.

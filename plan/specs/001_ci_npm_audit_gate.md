@@ -1,7 +1,7 @@
 # 001 — Add `npm audit` security gate to CI
 
 - **Wave:** Phase 0 — Quick Wins & Safety
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 3/5 · Feasibility 5/5 · Risk Low · Codebase Fit 5/5
 - **Depends on:** none
 - **Scope gate:** In-scope (CI workflow edit only; **no new npm script** — respects LOOP §11)
@@ -13,11 +13,11 @@ Dependencies are exact-pinned and intentionally bleeding-edge (Next 16.2.6, Reac
 Impact: turns dependency security from "manual, never" into "every PR." Cheap, high-signal.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] The required `gate` job in `.github/workflows/ci.yml` runs `npm audit --audit-level=high` after `npm ci`.
-- [ ] The step passes on `main` today (baseline is 0 vulns).
-- [ ] Threshold (`high`) documented inline; rationale: block High/Critical, don't fail on Low/Moderate noise.
-- [ ] `docs/LOCAL-GATE.md` notes the audit step so local runs match CI.
-- [ ] Full `gate` (lint+typecheck+test+build) remains green.
+- [x] The required `gate` job in `.github/workflows/ci.yml` runs `npm audit --audit-level=high` after `npm ci`.
+- [x] The step passes on `main` today (baseline is 0 vulns).
+- [x] Threshold (`high`) documented inline; rationale: block High/Critical, don't fail on Low/Moderate noise.
+- [x] `docs/LOCAL-GATE.md` notes the audit step so local runs match CI.
+- [x] Full `gate` (lint+typecheck+test+build) remains green.
 
 ## Implementation Approach
 **Files to touch:** `.github/workflows/ci.yml` (add one step to the `gate` job, after install, before lint), `docs/LOCAL-GATE.md` (one line).
