@@ -2,11 +2,11 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 21 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 24 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
-## Wave 0 — Quick Wins & Safety (7 / 8)
+## Wave 0 — Quick Wins & Safety (8 / 8)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
@@ -19,7 +19,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 007 | Reconcile ownership zones | — | |
 | [x] Done | 008 | Security headers baseline | — | |
 
-## Wave 1 — Core Upgrades (3 / 10)
+## Wave 1 — Core Upgrades (10 / 10)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
@@ -34,7 +34,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 017 | React Compiler evaluation (spike) | 010 | |
 | [x] Done | 018 | Audit-event write coverage | 009, 006 | |
 
-## Wave 2 — Major Features (2 / 6)
+## Wave 2 — Major Features (6 / 6)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
