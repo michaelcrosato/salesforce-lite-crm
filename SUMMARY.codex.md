@@ -1,41 +1,39 @@
 Agent: Codex
 
-Sprint: Sprint 55
+Sprint: Sprint 56
 
-Feature: S55-F3 - Capacity window operator surface
+Feature: Sprint 56 planning rollover
 
 Branch: main
 
 Status: done
 
-Commits this prompt: 7c45b1c - [codex] S55-F3: expose capacity windows in simulator UI
+Commits this prompt: 8f989d3 - [codex] sprint 56: plan codex track; 608959b - [codex] sprint 56: backlog refresh
 
-Gate status: PASS - `scripts/local-gate.ps1` completed successfully with `npm run test` at 114 files / 557 tests and `npm run test:e2e` at 50 tests.
+Gate status: PASS - baseline `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (114 files / 557 tests), build, Playwright Chromium install, and `npm run test:e2e` (50 tests). Post-planning verification also passed `npm run lint`, `npm run typecheck`, `npm run test` (114 files / 557 tests), and `npm run build`.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-28T16:23:25.6441920-07:00
+Timestamp: 2026-05-28T17:12:45.0469357-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight in single-agent root mode on `main`; the baseline gate through `npm run build` was green and the tree was clean.
-- Reconciled Sprint 55 before selection: `main` already contained S55-F1 and S55-F2 implementation/report commits despite PLAN.md and `docs/FEATURE-BACKLOG.md` still listing those rows as queued.
-- Implemented S55-F3 on the existing `/reports` routing simulator surface by accepting optional hypothetical capacity-window JSON, passing it into the read-only review packet action, and rendering capacity summary/outcome details plus no-write flags.
-- Added Playwright coverage for capacity-window simulation using seeded dealer orders and verified the preview leaves live leads, routing events, dealer orders, areas, and current-month assignments unchanged.
-- Verified the full `scripts/local-gate.ps1` sequence passed, including lint, typecheck, 114 Vitest files / 557 tests, build, and 50 Playwright tests.
-
-### Discovered this prompt
-
-- PLAN.md §4 and `docs/FEATURE-BACKLOG.md` still list S55-F1, S55-F2, and S55-F3 as queued even though `main` now contains implementation/report commits for all three Sprint 55 features and the full local gate is green. A sprint completion reconciliation or rollover pass should mark Sprint 55 complete before new product scope is selected.
+- Ran sprint rollover pre-flight from the single-agent root on `main`; the worktree was clean and the full local gate was green before planning changes.
+- Reviewed `PLAN.md`, `CRM-CONTRACT.md`, `README.md`, `docs/decisions.md`, all agent SUMMARY/BLOCKERS files, `docs/FEATURE-BACKLOG.md`, and the last 30 days of git history.
+- Confirmed Sprint 55 Codex work is complete from report and commit evidence: `a578957` / `037cb1c` for S55-F1, `907033b` / `57229d2` for S55-F2, and `7c45b1c` / `78dcdff` for S55-F3.
+- Updated `PLAN.md` to version 2.62A, marked S55-F1 through S55-F3 done, queued Sprint 56, and recorded the Sprint 55 completion / Sprint 56 planning decision.
+- Synced `docs/FEATURE-BACKLOG.md` so Sprint 55 is done and S56-F1 through S56-F3 are queued.
+- Observed lower-authority `docs/ROADMAP.md` and `docs/PROJECT-CONTROL.md` still reference Sprint 52 as the latest completed track; left them unchanged because this rollover prompt allowed writes only to PLAN/backlog/report files.
+- Verified planning changes with `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 
 ### Next action
 
-Run a Sprint 55 completion reconciliation/rollover pass; no further Codex feature work should be invented from the stale queued rows.
+Run LOOP.md to begin S56-F1
 
 ### Scope confirmation
 
-No cross-ownership edits: YES - single-agent root mode; one coherent S55-F3 slice touched the reports route, report operator component, report action, e2e coverage, and Codex report files.
+No cross-ownership edits: YES - single-agent root mode; current prompt explicitly authorized `PLAN.md`, `docs/FEATURE-BACKLOG.md`, `SUMMARY.codex.md`, and `BLOCKERS.codex.md`.
 
 CRM-CONTRACT.md honored: YES
