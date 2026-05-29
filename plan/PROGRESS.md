@@ -24,7 +24,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 009 | Structured logging | — | |
-| [ ] Todo | 010 | Component unit tests | 006 | ⚠️ |
+| [x] Done | 010 | Component unit tests | 006 | ⚠️ |
 | [x] Done | 011 | Reachability gate + retire CSV tower | — | |
 | [x] Done | 012 | Parallel-safe tests | — | |
 | [x] Done | 013 | Fix e2e + promote to required | — | |
