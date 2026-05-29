@@ -44,7 +44,7 @@ describe("saved report definition contracts", () => {
       catalogType: "saved-report-definition-catalog",
       entityCount: 10,
       fieldCount: 76,
-      filterCount: 37,
+      filterCount: 38,
       groupingCount: 58,
       metricCount: 28,
       chartCount: 40,
@@ -107,7 +107,7 @@ describe("saved report definition contracts", () => {
       {
         entity: "leads",
         fields: 9,
-        filters: 4,
+        filters: 5,
         groupings: 7,
         metrics: 1,
         charts: 4

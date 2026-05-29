@@ -1,7 +1,7 @@
 # 019 — Saved views + persisted per-entity filters/sort
 
 - **Wave:** Phase 2 — Major Features
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 5/5 · Feasibility 3/5 · Risk Med · Codebase Fit 4/5
 - **Depends on:** 014 (caching/tags interact with filtered list reads)
 - **Scope gate:** Likely in-scope — `SavedListView` model + `app/saved-list-views` actions **already exist**; this extends them. **Confirm against PLAN.md §4 before building**; if PLAN treats list-view expansion as a non-goal, file a promotion request first.
@@ -13,11 +13,11 @@ The single highest-leverage parity feature versus modern CRMs (Twenty, EspoCRM).
 Impact: transforms static lists into a configurable workspace; biggest perceived "this is a real CRM" jump.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] A user can save the current filter/sort/column config of the Leads (and Deals) list as a named view, switch between views, and set a default.
-- [ ] Views persist via the existing `SavedListView` model (extend fields only if needed; **any schema change requires explicit scope + `docs/schema-changelog.md` entry** — prefer storing the config as validated JSON in an existing column).
-- [ ] Filters/sort are Zod-validated at the action boundary and applied server-side in the Prisma query.
-- [ ] e2e covers: create view → reload → view persists + applies; delete view.
-- [ ] Gate + e2e green.
+- [x] A user can save the current filter/sort/column config of the Leads (and Deals) list as a named view, switch between views, and set a default.
+- [x] Views persist via the existing `SavedListView` model (extend fields only if needed; **any schema change requires explicit scope + `docs/schema-changelog.md` entry** — prefer storing the config as validated JSON in an existing column).
+- [x] Filters/sort are Zod-validated at the action boundary and applied server-side in the Prisma query.
+- [x] e2e covers: create view → reload → view persists + applies; delete view.
+- [x] Gate + e2e green.
 
 ## Implementation Approach
 **Files to touch:** `app/leads/*`, `app/deals/*` (list UI + view switcher), `app/saved-list-views*` actions, `components/**` (a saved-view control), `lib/services/*` (apply filter/sort to queries), `lib/validation.ts` (filter schema).

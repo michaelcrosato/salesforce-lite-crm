@@ -387,6 +387,7 @@ const entitySeeds = [
         "assignedOrderId"
       ]),
       equalsFilter("areaId", "Area", "id", ["areaId"]),
+      equalsFilter("source", "Source", "text", ["source"]),
       searchFilter([
         ["firstName"],
         ["lastName"],
