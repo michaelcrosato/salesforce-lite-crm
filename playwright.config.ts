@@ -5,14 +5,14 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 60_000,
+  timeout: process.env.CI ? 180_000 : 60_000,
   workers: 1,
   expect: {
-    timeout: 10_000
+    timeout: process.env.CI ? 30_000 : 10_000
   },
   use: {
     baseURL,
-    trace: "on-first-retry"
+    trace: process.env.CI ? "retain-on-failure" : "on-first-retry"
   },
   webServer: {
     command: `npm run dev -- --port ${port}`,
