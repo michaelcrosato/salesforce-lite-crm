@@ -1168,7 +1168,7 @@ function Merge-GreenBranchIfRequested {
     $mergeResult = Invoke-NativeCapture { & gh pr merge $branch --squash --delete-branch 2>&1 }
     $mergeOutput = $mergeResult.Output | Out-String
     if ($mergeResult.ExitCode -ne 0) {
-      Write-Host "PR squash-merge failed for $branch: $mergeOutput"
+      Write-Host "PR squash-merge failed for ${branch}: $mergeOutput"
       Write-Blocker -Description "PR squash-merge failed for $branch" -Evidence $mergeOutput
       return $false
     }

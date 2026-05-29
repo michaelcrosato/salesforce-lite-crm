@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { PageHeader } from "@/components/page-header";
 import { AiActionReviewOperator } from "@/components/reports/ai-action-review-operator";
 import { ApprovalReadinessOperator } from "@/components/reports/approval-readiness-operator";
@@ -69,28 +70,12 @@ type ReportsSearchParams = {
 const DEFAULT_CSV_EXPORT_ENTITY: CsvExportDeliveryPacketEntity = "accounts";
 const CSV_EXPORT_PREVIEW_LIMIT = 5;
 
-import { cacheTag } from "next/cache";
-
-async function getCachedReportsData(
-  selectedCsvEntity: CsvExportDeliveryPacketEntity,
-  auditFilters: AuditEventExplorerInput
-) {
-  "use cache";
-  cacheTag("reports");
-
-  return await Promise.all([
-    listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
-    getCsvExportDeliveryPacket(selectedCsvEntity),
-    getAuditEventExplorer(auditFilters),
-    listSavedReportDefinitions()
-  ]);
-}
-
 export default async function ReportsPage({
   searchParams
 }: {
   searchParams?: Promise<ReportsSearchParams>;
 }) {
+  await connection();
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const selectedCsvEntity = resolveCsvExportEntity(
     resolvedSearchParams.csvExport
@@ -101,7 +86,12 @@ export default async function ReportsPage({
     selectedCsvPacket,
     auditEventExplorer,
     persistedSavedReports
-  ] = await getCachedReportsData(selectedCsvEntity, auditFilters);
+  ] = await Promise.all([
+    listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
+    getCsvExportDeliveryPacket(selectedCsvEntity),
+    getAuditEventExplorer(auditFilters),
+    listSavedReportDefinitions()
+  ]);
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();

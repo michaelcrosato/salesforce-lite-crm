@@ -21,6 +21,7 @@ test("saved reports can be pinned as dashboard cards on reports and dashboard", 
     page.getByRole("heading", { name: "Reports", exact: true })
   ).toBeVisible();
   await expect(page.getByTestId("dashboard-card-operator")).toBeVisible();
+  await expectSavedReportOperatorReady(page);
 
   await createOpportunitySavedReport(page, firstName, "proposal");
   await createOpportunitySavedReport(page, secondName, "negotiation");
@@ -112,6 +113,7 @@ async function createOpportunitySavedReport(
   name: string,
   stage: string
 ) {
+  await expectSavedReportOperatorReady(page);
   await page.getByTestId("saved-report-entity-select").selectOption(
     "opportunities"
   );
@@ -136,6 +138,13 @@ async function createOpportunitySavedReport(
       .getByTestId("saved-report-persisted-list")
       .getByRole("row", { name: new RegExp(escapeRegex(name)) })
   ).toBeVisible();
+}
+
+async function expectSavedReportOperatorReady(page: Page) {
+  await expect(page.getByTestId("saved-report-operator")).toHaveAttribute(
+    "data-hydrated",
+    "true"
+  );
 }
 
 async function cleanupE2eDashboardCardReports() {

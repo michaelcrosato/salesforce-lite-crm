@@ -9,6 +9,7 @@ test("routing simulator preview shows read-only assignment and blocker details",
 
   const panel = page.getByTestId("routing-simulator-operator");
   await expect(panel).toBeVisible();
+  await expect(panel).toHaveAttribute("data-hydrated", "true");
   await expect(
     panel.getByTestId("routing-simulator-summary-writes")
   ).toContainText("None");
@@ -104,6 +105,7 @@ test("routing simulator preview preserves live routing state and excluded routes
   await page.goto("/reports");
 
   const panel = page.getByTestId("routing-simulator-operator");
+  await expect(panel).toHaveAttribute("data-hydrated", "true");
   await panel.getByTestId("routing-simulator-input").fill(
     JSON.stringify(
       {
@@ -157,6 +159,7 @@ test("routing simulator preview applies hypothetical capacity windows", async ({
   await page.goto("/reports");
 
   const panel = page.getByTestId("routing-simulator-operator");
+  await expect(panel).toHaveAttribute("data-hydrated", "true");
   await panel.getByTestId("routing-simulator-input").fill(
     JSON.stringify(
       {

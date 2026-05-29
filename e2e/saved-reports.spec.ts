@@ -17,6 +17,10 @@ test("saved report definitions can be managed from reports", async ({ page }) =>
   await page.goto("/reports");
   await expect(page.getByRole("heading", { name: "Reports" })).toBeVisible();
   await expect(page.getByTestId("saved-report-operator")).toBeVisible();
+  await expect(page.getByTestId("saved-report-operator")).toHaveAttribute(
+    "data-hydrated",
+    "true"
+  );
 
   await page.getByTestId("saved-report-entity-select").selectOption(
     "opportunities"
