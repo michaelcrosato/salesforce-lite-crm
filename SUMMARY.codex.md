@@ -1,38 +1,38 @@
-Agent: Codex
+Agent: codex
 
-Sprint: Sprint 56
+Sprint: cleanup
 
-Feature: S56-F1 — Pacing snapshot contracts
+Feature: dirty worktree cleanup / commit handoff
 
 Branch: main
 
-Status: done
+Status: blocked
 
-Commits this prompt: bcf279b — [codex] S56-F1: add pacing snapshot contracts
+Commits this prompt: 4952b6f — [codex] cleanup: stabilize reports e2e readiness; ad5e7a3 — [codex] cleanup: fix automation gate setup
 
-Gate status: PASS — `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (115 files / 562 tests), build, Playwright Chromium install, and `npm run test:e2e` (50 tests).
+Gate status: FAIL — guarded `scripts/local-gate.ps1` on `main` passed install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (115 files / 564 tests), and build, then failed before Playwright execution because port 3004 was already in use by another active Playwright/Next run in this repo.
 
-DoD self-check: PASS
+DoD self-check: FAIL
 
-Timestamp: 2026-05-28T17:34:26.6964351-07:00
+Timestamp: 2026-05-29T10:00:39.1559186-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from the single-agent root on `main`; the worktree was clean and the baseline gate passed through lint, typecheck, unit tests, and build before edits.
-- Reconciled current coordination state: `PLAN.md` queues Sprint 56 for Codex, `CRM-CONTRACT.md` is present, and `BLOCKERS.codex.md` had no active blockers.
-- Noted lower-authority drift: older Claude/Grok/Gemini SUMMARY files still describe historical parallel Sprint 4/5 work, and `docs/PROJECT-CONTROL.md` / `docs/ROADMAP.md` still describe Sprint 52 as latest completed; left them unchanged because `PLAN.md` §4 and the current prompt authorize S56 implementation.
-- Added `lib/server/pacingSnapshotContracts.ts` with read-only pacing snapshot catalog metadata, daily/monthly granularity helpers, metric-key definitions, fixture inputs, bounded validation, and explicit no-write safety flags.
-- Added `tests/api/pacing-snapshot-contracts.test.ts` covering catalog metadata, metric keys, fixture normalization, validation failures, and no-write DB counts.
-- Verified the implementation with focused Vitest, lint, typecheck, and the full local gate through Playwright e2e.
+- Inspected the dirty worktree and staged only scoped implementation and report paths.
+- Removed untracked `pnpm-lock.yaml` as an npm-repo generated/local artifact; it was not committed.
+- Committed reports UI/E2E readiness cleanup for the `/reports` route and interactive report operators.
+- Committed automation/test setup cleanup for PR-merge error logging and Vitest template database setup.
+- Recovered from an unexpected local branch switch by returning to `main` and cherry-picking the report/E2E implementation commit onto the requested branch.
+- Filed a blocker because concurrent processes continued using this same root worktree and port 3004, preventing a trusted final full-gate pass.
 
 ### Next action
 
-Run LOOP.md to begin S56-F2 — Read-only pacing snapshot builder.
+Stop or isolate the concurrent root-worktree automation, switch to `main`, and rerun `scripts/local-gate.ps1` before integrating these local commits through the documented PR path.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES — single-agent root mode; implementation was scoped to `lib/server/` and `tests/api/`.
+No cross-ownership edits: YES — single-agent root cleanup mode; historical zones were advisory.
 
-CRM-CONTRACT.md honored: YES — no route, schema, UI, persistence, dealer-order edit, area edit, external service, or contract change was required.
+CRM-CONTRACT.md honored:  YES

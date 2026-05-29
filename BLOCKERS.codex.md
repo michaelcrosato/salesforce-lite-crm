@@ -1,21 +1,21 @@
-Agent: Codex
+Agent: codex
 
-Sprint: Sprint 56
+Sprint: cleanup
 
-Feature: S56-F1 — Pacing snapshot contracts
+Feature: dirty worktree cleanup / commit handoff
 
 Branch: main
 
-Timestamp: 2026-05-28T17:34:26.6964351-07:00
+Timestamp: 2026-05-29T10:00:39.1559186-07:00
 
-Escalation required: NO
+Escalation required: YES
 
 ### Active blockers
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|--------------|------|-------------|----------|---------|-----------------|
+| 1 | `C:\dev\salesforce-lite-crm` worktree / port 3004 | dependency | Concurrent automation is using the single-agent root while this cleanup is running, invalidating final gate validation. | Reflog shows checkouts from `main` to `gemini/spec-020-bulk-actions` during cleanup; `scripts/local-gate.ps1` failed when Playwright could not bind `http://127.0.0.1:3004/dashboard`; `Get-CimInstance Win32_Process` showed active `scripts\autonomy-loop.ps1 -RunRoot C:\dev\salesforce-lite-crm` and `npx playwright test` / `next dev --port 3004` processes. | Exclusive root worktree or isolated agent worktrees. | Stop or move the concurrent run, switch to `main`, rerun `scripts/local-gate.ps1`, then update reports and continue through PR-based integration. |
 
 ### Resolved this prompt
 
-- No active Codex blockers were open at the start of this prompt.
-- No new blocker was filed: S56-F1 implementation passed focused Vitest, lint, typecheck, and the full `scripts/local-gate.ps1` sequence.
+- Removed stale overnight-startup blocker state from the Codex report and replaced it with the current root-worktree concurrency blocker.
