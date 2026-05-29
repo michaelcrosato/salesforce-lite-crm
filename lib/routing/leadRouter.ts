@@ -1,5 +1,6 @@
 import type { Area, DealerOrder, Prisma } from "@prisma/client";
 import type { AssignmentReason } from "@/lib/crm-constants";
+import { logger } from "@/lib/observability/logger";
 import {
   extractPostalPrefix,
   normalizePostalCode as normalizeDisplayPostalCode
@@ -386,6 +387,15 @@ async function markUnrouted(
       nextStep: "Review routing coverage and active order capacity.",
       createdAt: now
     }
+  });
+
+  logger.warn("lead_routing_unrouted", {
+    leadId: lead.id,
+    reason,
+    areaId: area?.id ?? null,
+    areaName: area?.name ?? null,
+    activeOrderCount: filteredOrders.length,
+    rankedOrderCount: rankedOrders.length
   });
 }
 
