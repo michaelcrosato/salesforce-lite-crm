@@ -84,3 +84,11 @@
   routes for those objects still render excluded placeholders.
 - Kept deterministic local behavior for routing, summarization, analyst
   ranking, and forecast simulation.
+
+## React Compiler Spike & Evaluation (Spec 017)
+
+- Conducted a timed evaluation of the React Compiler (React 19.2 stable auto-memoization engine) on a dedicated spike branch (`gemini/spec-017-react-compiler`).
+- Measured baseline Turbopack cold build performance: **14.30 seconds** cleanly with all 591 unit/integration tests and 52 E2E browser tests passing 100% green.
+- Enabled `reactCompiler: true` in `next.config.mjs` and observed Next.js attempting to resolve `babel-plugin-react-compiler` under the hood.
+- Build failed with a hard resolution error because the dependency `babel-plugin-react-compiler` is not present in `node_modules` and is a gated dependency change requiring human/operator promotion approval per CLAUDE.md §14.
+- Decided to **DEFER** the adoption of the React Compiler to a future sprint. Reverted all config modifications to keep the `main` branch completely clean and avoid introducing unapproved dependencies or breaking compilation pipelines.

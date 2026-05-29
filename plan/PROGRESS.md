@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 18 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 016): `tsc --noEmit` ✅ · test **562 passed** ✅ · build ✅ · reachability **20/20** ✅.
+**Overall: 20 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 017): lint ✅ · `tsc --noEmit` ✅ · test **591 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -31,7 +31,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 014 | Targeted caching + revalidation | 013 | |
 | [x] Done | 015 | Consolidate agent prompts | — | |
 | [x] Done | 016 | Complete PR-merge migration | — | |
-| [ ] Todo | 017 | React Compiler evaluation (spike) | 010 | ⚠️ |
+| [x] Done | 017 | React Compiler evaluation (spike) | 010 | |
 | [x] Done | 018 | Audit-event write coverage | 009, 006 | |
 
 ## Wave 2 — Major Features (2 / 6)
@@ -41,7 +41,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 019 | Saved views + persisted filters | 014 | |
 | [x] Done | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
 | [x] Done | 021 | CSV export for core entities | 019 | |
-| [ ] Todo | 022 | Optimistic UI for deal kanban | 014, 010 | |
+| [x] Done | 022 | Optimistic UI for deal kanban | 014, 010 | |
 | [ ] Todo | 023 | Tailwind v4 (Oxide) migration | 008, 010 | ⚠️ |
 | [x] Done | 024 | Audit-trail change-history UI | 018 | |
 
@@ -80,5 +80,8 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-29 — **016 Done** (branch `gemini/autonomy`). Added `Write-Blocker` and `Merge-GreenBranchIfRequested` helpers in `scripts/autonomy-loop.ps1` and wired them to auto-PR/merge on `MERGE READY`. Replaced `-NoAllowMain` with `-AllowMain` in `scripts/start-codex-overnight.ps1` to default runner to branch mode. Configured `enforce_admins=true` on `main` branch protection rules. Verified 562 tests pass cleanly, and direct push to `main` is rejected.
 - 2026-05-29 — **018 Done** (branch `gemini/spec-018-audit-coverage`). Implemented comprehensive transactional audit logging for all mutating CRM server actions (Accounts, Contacts, Deals, Leads, Campaigns, Cases, Tasks) and routing outcomes in `lib/routing/leadRouter.ts`. Added a robust suite of integration tests at `tests/api/auditMutations.test.ts`. Verified ESLint and Next.js Turbopack build compile successfully with zero errors and all 571 tests pass green.
 - 2026-05-29 — **006 Done** (branch `gemini/spec-006-coverage`). Added `@vitest/coverage-v8` devDependency. Configured Vitest to generate coverage reports for lib, app, and components. Verified all 577 tests pass cleanly and coverage baseline is recorded: Statements 64.35%, Branches 49.33%, Functions 67.27%, Lines 64.26%.
+- 2026-05-29 — **022 Done** (branch `gemini/spec-022-optimistic-kanban`). Implemented high-performance React 19 `useOptimistic` transitions in the Deals Kanban pipeline (`components/deal-board.tsx`), ensuring a snappy drag-and-drop/dropdown pipeline UX. Enabled seamless rollback and precise toast error delivery on server mutation failure by converting the stage select dropdown into a fully controlled component. Added robust component test coverage (`tests/components/deal-board.test.tsx`) validating initial layout, instant optimistic transitions, server action success, and rollback/error path. Verified all gates pass cleanly: typechecking, ESLint linting, Vitest (591/591 tests passing), and Playwright E2E smoke tests (52/52 tests passing).
+- 2026-05-29 — **017 Done** (branch `gemini/spec-017-react-compiler`). Conducted a controlled, timed evaluation of the React Compiler (React 19.2 stable auto-memoization engine). Swift SWC compilation under the native flag required resolving the gated `babel-plugin-react-compiler` package per CLAUDE.md §14. Recorded the detailed decision to DEFER the adoption to a future sprint in `docs/decisions.md` and reverted all configuration edits to keep the main branch stable and completely clean.
+
 
 

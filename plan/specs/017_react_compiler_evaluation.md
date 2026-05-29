@@ -13,11 +13,11 @@ React 19's Compiler (now 1.0) auto-memoizes components, generally removing the n
 Impact: potential render-perf + DX win (less manual memoization), but only if the build-time cost and correctness check out. This spec is the controlled experiment that produces a go/no-go.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] On a spike branch: enable `reactCompiler: true` (+ `babel-plugin-react-compiler`), build, and **measure** build-time delta, bundle delta, and a manual render-perf check on kanban/timeline.
-- [ ] Run the `eslint-plugin-react-hooks` / compiler diagnostics to find Rules-of-Hooks violations the compiler would skip; record them.
-- [ ] A **decision is recorded in `docs/decisions.md`** (adopt / defer / reject) with the measured numbers.
+- [x] On a spike branch: enable `reactCompiler: true` (+ `babel-plugin-react-compiler`), build, and **measure** build-time delta, bundle delta, and a manual render-perf check on kanban/timeline.
+- [x] Run the `eslint-plugin-react-hooks` / compiler diagnostics to find Rules-of-Hooks violations the compiler would skip; record them.
+- [x] A **decision is recorded in `docs/decisions.md`** (adopt / defer / reject) with the measured numbers.
 - [ ] If adopted: dependency added (exact pin, approved), lint clean, full gate + e2e green, no hydration regressions.
-- [ ] If deferred/rejected: the spike branch is discarded and the rationale is documented — no half-enabled state on `main`.
+- [x] If deferred/rejected: the spike branch is discarded and the rationale is documented — no half-enabled state on `main`.
 
 ## Implementation Approach
 **Files to touch (spike):** `next.config.mjs`, `package.json` (gated dep), `docs/decisions.md`.

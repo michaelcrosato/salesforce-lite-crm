@@ -1,7 +1,7 @@
 # 022 — Optimistic UI for the deal kanban
 
 - **Wave:** Phase 2 — Major Features
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 3/5 · Feasibility 3/5 · Risk Med · Codebase Fit 4/5
 - **Depends on:** 014 (`updateTag` read-your-writes), 010 (component tests)
 - **Scope gate:** In-scope (UX enhancement to existing deals kanban; no schema/route change)
@@ -13,11 +13,11 @@ Modern CRMs feel instant: dragging a deal to a new stage updates the UI immediat
 Impact: a noticeably snappier pipeline UX — the most-interacted-with surface in a deal-centric CRM.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Dragging a deal between stages applies optimistically (card moves instantly), then commits via the existing deal stage server action.
-- [ ] On server failure, the optimistic move **rolls back** and a toast surfaces the error (uses the existing `ToastProvider`).
-- [ ] The action calls `updateTag('deals')` so any cached list/board read reflects the committed state.
-- [ ] No regression to `OpportunityStageHistory` writes (stage changes must still record history).
-- [ ] Gate + e2e green; kanban drag covered by Playwright 1.60 `locator.drop()`.
+- [x] Dragging a deal between stages applies optimistically (card moves instantly), then commits via the existing deal stage server action.
+- [x] On server failure, the optimistic move **rolls back** and a toast surfaces the error (uses the existing `ToastProvider`).
+- [x] The action calls `updateTag('deals')` so any cached list/board read reflects the committed state.
+- [x] No regression to `OpportunityStageHistory` writes (stage changes must still record history).
+- [x] Gate + e2e green; kanban drag covered by Playwright 1.60 `locator.drop()`.
 
 ## Implementation Approach
 **Files to touch:** the deals kanban `components/**` (introduce `useOptimistic` reducer for card↔stage), `app/deals/actions.ts` (ensure the stage-change action is callable from the optimistic flow + tags invalidated), toast wiring.

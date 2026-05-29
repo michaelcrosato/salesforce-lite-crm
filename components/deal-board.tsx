@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useOptimistic } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { moveDealAction } from "@/app/deals/actions";
@@ -55,7 +55,17 @@ export function DealBoard({
   );
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const selectedDeal = deals.find((deal) => deal.id === selectedDealId) ?? null;
+
+  const [optimisticDeals, setOptimisticDeals] = useOptimistic(
+    deals,
+    (state, update: { dealId: string; stage: DealStage }) => {
+      return state.map((deal) =>
+        deal.id === update.dealId ? { ...deal, stage: update.stage } : deal
+      );
+    }
+  );
+
+  const selectedDeal = optimisticDeals.find((deal) => deal.id === selectedDealId) ?? null;
 
   if (isLoading) {
     return (
@@ -90,16 +100,15 @@ export function DealBoard({
     }
 
     setDraggingDealId(null);
-    startTransition(() => {
-      void (async () => {
-        const result = await moveDealAction({ dealId, stage });
-        showToast({
-          title: result.ok ? "Deal moved" : "Deal not moved",
-          description: result.message,
-          variant: result.ok ? "success" : "error"
-        });
-        router.refresh();
-      })();
+    startTransition(async () => {
+      setOptimisticDeals({ dealId, stage });
+      const result = await moveDealAction({ dealId, stage });
+      showToast({
+        title: result.ok ? "Deal moved" : "Deal not moved",
+        description: result.message,
+        variant: result.ok ? "success" : "error"
+      });
+      router.refresh();
     });
   }
 
@@ -108,7 +117,7 @@ export function DealBoard({
       <ListSelectedExportAction
         entity="opportunities"
         entityLabel="Opportunities"
-        records={deals.map((deal) => ({
+        records={optimisticDeals.map((deal) => ({
           id: deal.id,
           label: deal.name
         }))}
@@ -118,7 +127,7 @@ export function DealBoard({
       </div>
       <div className="grid gap-4 xl:grid-cols-6">
         {DEAL_STAGES.map((stage) => {
-          const stageDeals = deals.filter((deal) => deal.stage === stage);
+          const stageDeals = optimisticDeals.filter((deal) => deal.stage === stage);
           const total = stageDeals.reduce((sum, deal) => sum + deal.value, 0);
 
           return (
@@ -233,7 +242,7 @@ export function DealBoard({
                         <Select
                           aria-label={`Move ${deal.name} stage`}
                           className="h-8 text-xs"
-                          defaultValue={deal.stage}
+                          value={deal.stage}
                           disabled={isPending}
                           onClick={(event) => event.stopPropagation()}
                           onChange={(event) =>
