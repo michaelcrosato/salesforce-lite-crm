@@ -40,6 +40,10 @@ audit-verify-fix pass, not a build:
 4. **.env.example** — documented the two optional env vars the code actually reads
    (`LOG_LEVEL`, `PLAYWRIGHT_PORT`, with real defaults) as commented entries;
    `DATABASE_URL` unchanged.
+5. **tickets/TICKET005 + TICKET006 → Done** — both were stale "Open" but their work
+   already shipped (spec 015 generator; spec 011 `check-reachability.mjs` ratchet).
+   An AFK agent picking either would have re-done shipped infra. Statuses + ACs
+   reconciled against current code, with the alternative implementation forms noted.
 
 Why 565→562: spec 011's CSV-tower retirement on this branch removed tests after
 the 2026-05-28 baseline that the docs were quoting. Verified by running the gate,
