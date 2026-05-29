@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Suspense>
         </aside>
         <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
-          <header className="sticky top-0 z-20 min-w-0 overflow-x-clip border-b bg-background/95 backdrop-blur">
+          <header className="sticky top-0 z-20 min-w-0 overflow-x-clip border-b bg-background/95 backdrop-blur-sm">
             <div className="flex h-16 min-w-0 items-center gap-4 px-4 sm:px-6 lg:px-8">
               <div className="min-w-0 shrink-0 lg:hidden">
                 <Link

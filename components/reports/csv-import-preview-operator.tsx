@@ -321,7 +321,7 @@ export function CsvImportPreviewOperator({
                     setApplyResult(null);
                   }}
                   placeholder="First Name,Last Name,Email,Status"
-                  className="min-h-[14rem] font-mono"
+                  className="min-h-56 font-mono"
                   data-testid="csv-import-input"
                 />
                 <FieldError message={csvError} />
@@ -433,7 +433,7 @@ function ImportPreviewResult({ bundle }: { bundle: CsvDedupeReviewBundle }) {
                     </TableCell>
                     <TableCell>{row.action.label}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[28rem] truncate">
+                      <span className="block max-w-md truncate">
                         {row.readiness.reasons.length > 0
                           ? row.readiness.reasons.map((reason) => reason.message).join(" ")
                           : "None"}
@@ -510,7 +510,7 @@ function ContactApplyConfirmation({
             {formatNumber(createCandidateRows)} create-safe rows are available.
           </p>
         </div>
-        <Badge variant={createCandidateRows > 0 ? "warning" : "outline"}>
+        <Badge variant={createCandidateRows > 0 ? "warning" : "outline-solid"}>
           {createCandidateRows > 0 ? "ready" : "blocked"}
         </Badge>
       </CardHeader>
@@ -656,7 +656,7 @@ function ContactApplyResult({
                     </TableCell>
                     <TableCell>{row.auditEventId ?? "Not recorded"}</TableCell>
                     <TableCell>
-                      <span className="block max-w-[34rem] truncate">
+                      <span className="block max-w-136 truncate">
                         {applyOutcomeReason(row)}
                       </span>
                     </TableCell>

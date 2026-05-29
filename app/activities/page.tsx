@@ -86,13 +86,13 @@ export default async function ActivitiesPage({
             <CardTitle>Activity Feed</CardTitle>
             <div className="mt-2 flex flex-wrap gap-2">
               <Link href="/activities">
-                <Badge variant={filter === "all" ? "default" : "outline"}>
+                <Badge variant={filter === "all" ? "default" : "outline-solid"}>
                   All
                 </Badge>
               </Link>
               {ACTIVITY_TYPES.map((type) => (
                 <Link key={type} href={`/activities?type=${type}`}>
-                  <Badge variant={filter === type ? "default" : "outline"}>
+                  <Badge variant={filter === type ? "default" : "outline-solid"}>
                     {ACTIVITY_TYPE_LABELS[type]}
                   </Badge>
                 </Link>

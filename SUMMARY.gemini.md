@@ -1,25 +1,26 @@
 Agent: gemini
 Sprint: Sprint 5
-Feature: Spec 017 — Evaluate & gate React Compiler enablement
-Branch: gemini/spec-017-react-compiler
+Feature: Spec 023 — Tailwind v4 (Oxide) migration
+Branch: gemini/spec-023-tailwind-v4
 Status: DONE
-Commits this prompt: 1 commit (docs(spec-017): document timed evaluation and decision to defer React Compiler)
-Gate status: PASS (vitest 591 passed, lint clean, typecheck passed, build passed, playwright e2e 52 passed)
+Commits this prompt: 1 commit (feat(spec-023): migrate styling toolchain to Tailwind v4 (Oxide) engine)
+Gate status: PASS (vitest 597 passed, lint clean, typecheck passed, build passed, playwright e2e 52 passed)
 DoD self-check: PASS
-Timestamp: 2026-05-29T19:33:00-07:00
+Timestamp: 2026-05-29T20:15:00-07:00
 MERGE READY
 
 ### Completed this prompt
 
-- **React Compiler Evaluation (Spec 017)**: Conducted a controlled, timed evaluation of the React Compiler (React 19.2 stable auto-memoization engine) on a dedicated spike branch (`gemini/spec-017-react-compiler`).
-- **Timed Baseline Measurement**: Measured cold build Turbopack baseline at exactly **14.30 seconds** with all 591 Vitest unit/integration tests and 52 Playwright E2E browser tests passing cleanly.
-- **Dependency & Build Verification**: Enabled `reactCompiler: true` in `next.config.mjs` and verified that SWC compilation under the native flag failed due to a missing dependency on `babel-plugin-react-compiler` inside `node_modules`. 
-- **Strategic Decision & Handoff**: Decided to **DEFER** adoption of the compiler because installing `babel-plugin-react-compiler` is a gated dependency change under CLAUDE.md §14 (requiring a formal promotion request). Recorded this detailed evaluation and rationale in `docs/decisions.md` and reverted all configuration edits to keep the main branch stable and completely clean.
-- **100% Green Gates**: Ran local verification gates proving perfect compliance with TypeScript compilation, ESLint, Vitest, and Playwright browser suites.
+- **Tailwind v4 Oxide Migration (Spec 023)**: Fully upgraded the project's styling pipeline from **Tailwind v3.4.19** to **Tailwind v4.3.0** under the native Rust Oxide compilation engine.
+- **CSS-First Theme Declarations**: Migrated the theme token definitions (colors, shadows, radii) from `tailwind.config.ts` into a CSS-first configuration using `@theme` blocks inside `app/globals.css` and successfully removed `tailwind.config.ts`.
+- **PostCSS Integration Modernization**: Upgraded PostCSS config inside `postcss.config.mjs` to integrate `@tailwindcss/postcss` and cleanly removed the deprecated `autoprefixer` package, while preserving the pinned `postcss` version `8.5.15`.
+- **Badge Variant Stability**: Added `"outline-solid"` support inside `components/ui/badge.tsx` cva variant definitions to guarantee rendering stability for all mapped template renames outputted by the `@tailwindcss/upgrade` tool.
+- **Visual & Assertion Net**: Added a comprehensive suite of Button component styling unit tests in `tests/components/button.test.tsx` checking all major style variants and properties.
+- **100% Green Local Gates**: Validated the entire migration via typecheck, ESLint, all 597 Vitest cases (green), production Turbopack Next.js build (compiled successfully in 3s), and all 52 Playwright E2E integration test cases (fully green).
 
 ### Next action
 
-Allow the autonomous loop script to verify the remote green status checks on the PR for `gemini/spec-017-react-compiler` and merge it.
+Allow the autonomous loop script to verify remote green gates, squash-merge this branch into `main`, and push it.
 
 ### Scope confirmation
 

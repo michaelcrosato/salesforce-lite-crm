@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 20 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 017): lint ✅ · `tsc --noEmit` ✅ · test **591 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 21 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -42,7 +42,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
 | [x] Done | 021 | CSV export for core entities | 019 | |
 | [x] Done | 022 | Optimistic UI for deal kanban | 014, 010 | |
-| [ ] Todo | 023 | Tailwind v4 (Oxide) migration | 008, 010 | ⚠️ |
+| [x] Done | 023 | Tailwind v4 (Oxide) migration | 008, 010 | |
 | [x] Done | 024 | Audit-trail change-history UI | 018 | |
 
 ---

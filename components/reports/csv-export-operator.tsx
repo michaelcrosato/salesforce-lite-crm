@@ -173,7 +173,7 @@ export function CsvExportOperator({
                     >
                       <Badge
                         className="mb-2"
-                        variant={note.severity === "warning" ? "warning" : "outline"}
+                        variant={note.severity === "warning" ? "warning" : "outline-solid"}
                       >
                         {note.code}
                       </Badge>
@@ -264,7 +264,7 @@ function EntityLink({
     <Link
       aria-current={selected ? "true" : undefined}
       className={cn(
-        "block rounded-md border bg-card px-4 py-3 transition-colors hover:bg-muted/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "block rounded-md border bg-card px-4 py-3 transition-colors hover:bg-muted/30 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
         selected && "border-primary bg-primary/5"
       )}
       data-testid={`csv-export-entity-${packet.entity}`}
@@ -273,7 +273,7 @@ function EntityLink({
     >
       <div className="flex items-center justify-between gap-3">
         <span className="font-medium">{packet.label}</span>
-        <Badge variant={packet.totalAvailableRows > 0 ? "success" : "outline"}>
+        <Badge variant={packet.totalAvailableRows > 0 ? "success" : "outline-solid"}>
           {formatNumber(packet.totalAvailableRows)}
         </Badge>
       </div>

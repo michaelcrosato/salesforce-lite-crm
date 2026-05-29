@@ -262,7 +262,7 @@ function SourceSurfaceRow({ surface }: { surface: SourceSurface }) {
         {formatToken(surface.category)}.{formatToken(surface.action)}
       </TableCell>
       <TableCell>
-        <span className="block max-w-[22rem] truncate">
+        <span className="block max-w-88 truncate">
           {surface.sourceSurface}
         </span>
       </TableCell>
@@ -314,7 +314,7 @@ function statusVariant(status: AuditCoverageStatus) {
     case "known_gap":
       return "warning";
     case "taxonomy_only":
-      return "outline";
+      return "outline-solid";
   }
 }
 

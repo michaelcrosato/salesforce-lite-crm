@@ -102,7 +102,7 @@ export function SidebarNav({ mobile = false, "data-testid": testid }: SidebarNav
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all demo-stable",
               active
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-xs"
                 : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-0.5",
               mobile && "shrink-0"
             )}

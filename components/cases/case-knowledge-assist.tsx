@@ -13,7 +13,7 @@ import { formatDate } from "@/lib/formatters";
 type BadgeVariant =
   | "default"
   | "secondary"
-  | "outline"
+  | "outline-solid"
   | "success"
   | "warning"
   | "danger";
@@ -241,7 +241,7 @@ function suggestionCountLabel(packet: CaseKnowledgeAssistPacketView): string {
 }
 
 function summaryVariant(totalAvailable: number): BadgeVariant {
-  return totalAvailable > 0 ? "success" : "outline";
+  return totalAvailable > 0 ? "success" : "outline-solid";
 }
 
 function reasonVariant(
@@ -251,7 +251,7 @@ function reasonVariant(
     ? "danger"
     : reasonCode === "queue_match"
       ? "success"
-      : "outline";
+      : "outline-solid";
 }
 
 function audienceLabel(audience: string): string {
