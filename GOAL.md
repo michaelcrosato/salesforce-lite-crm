@@ -15,9 +15,8 @@ agents extend while preserving the shared contract and local gate.
 
 ## Current state
 
-- Gates green on the last maintenance pass: `lint`, `typecheck`,
-  `test` (565/565), `build`. E2E (Playwright) not run that pass — tracked in
-  `tickets/TICKET001.md`.
+- Full local gate green (2026-05-28): `lint`, `typecheck`, `test` (565/565),
+  `build`, and `test:e2e` (50/50 Playwright). See `tickets/TICKET001.md`.
 - Sprint 52 complete; no next feature track selected (`docs/PROJECT-CONTROL.md`).
 - No auth, deployment, external AI, or Salesforce integration.
 

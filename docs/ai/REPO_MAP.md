@@ -56,5 +56,5 @@ handoff records — skip unless coordinating a multi-agent run.
   current sprint, not the whole file. Consolidation is tracked in `tickets/`.
 - `lib/server/csv*` (~36 files) is a deep read-only contract stack built over
   Sprints 5–23. It is no-write by design; consolidation is a tracked ticket.
-- The only gate not run during the last maintenance pass was the Playwright
-  e2e suite (heavy; needs browser install). See `tickets/TICKET001.md`.
+- Full local gate (incl. Playwright e2e, 50 tests) was confirmed green on
+  2026-05-28. E2E is heavy (needs `npx playwright install chromium`).
