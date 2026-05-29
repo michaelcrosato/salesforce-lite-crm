@@ -20,6 +20,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   useTransition
 } from "react";
 import {
@@ -125,6 +126,11 @@ export function SavedReportOperator({
     initialChart?.defaultMetricKey ?? "recordCount"
   );
   const [result, setResult] = useState<SavedReportActionResult | null>(null);
+  const isHydrated = useSyncExternalStore(
+    subscribeHydration,
+    getHydrationSnapshot,
+    getServerHydrationSnapshot
+  );
 
   const selectedDefinition = useMemo(
     () =>
@@ -374,7 +380,11 @@ export function SavedReportOperator({
   }
 
   return (
-    <section className="space-y-4" data-testid="saved-report-operator">
+    <section
+      className="space-y-4"
+      data-hydrated={isHydrated ? "true" : "false"}
+      data-testid="saved-report-operator"
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-normal">
@@ -1228,4 +1238,18 @@ function testIdToken(value: string): string {
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+function subscribeHydration(onStoreChange: () => void): () => void {
+  queueMicrotask(onStoreChange);
+
+  return () => {};
+}
+
+function getHydrationSnapshot(): boolean {
+  return true;
+}
+
+function getServerHydrationSnapshot(): boolean {
+  return false;
 }
