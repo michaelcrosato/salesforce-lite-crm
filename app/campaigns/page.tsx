@@ -46,7 +46,7 @@ import {
 import type { SortOrder } from "@/lib/services/listQuery";
 import { dateQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Campaigns"

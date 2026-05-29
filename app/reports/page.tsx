@@ -53,7 +53,7 @@ import {
 import { getDealerCapacityWindowCatalog } from "@/lib/server/dealerCapacityWindowContracts";
 import { getRoutingSimulatorInputCatalog } from "@/lib/server/routingSimulatorContracts";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Reports"
@@ -68,6 +68,23 @@ type ReportsSearchParams = {
 
 const DEFAULT_CSV_EXPORT_ENTITY: CsvExportDeliveryPacketEntity = "accounts";
 const CSV_EXPORT_PREVIEW_LIMIT = 5;
+
+import { cacheTag } from "next/cache";
+
+async function getCachedReportsData(
+  selectedCsvEntity: CsvExportDeliveryPacketEntity,
+  auditFilters: AuditEventExplorerInput
+) {
+  "use cache";
+  cacheTag("reports");
+
+  return await Promise.all([
+    listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
+    getCsvExportDeliveryPacket(selectedCsvEntity),
+    getAuditEventExplorer(auditFilters),
+    listSavedReportDefinitions()
+  ]);
+}
 
 export default async function ReportsPage({
   searchParams
@@ -84,12 +101,7 @@ export default async function ReportsPage({
     selectedCsvPacket,
     auditEventExplorer,
     persistedSavedReports
-  ] = await Promise.all([
-    listCsvExportDeliveryPackets({ limit: CSV_EXPORT_PREVIEW_LIMIT }),
-    getCsvExportDeliveryPacket(selectedCsvEntity),
-    getAuditEventExplorer(auditFilters),
-    listSavedReportDefinitions()
-  ]);
+  ] = await getCachedReportsData(selectedCsvEntity, auditFilters);
   const csvImportTemplates = listCsvImportTemplates();
   const auditCoverageManifest = getAuditCoverageManifest();
   const listFilterSupportCatalog = getListFilterSupportCatalog();

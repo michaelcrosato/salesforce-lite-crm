@@ -13,42 +13,13 @@ import {
 } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
+import { cacheTag } from "next/cache";
 
-export const dynamic = "force-dynamic";
+async function getCachedAccounts(query: string, status: string) {
+  "use cache";
+  cacheTag("accounts");
 
-export const metadata: Metadata = {
-  title: "Accounts"
-};
-
-type AccountListItem = {
-  id: string;
-  name: string;
-  industry: string | null;
-  city: string | null;
-  region: string | null;
-  status: string;
-  healthScore: number;
-  owner: {
-    name: string;
-  } | null;
-  contacts: Array<{ id: string }>;
-  deals: Array<{
-    stage: string;
-    value: number;
-  }>;
-};
-
-export default async function AccountsPage({
-  searchParams
-}: {
-  searchParams: Promise<{ q?: string; status?: string }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const query = resolvedSearchParams.q?.trim() ?? "";
-  const status = ACCOUNT_STATUSES.includes(resolvedSearchParams.status as AccountStatus)
-    ? (resolvedSearchParams.status as AccountStatus)
-    : "all";
-  const accounts = await prisma.account.findMany({
+  return await prisma.account.findMany({
     where: {
       AND: [
         query
@@ -101,6 +72,41 @@ export default async function AccountsPage({
       }
     }
   });
+}
+
+export const metadata: Metadata = {
+  title: "Accounts"
+};
+
+type AccountListItem = {
+  id: string;
+  name: string;
+  industry: string | null;
+  city: string | null;
+  region: string | null;
+  status: string;
+  healthScore: number;
+  owner: {
+    name: string;
+  } | null;
+  contacts: Array<{ id: string }>;
+  deals: Array<{
+    stage: string;
+    value: number;
+  }>;
+};
+
+export default async function AccountsPage({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams.q?.trim() ?? "";
+  const status = ACCOUNT_STATUSES.includes(resolvedSearchParams.status as AccountStatus)
+    ? (resolvedSearchParams.status as AccountStatus)
+    : "all";
+  const accounts = await getCachedAccounts(query, status);
 
   return (
     <div className="crm-page">

@@ -1,6 +1,7 @@
 "use server";
 
 import { ZodError } from "zod/v4";
+import { updateTag } from "next/cache";
 import {
   getCsvDedupeReviewBundle,
   isCsvDedupeReviewBundleEntity,
@@ -616,6 +617,7 @@ export async function createSavedReportDefinitionAction(
       previewLimit: input.limit
     });
 
+    updateTag("reports");
     return {
       ok: true,
       message: `Saved report '${definition.name}' was created.`,
@@ -680,6 +682,7 @@ export async function updateSavedReportDefinitionAction(
       previewLimit: input.limit
     });
 
+    updateTag("reports");
     return {
       ok: true,
       message: `Saved report '${definition.name}' was updated.`,
@@ -783,6 +786,7 @@ export async function archiveSavedReportDefinitionAction(
   try {
     const definition = await archiveSavedReportDefinition(definitionId);
 
+    updateTag("reports");
     return {
       ok: true,
       message: `Saved report '${definition.name}' was archived.`,
@@ -819,6 +823,7 @@ export async function deleteSavedReportDefinitionAction(
   try {
     const definition = await deleteSavedReportDefinition(definitionId);
 
+    updateTag("reports");
     return {
       ok: true,
       message: `Saved report '${definition.name}' was deleted.`,

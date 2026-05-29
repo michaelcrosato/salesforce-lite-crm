@@ -43,7 +43,7 @@ import {
   nonEmptyQueryParam
 } from "@/lib/queryParams";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Tasks"

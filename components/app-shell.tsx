@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { SidebarNav } from "@/components/sidebar-nav";
@@ -18,7 +19,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </Link>
           </div>
-          <SidebarNav />
+          <Suspense fallback={<div className="h-32" />}>
+            <SidebarNav />
+          </Suspense>
         </aside>
         <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
           <header className="sticky top-0 z-20 min-w-0 overflow-x-clip border-b bg-background/95 backdrop-blur">
@@ -48,7 +51,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </form>
             </div>
             <div className="min-w-0 border-t bg-card lg:hidden">
-              <SidebarNav mobile />
+              <Suspense fallback={<div className="h-10" />}>
+                <SidebarNav mobile />
+              </Suspense>
             </div>
           </header>
           <main className="min-w-0 flex-1">{children}</main>

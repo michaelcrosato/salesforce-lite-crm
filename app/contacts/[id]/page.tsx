@@ -19,7 +19,7 @@ import { CONTACT_STATUS_LABELS, STAGE_LABELS } from "@/lib/crm-constants";
 import { formatCurrency, formatDate, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+
 
 export async function generateMetadata({
   params

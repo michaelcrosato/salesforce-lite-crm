@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
@@ -81,6 +81,7 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
     });
   }
 
+  updateTag("deals");
   revalidatePath("/deals");
   revalidatePath("/dashboard");
   revalidatePath("/activities");
@@ -184,6 +185,7 @@ export async function updateDealAction(
     });
   }
 
+  updateTag("deals");
   revalidatePath("/deals");
   revalidatePath("/dashboard");
   revalidatePath("/activities");
@@ -274,6 +276,7 @@ export async function moveDealAction(input: {
     });
   }
 
+  updateTag("deals");
   revalidatePath("/deals");
   revalidatePath("/dashboard");
   revalidatePath("/activities");

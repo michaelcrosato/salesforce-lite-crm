@@ -7,8 +7,88 @@ import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/prisma";
 import { isOpenDealStage } from "@/lib/business/deals";
+import { cacheTag } from "next/cache";
 
-export const dynamic = "force-dynamic";
+async function getCachedContacts(query: string) {
+  "use cache";
+  cacheTag("contacts");
+
+  return await prisma.contact.findMany({
+    where: query
+      ? {
+          OR: [
+            {
+              firstName: {
+                contains: query
+              }
+            },
+            {
+              lastName: {
+                contains: query
+              }
+            },
+            {
+              email: {
+                contains: query
+              }
+            },
+            {
+              account: {
+                name: {
+                  contains: query
+                }
+              }
+            }
+          ]
+        }
+      : undefined,
+    orderBy: [
+      {
+        lastName: "asc"
+      },
+      {
+        firstName: "asc"
+      }
+    ],
+    include: {
+      account: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      deals: {
+        select: {
+          stage: true
+        }
+      },
+      activities: {
+        orderBy: {
+          createdAt: "desc"
+        },
+        take: 1,
+        select: {
+          createdAt: true
+        }
+      }
+    }
+  });
+}
+
+async function getCachedAccountsList() {
+  "use cache";
+  cacheTag("accounts");
+
+  return await prisma.account.findMany({
+    orderBy: {
+      name: "asc"
+    },
+    select: {
+      id: true,
+      name: true
+    }
+  });
+}
 
 export const metadata: Metadata = {
   title: "Contacts"
@@ -22,75 +102,8 @@ export default async function ContactsPage({
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams.q?.trim() ?? "";
   const [contacts, accounts] = await Promise.all([
-    prisma.contact.findMany({
-      where: query
-        ? {
-            OR: [
-              {
-                firstName: {
-                  contains: query
-                }
-              },
-              {
-                lastName: {
-                  contains: query
-                }
-              },
-              {
-                email: {
-                  contains: query
-                }
-              },
-              {
-                account: {
-                  name: {
-                    contains: query
-                  }
-                }
-              }
-            ]
-          }
-        : undefined,
-      orderBy: [
-        {
-          lastName: "asc"
-        },
-        {
-          firstName: "asc"
-        }
-      ],
-      include: {
-        account: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
-        deals: {
-          select: {
-            stage: true
-          }
-        },
-        activities: {
-          orderBy: {
-            createdAt: "desc"
-          },
-          take: 1,
-          select: {
-            createdAt: true
-          }
-        }
-      }
-    }),
-    prisma.account.findMany({
-      orderBy: {
-        name: "asc"
-      },
-      select: {
-        id: true,
-        name: true
-      }
-    })
+    getCachedContacts(query),
+    getCachedAccountsList()
   ]);
 
   return (

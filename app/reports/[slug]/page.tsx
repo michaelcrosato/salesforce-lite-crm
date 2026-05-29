@@ -27,7 +27,7 @@ import {
   topAccountsByOpportunityValue
 } from "@/lib/services/reports";
 
-export const dynamic = "force-dynamic";
+
 
 type ReportParams = { slug: string };
 
@@ -77,9 +77,47 @@ export default async function ReportDetailPage({
   );
 }
 
+import { cacheTag } from "next/cache";
+
+async function getCachedPipelineByStage() {
+  "use cache";
+  cacheTag("reports");
+  return await pipelineByStage();
+}
+
+async function getCachedLeadsBySource() {
+  "use cache";
+  cacheTag("reports");
+  return await leadsBySource();
+}
+
+async function getCachedActivityVolume() {
+  "use cache";
+  cacheTag("reports");
+  return await activityVolumeByDay();
+}
+
+async function getCachedTopAccounts() {
+  "use cache";
+  cacheTag("reports");
+  return await topAccountsByOpportunityValue();
+}
+
+async function getCachedStaleOpportunities() {
+  "use cache";
+  cacheTag("reports");
+  return await staleOpportunities();
+}
+
+async function getCachedOverdueTasks() {
+  "use cache";
+  cacheTag("reports");
+  return await overdueTasks();
+}
+
 async function ReportBody({ slug }: { slug: ReportSlug }) {
   if (slug === "pipeline-by-stage") {
-    const rows = await pipelineByStage();
+    const rows = await getCachedPipelineByStage();
     if (rows.length === 0) {
       return <EmptyState title="No pipeline data" description="No opportunity data found." />;
     }
@@ -87,7 +125,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   }
 
   if (slug === "leads-by-source") {
-    const rows = await leadsBySource();
+    const rows = await getCachedLeadsBySource();
     if (rows.length === 0) {
       return <EmptyState title="No leads" description="No leads recorded yet." />;
     }
@@ -95,7 +133,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   }
 
   if (slug === "activity-volume") {
-    const rows = await activityVolumeByDay();
+    const rows = await getCachedActivityVolume();
     if (rows.length === 0) {
       return <EmptyState title="No recent activity" description="No activity in the last 30 days." />;
     }
@@ -103,7 +141,7 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   }
 
   if (slug === "top-accounts") {
-    const rows = await topAccountsByOpportunityValue();
+    const rows = await getCachedTopAccounts();
     if (rows.length === 0) {
       return <EmptyState title="No accounts" description="No accounts with opportunities." />;
     }
@@ -111,14 +149,14 @@ async function ReportBody({ slug }: { slug: ReportSlug }) {
   }
 
   if (slug === "stale-opportunities") {
-    const rows = await staleOpportunities();
+    const rows = await getCachedStaleOpportunities();
     if (rows.length === 0) {
       return <EmptyState title="No stale opportunities" description="All open opportunities have recent activity." />;
     }
     return <StaleOpportunitiesTable rows={rows} />;
   }
 
-  const rows = await overdueTasks();
+  const rows = await getCachedOverdueTasks();
   if (rows.length === 0) {
     return <EmptyState title="No overdue tasks" description="Everything on the board is on time." />;
   }

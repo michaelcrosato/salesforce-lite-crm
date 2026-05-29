@@ -4,7 +4,8 @@ import { actionErrorResult, logActionError } from "@/lib/action-result";
 import { logger } from "@/lib/observability/logger";
 
 vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn()
+  revalidatePath: vi.fn(),
+  updateTag: vi.fn()
 }));
 
 // Isolated to this file: a minimal account delegate so the server action can

@@ -17,7 +17,7 @@ import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { prisma } from "@/lib/prisma";
 import { getRoutingDecisionsForLeads } from "@/lib/services/leads";
 
-export const dynamic = "force-dynamic";
+
 
 export async function generateMetadata({
   params

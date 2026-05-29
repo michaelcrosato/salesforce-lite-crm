@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { ASSIGNMENT_REASON_LABELS, type AssignmentReason } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
@@ -124,6 +124,7 @@ function reasonLabel(reason: AssignmentReason) {
 }
 
 function revalidateDealerOpsPaths() {
+  updateTag("leads");
   revalidatePath("/leads");
   revalidatePath("/orders");
   revalidatePath("/dashboard");

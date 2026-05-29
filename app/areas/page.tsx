@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Areas"

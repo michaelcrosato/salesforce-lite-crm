@@ -13,6 +13,7 @@ import { calculateDashboardKpis, rankTodaysFocus } from "@/lib/business/dashboar
 import { calculateDealerOpsKpis, rankDealerOpsFocus } from "@/lib/business/dealerOps";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
+import { connection } from "next/server";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
 import { getDashboardCardDefinitionCatalog } from "@/lib/server/dashboardCardDefinitions";
 import {
@@ -20,13 +21,14 @@ import {
   toSavedReportDefinitionSnapshot
 } from "@/lib/server/savedReportPersistence";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Dashboard"
 };
 
 export default async function DashboardPage() {
+  await connection();
   const now = new Date();
   const { start, end } = currentMonthRange(now);
   const [

@@ -21,7 +21,7 @@ import { prisma } from "@/lib/prisma";
 import { boundedNumberQueryParam, nonEmptyQueryParam } from "@/lib/queryParams";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Forecast Simulator"
@@ -32,9 +32,9 @@ export default async function ForecastPage({
 }: {
   searchParams: Promise<{ multiplier?: string; assignmentRate?: string; area?: string }>;
 }) {
+  const params = await searchParams;
   const now = new Date();
   const { start, end } = currentMonthRange(now);
-  const params = await searchParams;
   const leadVolumeMultiplierParam = boundedNumberQueryParam(params.multiplier, {
     min: 0.5,
     max: 3

@@ -4,7 +4,8 @@ import { updateContactAction } from "@/app/contacts/actions";
 import { prisma } from "@/lib/prisma";
 
 vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn()
+  revalidatePath: vi.fn(),
+  updateTag: vi.fn()
 }));
 
 const accountId = "test-form-action-account";

@@ -8,7 +8,8 @@ import {
 import { prisma } from "@/lib/prisma";
 
 vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn()
+  revalidatePath: vi.fn(),
+  updateTag: vi.fn()
 }));
 
 const testTaskTitle = "Test Task Action Title";

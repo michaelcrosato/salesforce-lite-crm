@@ -25,8 +25,94 @@ import { MAX_LEAD_DISPOSITION_LIMIT } from "@/lib/services/leadDispositions";
 import { getRoutingDecisionsForLeads } from "@/lib/services/leads";
 import { listLeadSlaFollowUpPacketBatch } from "@/lib/services/leadSlaFollowUp";
 import { isLeadStatus } from "@/lib/validation";
+import { cacheTag } from "next/cache";
 
-export const dynamic = "force-dynamic";
+async function getCachedLeads(status: string, areaId: string, orderId: string, source: string) {
+  "use cache";
+  cacheTag("leads");
+
+  return await prisma.lead.findMany({
+    where: {
+      ...(status !== "all" ? { status } : {}),
+      ...(areaId !== "all" ? { areaId } : {}),
+      ...(orderId !== "all" ? { assignedOrderId: orderId } : {}),
+      ...(source !== "all" ? { source } : {})
+    },
+    orderBy: {
+      createdAt: "desc"
+    },
+    include: {
+      area: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      assignedOrder: {
+        select: {
+          id: true,
+          name: true,
+          account: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+async function getCachedAreas() {
+  "use cache";
+  cacheTag("areas");
+
+  return await prisma.area.findMany({
+    orderBy: {
+      name: "asc"
+    },
+    select: {
+      id: true,
+      name: true
+    }
+  });
+}
+
+async function getCachedOrders() {
+  "use cache";
+  cacheTag("orders");
+
+  return await prisma.dealerOrder.findMany({
+    orderBy: {
+      name: "asc"
+    },
+    select: {
+      id: true,
+      name: true
+    }
+  });
+}
+
+async function getCachedSources() {
+  "use cache";
+  cacheTag("leads");
+
+  return await prisma.lead.findMany({
+    where: {
+      source: {
+        not: null
+      }
+    },
+    distinct: ["source"],
+    orderBy: {
+      source: "asc"
+    },
+    select: {
+      source: true
+    }
+  });
+}
 
 export const metadata: Metadata = {
   title: "Lead Inbox"
@@ -43,69 +129,10 @@ export default async function LeadsPage({
   const orderId = allQueryParam(params.order);
   const source = allQueryParam(params.source);
   const [leads, areas, orders, sources] = await Promise.all([
-    prisma.lead.findMany({
-      where: {
-        ...(status !== "all" ? { status } : {}),
-        ...(areaId !== "all" ? { areaId } : {}),
-        ...(orderId !== "all" ? { assignedOrderId: orderId } : {}),
-        ...(source !== "all" ? { source } : {})
-      },
-      orderBy: {
-        createdAt: "desc"
-      },
-      include: {
-        area: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
-        assignedOrder: {
-          select: {
-            id: true,
-            name: true,
-            account: {
-              select: {
-                id: true,
-                name: true
-              }
-            }
-          }
-        }
-      }
-    }),
-    prisma.area.findMany({
-      orderBy: {
-        name: "asc"
-      },
-      select: {
-        id: true,
-        name: true
-      }
-    }),
-    prisma.dealerOrder.findMany({
-      orderBy: {
-        name: "asc"
-      },
-      select: {
-        id: true,
-        name: true
-      }
-    }),
-    prisma.lead.findMany({
-      where: {
-        source: {
-          not: null
-        }
-      },
-      distinct: ["source"],
-      orderBy: {
-        source: "asc"
-      },
-      select: {
-        source: true
-      }
-    })
+    getCachedLeads(status, areaId, orderId, source),
+    getCachedAreas(),
+    getCachedOrders(),
+    getCachedSources()
   ]);
 
   const leadIds = leads.map((lead) => lead.id);

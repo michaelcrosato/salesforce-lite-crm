@@ -53,7 +53,7 @@ import {
 } from "@/lib/services/savedListViews";
 import type { SortOrder } from "@/lib/services/listQuery";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Cases"

@@ -9,7 +9,8 @@ import {
 } from "@/lib/services/opportunityStageHistory";
 
 vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn()
+  revalidatePath: vi.fn(),
+  updateTag: vi.fn()
 }));
 
 const dealId = "test-stage-history-deal";

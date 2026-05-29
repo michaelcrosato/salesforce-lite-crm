@@ -19,7 +19,7 @@ import { CONTACT_STATUS_LABELS, STAGE_LABELS, type ContactStatus } from "@/lib/c
 import { formatCurrency, formatDate, formatNumber, formatPercent } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+
 
 type AccountContactListItem = {
   id: string;

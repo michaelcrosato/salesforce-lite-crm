@@ -14,19 +14,16 @@ import {
   expectedDeliveredByToday
 } from "@/lib/business/dealerOps";
 import { formatDate, formatNumber } from "@/lib/formatters";
+import { connection } from "next/server";
 import { currentMonthRange } from "@/lib/routing/leadRouter";
+import { cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+async function getCachedOrders(start: Date, end: Date) {
+  "use cache";
+  cacheTag("orders");
 
-export const metadata: Metadata = {
-  title: "Dealer Orders"
-};
-
-export default async function OrdersPage() {
-  const now = new Date();
-  const { start, end } = currentMonthRange(now);
-  const orders = await prisma.dealerOrder.findMany({
+  return await prisma.dealerOrder.findMany({
     orderBy: [
       {
         status: "asc"
@@ -65,6 +62,17 @@ export default async function OrdersPage() {
       }
     }
   });
+}
+
+export const metadata: Metadata = {
+  title: "Dealer Orders"
+};
+
+export default async function OrdersPage() {
+  await connection();
+  const now = new Date();
+  const { start, end } = currentMonthRange(now);
+  const orders = await getCachedOrders(start, end);
 
   return (
     <div className="crm-page max-w-[1500px]">

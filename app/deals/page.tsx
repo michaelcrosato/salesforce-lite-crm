@@ -12,21 +12,14 @@ import {
 } from "@/lib/business/deals";
 import { DEAL_STAGES, type DealStage } from "@/lib/crm-constants";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
+import { cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+async function getCachedDeals() {
+  "use cache";
+  cacheTag("deals");
 
-export const metadata: Metadata = {
-  title: "Deals"
-};
-
-export default async function DealsPage({
-  searchParams
-}: {
-  searchParams: Promise<{ deal?: string }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const [deals, accounts, contacts, owners] = await Promise.all([
+  return await Promise.all([
     prisma.deal.findMany({
       orderBy: [
         {
@@ -119,6 +112,19 @@ export default async function DealsPage({
       }
     })
   ]);
+}
+
+export const metadata: Metadata = {
+  title: "Deals"
+};
+
+export default async function DealsPage({
+  searchParams
+}: {
+  searchParams: Promise<{ deal?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const [deals, accounts, contacts, owners] = await getCachedDeals();
 
   const openDeals = deals.filter((deal) => isOpenDealStage(deal.stage));
   const wonValue = deals

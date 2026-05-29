@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "New Deal"

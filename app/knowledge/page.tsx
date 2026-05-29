@@ -30,7 +30,7 @@ import { prisma } from "@/lib/prisma";
 import { nonEmptyQueryParam } from "@/lib/queryParams";
 import type { SortOrder } from "@/lib/services/listQuery";
 
-export const dynamic = "force-dynamic";
+
 
 export const metadata: Metadata = {
   title: "Knowledge Articles"

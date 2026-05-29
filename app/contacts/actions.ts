@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { deterministicActivitySummarizer } from "@/lib/ai/activitySummarizer";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
@@ -50,6 +50,7 @@ export async function createContactAction(
         status: parsed.data.status
       }
     });
+    updateTag("contacts");
     revalidatePath("/contacts");
     revalidatePath("/dashboard");
 
@@ -103,6 +104,7 @@ export async function updateContactAction(
         status: parsed.data.status
       }
     });
+    updateTag("contacts");
     revalidatePath("/contacts");
     revalidatePath(`/contacts/${contactId}`);
     revalidatePath("/dashboard");
@@ -192,6 +194,10 @@ export async function addContactNoteAction(
     }
   });
 
+  updateTag("contacts");
+  if (linkedDeal) {
+    updateTag("deals");
+  }
   revalidatePath("/contacts");
   revalidatePath(`/contacts/${contact.id}`);
   revalidatePath("/activities");

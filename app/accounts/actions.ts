@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { accountFormSchema } from "@/lib/validation";
@@ -57,6 +57,7 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
     });
   }
 
+  updateTag("accounts");
   revalidatePath("/accounts");
   revalidatePath("/dashboard");
 
@@ -113,6 +114,7 @@ export async function updateAccountAction(
     });
   }
 
+  updateTag("accounts");
   revalidatePath("/accounts");
   revalidatePath(`/accounts/${accountId}`);
   revalidatePath("/dashboard");

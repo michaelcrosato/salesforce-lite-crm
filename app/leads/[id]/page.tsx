@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 import { isLeadStatus } from "@/lib/validation";
 
-export const dynamic = "force-dynamic";
+
 
 export async function generateMetadata({
   params

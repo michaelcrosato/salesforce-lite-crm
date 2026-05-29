@@ -23,6 +23,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cacheComponents: true,
   allowedDevOrigins: ["127.0.0.1"],
   serverExternalPackages: [
     "@prisma/client",
