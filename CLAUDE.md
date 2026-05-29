@@ -6,7 +6,9 @@ Read fully before touching any file in this repo.
 2. **`git status --short` before editing.** Don't overwrite unexpected local changes.
 3. **Stay in your zone.** Zones are in `.claude/zones.json`. Use `[CROSS-ZONE OK <reason>]` only when necessary.
 4. **Atomic commits.** One logical change per commit. Report-only commits include only SUMMARY/BLOCKERS files.
-5. **Never claim checks you didn't run.** Lint, typecheck, format scripts DO NOT exist. Allowed quality claims:
+5. **Never claim checks you didn't run.** No `format` script exists (`npm run agent:format` is a no-op). Allowed quality claims, each only if it actually ran and passed:
+   - `npm run lint`
+   - `npm run typecheck`
    - `npm run test`
    - `npm run build`
    - `npm run test:e2e`

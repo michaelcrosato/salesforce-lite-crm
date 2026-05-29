@@ -33,7 +33,7 @@ Playwright. Package manager: npm.
 
 ## Tests
 
-- Unit: `tests/**/*.test.ts` (116 files, 565 tests) — `npm run test`.
+- Unit: `tests/**/*.test.ts` (115 files, 562 tests) — `npm run test`.
 - E2E: `e2e/**/*.spec.ts` — `npm run test:e2e` (seeds first, needs Chromium).
 
 ## Config
