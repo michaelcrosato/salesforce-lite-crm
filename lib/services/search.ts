@@ -1,6 +1,5 @@
-import type { Prisma } from "@prisma/client";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
-import { prisma } from "@/lib/prisma";
+import { databaseProvider, prisma } from "@/lib/prisma";
 
 export type SearchResultItem = {
   id: string;
@@ -28,9 +27,16 @@ const emptyResults = (): GlobalSearchResults => ({
   campaigns: []
 });
 
-const contains = (query: string): Prisma.StringFilter => ({
-  contains: query
-});
+// SQLite's better-sqlite3 adapter rejects a `mode` key, and the SQLite-generated
+// Prisma client omits it from `StringFilter` entirely; Postgres needs
+// `mode: "insensitive"` for case-folding. Branch on the active provider so the
+// same query stays case-insensitive across both.
+type ContainsFilter = { contains: string; mode?: "insensitive" };
+
+const contains = (query: string): ContainsFilter =>
+  databaseProvider() === "postgres"
+    ? { contains: query, mode: "insensitive" }
+    : { contains: query };
 
 export async function globalSearch(
   query: string

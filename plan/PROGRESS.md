@@ -2,17 +2,17 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 2 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅.
+**Overall: 3 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅.
 
 ---
 
-## Wave 0 — Quick Wins & Safety (2 / 8)
+## Wave 0 — Quick Wins & Safety (3 / 8)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 001 | CI `npm audit` gate | — | |
 | [x] Done | 002 | Zod v4 imports (`zod/v4`) | — | |
-| [ ] Todo | 003 | Portable case-insensitive search | — | |
+| [x] Done | 003 | Portable case-insensitive search | — | |
 | [ ] Todo | 004 | Surface server-action errors | 009 | |
 | [ ] Todo | 005 | `noUncheckedIndexedAccess` | — | |
 | [ ] Todo | 006 | Vitest coverage reporting | — | ⚠️ |
@@ -62,3 +62,4 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-28 — Blueprint generated (24 specs + ROADMAP + AGENTS + PROGRESS). Nothing executed yet; all specs `Todo`. Baseline green.
 - 2026-05-28 — **001 Done** (branch `phase-0-quick-wins`). Files: `.github/workflows/ci.yml` (+`npm audit --audit-level=high` step in `gate`), `docs/LOCAL-GATE.md` (+audit line). Validated: `npm audit --audit-level=high` → 0 vulns, exit 0.
 - 2026-05-28 — **002 Done** (branch `phase-0-quick-wins`, `[CROSS-ZONE OK]` — migration spans `lib/**`, `app/**`, `tests/**`). All source `from "zod"` → `from "zod/v4"`. Validated: `npm run typecheck` exit 0 · `npm run test` **565 passed** · `npm run build` exit 0 ("Compiled successfully"). **Spec premise was inaccurate** ("zero behavior change / 565 tests pass unchanged"): v4 is a real API shift. Required (a) a data-integrity fix — v4 `.partial()` injects `.default()` values for absent keys, so the 5 `*UpdateSchema` (lead/task/case/knowledgeArticle/campaign) override defaulted enums back to `.optional()` to preserve v3 update-payload behavior + protect audit `changedFields`; `.default({})`→`.prefault({})` for input-side parsing; and (b) ~30 test-assertion wording updates for changed v4 default issue messages/codes. User-facing custom validation strings unaffected. Re-score: Risk Medium, not Low. See spec 002 migration note.
+- 2026-05-28 — **003 Done** (branch `phase-0-quick-wins`, `[CROSS-ZONE OK]` — touches `lib/prisma.ts`, `lib/services/search.ts`, `tests/api/search.test.ts` [gemini zone]). Added `databaseProvider()` to `lib/prisma.ts` (reused by `createPrismaClient`); `globalSearch`'s `contains` helper now returns `{ contains, mode: "insensitive" }` on Postgres and `{ contains }` on SQLite. New unit test pins case-folding (`ACME`/`acme`/`AcMe` → "Acme Insulation Co"). SQLite client lacks `mode` in `StringFilter`, so a dedicated filter type avoids `any`. Validated: `npm run typecheck` exit 0 · `npm run test` **566 passed** · `npm run build` exit 0.

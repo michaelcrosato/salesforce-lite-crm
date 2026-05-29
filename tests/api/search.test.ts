@@ -4,6 +4,7 @@ import { globalSearch } from "@/lib/services/search";
 
 const ids = {
   account: "test-search-account",
+  caseFoldAccount: "test-search-case-fold-account",
   contact: "test-search-contact",
   opportunity: "test-search-opportunity",
   lead: "test-search-lead",
@@ -55,6 +56,28 @@ describe("global search service", () => {
     ]);
     expect(results.accounts).toHaveLength(0);
     expect(results.opportunities).toHaveLength(0);
+  });
+
+  it("matches mixed-case terms regardless of query casing", async () => {
+    await prisma.account.create({
+      data: {
+        id: ids.caseFoldAccount,
+        name: "Acme Insulation Co",
+        status: "active",
+        healthScore: 70
+      }
+    });
+
+    const expected = {
+      id: ids.caseFoldAccount,
+      label: "Acme Insulation Co",
+      route: `/accounts/${ids.caseFoldAccount}`
+    };
+
+    for (const term of ["ACME", "acme", "AcMe"]) {
+      const results = await globalSearch(term);
+      expect(results.accounts).toContainEqual(expected);
+    }
   });
 
   it("returns cross-entity matches with route-safe result links", async () => {
@@ -206,7 +229,9 @@ async function cleanupSearchFixtures() {
   });
   await prisma.account.deleteMany({
     where: {
-      id: ids.account
+      id: {
+        in: [ids.account, ids.caseFoldAccount]
+      }
     }
   });
 }

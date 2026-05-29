@@ -1,7 +1,7 @@
 # 003 — Make global search case-folding explicit & provider-portable
 
 - **Wave:** Phase 0 — Quick Wins & Safety
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 4/5 · Feasibility 4/5 · Risk Low · Codebase Fit 5/5
 - **Depends on:** none
 - **Scope gate:** In-scope
@@ -16,10 +16,12 @@
 Make the intent explicit and portable, and lock it with a test. This is the cross-entity command-palette surface (Ctrl/Cmd+K) — the most-used search in the product.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Searching a mixed-case term matches records regardless of case on SQLite (e.g. `"ACME"` finds seeded `"Acme …"`), proven by a new unit test.
-- [ ] Behavior is provider-portable: when `DATABASE_URL` is Postgres, filters use `mode: "insensitive"`; on SQLite they must **not** pass `mode` (the better-sqlite3 adapter rejects it). Branch on provider via a single helper.
-- [ ] The `contains` helper is the single point of change; all 7 entity queries inherit it.
-- [ ] `npm run test` + `npm run build` green.
+- [x] Searching a mixed-case term matches records regardless of case on SQLite (e.g. `"ACME"` finds seeded `"Acme …"`), proven by a new unit test (`tests/api/search.test.ts` → "matches mixed-case terms regardless of query casing", asserts `ACME`/`acme`/`AcMe`).
+- [x] Behavior is provider-portable: when `DATABASE_URL` is Postgres, filters use `mode: "insensitive"`; on SQLite they must **not** pass `mode` (the better-sqlite3 adapter rejects it). Branch on provider via a single helper (`databaseProvider()` in `lib/prisma.ts`).
+- [x] The `contains` helper is the single point of change; all 7 entity queries inherit it.
+- [x] `npm run test` (566) + `npm run build` green.
+
+> **Type note:** the SQLite-generated Prisma client omits `mode` from `StringFilter` (no `QueryMode`), so the helper returns a dedicated `{ contains: string; mode?: "insensitive" }` type (structurally assignable to the where-clause filters) rather than `Prisma.StringFilter` — no `any`/`@ts-ignore`.
 
 ## Implementation Approach
 **Files to touch:** `lib/services/search.ts` (upgrade the `contains` helper to a provider-aware filter builder), optionally `lib/prisma.ts` (export a `databaseProvider()` helper deriving `"sqlite" | "postgres"` from `DATABASE_URL`), `tests/api/search.test.ts` (new or extend).

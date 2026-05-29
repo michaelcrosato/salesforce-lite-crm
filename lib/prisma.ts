@@ -6,13 +6,21 @@ const globalForPrisma = globalThis as typeof globalThis & {
   prisma?: PrismaClient;
 };
 
+export type DatabaseProvider = "sqlite" | "postgres";
+
+export function databaseProvider(): DatabaseProvider {
+  const databaseUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
+
+  return databaseUrl.startsWith("postgres://") ||
+    databaseUrl.startsWith("postgresql://")
+    ? "postgres"
+    : "sqlite";
+}
+
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
 
-  if (
-    databaseUrl.startsWith("postgres://") ||
-    databaseUrl.startsWith("postgresql://")
-  ) {
+  if (databaseProvider() === "postgres") {
     return new PrismaClient({
       log:
         process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"]
