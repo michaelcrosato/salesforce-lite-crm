@@ -210,3 +210,28 @@ the ratchet, and must keep `npm run test` + `npm run build` green:
 
 After each cut, re-run `node scripts/check-reachability.mjs` — a freed inner
 layer drops to terminal and becomes the next safe deletion.
+
+### Executed — first batch (2026-05-29, spec 011)
+
+The release-tower batch landed as 5 atomic commits, each deleting the module +
+its sole test and lowering the ratchet, full gate green at every step
+(reachability + `tsc` + `npm run test` + `npm run build`):
+
+1. `csvReleaseReadinessPackets` (apex) — `8c27185`
+2. `csvReleaseDispositionManifests` — `8581c69`
+3. `csvReleaseHandoffCatalog` — `448f91f`
+4. `csvReleaseExceptionRegisters` — `64610ac`
+5. `csvReleaseClosureScorecards` — `6ebf052`
+
+**Orphans 25→20; test 579→559; ~8.5k LOC removed; zero live regressions.**
+
+**Correction to retirement step 2 above:** the batch stopped at these 5, not the
+full 7-module release tier. `csvReleaseVerificationManifests`,
+`csvContractReleaseDigest`, and `csvHandoffReleaseNotesPackets` did **not** fall
+to terminal after the apex — they are still imported by **operator-tower**
+modules (`csvOperatorAcceptanceChecklists`, `csvOperatorFixtureBundles`,
+`csvOperatorWalkthroughManifests`). They become deletable only once the operator
+tower is cut. Deletion order was verified per-cut against a reverse-import map
+(importers among `lib/server`); only modules with an **empty** importer list were
+removed, so no dangling import was ever possible. `csvOperatorWalkthroughManifests`
+is now terminal and is the natural start of the next (operator-tower) batch.
