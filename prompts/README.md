@@ -4,6 +4,17 @@ Prompts in this directory are versioned repo artifacts for planned agent work.
 They should be concise, scoped, and aligned with `PLAN.md` and
 `CRM-CONTRACT.md`.
 
+## Canonical loop templates
+
+`prompts/shared/LOOP.md` and `prompts/shared/SPRINT-ROLLOVER.md` are the single
+source of truth for the per-iteration loop prompts. The per-agent copies
+(`prompts/<agent>/LOOP.md`, `prompts/<agent>/SPRINT-ROLLOVER.md`) are generated
+byte-identical from them by `scripts/generate-agent-prompts.mjs` and keep the
+literal `{AGENT}` token that `scripts/autonomy-loop.ps1` substitutes at dispatch.
+Edit the shared template, run `node scripts/generate-agent-prompts.mjs`, then
+commit; `tests/prompts/agent-prompts.test.ts` and the script's `--check` mode
+fail if a per-agent copy drifts.
+
 Older prompt files are historical instructions for the branch or sprint that
 created them. They may mention completed work, old blockers, or prior branch
 names. Use current `PLAN.md`, `CRM-CONTRACT.md`, `docs/PROJECT-CONTROL.md`, and

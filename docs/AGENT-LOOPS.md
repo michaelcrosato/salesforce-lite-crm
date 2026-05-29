@@ -4,7 +4,7 @@
 
 Long-running agent loops should maximize useful progress while preserving the repo contract: explore, plan, implement, validate, repair, commit, report, push, repeat.
 
-The runner is the control system. The implementation brain is the repo-local prompt (`prompts/<agent>/LOOP.md`) plus the current worktree state.
+The runner is the control system. The implementation brain is the repo-local prompt (`prompts/<agent>/LOOP.md`) plus the current worktree state. That per-agent file is generated from the canonical `prompts/shared/LOOP.md`; edit the shared template and run `scripts/generate-agent-prompts.mjs` rather than hand-editing each copy.
 
 ## Topology
 

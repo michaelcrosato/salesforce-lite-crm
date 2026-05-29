@@ -66,10 +66,12 @@ every iteration pays orientation + gate cost before doing any work.
   copies) and `SPRINT-ROLLOVER.md` (5 identical) are maintained by hand and must
   stay in sync forever. One canonical template + runtime `{AGENT}` substitution
   removes ~7 redundant files and a whole class of drift. → **TICKET005**.
+  ✓ Done (spec 015): canonical `prompts/shared/{LOOP,SPRINT-ROLLOVER}.md` +
+  `scripts/generate-agent-prompts.mjs` generator + `tests/prompts/agent-prompts.test.ts`.
 - **A2 — Retire the `prompts/**/Old/` archive.** 9 Sprint-4B files are pure
   history; they inflate every `Glob prompts/**` an agent runs at boot. Move to a
   single archive note or delete (git history retains them). → folded into
-  **TICKET005**.
+  **TICKET005**. ✓ Done (spec 015): the 9 `prompts/**/Old/` files were removed.
 - **A3 — Make the test suite parallel-safe.** `--maxWorkers=1` exists almost
   certainly because tests share one SQLite file. As the suite grows past 565,
   serialized execution becomes the dominant inner-loop cost (it runs on *every*
