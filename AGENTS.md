@@ -56,6 +56,23 @@ forced git, schema/seed changes (CLAUDE.md §7–8), `.claude/**` hook config
 (§10), or real legal/security ambiguity. Otherwise take the safest assumption,
 document it in the ticket/summary, and continue.
 
+## Merge Path
+
+`main` is protected and accepts changes only through a pull request whose
+required `gate` check (lint + typecheck + test + build, run on CI) is green.
+There is exactly one path to `main`:
+
+1. Work on a branch (`<agent>/<feature>` in parallel mode).
+2. `git push origin <branch>`.
+3. `gh pr create --base main --fill`.
+4. Wait for the required `gate` check: `gh pr checks <branch> --watch`.
+5. `gh pr merge <branch> --squash --delete-branch` — never `--admin`, never force.
+
+If `gate` is red: leave the PR open, file a `gate` blocker, fix on the branch,
+and let `gate` re-run. Never bypass protection and never push directly to
+`main`. The `e2e` CI job is advisory (`continue-on-error`, non-blocking;
+TICKET008) and does not gate merges yet. Full procedure: `prompts/shared/MERGE.md`.
+
 ## Token Efficiency
 
 Read `PLAN.md` §1–4 and the current sprint, not all 3.4k lines. Use

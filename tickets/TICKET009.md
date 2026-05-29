@@ -44,9 +44,14 @@ protection flip via `gh api`.
 
 ## Steps
 
-1. Define the PR-merge sequence once (shared prompt template per TICKET005).
+1. [done] Define the PR-merge sequence once — documented in
+   `prompts/shared/MERGE.md` and each `prompts/*/LOOP.md` Phase 6. (Full dedup
+   to a single template remains TICKET005.)
 2. Update runner scripts to branch + PR + gated merge; never `--admin`.
-3. Add a "gate red → open PR + blocker, stop" rule (no bypass fallback).
+   **Pair the two halves** — a branch-mode default *and* an automated
+   PR-open + gated-merge step — and land them together. See Risks.
+3. [done, docs] "gate red → leave PR open + file blocker, stop" rule added to
+   `MERGE.md` and every `LOOP.md`. The loop enforces it once step 2 lands.
 4. Dry-run one full loop iteration end-to-end on a throwaway feature.
 5. Only then: `enforce_admins=true` to fully close direct-push bypass.
 
@@ -54,7 +59,11 @@ protection flip via `gh api`.
 
 - [ ] A full autonomous iteration merges via PR + green `gate`, no `--admin`.
 - [ ] Loop handles a red gate by stopping with a PR + blocker, not a bypass.
-- [ ] Docs (`AGENTS.md`, `PLAN.md` §7) describe the PR flow as the only path.
+- [x] Docs describe the PR flow as the only path — `AGENTS.md` ("Merge Path"),
+      `PLAN.md` §7, all five `prompts/*/LOOP.md` Phase 6, and
+      `prompts/shared/MERGE.md` (landed via PR, branch
+      `chore/document-pr-merge-flow`). Runner + `enforce_admins` items below
+      remain.
 - [ ] (Closing) `enforce_admins=true` set; verified that direct push to `main`
       is now rejected rather than bypassed.
 
@@ -69,3 +78,12 @@ gh api repos/michaelcrosato/salesforce-lite-crm/branches/main/protection
 
 Flipping `enforce_admins` too early hard-blocks the loop's pushes (no bypass) and
 strands iterations. Sequence it last, after the PR flow is proven.
+
+Changing the runner to branch-mode without also automating the PR-open + gated
+merge is its own trap: the overnight loop would produce green branches that
+never land, and `main` would stop advancing — bad for a no-human-in-the-loop
+project. Land branch-mode and auto-merge together (step 2) so progress keeps
+reaching `main`, just through the gate instead of a direct push. The
+documentation now describes the PR flow as the only path, but the runner
+(`scripts/start-codex-overnight.ps1` defaults `-AllowMain` + `-Push`) still
+pushes `main` directly until step 2 lands.
