@@ -14,7 +14,7 @@ export default function setup() {
   const templateDbPath = join(dbDir, "template.db");
 
   // Create template database schema
-  execSync(`npx prisma db push --accept-data-loss --force-reset`, {
+  execSync(`npx prisma db push --accept-data-loss`, {
     env: { ...process.env, DATABASE_URL: `file:${templateDbPath}` },
     stdio: "ignore"
   });
