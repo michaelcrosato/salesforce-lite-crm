@@ -1,38 +1,39 @@
 Agent: Codex
 
-Sprint: Sprint 56
+Sprint: Spec 024 repair
 
-Feature: S56-F1 — Pacing snapshot contracts
+Feature: Audit history local-gate repair
 
-Branch: main
+Branch: gemini/spec-024-audit-history
 
 Status: done
 
-Commits this prompt: bcf279b — [codex] S56-F1: add pacing snapshot contracts
+Commits this prompt: 35e5454 — [codex] spec-024: stabilize audit history gate
 
-Gate status: PASS — `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (115 files / 562 tests), build, Playwright Chromium install, and `npm run test:e2e` (50 tests).
+Gate status: PASS — `scripts/local-gate.ps1` passed: npm install, Prisma generate/db push, seed, lint, typecheck, `npm run test` (116 files / 575 tests), build, Playwright Chromium install, and `npm run test:e2e` (52 passed). Earlier in this prompt, the same full gate failed at `npm run test:e2e` on `e2e/reports.spec.ts`; the failure was repaired and the full gate was rerun green.
 
 DoD self-check: PASS
 
-Timestamp: 2026-05-28T17:34:26.6964351-07:00
+Timestamp: 2026-05-29T10:24:27.3263489-07:00
 
 Approximate model tokens/spend this prompt: unknown
 
 ### Completed this prompt
 
-- Ran Phase 0 pre-flight from the single-agent root on `main`; the worktree was clean and the baseline gate passed through lint, typecheck, unit tests, and build before edits.
-- Reconciled current coordination state: `PLAN.md` queues Sprint 56 for Codex, `CRM-CONTRACT.md` is present, and `BLOCKERS.codex.md` had no active blockers.
-- Noted lower-authority drift: older Claude/Grok/Gemini SUMMARY files still describe historical parallel Sprint 4/5 work, and `docs/PROJECT-CONTROL.md` / `docs/ROADMAP.md` still describe Sprint 52 as latest completed; left them unchanged because `PLAN.md` §4 and the current prompt authorize S56 implementation.
-- Added `lib/server/pacingSnapshotContracts.ts` with read-only pacing snapshot catalog metadata, daily/monthly granularity helpers, metric-key definitions, fixture inputs, bounded validation, and explicit no-write safety flags.
-- Added `tests/api/pacing-snapshot-contracts.test.ts` covering catalog metadata, metric keys, fixture normalization, validation failures, and no-write DB counts.
-- Verified the implementation with focused Vitest, lint, typecheck, and the full local gate through Playwright e2e.
+- Ran the required orientation and status checks from the single-agent root on `gemini/spec-024-audit-history`; `STOP` was absent and ownership zones were advisory.
+- Preserved the existing Spec 024 audit-history work on the branch and committed only the focused repair delta.
+- Removed the deal drawer render-time state update path by deriving visible audit events from the focused deal id and reusing the shared detail timeline tabs.
+- Cleaned audit-history panel formatting and preserved stage-change display using existing `previousStatus` audit metadata.
+- Invalidated the cached reports surface after task mutations so `/reports` audit explorer data refreshes after the reports e2e creates its marker task.
+- Aligned stale reports e2e count assertions to the existing server contracts already covered by unit tests (`listFilterSupport` filter count 38; bulk dry-run action count 6).
+- Observed untracked `pnpm-lock.yaml` after the green gate and left it unstaged as out-of-scope package-manager output.
 
 ### Next action
 
-Run LOOP.md to begin S56-F2 — Read-only pacing snapshot builder.
+Push `gemini/spec-024-audit-history` and continue the protected PR/CI gate path.
 
 ### Scope confirmation
 
-No cross-ownership edits: YES — single-agent root mode; implementation was scoped to `lib/server/` and `tests/api/`.
+No cross-ownership edits: YES — single-agent root mode; repair touched app actions, components, validation, and e2e coverage needed to make the current branch gate green.
 
-CRM-CONTRACT.md honored: YES — no route, schema, UI, persistence, dealer-order edit, area edit, external service, or contract change was required.
+CRM-CONTRACT.md honored: YES — no schema changes, no new routes, no `/deals/[id]` live detail behavior, no auth/deployment/Salesforce/external-AI integration, and no dealer-order or area CRUD.
