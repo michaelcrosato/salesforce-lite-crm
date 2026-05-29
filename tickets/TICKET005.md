@@ -1,8 +1,17 @@
 # TICKET005 — consolidate duplicated agent prompts to one template
 
-- **Status:** Open
+- **Status:** Done (2026-05-29) — shipped as `/plan/` spec 015.
 - **Priority:** Medium
 - **Depends on:** none. Context: `docs/ai/NEXT-LEVEL.md` Lever A1/A2.
+- **Result:** Consolidated via the DoD-permitted *generated* path:
+  `prompts/shared/{LOOP,SPRINT-ROLLOVER}.md` are the single source;
+  `scripts/generate-agent-prompts.mjs` fans them out byte-identical to each
+  `prompts/<agent>/` copy (kept on disk so `scripts/autonomy-loop.ps1` reads them
+  unchanged and substitutes `{AGENT}` at dispatch); `tests/prompts/agent-prompts.test.ts`
+  fails the gate on any drift. The 9 stale `prompts/**/Old/` archives were removed.
+  Commits `54590cf`, `5250d66`, `93c3889`. Note: the generated copies remain on
+  disk by design, so AC1 is met by single-source generation + drift guard, not by
+  deleting the per-agent files.
 
 ## Goal
 
@@ -55,10 +64,13 @@ new layout), `prompts/**/Old/**`.
 
 ## Acceptance criteria
 
-- [ ] No two prompt files are byte-identical except by explicit shared template.
-- [ ] Loop runner produces the correct per-agent text (claude and meta verified).
-- [ ] `prompts/README.md` documents the shared-template layout.
-- [ ] `npm run test` + `npm run build` green (no app/lib behavior changed).
+- [x] No two prompt files are byte-identical except by explicit shared template.
+      — single source in `prompts/shared/`; copies are generated + drift-guarded.
+- [x] Loop runner produces the correct per-agent text (claude and meta verified).
+      — `meta/LOOP.md` reconciled to the canonical; generator verified byte-identical.
+- [x] `prompts/README.md` documents the shared-template layout.
+- [x] `npm run test` + `npm run build` green (no app/lib behavior changed).
+      — test 562, build 0 (2026-05-29).
 
 ## Commands
 

@@ -1,9 +1,17 @@
 # TICKET006 — ratcheting server-module reachability gate
 
-- **Status:** Open
+- **Status:** Done (2026-05-29) — shipped as `/plan/` spec 011.
 - **Priority:** Medium
 - **Depends on:** none (independent of TICKET004, but they reinforce each other).
   Context: `docs/ai/NEXT-LEVEL.md` Lever B; `docs/ai/csv-contract-assessment.md`.
+- **Result:** Shipped as the gate script `scripts/check-reachability.mjs` +
+  `scripts/reachability-baseline.json` (allowlist + shrink-only `maxOrphans`
+  ratchet), run in the local gate as `node scripts/check-reachability.mjs`
+  (currently 20/20, exit 0). Static import graph of all `.ts/.tsx`, closure from
+  `app/**` + `components/**` roots, fails on any NEW test-only `lib/server` orphan
+  or count above the ratchet. Pure `node:fs` (no new dep). Implementation form is
+  a Node gate script rather than the `tests/arch/*.test.ts` originally sketched
+  here, but every acceptance criterion below holds.
 
 ## Goal
 
@@ -53,11 +61,14 @@ LOOP §4).
 
 ## Acceptance criteria
 
-- [ ] Test is green on first adoption (allowlist absorbs the known tower).
-- [ ] Removing an allowlist entry whose module is still orphaned fails the test
-      (ratchet proven with a temporary local check).
-- [ ] No new dependency; no `any`/`@ts-ignore`.
-- [ ] `npm run test` + `npm run build` green.
+- [x] Test is green on first adoption (allowlist absorbs the known tower).
+      — baseline seeded; gate reports 20/20, exit 0.
+- [x] Removing an allowlist entry whose module is still orphaned fails the test
+      (ratchet proven with a temporary local check). — `newOrphans`/`maxOrphans`
+      checks fail the gate on regrowth.
+- [x] No new dependency; no `any`/`@ts-ignore`. — pure `node:fs`/`node:path`.
+- [x] `npm run test` + `npm run build` green. — test 562, build 0 (2026-05-29);
+      reachability gate runs as `node scripts/check-reachability.mjs`.
 
 ## Commands
 
