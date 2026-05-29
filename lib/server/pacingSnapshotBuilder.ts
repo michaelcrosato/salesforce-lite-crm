@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import {
   PACING_SNAPSHOT_CONTENT_TYPE,

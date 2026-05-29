@@ -245,7 +245,7 @@ describe("server workflow rule execution readiness receipts", () => {
         actions: [{ action: "draft_status_update", targetValue: "paused" }],
         execute: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'execute'");
+    ).rejects.toThrow(/Unrecognized key: .*execute/);
 
     const receipt = await getWorkflowRuleExecutionReadinessReceipt({
       entity: "accounts",

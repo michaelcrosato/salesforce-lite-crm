@@ -1,5 +1,5 @@
 import type { Prisma, SavedListView } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   getListFilterSupportEntityCatalog,
   isListFilterSupportEntity,
@@ -63,7 +63,7 @@ const savedListViewCreateSchema = z
       .min(1, "Saved view name is required.")
       .max(120, "Saved view name cannot exceed 120 characters."),
     description: optionalText,
-    filters: z.record(z.unknown()).optional(),
+    filters: z.record(z.string(), z.unknown()).optional(),
     sortBy: z.string().trim().min(1).optional(),
     sortOrder: sortOrderSchema.optional(),
     pageSize: z.coerce.number().int().min(1).max(100).optional()
@@ -91,7 +91,7 @@ const savedListViewQuerySchema = z
         pageSize: z.coerce.number().int().min(1).max(100).optional(),
         sortBy: z.string().trim().min(1).optional(),
         sortOrder: sortOrderSchema.optional(),
-        filters: z.record(z.unknown()).optional()
+        filters: z.record(z.string(), z.unknown()).optional()
       })
       .strict()
       .optional()

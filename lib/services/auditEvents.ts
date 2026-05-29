@@ -1,5 +1,5 @@
 import type { AuditEvent, Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
 import { idSchema } from "@/lib/validation";
@@ -74,7 +74,7 @@ const optionalDate = z.preprocess((value) => {
   }
 
   return new Date(value);
-}, z.date().optional());
+}, z.date().optional()).optional();
 
 const auditMetadataValueSchema: z.ZodType<AuditMetadataValue> = z.lazy(() =>
   z.union([
@@ -83,7 +83,7 @@ const auditMetadataValueSchema: z.ZodType<AuditMetadataValue> = z.lazy(() =>
     z.boolean(),
     z.null(),
     z.array(auditMetadataValueSchema),
-    z.record(auditMetadataValueSchema)
+    z.record(z.string(), auditMetadataValueSchema)
   ])
 );
 

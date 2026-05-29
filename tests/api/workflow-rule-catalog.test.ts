@@ -348,7 +348,7 @@ describe("server workflow rule catalog", () => {
 
     expect(() =>
       getWorkflowRuleCatalog({ includeUnsupported: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeUnsupported'");
+    ).toThrow(/Unrecognized key: .*includeUnsupported/);
     expect(catalog.source.routeScope).not.toContain("/search");
     expect(catalog.source.routeScope).not.toContain("/command-palette");
     expect(catalog.source.routeScope).not.toContain("/deals/[id]");

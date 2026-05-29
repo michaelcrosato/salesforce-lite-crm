@@ -236,7 +236,7 @@ describe("server workflow rule execution capabilities", () => {
 
     expect(() =>
       getWorkflowRuleExecutionCapabilityMatrix({ execute: true })
-    ).toThrow("Unrecognized key(s) in object: 'execute'");
+    ).toThrow(/Unrecognized key: .*execute/);
     expect(getWorkflowRuleExecutionEntityCapability("dealer-orders")).toBeNull();
     expect(getWorkflowRuleExecutionEntityCapability("areas")).toBeNull();
     expect(

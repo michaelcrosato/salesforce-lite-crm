@@ -224,7 +224,7 @@ describe("approval policy registry", () => {
       "crm.workflow-manual-execution"
     ]);
     expect(() => getApprovalPolicyRegistry({ execute: true })).toThrow(
-      "Unrecognized key(s) in object: 'execute'"
+      /Unrecognized key: .*execute/
     );
     expect(registry.source.routeScope).toEqual(["/reports"]);
     expect(registry.source.routeScope).not.toContain("/search");

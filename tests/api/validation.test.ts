@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 import {
   accountCreateSchema,
   activityCreateSchema,

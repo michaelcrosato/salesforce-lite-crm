@@ -179,7 +179,7 @@ describe("server bulk list selection contracts", () => {
     expect(getBulkListSelectionContract("notes")).toBeNull();
     expect(() =>
       getBulkListSelectionContractCatalog({ includeRows: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeRows'");
+    ).toThrow(/Unrecognized key: .*includeRows/);
     expect(await currentCounts()).toEqual(countsBefore);
   });
 });

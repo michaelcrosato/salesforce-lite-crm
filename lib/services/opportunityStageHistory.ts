@@ -1,5 +1,5 @@
 import type { OpportunityStageHistory, Prisma } from "@prisma/client";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import {
   idSchema,

@@ -327,7 +327,7 @@ describe("AI action review packets", () => {
         code: "proposal_invalid",
         severity: "error",
         path: "root",
-        message: "Unrecognized key(s) in object: 'executeNow'"
+        message: 'Unrecognized key: "executeNow"'
       }
     ]);
     expect(packet.reviewResult).toMatchObject({

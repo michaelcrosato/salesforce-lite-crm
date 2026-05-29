@@ -238,7 +238,7 @@ describe("server list filter support catalog", () => {
     expect(getListFilterSupportEntityCatalog("notes")).toBeNull();
     expect(() =>
       getListFilterSupportCatalog({ includeUnsupported: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeUnsupported'");
+    ).toThrow(/Unrecognized key: .*includeUnsupported/);
     expect(await currentCounts()).toEqual(countsBefore);
   });
 });

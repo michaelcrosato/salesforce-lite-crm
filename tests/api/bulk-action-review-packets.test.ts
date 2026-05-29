@@ -255,7 +255,7 @@ describe("server bulk action dry-run review packets", () => {
         taskTitle: "Follow up",
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
     expect(await prisma.task.count()).toBe(taskCountBefore);
   });
 });

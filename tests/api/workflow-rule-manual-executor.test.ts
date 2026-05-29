@@ -343,7 +343,7 @@ describe("server workflow rule manual executor", () => {
           actorUserId
         }
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'execute'");
+    ).rejects.toThrow(/Unrecognized key: .*execute/);
 
     expect(notification.status).toBe("blocked");
     expect(notification.summary).toMatchObject({

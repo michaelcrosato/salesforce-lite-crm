@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const APPROVAL_POLICY_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;

@@ -176,7 +176,7 @@ describe("server bulk action selected export packets", () => {
         recordIds: [contactAId],
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
     expect(await prisma.auditEvent.count()).toBe(auditCountBefore);
   });
 });

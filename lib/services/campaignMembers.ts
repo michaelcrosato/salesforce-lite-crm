@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
 import {
@@ -16,7 +16,7 @@ const campaignMemberAvailabilitySearchSchema = z.preprocess((value) => {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
-}, z.string().optional());
+}, z.string().optional()).optional();
 
 const campaignMemberAvailabilitySchema = z
   .object({

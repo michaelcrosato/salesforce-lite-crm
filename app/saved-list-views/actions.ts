@@ -3,7 +3,7 @@
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   createSavedListView,
   deleteSavedListView,
@@ -15,7 +15,7 @@ import {
 } from "@/lib/server/listFilterSupportCatalog";
 
 const sortOrderSchema = z.enum(["asc", "desc"]);
-const filtersSchema = z.record(z.string());
+const filtersSchema = z.record(z.string(), z.string());
 
 const savedViewCreateFormSchema = z.object({
   entity: z.string().trim().min(1),

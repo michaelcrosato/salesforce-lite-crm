@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   WORKFLOW_RULE_CATALOG_CONTENT_TYPE,
   WORKFLOW_RULE_CATALOG_VERSION,

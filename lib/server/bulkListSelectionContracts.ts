@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   BULK_ACTION_DRY_RUN_ACTIONS,
   BULK_ACTION_DRY_RUN_MAX_RECORDS,

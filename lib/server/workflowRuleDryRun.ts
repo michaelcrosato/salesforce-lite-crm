@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import {
   WORKFLOW_RULE_ACTIONS,

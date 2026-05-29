@@ -231,7 +231,7 @@ describe("AI action intent registry", () => {
       ["lead.status.update", "email.draft", "email.send", "lead.routing.assign"]
     );
     expect(() => getAiActionIntentRegistry({ execute: true })).toThrow(
-      "Unrecognized key(s) in object: 'execute'"
+      /Unrecognized key: .*execute/
     );
     expect(registry.source.routeScope).not.toContain("/search");
     expect(registry.source.routeScope).not.toContain("/command-palette");

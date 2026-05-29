@@ -1,5 +1,5 @@
 import type { AuditEvent, Contact, Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { prisma } from "@/lib/prisma";
 import {
   CSV_IMPORT_APPLY_CAPABILITY_CONTENT_TYPE,

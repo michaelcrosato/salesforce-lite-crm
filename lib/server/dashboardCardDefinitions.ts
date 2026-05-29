@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { EXCLUDED_ROUTES, FEATURE_FLAGS } from "@/lib/featureFlags";
 import {
   SAVED_REPORT_CHART_TYPES,

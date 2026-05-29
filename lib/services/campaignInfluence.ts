@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { isOpenDealStage, stageSortIndex } from "@/lib/business/deals";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";

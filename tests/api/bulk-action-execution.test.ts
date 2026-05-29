@@ -343,7 +343,7 @@ describe("server bulk action execution", () => {
         targetStatus: "paused",
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
 
     const account = await prisma.account.findUniqueOrThrow({
       where: { id: activeAccountId },

@@ -12,7 +12,7 @@ import {
   contactCreateSchema,
   leadCreateSchema
 } from "@/lib/validation";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 
 export type CsvImportPreflightDiagnosticCategory =
   | "duplicate"
@@ -349,7 +349,7 @@ function summarizeActions(rows: readonly CsvImportPreflightRow[]): CsvImportActi
 
 function validRowsForSchema<TData extends ImportPersonData>(
   rows: readonly CsvImportPreflightRow[],
-  schema: z.ZodType<TData, z.ZodTypeDef, unknown>
+  schema: z.ZodType<TData>
 ): ValidPreflightRow<TData>[] {
   const validRows: ValidPreflightRow<TData>[] = [];
 

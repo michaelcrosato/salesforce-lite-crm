@@ -146,7 +146,7 @@ describe("routing simulator input contracts", () => {
     });
     expect(() =>
       getRoutingSimulatorInputCatalog({ includeAssignments: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeAssignments'");
+    ).toThrow(/Unrecognized key: .*includeAssignments/);
   });
 
   it("normalizes hypothetical lead inputs without evaluating assignments", () => {
@@ -284,7 +284,7 @@ describe("routing simulator input contracts", () => {
           }
         ]
       })
-    ).toThrow("Unrecognized key(s) in object: 'assignedOrderId'");
+    ).toThrow(/Unrecognized key: .*assignedOrderId/);
     expect(() =>
       validateRoutingSimulatorInputDraft({
         leads: Array.from({ length: ROUTING_SIMULATOR_MAX_BATCH_SIZE + 1 }, () => ({

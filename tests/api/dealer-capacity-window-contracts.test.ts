@@ -158,7 +158,7 @@ describe("dealer capacity window contracts", () => {
     });
     expect(() =>
       getDealerCapacityWindowCatalog({ includeLiveCapacity: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeLiveCapacity'");
+    ).toThrow(/Unrecognized key: .*includeLiveCapacity/);
   });
 
   it("normalizes hypothetical capacity windows without evaluating routing", () => {
@@ -348,7 +348,7 @@ describe("dealer capacity window contracts", () => {
           }
         ]
       })
-    ).toThrow("Unrecognized key(s) in object: 'liveRouting'");
+    ).toThrow(/Unrecognized key: .*liveRouting/);
     expect(() =>
       validateDealerCapacityWindowDraft({
         windows: [

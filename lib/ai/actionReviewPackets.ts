@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   AI_ACTION_INTENT_REGISTRY_VERSION,
   AI_ACTION_INTENT_SUPPORTED_IDS,
@@ -500,9 +500,9 @@ function snapshotInvalidProposal(
   input: unknown,
   intentId: string | null
 ): AiActionReviewProposalSnapshot {
-  const recordResult = z.record(z.unknown()).safeParse(input);
+  const recordResult = z.record(z.string(), z.unknown()).safeParse(input);
   const payloadResult = recordResult.success
-    ? z.record(z.unknown()).safeParse(recordResult.data.payload)
+    ? z.record(z.string(), z.unknown()).safeParse(recordResult.data.payload)
     : { success: false } as const;
 
   return {
@@ -626,7 +626,7 @@ function buildUnknownIntentIssue(
 }
 
 function extractIntentId(input: unknown): string | null {
-  const recordResult = z.record(z.unknown()).safeParse(input);
+  const recordResult = z.record(z.string(), z.unknown()).safeParse(input);
 
   if (!recordResult.success) {
     return null;

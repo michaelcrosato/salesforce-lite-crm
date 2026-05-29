@@ -175,7 +175,7 @@ describe("dashboard card definition contracts", () => {
     expect(getDashboardCardMutationAuditContract("refresh")).toBeNull();
     expect(() =>
       getDashboardCardDefinitionCatalog({ includeRoutes: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeRoutes'");
+    ).toThrow(/Unrecognized key: .*includeRoutes/);
   });
 
   it("validates and normalizes dashboard card drafts", () => {

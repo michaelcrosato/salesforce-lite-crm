@@ -229,7 +229,7 @@ describe("server audit coverage manifests", () => {
     expect(getAuditCoverageEntityManifest("account")).toBeNull();
     expect(() =>
       getAuditCoverageManifest({ includeTelemetry: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeTelemetry'");
+    ).toThrow(/Unrecognized key: .*includeTelemetry/);
     expect(await currentCounts()).toEqual(countsBefore);
   });
 });

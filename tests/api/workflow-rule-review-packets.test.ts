@@ -221,7 +221,7 @@ describe("server workflow rule review packets", () => {
         actions: [{ action: "draft_status_update", targetValue: "paused" }],
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
 
     const packet = await getWorkflowRuleReviewPacket({
       entity: "opportunities",

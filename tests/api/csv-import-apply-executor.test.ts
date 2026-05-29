@@ -279,7 +279,7 @@ describe("server CSV contact import apply executor", () => {
           actorUserId
         }
       })
-    ).rejects.toThrow("invalid_literal");
+    ).rejects.toThrow("invalid_value");
     await expect(
       executeCsvContactImportApply({
         entity: "contacts",
@@ -290,7 +290,7 @@ describe("server CSV contact import apply executor", () => {
           actorUserId
         }
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'execute'");
+    ).rejects.toThrow(/Unrecognized key: .*execute/);
     await expect(
       executeCsvContactImportApply({
         entity: "contacts",
@@ -301,7 +301,7 @@ describe("server CSV contact import apply executor", () => {
           persistApproval: true
         }
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'persistApproval'");
+    ).rejects.toThrow(/Unrecognized key: .*persistApproval/);
 
     expect(await currentCounts()).toEqual(countsBefore);
   });

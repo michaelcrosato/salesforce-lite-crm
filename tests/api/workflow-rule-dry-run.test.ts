@@ -281,7 +281,7 @@ describe("server workflow rule dry-run evaluator", () => {
         actions: [{ action: "draft_status_update", targetValue: "paused" }],
         limit: WORKFLOW_RULE_DRY_RUN_MAX_MATCHES + 1
       })
-    ).rejects.toThrow("Number must be less than or equal to 25");
+    ).rejects.toThrow("Too big: expected number to be <=25");
     await expect(
       dryRunWorkflowRule({
         entity: "accounts",
@@ -289,7 +289,7 @@ describe("server workflow rule dry-run evaluator", () => {
         actions: [{ action: "draft_status_update", targetValue: "paused" }],
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
     expect(await currentCounts()).toEqual(countsBefore);
   });
 });

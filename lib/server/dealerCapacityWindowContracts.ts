@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   ROUTING_SIMULATOR_INPUT_CONTENT_TYPE,
   ROUTING_SIMULATOR_INPUT_VERSION,

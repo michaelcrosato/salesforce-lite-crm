@@ -1,6 +1,6 @@
 import { parseCsv } from "@/lib/business/csv-import";
 import { contactCreateSchema, leadCreateSchema } from "@/lib/validation";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 
 export const CSV_IMPORT_PREVIEW_ENTITIES = ["contacts", "leads"] as const;
 export const CSV_IMPORT_PREVIEW_DEFAULT_LIMIT = 100;

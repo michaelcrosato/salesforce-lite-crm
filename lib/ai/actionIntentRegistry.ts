@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
 
 export const AI_ACTION_INTENT_CONTENT_TYPE =
@@ -252,7 +252,7 @@ export const aiActionIntentProposalSchema = z
   .object({
     intentId: aiActionIntentIdSchema,
     target: aiActionIntentProposalTargetSchema,
-    payload: z.record(z.unknown()).default({}),
+    payload: z.record(z.string(), z.unknown()).default({}),
     rationale: z.string().trim().min(1),
     provenance: z.array(aiActionIntentProposalProvenanceSchema).default([])
   })

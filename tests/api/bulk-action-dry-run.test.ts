@@ -270,7 +270,7 @@ describe("server bulk action dry-run contracts", () => {
         taskTitle: "Follow up",
         apply: true
       })
-    ).rejects.toThrow("Unrecognized key(s) in object: 'apply'");
+    ).rejects.toThrow(/Unrecognized key: .*apply/);
 
     await expect(
       dryRunBulkAction({
@@ -279,7 +279,7 @@ describe("server bulk action dry-run contracts", () => {
         recordIds: [activeAccountId],
         taskTitle: ""
       })
-    ).rejects.toThrow("String must contain at least 1 character(s)");
+    ).rejects.toThrow("Too small: expected string to have >=1 characters");
     expect(await prisma.task.count()).toBe(taskCountBefore);
   });
 });

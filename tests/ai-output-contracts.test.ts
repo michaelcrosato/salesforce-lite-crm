@@ -42,7 +42,9 @@ describe("deterministic AI output contracts", () => {
       ok: false,
       data: null
     });
-    expect(invalid.issues).toContain("nextStep: Required");
+    expect(invalid.issues).toContain(
+      "nextStep: Invalid input: expected string, received undefined"
+    );
   });
 
   it("validates analyst panel outputs and reports nested invalid actions", () => {
@@ -100,7 +102,9 @@ describe("deterministic AI output contracts", () => {
       ok: false,
       data: null
     });
-    expect(invalid.issues).toContain("actions.0.title: Required");
+    expect(invalid.issues).toContain(
+      "actions.0.title: Invalid input: expected string, received undefined"
+    );
   });
 
   it("validates case knowledge packets and rejects external sources", () => {
@@ -154,7 +158,7 @@ describe("deterministic AI output contracts", () => {
       data: null
     });
     expect(invalid.issues).toContain(
-      'source: Invalid literal value, expected "local_case_article_metadata"'
+      'source: Invalid input: expected "local_case_article_metadata"'
     );
   });
 });

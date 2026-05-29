@@ -132,7 +132,7 @@ describe("deterministic AI run receipts", () => {
     expect(receipt.validation).toEqual({
       status: "invalid",
       issueCount: 1,
-      issues: ["nextStep: Required"]
+      issues: ["nextStep: Invalid input: expected string, received undefined"]
     });
     expect(receipt.provider.external).toBe(false);
     expect(receipt.provider.tokens.total).toBe(0);

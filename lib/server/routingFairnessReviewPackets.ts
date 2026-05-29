@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AssignmentReason } from "@/lib/crm-constants";
 import {
   ROUTING_FAIRNESS_METRIC_CONTENT_TYPE,

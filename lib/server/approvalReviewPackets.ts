@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   APPROVAL_POLICY_BLOCKED_SUBJECT_IDS,
   APPROVAL_POLICY_CONTENT_TYPE,
@@ -247,7 +247,7 @@ export type ApprovalReviewPacketAudit = {
   readonly issues: readonly string[];
 };
 
-const unknownRecordSchema = z.record(z.unknown());
+const unknownRecordSchema = z.record(z.string(), z.unknown());
 
 const requestedCapabilitiesSchema = z
   .object({
@@ -265,7 +265,7 @@ const requestedCapabilitiesSchema = z
     dealerOrderAreaCrud: z.boolean().default(false)
   })
   .strict()
-  .default({});
+  .prefault({});
 
 const approvalReviewEvidenceSchema = z
   .object({

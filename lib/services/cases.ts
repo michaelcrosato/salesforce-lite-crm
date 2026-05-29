@@ -1,5 +1,5 @@
 import type { Case, Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   CASE_STATUSES,
   type CaseQueueKey,

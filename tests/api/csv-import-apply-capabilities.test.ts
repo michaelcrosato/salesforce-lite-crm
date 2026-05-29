@@ -204,7 +204,7 @@ describe("server CSV import apply capabilities", () => {
 
     expect(() =>
       getCsvImportApplyCapabilityMatrix({ apply: true })
-    ).toThrow("Unrecognized key(s) in object: 'apply'");
+    ).toThrow(/Unrecognized key: .*apply/);
     expect(getCsvImportApplyEntityCapability("accounts")).toBeNull();
     expect(getCsvImportApplyEntityCapability("opportunities")).toBeNull();
     expect(

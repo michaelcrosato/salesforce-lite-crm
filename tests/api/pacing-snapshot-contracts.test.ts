@@ -202,7 +202,7 @@ describe("pacing snapshot contracts", () => {
     });
     expect(() =>
       getPacingSnapshotCatalog({ includeLiveSnapshots: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeLiveSnapshots'");
+    ).toThrow(/Unrecognized key: .*includeLiveSnapshots/);
   });
 
   it("normalizes read-only snapshot inputs without building snapshots", () => {
@@ -382,7 +382,7 @@ describe("pacing snapshot contracts", () => {
           }
         ]
       })
-    ).toThrow("Unrecognized key(s) in object: 'persistSnapshot'");
+    ).toThrow(/Unrecognized key: .*persistSnapshot/);
     expect(() =>
       validatePacingSnapshotDraft({
         requests: Array.from({ length: PACING_SNAPSHOT_MAX_REQUESTS + 1 }, () => ({

@@ -9,7 +9,7 @@ import type {
   Lead,
   Task
 } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   listAccounts,
   listActivities,

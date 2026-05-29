@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   AUDIT_ENTITY_TYPES,
   AUDIT_EVENT_ACTIONS,

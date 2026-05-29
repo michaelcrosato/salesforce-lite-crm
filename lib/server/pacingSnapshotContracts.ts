@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const PACING_SNAPSHOT_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;

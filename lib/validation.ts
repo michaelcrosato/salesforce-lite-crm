@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   ACCOUNT_STATUSES,
   ACTIVITY_TYPES,
@@ -26,7 +26,7 @@ const optionalText = z.preprocess((value) => {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
-}, z.string().optional());
+}, z.string().optional()).optional();
 
 const optionalDate = z.preprocess((value) => {
   if (value instanceof Date) {
@@ -42,7 +42,7 @@ const optionalDate = z.preprocess((value) => {
   }
 
   return new Date(value);
-}, z.date().optional());
+}, z.date().optional()).optional();
 
 const requiredDate = (message: string) =>
   z.preprocess(
@@ -61,7 +61,7 @@ const requiredDate = (message: string) =>
 
       return new Date(value);
     },
-    z.date({ required_error: message, invalid_type_error: message })
+    z.date({ error: message })
   );
 
 export const accountStatusSchema = z.enum(ACCOUNT_STATUSES);
@@ -87,23 +87,25 @@ const blankStringToUndefined = (value: unknown) =>
 const optionalPostalCode = z.preprocess(
   blankStringToUndefined,
   postalCodeSchema.optional()
-);
+).optional();
 
 const optionalCaseQueueKey = z.preprocess(
   blankStringToUndefined,
   caseQueueKeySchema.optional()
-);
+).optional();
 
 const requiredInteger = (
   message: string,
-  refine: (schema: z.ZodNumber) => z.ZodNumber = (schema) => schema
+  refine: (
+    schema: ReturnType<typeof z.coerce.number>
+  ) => ReturnType<typeof z.coerce.number> = (schema) => schema
 ) =>
   z.preprocess(
     blankStringToUndefined,
     refine(
       z.coerce
         .number({
-          invalid_type_error: message
+          error: message
         })
         .int(message)
     )
@@ -114,12 +116,12 @@ const optionalNonNegativeInteger = (message: string) =>
     blankStringToUndefined,
     z.coerce
       .number({
-        invalid_type_error: message
+        error: message
       })
       .int(message)
       .min(0, message)
       .optional()
-  );
+  ).optional();
 
 export const accountFormSchema = z.object({
   name: z.string().trim().min(1, "Account name is required."),
@@ -142,7 +144,7 @@ export const contactFormSchema = z.object({
   accountId: optionalText,
   firstName: z.string().trim().min(1, "First name is required."),
   lastName: z.string().trim().min(1, "Last name is required."),
-  email: optionalText.pipe(z.string().email("Enter a valid email.").optional()),
+  email: optionalText.pipe(z.string().email("Enter a valid email.").optional()).optional(),
   phone: optionalText,
   title: optionalText,
   status: contactStatusSchema
@@ -182,7 +184,7 @@ export const leadFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required."),
   lastName: z.string().trim().min(1, "Last name is required."),
   phone: optionalText,
-  email: optionalText.pipe(z.string().email("Enter a valid email.").optional()),
+  email: optionalText.pipe(z.string().email("Enter a valid email.").optional()).optional(),
   postalCode: optionalPostalCode,
   province: optionalText,
   source: optionalText
@@ -230,7 +232,9 @@ export const leadCreateSchema = leadFormSchema.extend({
   assignedOrderId: optionalText,
   assignmentReason: optionalText
 });
-export const leadUpdateSchema = leadCreateSchema.partial();
+export const leadUpdateSchema = leadCreateSchema.partial().extend({
+  status: leadStatusSchema.optional()
+});
 
 export const activityCreateSchema = z.object({
   accountId: optionalText,
@@ -289,7 +293,10 @@ export const taskCreateSchema = z.object({
   dealId: optionalText,
   leadId: optionalText
 });
-export const taskUpdateSchema = taskCreateSchema.partial();
+export const taskUpdateSchema = taskCreateSchema.partial().extend({
+  status: taskStatusSchema.optional(),
+  priority: taskPrioritySchema.optional()
+});
 
 export const caseCreateSchema = z.object({
   subject: z.string().trim().min(1, "Case subject is required."),
@@ -301,7 +308,10 @@ export const caseCreateSchema = z.object({
   contactId: optionalText,
   ownerId: optionalText
 });
-export const caseUpdateSchema = caseCreateSchema.partial();
+export const caseUpdateSchema = caseCreateSchema.partial().extend({
+  status: caseStatusSchema.optional(),
+  priority: casePrioritySchema.optional()
+});
 
 export const knowledgeArticleCreateSchema = z.object({
   title: z.string().trim().min(1, "Knowledge article title is required."),
@@ -315,8 +325,13 @@ export const knowledgeArticleCreateSchema = z.object({
   ownerId: optionalText,
   publishedAt: optionalDate
 });
-export const knowledgeArticleUpdateSchema =
-  knowledgeArticleCreateSchema.partial();
+export const knowledgeArticleUpdateSchema = knowledgeArticleCreateSchema
+  .partial()
+  .extend({
+    status: knowledgeArticleStatusSchema.optional(),
+    audience: knowledgeArticleAudienceSchema.optional(),
+    keywords: optionalText
+  });
 
 export const campaignCreateSchema = z.object({
   name: z.string().trim().min(1, "Campaign name is required."),
@@ -331,7 +346,9 @@ export const campaignCreateSchema = z.object({
   leadIds: z.array(idSchema).optional(),
   contactIds: z.array(idSchema).optional()
 });
-export const campaignUpdateSchema = campaignCreateSchema.partial();
+export const campaignUpdateSchema = campaignCreateSchema.partial().extend({
+  status: campaignStatusSchema.optional()
+});
 
 export function isDealStage(
   value: string

@@ -261,7 +261,7 @@ describe("saved report definition contracts", () => {
     expect(getSavedReportEntityDefinition("notes")).toBeNull();
     expect(() =>
       getSavedReportDefinitionCatalog({ includeUnsupported: true })
-    ).toThrow("Unrecognized key(s) in object: 'includeUnsupported'");
+    ).toThrow(/Unrecognized key: .*includeUnsupported/);
     expect(() =>
       validateSavedReportDefinitionDraft({
         entity: "notes",

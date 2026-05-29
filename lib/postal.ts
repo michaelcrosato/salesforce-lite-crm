@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const POSTAL_COUNTRIES = ["CA", "US"] as const;
 export type PostalCountry = (typeof POSTAL_COUNTRIES)[number];

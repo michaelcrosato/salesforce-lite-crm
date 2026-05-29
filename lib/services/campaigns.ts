@@ -1,5 +1,5 @@
 import type { Campaign, Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { CAMPAIGN_STATUSES, type CampaignStatus } from "@/lib/crm/registry";
 import { prisma } from "@/lib/prisma";
 import {
