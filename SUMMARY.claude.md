@@ -1,74 +1,60 @@
 Agent: claude
-Mode: high-autonomy blueprint execution (/plan/ specs)
+Mode: high-autonomy AFK-readiness audit (new /goal, supersedes the /plan/ blueprint run)
 Branch: phase-0-quick-wins
-Status: paused at a clean checkpoint — spec 015 shipped; remaining blueprint work is human-gated
-Gate status: PASS — `npx tsc --noEmit` + `npm run test` (562) + `npm run build` + `node scripts/check-reachability.mjs` (20/20), run on HEAD `5250d66`
+Status: AFK-readiness verified — repo was already ~95% agent-ready; fixed doc/gate-fact drift
+Gate status: PASS (verified 2026-05-29, HEAD pre-commit `65e303f`) — `npm run lint` 0 ·
+  `npx tsc --noEmit` 0 · `npm run test` 562/562 (115 files) · `npm run build` 0.
+  `test:e2e` NOT re-run this session (50/50 last verified 2026-05-28, TICKET001).
 Timestamp: 2026-05-29
 
-## What shipped this session — spec 015 (Consolidate agent prompts)
+## Goal this session
 
-Completed the last unattended-eligible blueprint spec. Three commits on
-`phase-0-quick-wins`:
+"Ensure the repo is AFK-ready for autonomous coding agents… do real implementation
+work, fix bugs, update docs. Don't push to remotes. Small, reversible changes."
 
-1. `54590cf` — canonical `prompts/shared/{LOOP,SPRINT-ROLLOVER}.md` (single
-   source) + `scripts/generate-agent-prompts.mjs` (Buffer-based fan-out,
-   byte-identical) + `tests/prompts/agent-prompts.test.ts` (drift guard).
-   `meta/LOOP.md` reconciled to the 4-agent canonical (cosmetic whitespace only).
-2. `5250d66` — retired the 9 stale `prompts/**/Old/` Sprint-4B archives (git
-   retains history; grep-clean). **Committed only after explicit human
-   confirmation** (goal-directive file-deletion gate).
-3. `93c3889` — spec 015 → `[x] Done`; PROGRESS 9→10/24 (Wave 1 2→3/10).
+## Finding: the repo was already AFK-ready
 
-All 6 DoD items met; gate green on the final tree.
+Every named deliverable already exists and is high quality, so this was an
+audit-verify-fix pass, not a build:
+- `GOAL.md`, `docs/ROADMAP.md` (product) + `plan/ROADMAP.md` (24-spec blueprint —
+  distinct, not a dup), `AGENTS.md` (already canonical: Operating Policy, Agent
+  Loop, Command Reference, Merge Path, Completion Criteria), `docs/ai/REPO_MAP.md`,
+  `.aiignore`, `README.md`, `tickets/TICKET001-009` (format already matches the
+  goal's required fields).
+- All 8 `scripts/agent/*.sh` exist and call real targets (`lint.sh`/`typecheck.sh`/
+  `test.sh` → existing `npm run lint`/`typecheck`/`test`). No broken script refs.
+- Windows is covered by the cross-platform `npm run agent:*` scripts +
+  `scripts/local-gate.ps1`; per-script `.ps1` wrappers would be redundant (skipped
+  to avoid gold-plating, per CLAUDE.md §13).
 
-## Key correction to the prior session's classification
+## Changed this session (doc/config accuracy — no code touched)
 
-Last session I filed 015 as "infra-entangled / must edit
-`scripts/autonomy-loop.ps1` → human-attended." **That was wrong.** The DoD
-offers an "…or are generated" path. Choosing the generator keeps the per-agent
-files **on disk**, so the dispatcher (`autonomy-loop.ps1` L699-704 / L889-894:
-`Test-Path` → throw-if-missing → `.Replace("{AGENT}", …)` at dispatch) is
-**never touched** and no dispatch dry-run is needed. The spec was completable
-unattended; only the file-deletion step required a human OK, which was obtained.
+1. **CLAUDE.md §5** — corrected a stale governance contradiction: it claimed
+   "Lint, typecheck… scripts DO NOT exist," but both are in `package.json` and
+   AGENTS.md treats them as gate stages. Now lists `npm run lint` + `npm run
+   typecheck` as valid claims; only `format` is a no-op.
+2. **GOAL.md** — gate line said `test (565/565)`; real verified count on this
+   branch is `562/562`. Updated + honestly dated (lint/tsc/test/build re-verified
+   2026-05-29; e2e 50/50 from 2026-05-28).
+3. **docs/ai/REPO_MAP.md** — `116 files, 565 tests` → `115 files, 562 tests`.
+4. **.env.example** — documented the two optional env vars the code actually reads
+   (`LOG_LEVEL`, `PLAYWRIGHT_PORT`, with real defaults) as commented entries;
+   `DATABASE_URL` unchanged.
 
-## Blueprint state: 10 / 24 done
+Why 565→562: spec 011's CSV-tower retirement on this branch removed tests after
+the 2026-05-28 baseline that the docs were quoting. Verified by running the gate,
+not inferred.
 
-Done: 001, 002, 003, 004, 005, 007, 008, 009, 011 (prior) + **015** (this session).
+## Next action
 
-The blueprint still cannot reach "absolute completion" unattended — the
-remaining critical path is gated on human/admin-only actions:
-
-- **New-dependency approvals** (CLAUDE.md §14): 006, 010, 017, 023 → cascade to
-  018, 020/022/024.
-- **Branch-protection / `enforce_admins` flips** (admin, only-after-green): 013,
-  016 → cascade to 014 and Wave 2.
-- **Spec 012 — confirmed integrity-protected human-gate** (sharpened; see
-  `BLOCKERS.claude.md`): its DoD must edit `vitest.config.ts` + `package.json`,
-  both listed in `scripts/gate-integrity.sha256.json`; `run-codex-yolo-loop.ps1`
-  halts `EXHAUSTED … "Human review required"` on protected-file drift, and the
-  manifest reserves updates for human action. Plus a 3× flake-check of the
-  rewired per-worker-SQLite harness.
-
-Wave 2 (019–024) entirely blocked behind the above.
-
-## Next actions (for the human / next session)
-
-1. **Push + PR (Task #29) — awaiting confirmation.** `phase-0-quick-wins` now
-   holds Phase 0 + spec 011 + spec 015 (clean tree, gate green). Push is
-   shared-state; not done unattended.
-2. **Spec 012 — human-attended:** edit the two integrity-protected files,
-   regenerate `gate-integrity.sha256.json` by deliberate human action, run the
-   3× flake-check of the per-worker-SQLite harness.
-3. **Unblock the dep chain:** approve new-dep promotions 006/010 (then 017/023)
-   → frees 018 → 020/022/024.
-4. **Admin flips when green:** 013 then 016 (014 after 013).
-5. **Owner call:** whether to continue retiring the rest of the CSV tower (order
-   pre-computed in `docs/ai/csv-contract-assessment.md`).
+- Optional: re-run `npm run test:e2e` (heavy; needs `npx playwright install
+  chromium`) to refresh the e2e count on this branch — left to a human, not
+  unattended-critical.
+- Push/PR of `phase-0-quick-wins` remains **awaiting confirmation** (shared-state;
+  the accepted goal says "Don't push to remotes"). Not done.
 
 ## Scope confirmation
 
-- spec 015: `[CROSS-ZONE OK]` narrated — generator/test land in `scripts/` +
-  `tests/` (gemini zone), docs are shared zone, `prompts/**` is unzoned.
-  Single-agent root mode (zones advisory).
-- No schema/seed changes. No new deps. No scope expansion. No forced git. The
-  only deletion (9 `Old/` archives) was human-confirmed. No push.
+Single-agent root mode (zones advisory). No code, schema, or seed changes. No new
+deps. No product-scope expansion. No deletions of tracked files. No push. Edits are
+docs + `.env.example` comments only — all reversible.
