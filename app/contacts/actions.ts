@@ -1,9 +1,8 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { deterministicActivitySummarizer } from "@/lib/ai/activitySummarizer";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { contactFormSchema, noteFormSchema } from "@/lib/validation";
 
@@ -16,17 +15,6 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
-}
-
-function prismaErrorMessage(error: unknown) {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    return "A record with that unique value already exists.";
-  }
-
-  return "The record could not be saved.";
 }
 
 export async function createContactAction(
@@ -70,10 +58,11 @@ export async function createContactAction(
       message: "Contact created."
     };
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "createContact",
+      entity: "contact",
+      fallbackMessage: "The record could not be saved."
+    });
   }
 }
 
@@ -123,10 +112,11 @@ export async function updateContactAction(
       message: "Contact updated."
     };
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "updateContact",
+      entity: "contact",
+      fallbackMessage: "The record could not be saved."
+    });
   }
 }
 

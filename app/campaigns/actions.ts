@@ -1,9 +1,8 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import {
   completeCampaign,
   createCampaign,
@@ -39,7 +38,7 @@ function buildRawInput(formData: FormData) {
   };
 }
 
-function failureFrom(error: unknown): ActionResult {
+function failureFrom(error: unknown, action: string): ActionResult {
   if (error instanceof z.ZodError) {
     return {
       ok: false,
@@ -48,20 +47,14 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    return {
-      ok: false,
-      message: "A record with that unique value already exists."
-    };
-  }
-
-  return { ok: false, message: "The campaign could not be saved." };
+  return actionErrorResult(error, {
+    action,
+    entity: "campaign",
+    fallbackMessage: "The campaign could not be saved."
+  });
 }
 
-function memberFailureFrom(error: unknown): ActionResult {
+function memberFailureFrom(error: unknown, action: string): ActionResult {
   if (error instanceof z.ZodError) {
     return {
       ok: false,
@@ -70,7 +63,11 @@ function memberFailureFrom(error: unknown): ActionResult {
     };
   }
 
-  return { ok: false, message: "Campaign members could not be updated." };
+  return actionErrorResult(error, {
+    action,
+    entity: "campaignMember",
+    fallbackMessage: "Campaign members could not be updated."
+  });
 }
 
 function revalidateAll(): void {
@@ -130,7 +127,7 @@ export async function createCampaignAction(
     revalidateAll();
     return { ok: true, message: "Campaign created." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "createCampaign");
   }
 }
 
@@ -155,7 +152,7 @@ export async function updateCampaignAction(
     revalidateAll();
     return { ok: true, message: "Campaign updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateCampaign");
   }
 }
 
@@ -180,7 +177,7 @@ export async function updateCampaignStatusAction(
     revalidateAll();
     return { ok: true, message: "Campaign status updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateCampaignStatus");
   }
 }
 
@@ -192,7 +189,7 @@ export async function deleteCampaignAction(
     revalidateAll();
     return { ok: true, message: "Campaign deleted." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "deleteCampaign");
   }
 }
 
@@ -220,7 +217,7 @@ export async function addCampaignMemberAction(
     revalidateAll();
     return { ok: true, message: "Campaign member added." };
   } catch (error) {
-    return memberFailureFrom(error);
+    return memberFailureFrom(error, "addCampaignMember");
   }
 }
 
@@ -249,6 +246,6 @@ export async function removeCampaignMemberAction(
     revalidateAll();
     return { ok: true, message: "Campaign member removed." };
   } catch (error) {
-    return memberFailureFrom(error);
+    return memberFailureFrom(error, "removeCampaignMember");
   }
 }

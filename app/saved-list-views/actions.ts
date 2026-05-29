@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod/v4";
+import { logActionError } from "@/lib/action-result";
 import {
   createSavedListView,
   deleteSavedListView,
@@ -145,6 +146,10 @@ export async function createSavedListViewAction(
     revalidatePath(route);
     viewId = created.id;
   } catch (error) {
+    logActionError(error, {
+      action: "createSavedListView",
+      entity: "savedListView"
+    });
     redirectTo(fallbackRoute, "error", {
       errorCode: savedViewErrorCode(error)
     });
@@ -173,6 +178,10 @@ export async function updateSavedListViewAction(
     revalidatePath(route);
     viewId = updated.id;
   } catch (error) {
+    logActionError(error, {
+      action: "updateSavedListView",
+      entity: "savedListView"
+    });
     redirectTo(fallbackRoute, "error", {
       errorCode: savedViewErrorCode(error)
     });
@@ -194,6 +203,10 @@ export async function deleteSavedListViewAction(
 
     revalidatePath(route);
   } catch (error) {
+    logActionError(error, {
+      action: "deleteSavedListView",
+      entity: "savedListView"
+    });
     redirectTo(fallbackRoute, "error", {
       errorCode: savedViewErrorCode(error)
     });

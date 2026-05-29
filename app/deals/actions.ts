@@ -1,8 +1,7 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
@@ -22,13 +21,6 @@ function fieldErrors(error: {
 
 function closeDateFromForm(value: string | undefined) {
   return value ? new Date(`${value}T12:00:00`) : null;
-}
-
-function prismaErrorMessage(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return "A record with that unique value already exists.";
-  }
-  return "The deal could not be saved.";
 }
 
 export async function createDealAction(formData: FormData): Promise<ActionResult> {
@@ -82,10 +74,11 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
       },
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "createDeal",
+      entity: "deal",
+      fallbackMessage: "The deal could not be saved."
+    });
   }
 
   revalidatePath("/deals");
@@ -184,10 +177,11 @@ export async function updateDealAction(
       }
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "updateDeal",
+      entity: "deal",
+      fallbackMessage: "The deal could not be saved."
+    });
   }
 
   revalidatePath("/deals");
@@ -273,10 +267,11 @@ export async function moveDealAction(input: {
       })
     ]);
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "moveDeal",
+      entity: "deal",
+      fallbackMessage: "The deal could not be saved."
+    });
   }
 
   revalidatePath("/deals");

@@ -1,8 +1,7 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { ASSIGNMENT_REASON_LABELS, type AssignmentReason } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
 import { routeLead } from "@/lib/routing/leadRouter";
@@ -17,13 +16,6 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
-}
-
-function prismaErrorMessage(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return "A record with that unique value already exists.";
-  }
-  return "The lead could not be saved.";
 }
 
 export async function createLeadAction(formData: FormData): Promise<ActionResult> {
@@ -65,10 +57,11 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
       }
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "createLead",
+      entity: "lead",
+      fallbackMessage: "The lead could not be saved."
+    });
   }
 
   const routeResult = await routeLead(lead.id);
@@ -110,10 +103,11 @@ export async function updateLeadStatusAction(input: {
       }
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "updateLeadStatus",
+      entity: "lead",
+      fallbackMessage: "The lead could not be saved."
+    });
   }
 
   revalidateDealerOpsPaths();

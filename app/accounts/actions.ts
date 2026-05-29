@@ -1,8 +1,7 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { accountFormSchema } from "@/lib/validation";
 
@@ -15,13 +14,6 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
-}
-
-function prismaErrorMessage(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-    return "A record with that unique value already exists.";
-  }
-  return "The account could not be saved.";
 }
 
 export async function createAccountAction(formData: FormData): Promise<ActionResult> {
@@ -58,10 +50,11 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
       }
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "createAccount",
+      entity: "account",
+      fallbackMessage: "The account could not be saved."
+    });
   }
 
   revalidatePath("/accounts");
@@ -113,10 +106,11 @@ export async function updateAccountAction(
       }
     });
   } catch (error) {
-    return {
-      ok: false,
-      message: prismaErrorMessage(error)
-    };
+    return actionErrorResult(error, {
+      action: "updateAccount",
+      entity: "account",
+      fallbackMessage: "The account could not be saved."
+    });
   }
 
   revalidatePath("/accounts");

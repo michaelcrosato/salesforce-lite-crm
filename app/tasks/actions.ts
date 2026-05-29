@@ -1,9 +1,8 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import {
   completeTask,
   createTask,
@@ -33,7 +32,7 @@ function buildRawInput(formData: FormData) {
   };
 }
 
-function failureFrom(error: unknown): ActionResult {
+function failureFrom(error: unknown, action: string): ActionResult {
   if (error instanceof z.ZodError) {
     return {
       ok: false,
@@ -42,17 +41,11 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    return {
-      ok: false,
-      message: "A record with that unique value already exists."
-    };
-  }
-
-  return { ok: false, message: "The task could not be saved." };
+  return actionErrorResult(error, {
+    action,
+    entity: "task",
+    fallbackMessage: "The task could not be saved."
+  });
 }
 
 function revalidateAll(): void {
@@ -79,7 +72,7 @@ export async function createTaskAction(
     revalidateAll();
     return { ok: true, message: "Task created." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "createTask");
   }
 }
 
@@ -102,7 +95,7 @@ export async function updateTaskAction(
     revalidateAll();
     return { ok: true, message: "Task updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateTask");
   }
 }
 
@@ -127,7 +120,7 @@ export async function updateTaskStatusAction(
     revalidateAll();
     return { ok: true, message: "Task status updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateTaskStatus");
   }
 }
 
@@ -137,6 +130,6 @@ export async function deleteTaskAction(taskId: string): Promise<ActionResult> {
     revalidateAll();
     return { ok: true, message: "Task deleted." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "deleteTask");
   }
 }

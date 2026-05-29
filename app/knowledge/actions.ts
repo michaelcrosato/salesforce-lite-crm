@@ -1,9 +1,8 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import {
   archiveKnowledgeArticle,
   createKnowledgeArticle,
@@ -34,7 +33,7 @@ function buildRawInput(formData: FormData) {
   };
 }
 
-function failureFrom(error: unknown): ActionResult {
+function failureFrom(error: unknown, action: string): ActionResult {
   if (error instanceof z.ZodError) {
     return {
       ok: false,
@@ -43,23 +42,14 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === "P2002") {
-      return {
-        ok: false,
-        message: "A record with that unique value already exists."
-      };
+  return actionErrorResult(error, {
+    action,
+    entity: "knowledgeArticle",
+    fallbackMessage: "The knowledge article could not be saved.",
+    knownCodes: {
+      P2025: "The knowledge article could not be found."
     }
-
-    if (error.code === "P2025") {
-      return {
-        ok: false,
-        message: "The knowledge article could not be found."
-      };
-    }
-  }
-
-  return { ok: false, message: "The knowledge article could not be saved." };
+  });
 }
 
 function revalidateKnowledgeSurfaces(): void {
@@ -85,7 +75,7 @@ export async function createKnowledgeArticleAction(
     revalidateKnowledgeSurfaces();
     return { ok: true, message: "Article created." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "createKnowledgeArticle");
   }
 }
 
@@ -108,7 +98,7 @@ export async function updateKnowledgeArticleAction(
     revalidateKnowledgeSurfaces();
     return { ok: true, message: "Article updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateKnowledgeArticle");
   }
 }
 
@@ -120,7 +110,7 @@ export async function publishKnowledgeArticleAction(
     revalidateKnowledgeSurfaces();
     return { ok: true, message: "Article published." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "publishKnowledgeArticle");
   }
 }
 
@@ -132,6 +122,6 @@ export async function archiveKnowledgeArticleAction(
     revalidateKnowledgeSurfaces();
     return { ok: true, message: "Article archived." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "archiveKnowledgeArticle");
   }
 }

@@ -1,9 +1,8 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
-import type { ActionResult } from "@/lib/action-result";
+import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import {
   createCase,
   deleteCase,
@@ -31,7 +30,7 @@ function buildRawInput(formData: FormData) {
   };
 }
 
-function failureFrom(error: unknown): ActionResult {
+function failureFrom(error: unknown, action: string): ActionResult {
   if (error instanceof z.ZodError) {
     return {
       ok: false,
@@ -40,17 +39,11 @@ function failureFrom(error: unknown): ActionResult {
     };
   }
 
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    return {
-      ok: false,
-      message: "A record with that unique value already exists."
-    };
-  }
-
-  return { ok: false, message: "The case could not be saved." };
+  return actionErrorResult(error, {
+    action,
+    entity: "case",
+    fallbackMessage: "The case could not be saved."
+  });
 }
 
 function revalidateAll(): void {
@@ -76,7 +69,7 @@ export async function createCaseAction(
     revalidateAll();
     return { ok: true, message: "Case created." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "createCase");
   }
 }
 
@@ -99,7 +92,7 @@ export async function updateCaseAction(
     revalidateAll();
     return { ok: true, message: "Case updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateCase");
   }
 }
 
@@ -125,7 +118,7 @@ export async function updateCaseStatusAction(
     revalidateAll();
     return { ok: true, message: "Case status updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateCaseStatus");
   }
 }
 
@@ -144,7 +137,7 @@ export async function updateCaseQueueAction(
     revalidateAll();
     return { ok: true, message: "Case queue updated." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "updateCaseQueue");
   }
 }
 
@@ -154,6 +147,6 @@ export async function deleteCaseAction(caseId: string): Promise<ActionResult> {
     revalidateAll();
     return { ok: true, message: "Case deleted." };
   } catch (error) {
-    return failureFrom(error);
+    return failureFrom(error, "deleteCase");
   }
 }
