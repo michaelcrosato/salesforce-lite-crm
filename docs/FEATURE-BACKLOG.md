@@ -141,9 +141,12 @@ in `PLAN.md` section 16 and `docs/ROADMAP.md`.
 | S54-F1 | Routing fairness metric contracts | Codex | done |
 | S54-F2 | Routing fairness review packets | Codex | done |
 | S54-F3 | Routing fairness operator surface | Codex | done |
-| S55-F1 | Dealer capacity window contracts | Codex | queued |
-| S55-F2 | Capacity-aware routing simulation evaluator | Codex | queued |
-| S55-F3 | Capacity window operator surface | Codex | queued |
+| S55-F1 | Dealer capacity window contracts | Codex | done |
+| S55-F2 | Capacity-aware routing simulation evaluator | Codex | done |
+| S55-F3 | Capacity window operator surface | Codex | done |
+| S56-F1 | Pacing snapshot contracts | Codex | queued |
+| S56-F2 | Read-only pacing snapshot builder | Codex | queued |
+| S56-F3 | Pacing snapshot review packets | Codex | queued |
 
 The implemented app-router surface includes `/tasks`, `/tasks/new`, `/cases`,
 `/cases/new`, `/campaigns`, `/campaigns/new`, `/reports`, and
