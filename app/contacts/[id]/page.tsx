@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddNoteForm } from "@/components/add-note-form";
-import { ActivityTimeline } from "@/components/activity-timeline";
+import { DetailTimelineTabs } from "@/components/detail-timeline-tabs";
+import { type HistoryEvent } from "@/components/audit-history-panel";
+import { listAuditEventsForEntity } from "@/lib/services/auditEvents";
 import { ContactForm } from "@/components/contact-form";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -111,6 +113,8 @@ export default async function ContactDetailPage({
   if (!contact) {
     notFound();
   }
+
+  const auditEvents = await listAuditEventsForEntity("contact", resolvedParams.id);
 
   return (
     <div className="crm-page">
@@ -230,14 +234,11 @@ export default async function ContactDetailPage({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ActivityTimeline activities={contact.activities} />
-            </CardContent>
-          </Card>
+          <DetailTimelineTabs
+            activities={contact.activities}
+            auditEvents={auditEvents as HistoryEvent[]}
+            entityType="contact"
+          />
         </div>
 
         <div className="space-y-6">

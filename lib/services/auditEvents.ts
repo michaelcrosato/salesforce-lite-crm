@@ -293,7 +293,16 @@ export async function listAuditEvents(
     where,
     orderBy: [{ occurredAt: "desc" }, { id: "asc" }],
     skip: (page - 1) * take,
-    take
+    take,
+    include: {
+      actorUser: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      }
+    }
   });
 }
 

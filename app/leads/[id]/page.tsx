@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ActivityTimeline } from "@/components/activity-timeline";
+import { DetailTimelineTabs } from "@/components/detail-timeline-tabs";
+import { type HistoryEvent } from "@/components/audit-history-panel";
+import { listAuditEventsForEntity } from "@/lib/services/auditEvents";
 import { LeadStatusControl } from "@/components/lead-status-control";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -95,6 +97,8 @@ export default async function LeadDetailPage({
     notFound();
   }
 
+  const auditEvents = await listAuditEventsForEntity("lead", id);
+
   const status = isLeadStatus(lead.status) ? lead.status : "new";
 
   return (
@@ -120,14 +124,11 @@ export default async function LeadDetailPage({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ActivityTimeline activities={lead.activities} />
-            </CardContent>
-          </Card>
+          <DetailTimelineTabs
+            activities={lead.activities}
+            auditEvents={auditEvents as HistoryEvent[]}
+            entityType="lead"
+          />
         </div>
 
         <div className="space-y-5">
