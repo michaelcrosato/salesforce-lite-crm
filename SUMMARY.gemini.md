@@ -1,27 +1,27 @@
 Agent: gemini
 Sprint: Sprint 5
-Feature: Spec 010 — Component unit tests
-Branch: gemini/spec-010-component-tests
+Feature: Spec 022 — Optimistic UI for deal kanban
+Branch: gemini/spec-022-optimistic-kanban
 Status: DONE
-Commits this prompt: 1 commit (feat(spec-010): Configure Vitest projects workspace with robust DOM component tests)
-Gate status: PASS (vitest 588 passed, lint clean, typecheck passed, build passed)
+Commits this prompt: 2 commits (feat(deals): implement optimistic ui for deals kanban board stage transitions; docs(spec-022): update PROGRESS.md and Spec 022 status)
+Gate status: PASS (vitest 591 passed, lint clean, typecheck passed, build passed, playwright e2e 52 passed)
 DoD self-check: PASS
-Timestamp: 2026-05-29T12:07:00-07:00
+Timestamp: 2026-05-29T12:26:00-07:00
 MERGE READY
 
 ### Completed this prompt
 
-- **Vitest Projects Workspace (Spec 010)**: Configured unified projects workspace in `vitest.config.ts` using Vitest 4's `test.projects` configuration block. This cleanly isolates the existing `environment: "node"` tests from the new DOM-based component tests.
-- **Global Component Test Setup**: Created and configured `tests/components/setup.ts` to mock Next.js routing APIs (`useRouter`, `usePathname`, `useSearchParams`) and React's `useTransition` to execute synchronous/controlled transitions.
-- **Component Test Suites Written**: Added comprehensive Vitest DOM tests in `tests/components/` covering:
-  - `command-palette.tsx`: Keyboard event triggers (Ctrl+K to open, Escape to close), input change debounce behavior (search action called once past 120ms with fake timers), microtask promise flushing, and navigation closure on result click.
-  - `lead-form.tsx`: Rendering of all form labels/inputs, HTML5 form validation bypass via direct `fireEvent.submit` element submission, server-action validation error display surfacing (toast warnings + error labels), and successful lead creation form reset.
-  - `deal-detail-drawer.tsx`: Verification of null deal state handling, regex-based robust formatting-safe element queries (`/Jane.*Doe/`, `/Owner.*Sales.*Rep/`), stage transition selector changes, close button action click handlers, and `moveDealAction` trigger hooks.
-- **Verification & Validation**: All 11 DOM component tests pass green along with all 577 node/integration tests (total **588 tests passed**). The typescript compilation checks and linter checkers pass cleanly with zero warnings/errors (`npm run typecheck`, `npm run lint`), and the Next.js production build (`npm run build`) builds cleanly with PPR enabled.
+- **Optimistic Stage Transitions (Spec 022)**: Implemented high-performance React 19 `useOptimistic` transitions in the Deals Kanban pipeline (`components/deal-board.tsx`), ensuring a snappy drag-and-drop/dropdown pipeline UX by instantly shifting cards to target columns.
+- **Robust Rollback & Controlled Select Components**: Converted the dropdown Select component on cards to a fully controlled element (`value={deal.stage}`) to avoid stale DOM rendering issues during React transitions. Configured startTransition to handle optimistic updates seamlessly, immediately initiating database writes while retaining correct context for automated state rollback and user error alerts (`showToast`) on server failure.
+- **Comprehensive Component Testing**: Wrote a complete component test suite at `tests/components/deal-board.test.tsx` checking:
+  - Default layout rendering of columns, currency summaries, and deal badges.
+  - Successful optimistic state updates under action transition promises, confirming instant card changes before server action settlement.
+  - Graceful state rollback behavior and precise toast alert messaging on server error conditions.
+- **Verification & Validation**: Verified the workspace using `pnpm verify` equivalent: ESLint checking (`npm run lint`) is completely clean with 0 warnings/errors, typechecking passes with 0 compiler errors, all 591 Vitest unit/integration tests pass cleanly, and all 52 Playwright E2E tests are fully green.
 
 ### Next action
 
-Allow the autonomous loop script to verify the remote green status checks on the PR and merge the task branch `gemini/spec-010-component-tests` into `main`.
+Allow the autonomous loop script to verify the remote green status checks on the PR (already pushed and PR #17 created) and merge the feature branch `gemini/spec-022-optimistic-kanban` into `main`.
 
 ### Scope confirmation
 
