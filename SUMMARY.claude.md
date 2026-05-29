@@ -1,88 +1,74 @@
 Agent: claude
 Mode: high-autonomy blueprint execution (/plan/ specs)
 Branch: phase-0-quick-wins
-Status: paused at a clean checkpoint — remaining blueprint work is human-gated
-Gate status: PASS — `npx tsc --noEmit` + `npm run test` (559) + `npm run build` + `node scripts/check-reachability.mjs` (20/20)
+Status: paused at a clean checkpoint — spec 015 shipped; remaining blueprint work is human-gated
+Gate status: PASS — `npx tsc --noEmit` + `npm run test` (562) + `npm run build` + `node scripts/check-reachability.mjs` (20/20), run on HEAD `5250d66`
 Timestamp: 2026-05-29
 
-## What shipped this session — spec 011 (Reachability gate + retire CSV tower)
+## What shipped this session — spec 015 (Consolidate agent prompts)
 
-Two parts, all on `phase-0-quick-wins`:
+Completed the last unattended-eligible blueprint spec. Three commits on
+`phase-0-quick-wins`:
 
-1. **Gate** (`5aaa9b3`, landed prior session): `scripts/check-reachability.mjs`
-   (static import-graph BFS from `app/**`+`components/**`; `lib/server/*.ts`
-   outside the closure = test-only orphan) + `scripts/reachability-baseline.json`
-   shrink-only ratchet + CI `gate` wiring + retirement plan in
-   `docs/ai/csv-contract-assessment.md`.
+1. `54590cf` — canonical `prompts/shared/{LOOP,SPRINT-ROLLOVER}.md` (single
+   source) + `scripts/generate-agent-prompts.mjs` (Buffer-based fan-out,
+   byte-identical) + `tests/prompts/agent-prompts.test.ts` (drift guard).
+   `meta/LOOP.md` reconciled to the 4-agent canonical (cosmetic whitespace only).
+2. `5250d66` — retired the 9 stale `prompts/**/Old/` Sprint-4B archives (git
+   retains history; grep-clean). **Committed only after explicit human
+   confirmation** (goal-directive file-deletion gate).
+3. `93c3889` — spec 015 → `[x] Done`; PROGRESS 9→10/24 (Wave 1 2→3/10).
 
-2. **First retirement batch — CSV release tower, 5 atomic cuts.** Each commit
-   deletes one module + its sole test and lowers the ratchet; full gate green at
-   every step. Deletion order was **mechanically verified terminal-at-cut** via a
-   reverse-import map (only modules with an empty importer list were removed → no
-   dangling import was ever possible):
-   - `8c27185` csvReleaseReadinessPackets (apex)
-   - `8581c69` csvReleaseDispositionManifests
-   - `448f91f` csvReleaseHandoffCatalog
-   - `64610ac` csvReleaseExceptionRegisters
-   - `6ebf052` csvReleaseClosureScorecards
-   - `c89d485` docs: mark 011 Done + log the batch
+All 6 DoD items met; gate green on the final tree.
 
-   **Result: orphans 25→20, test 579→559 (−20 dead contract cases), ~8.5k LOC
-   removed, zero live regressions.** All 5 spec-011 DoD criteria satisfied.
+## Key correction to the prior session's classification
 
-## Why I stopped the tower at 5 (did NOT go wholesale)
+Last session I filed 015 as "infra-entangled / must edit
+`scripts/autonomy-loop.ps1` → human-attended." **That was wrong.** The DoD
+offers an "…or are generated" path. Choosing the generator keeps the per-agent
+files **on disk**, so the dispatcher (`autonomy-loop.ps1` L699-704 / L889-894:
+`Test-Path` → throw-if-missing → `.Replace("{AGENT}", …)` at dispatch) is
+**never touched** and no dispatch dry-run is needed. The spec was completable
+unattended; only the file-deletion step required a human OK, which was obtained.
 
-- The operator and contract layers are **interleaved** in the import graph
-  (e.g. `csvContractDriftSnapshots` both imports and is imported by operator
-  modules), so there is **no clean bounded "operator-only" batch** — continuing
-  means retiring the whole remaining CSV tower in one sweep.
-- The repo's own `docs/ai/csv-contract-assessment.md` (§ near L137) explicitly
-  flags **wholesale** tower retirement as a roadmap-owner / product-scope
-  decision, not a cleanup-pass call. Spec 011's DoD asks only for "at least the
-  first batch" + "series of small PRs, never one mega-deletion."
-- So the release-tower batch is the correct, DoD-satisfying, owner-safe stopping
-  point. The remaining retirement order (operator → contract/QA → `csvInFlightCache`
-  last → 4 non-CSV orphans) is documented in the assessment doc for owner-approved
-  follow-up PRs.
+## Blueprint state: 10 / 24 done
 
-## Blueprint state: 9 / 24 done
+Done: 001, 002, 003, 004, 005, 007, 008, 009, 011 (prior) + **015** (this session).
 
-Done: 001, 002, 003, 004, 005, 007, 008, 009 (prior sessions) + **011** (this).
+The blueprint still cannot reach "absolute completion" unattended — the
+remaining critical path is gated on human/admin-only actions:
 
-### Structural finding (flagging for the human)
-
-The blueprint **cannot be driven to "absolute completion" by an unattended
-agent.** The critical path is gated on actions only a human/admin can take:
-
-- **New-dependency approvals** (CLAUDE.md §14): 006, 010, 017, 023 — and these
-  cascade to 018 (dep 006), 020/022/024 (dep 018/010), etc.
+- **New-dependency approvals** (CLAUDE.md §14): 006, 010, 017, 023 → cascade to
+  018, 020/022/024.
 - **Branch-protection / `enforce_admins` flips** (admin, only-after-green): 013,
-  016 — cascade to 014 (dep 013) and the Wave-2 list features (dep 019←014).
-- **Infra-entangled, can't validate unattended:** 012 rewires the `npm run test`
-  harness the Stop gate depends on (per-worker SQLite, needs a 3× flake-check);
-  015 must edit `scripts/autonomy-loop.ps1` (it reads `prompts/{AGENT}/LOOP.md`
-  at L699-704 and throws if missing, substituting `{AGENT}` at dispatch) to
-  collapse the 5 near-identical templates, and wants a dispatch dry-run a human
-  can watch. Both are technically unblocked but should be **human-attended**.
+  016 → cascade to 014 and Wave 2.
+- **Spec 012 — confirmed integrity-protected human-gate** (sharpened; see
+  `BLOCKERS.claude.md`): its DoD must edit `vitest.config.ts` + `package.json`,
+  both listed in `scripts/gate-integrity.sha256.json`; `run-codex-yolo-loop.ps1`
+  halts `EXHAUSTED … "Human review required"` on protected-file drift, and the
+  manifest reserves updates for human action. Plus a 3× flake-check of the
+  rewired per-worker-SQLite harness.
 
-Wave 2 (019–024) is entirely blocked behind the above.
+Wave 2 (019–024) entirely blocked behind the above.
 
 ## Next actions (for the human / next session)
 
-1. **Push + PR (Task #29) — awaiting confirmation.** `phase-0-quick-wins` holds
-   all of Phase 0 + spec 011 (clean tree, gate green). Push affects shared state,
-   so I did not push unattended. Suggested: open the PR, let CI `gate` (now incl.
-   the reachability step) prove green, squash-merge.
-2. **Unblock the dep chain:** approve the new-dep promotion requests for 006/010
-   (then 017/023), which frees 018 → 020/022/024.
-3. **Do the admin flips when green:** 013 then 016 (and 014 after 013).
-4. **Human-attended:** execute 012 and 015 with a gate/dispatch dry-run in view.
-5. **Owner call:** decide whether to continue retiring the rest of the CSV tower
-   (operator/contract layers) — order is pre-computed in the assessment doc.
+1. **Push + PR (Task #29) — awaiting confirmation.** `phase-0-quick-wins` now
+   holds Phase 0 + spec 011 + spec 015 (clean tree, gate green). Push is
+   shared-state; not done unattended.
+2. **Spec 012 — human-attended:** edit the two integrity-protected files,
+   regenerate `gate-integrity.sha256.json` by deliberate human action, run the
+   3× flake-check of the per-worker-SQLite harness.
+3. **Unblock the dep chain:** approve new-dep promotions 006/010 (then 017/023)
+   → frees 018 → 020/022/024.
+4. **Admin flips when green:** 013 then 016 (014 after 013).
+5. **Owner call:** whether to continue retiring the rest of the CSV tower (order
+   pre-computed in `docs/ai/csv-contract-assessment.md`).
 
 ## Scope confirmation
 
-- Zones: spec 011 spans `lib/server` (codex), `tests/api` (gemini),
-  `scripts/` (gemini) — each cut narrated `[CROSS-ZONE OK]` per CLAUDE.md §3.
-- No schema/seed changes. No new deps. No scope expansion. No forced git, no
-  branch-protection changes, no push.
+- spec 015: `[CROSS-ZONE OK]` narrated — generator/test land in `scripts/` +
+  `tests/` (gemini zone), docs are shared zone, `prompts/**` is unzoned.
+  Single-agent root mode (zones advisory).
+- No schema/seed changes. No new deps. No scope expansion. No forced git. The
+  only deletion (9 `Old/` archives) was human-confirmed. No push.
