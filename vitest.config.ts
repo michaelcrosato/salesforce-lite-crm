@@ -1,14 +1,44 @@
 import { defineConfig } from "vitest/config";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootPath = path.resolve(__dirname);
 
 export default defineConfig({
   test: {
-    globals: false,
-    environment: "node",
-    include: ["tests/**/*.test.ts"],
-    globalSetup: ["tests/setup/global.ts"],
-    setupFiles: ["tests/setup/db.ts"],
-    testTimeout: 30000,
+    projects: [
+      {
+        test: {
+          name: "node",
+          environment: "node",
+          include: ["tests/**/*.test.ts"],
+          globalSetup: [path.resolve(rootPath, "tests/setup/global.ts")],
+          setupFiles: [path.resolve(rootPath, "tests/setup/db.ts")],
+          testTimeout: 30000,
+        },
+        resolve: {
+          alias: {
+            "@": rootPath
+          }
+        }
+      },
+      {
+        test: {
+          name: "dom",
+          globals: true,
+          environment: "jsdom",
+          include: ["tests/components/**/*.test.tsx", "tests/components/**/*.test.ts"],
+          setupFiles: [path.resolve(rootPath, "tests/components/setup.ts")],
+          testTimeout: 30000,
+        },
+        resolve: {
+          alias: {
+            "@": rootPath
+          }
+        }
+      }
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
@@ -18,7 +48,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL(".", import.meta.url))
+      "@": rootPath
     }
   }
 });

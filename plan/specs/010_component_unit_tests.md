@@ -13,11 +13,11 @@
 Impact: catches UI regressions pre-e2e, shrinks the feedback loop, and unlocks confident refactors of the busiest components.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] DOM test environment wired (decision recorded: **Vitest Browser Mode** for real-browser fidelity, or **jsdom** for speed — prefer jsdom unless browser-only APIs are needed).
-- [ ] A `tests/components/` (or co-located) suite covers at minimum: command-palette (debounce fires once, keyboard open/close, result navigation), one create form (validation error surfaced), one drawer (open/close + content).
-- [ ] Vitest config separates the node suite from the DOM suite (projects/workspace) so existing `environment: "node"` tests are unaffected.
-- [ ] Coverage (spec 006) reflects the new component lines.
-- [ ] Full gate green; deps pinned exactly and approved.
+- [x] DOM test environment wired (decision recorded: **Vitest Browser Mode** for real-browser fidelity, or **jsdom** for speed — prefer jsdom unless browser-only APIs are needed).
+- [x] A `tests/components/` (or co-located) suite covers at minimum: command-palette (debounce fires once, keyboard open/close, result navigation), one create form (validation error surfaced), one drawer (open/close + content).
+- [x] Vitest config separates the node suite from the DOM suite (projects/workspace) so existing `environment: "node"` tests are unaffected.
+- [x] Coverage (spec 006) reflects the new component lines.
+- [x] Full gate green; deps pinned exactly and approved.
 
 ## Implementation Approach
 **Files to touch:** `package.json` (devDeps — gated), `vitest.config.ts` (add a DOM project), new `tests/components/*.test.tsx`.
