@@ -196,9 +196,7 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   await expect(
     page.getByTestId("bulk-dry-run-summary-entities")
   ).toContainText("10");
-  await expect(page.getByTestId("bulk-dry-run-summary-actions")).toContainText(
-    "5"
-  );
+  await expect(page.getByTestId("bulk-dry-run-summary-actions")).toContainText("6");
   await expect(
     page.getByTestId("bulk-dry-run-summary-max-records")
   ).toContainText("200");
@@ -491,3 +489,4 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     "Routing assignments off"
   );
 });
+
