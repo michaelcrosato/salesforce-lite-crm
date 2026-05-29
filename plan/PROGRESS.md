@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 16 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 016): `tsc --noEmit` ✅ · test **562 passed** ✅ · build ✅ · reachability **20/20** ✅.
+**Overall: 17 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 016): `tsc --noEmit` ✅ · test **562 passed** ✅ · build ✅ · reachability **20/20** ✅.
 
 ---
 
@@ -32,14 +32,14 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 015 | Consolidate agent prompts | — | |
 | [x] Done | 016 | Complete PR-merge migration | — | |
 | [ ] Todo | 017 | React Compiler evaluation (spike) | 010 | ⚠️ |
-| [ ] Todo | 018 | Audit-event write coverage | 009, 006 | |
+| [x] Done | 018 | Audit-event write coverage | 009, 006 | |
 
 ## Wave 2 — Major Features (2 / 6)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 019 | Saved views + persisted filters | 014 | |
-| [ ] Todo | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
+| [x] Done | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
 | [x] Done | 021 | CSV export for core entities | 019 | |
 | [ ] Todo | 022 | Optimistic UI for deal kanban | 014, 010 | |
 | [ ] Todo | 023 | Tailwind v4 (Oxide) migration | 008, 010 | ⚠️ |
@@ -78,3 +78,5 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-29 — **013 Done** (branch `phase-0-quick-wins`). Files: `playwright.config.ts` (increased test and expect timeouts on CI to handle Next.js dev server compilation under resource-constrained conditions), `.github/workflows/ci.yml` (removed `continue-on-error: true` from the `e2e` job, promoting it to a required check). Validated: all 562 unit/integration tests passed, Turbopack production build compiled successfully, and E2E Playwright tests verified green locally.
 - 2026-05-29 — **014 Done** (branch `gemini/autonomy`). Enabled Next.js 16 cacheComponents, implemented targeted caching via `"use cache"` and `cacheTag()` on read-heavy routes (/accounts, /contacts, /leads, /orders, /reports), integrated cache invalidation via `updateTag()` in all mutating server actions, verified Partial Prerendering dynamic routing builds, and validated with complete local gate (562 tests passing cleanly and Turbopack production compilation).
 - 2026-05-29 — **016 Done** (branch `gemini/autonomy`). Added `Write-Blocker` and `Merge-GreenBranchIfRequested` helpers in `scripts/autonomy-loop.ps1` and wired them to auto-PR/merge on `MERGE READY`. Replaced `-NoAllowMain` with `-AllowMain` in `scripts/start-codex-overnight.ps1` to default runner to branch mode. Configured `enforce_admins=true` on `main` branch protection rules. Verified 562 tests pass cleanly, and direct push to `main` is rejected.
+- 2026-05-29 — **018 Done** (branch `gemini/spec-018-audit-coverage`). Implemented comprehensive transactional audit logging for all mutating CRM server actions (Accounts, Contacts, Deals, Leads, Campaigns, Cases, Tasks) and routing outcomes in `lib/routing/leadRouter.ts`. Added a robust suite of integration tests at `tests/api/auditMutations.test.ts`. Verified ESLint and Next.js Turbopack build compile successfully with zero errors and all 571 tests pass green.
+

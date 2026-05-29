@@ -201,6 +201,8 @@ function actionLabel(action: BulkActionDryRunReviewPacketAction): string {
       return "Task creation";
     case "selected_export":
       return "Selected export";
+    case "delete":
+      return "Delete";
   }
 }
 
@@ -219,6 +221,8 @@ function isActionSupported(
       return TASK_CREATION_ENTITIES.has(entity);
     case "selected_export":
       return true;
+    case "delete":
+      return entity === "leads" || entity === "opportunities";
   }
 }
 
@@ -267,6 +271,16 @@ function targetMetadataForAction(
         field: null,
         required: false,
         valueSource: "csv_export_definition",
+        allowedValues: null
+      };
+    case "delete":
+      return {
+        field: null,
+        required: false,
+        valueSource:
+          entity === "leads" || entity === "opportunities"
+            ? "none"
+            : "unsupported",
         allowedValues: null
       };
   }

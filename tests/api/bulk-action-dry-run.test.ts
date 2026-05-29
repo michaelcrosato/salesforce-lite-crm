@@ -34,7 +34,8 @@ describe("server bulk action dry-run contracts", () => {
       "stage_update",
       "owner_assignment",
       "task_creation",
-      "selected_export"
+      "selected_export",
+      "delete"
     ]);
     expect(BULK_ACTION_DRY_RUN_ENTITIES).toEqual([
       "accounts",

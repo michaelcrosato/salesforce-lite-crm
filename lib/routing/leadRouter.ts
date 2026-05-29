@@ -6,6 +6,7 @@ import {
   normalizePostalCode as normalizeDisplayPostalCode
 } from "@/lib/postal";
 import { prisma } from "@/lib/prisma";
+import { buildAuditEventCreateData } from "@/lib/services/auditEvents";
 
 type RoutableLead = {
   postalCode?: string | null;
@@ -280,6 +281,25 @@ export async function routeLead(
       }
     });
 
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "routing",
+        action: "lead_routed",
+        entityType: "lead",
+        entityId: lead.id,
+        summary: routingSummary,
+        metadata: {
+          areaId: area.id,
+          areaName: area.name,
+          assignedOrderId: winningOrder.id,
+          assignedOrderName: winningOrder.name,
+          paceGap: Number(paceGap.toFixed(2)),
+          deliveredThisMonth: winningOrder.deliveredThisMonth,
+          monthlyQuota: winningOrder.monthlyQuota
+        }
+      })
+    });
+
     await tx.activity.create({
       data: {
         accountId: winningOrder.accountId,
@@ -387,6 +407,21 @@ async function markUnrouted(
       nextStep: "Review routing coverage and active order capacity.",
       createdAt: now
     }
+  });
+
+  await tx.auditEvent.create({
+    data: buildAuditEventCreateData({
+      category: "routing",
+      action: "lead_unrouted",
+      entityType: "lead",
+      entityId: lead.id,
+      summary: routingSummary,
+      metadata: {
+        reason,
+        areaId: area?.id ?? null,
+        areaName: area?.name ?? null
+      }
+    })
   });
 
   logger.warn("lead_routing_unrouted", {

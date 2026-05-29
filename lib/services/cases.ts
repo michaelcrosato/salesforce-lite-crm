@@ -263,7 +263,26 @@ export async function resolveCase(id: string): Promise<Case> {
 }
 
 export async function deleteCase(id: string): Promise<Case> {
-  return prisma.case.delete({ where: { id: idSchema.parse(id) } });
+  const caseId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const crmCase = await tx.case.delete({
+      where: { id: caseId }
+    });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "deleted",
+        entityType: "case",
+        entityId: crmCase.id,
+        summary: `Case deleted: ${crmCase.subject}.`,
+        metadata: caseAuditMetadata(crmCase)
+      })
+    });
+
+    return crmCase;
+  });
 }
 
 function caseAuditMetadata(crmCase: Case): Record<string, AuditMetadataValue> {

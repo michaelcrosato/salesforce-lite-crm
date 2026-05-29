@@ -6,6 +6,8 @@ import { ASSIGNMENT_REASON_LABELS, type AssignmentReason } from "@/lib/crm-const
 import { prisma } from "@/lib/prisma";
 import { routeLead } from "@/lib/routing/leadRouter";
 import { leadFormSchema, leadStatusUpdateSchema } from "@/lib/validation";
+import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import type { Lead } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -16,6 +18,19 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
+}
+
+function leadAuditMetadata(lead: Lead): Record<string, AuditMetadataValue> {
+  return {
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    phone: lead.phone,
+    email: lead.email,
+    postalCode: lead.postalCode,
+    province: lead.province,
+    source: lead.source,
+    status: lead.status
+  };
 }
 
 export async function createLeadAction(formData: FormData): Promise<ActionResult> {
@@ -44,17 +59,32 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
 
   let lead;
   try {
-    lead = await prisma.lead.create({
-      data: {
-        firstName: parsed.data.firstName,
-        lastName: parsed.data.lastName,
-        phone: parsed.data.phone,
-        email: parsed.data.email,
-        postalCode: parsed.data.postalCode,
-        province: parsed.data.province,
-        source: parsed.data.source,
-        status: "new"
-      }
+    lead = await prisma.$transaction(async (tx) => {
+      const createdLead = await tx.lead.create({
+        data: {
+          firstName: parsed.data.firstName,
+          lastName: parsed.data.lastName,
+          phone: parsed.data.phone,
+          email: parsed.data.email,
+          postalCode: parsed.data.postalCode,
+          province: parsed.data.province,
+          source: parsed.data.source,
+          status: "new"
+        }
+      });
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: "created",
+          entityType: "lead",
+          entityId: createdLead.id,
+          summary: `Lead created: ${createdLead.firstName} ${createdLead.lastName}.`,
+          metadata: leadAuditMetadata(createdLead)
+        })
+      });
+
+      return createdLead;
     });
   } catch (error) {
     return actionErrorResult(error, {
@@ -94,13 +124,38 @@ export async function updateLeadStatusAction(input: {
   }
 
   try {
-    await prisma.lead.update({
-      where: {
-        id: parsed.data.leadId
-      },
-      data: {
-        status: parsed.data.status
-      }
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.lead.findUniqueOrThrow({
+        where: { id: parsed.data.leadId }
+      });
+
+      const lead = await tx.lead.update({
+        where: {
+          id: parsed.data.leadId
+        },
+        data: {
+          status: parsed.data.status
+        }
+      });
+
+      const statusChanged = existing.status !== lead.status;
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: statusChanged ? "status_changed" : "updated",
+          entityType: "lead",
+          entityId: lead.id,
+          summary: statusChanged
+            ? `Lead status changed from ${existing.status} to ${lead.status}.`
+            : `Lead updated: ${lead.firstName} ${lead.lastName}.`,
+          metadata: {
+            ...leadAuditMetadata(lead),
+            changedFields: ["status"],
+            previousStatus: statusChanged ? existing.status : null
+          }
+        })
+      });
     });
   } catch (error) {
     return actionErrorResult(error, {

@@ -91,14 +91,15 @@ const EXECUTION_ACTION_LABELS = {
   status_update: "Status update",
   stage_update: "Stage update",
   owner_assignment: "Owner assignment",
-  task_creation: "Task creation"
+  task_creation: "Task creation",
+  delete: "Delete"
 } satisfies Record<BulkActionExecutionAction, string>;
 
 const EXECUTION_ACTIONS_BY_ENTITY = {
   accounts: ["status_update", "owner_assignment", "task_creation"],
   contacts: ["status_update", "task_creation"],
-  opportunities: ["stage_update", "owner_assignment", "task_creation"],
-  leads: ["status_update", "task_creation"],
+  opportunities: ["stage_update", "owner_assignment", "task_creation", "delete"],
+  leads: ["status_update", "task_creation", "delete"],
   activities: [],
   "dealer-orders": [],
   areas: [],
@@ -835,6 +836,8 @@ function targetConfigForAction(
         label: "Bulk target",
         placeholder: DEFAULT_TASK_TITLE
       };
+    case "delete":
+      return null;
   }
 }
 

@@ -28,7 +28,8 @@ export const BULK_ACTION_DRY_RUN_ACTIONS = [
   "stage_update",
   "owner_assignment",
   "task_creation",
-  "selected_export"
+  "selected_export",
+  "delete"
 ] as const;
 
 export const BULK_ACTION_DRY_RUN_MAX_RECORDS = 200;
@@ -264,6 +265,16 @@ function evaluateRecord(
         currentValue: null,
         targetValue: context.targetValue
       });
+    case "delete":
+      return buildRecordResult({
+        id: record.id,
+        label: record.label,
+        eligible: true,
+        reason: "eligible",
+        message: "Selected record is eligible for deletion.",
+        currentValue: null,
+        targetValue: null
+      });
   }
 }
 
@@ -315,6 +326,8 @@ async function buildEvaluationContext(
       return buildTaskCreationContext(input.entity, input.taskTitle);
     case "selected_export":
       return buildSelectedExportContext(input.entity);
+    case "delete":
+      return buildDeleteContext(input.entity);
   }
 }
 
@@ -491,6 +504,23 @@ function buildSelectedExportContext(
   });
 }
 
+function buildDeleteContext(
+  entity: BulkActionDryRunEntity
+): EvaluationContext {
+  if (entity !== "leads" && entity !== "opportunities") {
+    return blockedContext(
+      null,
+      "unsupported_action_for_entity",
+      "Bulk deletion is not supported for this entity.",
+      { supported: false }
+    );
+  }
+
+  return allowedContext(null, {
+    supported: true
+  });
+}
+
 function allowedContext(
   targetValue: string | null,
   metadata: Record<string, AuditMetadataValue>
@@ -530,6 +560,7 @@ function currentValueForAction(
       return record.ownerId;
     case "task_creation":
     case "selected_export":
+    case "delete":
       return null;
   }
 }
@@ -584,6 +615,8 @@ function targetForAudit(
       return input.taskTitle ?? null;
     case "selected_export":
       return input.entity;
+    case "delete":
+      return null;
   }
 }
 
