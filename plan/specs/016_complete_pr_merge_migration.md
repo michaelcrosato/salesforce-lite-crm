@@ -13,11 +13,11 @@ The documentation now mandates the gated PR flow (push branch → PR → green `
 Impact: the autonomous loop lands changes the same legitimate, gated way a human does — the last piece of the "PR flow is the only path" goal.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Runner default changes to **branch mode**, AND an automated **PR-open + watch-gate + squash-merge** step is added — landed **together** (branch-mode alone would strand green branches and stall `main`).
-- [ ] The runner never uses `--admin`/force; on red `gate` it leaves the PR open + files a `gate` blocker and stops.
-- [ ] A full **dry-run iteration** merges via PR + green `gate` on a throwaway feature, verified end-to-end.
-- [ ] **Only then:** `enforce_admins=true` set via `gh api`; verified that a direct push to `main` is now *rejected* (not bypassed).
-- [ ] TICKET009 acceptance boxes checked.
+- [x] Runner default changes to **branch mode**, AND an automated **PR-open + watch-gate + squash-merge** step is added — landed **together** (branch-mode alone would strand green branches and stall `main`).
+- [x] The runner never uses `--admin`/force; on red `gate` it leaves the PR open + files a `gate` blocker and stops.
+- [x] A full **dry-run iteration** merges via PR + green `gate` on a throwaway feature, verified end-to-end.
+- [x] **Only then:** `enforce_admins=true` set via `gh api`; verified that a direct push to `main` is now *rejected* (not bypassed).
+- [x] TICKET009 acceptance boxes checked.
 
 ## Implementation Approach
 **Files to touch:** `scripts/autonomy-loop.ps1` (`Push-GreenBranchIfRequested`, `Ensure-BranchPolicy`), `scripts/start-codex-overnight.ps1` (`Get-LoopArguments` defaults), branch protection via `gh api repos/michaelcrosato/salesforce-lite-crm/branches/main/protection`.
