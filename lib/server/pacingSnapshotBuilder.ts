@@ -773,6 +773,9 @@ function inWindow(value: Date, start: Date, endExclusive: Date): boolean {
 
 function calendarDateStart(value: string): Date {
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
 
   return new Date(Date.UTC(year, month - 1, day));
 }
@@ -815,6 +818,9 @@ function countDays(start: Date, endExclusive: Date): number {
 
 function daysInMonth(startsOn: string): number {
   const [year, month] = startsOn.split("-").map(Number);
+  if (year === undefined || month === undefined) {
+    throw new Error(`Invalid calendar date: ${startsOn}`);
+  }
   const start = new Date(Date.UTC(year, month - 1, 1));
   const end = new Date(Date.UTC(year, month, 1));
 

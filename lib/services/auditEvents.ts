@@ -401,7 +401,12 @@ function sortAuditMetadata(value: AuditMetadataValue): AuditMetadataValue {
     const sorted: { [key: string]: AuditMetadataValue } = {};
 
     for (const key of Object.keys(value).sort()) {
-      sorted[key] = sortAuditMetadata(value[key]);
+      const entry = value[key];
+      if (entry === undefined) {
+        // Unreachable: key comes from Object.keys(value).
+        continue;
+      }
+      sorted[key] = sortAuditMetadata(entry);
     }
 
     return sorted;

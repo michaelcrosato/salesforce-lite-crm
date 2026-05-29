@@ -67,7 +67,7 @@ function parseCsvRecords(input: string) {
   const lines = input.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
 
   // trim trailing empty lines but keep internal
-  while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
+  while (lines.length > 0 && lines[lines.length - 1]?.trim() === "") {
     lines.pop();
   }
 
@@ -77,6 +77,10 @@ function parseCsvRecords(input: string) {
   while (lineIndex < lines.length) {
     const lineNumber = lineIndex + 1;
     const line = lines[lineIndex];
+    if (line === undefined) {
+      // Unreachable: lineIndex < lines.length guarantees a line is present.
+      break;
+    }
     let parsed = parseCsvLine(line, lineNumber);
 
     if (parsed.error) {
@@ -118,7 +122,7 @@ export function parseCsv(input: string): ParseResult {
   const { records, errors } = parseCsvRecords(input);
 
   const nonEmptyRecords = records.filter(
-    (record) => !(record.length === 1 && record[0].trim() === "")
+    (record) => !(record.length === 1 && record[0]?.trim() === "")
   );
 
   if (nonEmptyRecords.length === 0) {
@@ -126,6 +130,10 @@ export function parseCsv(input: string): ParseResult {
   }
 
   const [headerRecord, ...rowRecords] = nonEmptyRecords;
+  if (!headerRecord) {
+    // Unreachable: nonEmptyRecords.length === 0 already returned above.
+    return { headers: [], rows: [], errors: [] };
+  }
   const headers = headerRecord.map((h) => h.trim());
 
   const rows = rowRecords.map((record) => record.map((field) => field.trim()));

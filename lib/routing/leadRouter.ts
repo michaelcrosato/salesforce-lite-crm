@@ -248,6 +248,10 @@ export async function routeLead(
     }
 
     const winningOrder = rankedOrders[0];
+    if (!winningOrder) {
+      // Unreachable: the rankedOrders.length === 0 guard above already returned.
+      throw new Error("Ranked orders unexpectedly empty after capacity ranking.");
+    }
     const rankedOrderSummaries = rankedOrders.map((order, index) => ({
       orderId: order.id,
       dealerName: order.name,

@@ -81,7 +81,7 @@ export function bucketByDateRange<T extends Record<string, unknown>>(
     const t = dt.getTime();
     for (const b of buckets) {
       if (t >= b.start.getTime() && t <= b.end.getTime()) {
-        result[b.label].push(rec);
+        result[b.label]?.push(rec);
         break;
       }
     }

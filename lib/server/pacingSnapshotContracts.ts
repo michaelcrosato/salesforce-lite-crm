@@ -624,6 +624,9 @@ export function isPacingSnapshotCalendarDate(value: string): boolean {
   }
 
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    return false;
+  }
   const utc = new Date(Date.UTC(year, month - 1, day));
 
   return (
@@ -905,12 +908,23 @@ function countInclusiveCalendarDays(startsOn: string, endsOn: string): number {
 function countMonthBuckets(startsOn: string, endsOn: string): number {
   const [startYear, startMonth] = startsOn.split("-").map(Number);
   const [endYear, endMonth] = endsOn.split("-").map(Number);
+  if (
+    startYear === undefined ||
+    startMonth === undefined ||
+    endYear === undefined ||
+    endMonth === undefined
+  ) {
+    throw new Error(`Invalid calendar date range: ${startsOn}..${endsOn}`);
+  }
 
   return (endYear - startYear) * 12 + endMonth - startMonth + 1;
 }
 
 function calendarDateUtcMs(value: string): number {
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
 
   return Date.UTC(year, month - 1, day);
 }

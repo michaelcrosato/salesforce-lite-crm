@@ -501,6 +501,9 @@ export function isCalendarDate(value: string): boolean {
   }
 
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    return false;
+  }
   const utc = new Date(Date.UTC(year, month - 1, day));
 
   return (
@@ -722,6 +725,9 @@ function countInclusiveCalendarDays(startsOn: string, endsOn: string): number {
 
 function calendarDateUtcMs(value: string): number {
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
 
   return Date.UTC(year, month - 1, day);
 }

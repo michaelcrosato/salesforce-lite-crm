@@ -409,7 +409,7 @@ function buildCsvExportPreviewRows<Row extends CsvRow>(
     const previewRow: CsvExportPreviewRow = {};
 
     for (const column of columns) {
-      previewRow[String(column.key)] = toPreviewCell(row[column.key]);
+      previewRow[String(column.key)] = toPreviewCell(row[column.key] ?? null);
     }
 
     return previewRow;

@@ -793,7 +793,7 @@ function buildDimensions(
 function groupKey(dimensions: Record<string, SavedReportSerializableValue>): string {
   return Object.keys(dimensions)
     .sort()
-    .map((key) => `${key}:${labelForValue(dimensions[key])}`)
+    .map((key) => `${key}:${labelForValue(dimensions[key] ?? null)}`)
     .join("|");
 }
 
@@ -839,6 +839,10 @@ function readFieldValue(
     }
 
     const [key] = path;
+    if (key === undefined) {
+      // Unreachable: path.length !== 1 already continued above.
+      continue;
+    }
     const value = row[key];
 
     if (value !== undefined) {

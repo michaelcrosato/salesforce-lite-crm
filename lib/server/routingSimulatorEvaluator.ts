@@ -638,7 +638,9 @@ function selectCapacityEligibleOrder(
     (check) => check.eligible
   );
   const selectedCheck =
-    selectedCheckIndex === -1 ? null : candidateChecks[selectedCheckIndex];
+    selectedCheckIndex === -1
+      ? null
+      : candidateChecks[selectedCheckIndex] ?? null;
   const selectedOrder = selectedCheck
     ? rankedOrders.find((order) => order.orderId === selectedCheck.orderId) ??
       null
@@ -986,6 +988,9 @@ function calendarDateKey(value: Date): string {
 
 function calendarDateStart(value: string): Date {
   const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
 
   return new Date(Date.UTC(year, month - 1, day));
 }
