@@ -116,13 +116,16 @@ describe("audit event service", () => {
       category: "routing",
       action: "lead_routed"
     });
+    const testRoutingEvents = routingEvents.filter(
+      (event) => event.entityId === leadEntityId
+    );
 
     expect(accountEvents.map((event) => event.summary)).toEqual([
       "Account paused.",
       "Account created."
     ]);
-    expect(routingEvents).toHaveLength(1);
-    expect(routingEvents[0]?.entityId).toBe(leadEntityId);
+    expect(testRoutingEvents).toHaveLength(1);
+    expect(testRoutingEvents[0]?.summary).toBe("Lead routed.");
   });
 
   it("builds a read-only explorer snapshot with filters, counts, and links", async () => {

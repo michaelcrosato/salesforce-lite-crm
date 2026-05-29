@@ -1,12 +1,12 @@
 Agent: Codex
 
-Sprint: Spec 024 repair
+Sprint: Sprint 56
 
-Feature: Audit history local-gate repair
+Feature: S56-F3 - Pacing snapshot review packets
 
-Branch: gemini/spec-024-audit-history
+Branch: codex/sprint-56-pacing-snapshot-review-packets
 
-Timestamp: 2026-05-29T10:24:27.3263489-07:00
+Timestamp: 2026-05-29T11:24:30-07:00
 
 Escalation required: NO
 
@@ -17,7 +17,5 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- Resolved `npm run test:e2e` failure in `e2e/reports.spec.ts`: `/reports` served a stale cached audit explorer snapshot after task creation because task mutations did not invalidate the `reports` cache tag.
-- Resolved stale reports e2e assertions for contract counts: server/unit contracts report 38 list-filter fields and 6 bulk dry-run actions.
-- Final `scripts/local-gate.ps1` passed with `npm run test` 116 files / 575 tests and Playwright 52 / 52 tests.
-- No blocker filed for untracked `pnpm-lock.yaml`; it is out-of-scope package-manager output and was left unstaged.
+- Initial PR `gate` failure resolved: `node scripts/check-reachability.mjs` reported `lib/server/pacingSnapshotReviewPackets.ts` as a new test-only orphan; fixed by wiring the packet into `app/reports/actions.ts` and lowering the ratchet baseline to 18.
+- Duplicate PR `gate` failure resolved: `tests/api/auditEvents.test.ts` expected one global `routing/lead_routed` event, while CI observed an additional matching event; fixed by asserting against the test-created `leadEntityId` event only.

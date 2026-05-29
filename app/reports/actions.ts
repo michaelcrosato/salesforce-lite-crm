@@ -61,6 +61,10 @@ import {
   type RoutingFairnessReviewPacket
 } from "@/lib/server/routingFairnessReviewPackets";
 import {
+  buildPacingSnapshotReviewPacket,
+  type PacingSnapshotReviewPacket
+} from "@/lib/server/pacingSnapshotReviewPackets";
+import {
   archiveSavedReportDefinition,
   createSavedReportDefinition,
   deleteSavedReportDefinition,
@@ -257,6 +261,21 @@ export type RoutingFairnessReviewActionResult =
       };
     };
 
+export type PacingSnapshotReviewActionResult =
+  | {
+      ok: true;
+      message: string;
+      packet: PacingSnapshotReviewPacket;
+    }
+  | {
+      ok: false;
+      message: string;
+      fieldErrors?: {
+        input?: string[];
+        target?: string[];
+      };
+    };
+
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
 const CSV_IMPORT_APPLY_CONFIRMATION_VALUE = "confirmed";
 const CSV_IMPORT_APPLY_ACTOR_USER_ID = "user-ava";
@@ -265,6 +284,7 @@ const WORKFLOW_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_ACTOR_USER_ID = "user-ava";
 const ROUTING_SIMULATOR_REVIEW_SAMPLE_LIMIT = 5;
 const ROUTING_FAIRNESS_REVIEW_SAMPLE_LIMIT = 5;
+const PACING_SNAPSHOT_REVIEW_BUCKET_SAMPLE_LIMIT = 5;
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -1048,6 +1068,62 @@ export async function previewRoutingFairnessReviewAction(
       fieldErrors: {
         target: [
           firstIssue ?? "Review the hypothetical lead batch and postal values."
+        ]
+      }
+    };
+  }
+}
+
+export async function previewPacingSnapshotReviewAction(
+  formData: FormData
+): Promise<PacingSnapshotReviewActionResult> {
+  const rawInput = formString(formData, "pacingSnapshotInput");
+
+  if (rawInput.trim().length === 0) {
+    return {
+      ok: false,
+      message: "Enter a pacing snapshot request before reviewing snapshots.",
+      fieldErrors: {
+        input: ["Enter JSON shaped like { \"requests\": [...] }."]
+      }
+    };
+  }
+
+  let parsedInput: unknown;
+
+  try {
+    parsedInput = JSON.parse(rawInput);
+  } catch {
+    return {
+      ok: false,
+      message: "Pacing snapshot input must be valid JSON.",
+      fieldErrors: {
+        input: ["Use JSON shaped like { \"requests\": [...] }."]
+      }
+    };
+  }
+
+  try {
+    const packet = await buildPacingSnapshotReviewPacket(parsedInput, {
+      bucketSampleLimit: PACING_SNAPSHOT_REVIEW_BUCKET_SAMPLE_LIMIT
+    });
+
+    return {
+      ok: true,
+      message: `Pacing snapshot review: ${packet.summary.bucketCount} buckets, ${packet.summary.emptyStateReasonCount} empty-state reasons.`,
+      packet
+    };
+  } catch (error) {
+    const firstIssue =
+      error instanceof ZodError ? error.issues[0]?.message : undefined;
+
+    return {
+      ok: false,
+      message: "The pacing snapshot review packet could not be built.",
+      fieldErrors: {
+        target: [
+          firstIssue ??
+            "Review the pacing snapshot request dates, metric keys, and dealer-order filters."
         ]
       }
     };
