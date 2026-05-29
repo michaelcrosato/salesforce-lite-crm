@@ -131,6 +131,10 @@ reversible, code deletion is not).
 - `tickets/TICKET005.md` — consolidate duplicated agent prompts to one template.
 - `tickets/TICKET006.md` — ratcheting server-module reachability gate.
 - `tickets/TICKET007.md` — investigate parallel-safe tests (drop `maxWorkers=1`).
+- `tickets/TICKET008.md` — fix the 3 CI-only e2e failures, then require `e2e`.
+- `tickets/TICKET009.md` — migrate the autonomous loop to PR-based merges so it
+  stops relying on admin-bypass (the CI split in PR #5 made green PR merges the
+  legitimate path; the loop should use it).
 
 These complement, and do not duplicate, the product roadmap. They are the
 infrastructure that lets the product roadmap be executed by agents at larger
