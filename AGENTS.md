@@ -124,13 +124,12 @@ Shared coordination zones:
 - `PLAN.md`, `CRM-CONTRACT.md`, `docs/decisions.md`
 - `SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md` schema
 - `prisma/schema.prisma`, `prisma/schema.postgres.prisma`, `prisma.config.ts`
-- `lib/types/`
 - `.env.example`, `.gitignore`, `package.json`, `package-lock.json`
 - framework config files such as `next.config.mjs`, `tsconfig.json`, `postcss.config.mjs`
 
 Agent zones from `PLAN.md`:
 
-- Codex: `lib/server/`, `lib/db/`, `lib/routing/`, `lib/forecast/`, `prisma/seed.ts`
+- Codex: `lib/server/`, `lib/services/`, `lib/business/`, `lib/routing/`, `lib/ai/`, `lib/prisma.ts`, `prisma/seed.ts`
 - Claude: `app/**`
 - Grok: `components/**`, `app/globals.css`, `tailwind.config.ts`
 - Gemini: `tests/**`, `e2e/**`, `scripts/**`, `playwright.config.ts`, `vitest.config.ts`

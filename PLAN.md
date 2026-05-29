@@ -247,8 +247,6 @@ Two \*\*shared coordination zones\*\*:
 
 &#x20; - `prisma.config.ts`
 
-&#x20; - `lib/types/` (cross-module type contracts)
-
 &#x20; - `CRM-CONTRACT.md`
 
 &#x20; - `.env.example`
@@ -279,7 +277,7 @@ Two \*\*shared coordination zones\*\*:
 
 |---|---|
 
-| `lib/server/`, `lib/db/`, `lib/routing/`, `lib/forecast/`, `prisma/seed.ts` | Codex |
+| `lib/server/`, `lib/services/`, `lib/business/`, `lib/routing/`, `lib/ai/`, `lib/prisma.ts`, `prisma/seed.ts` | Codex |
 
 | `app/\*\*` (Next.js routes, pages, layouts, server actions) | Claude |
 

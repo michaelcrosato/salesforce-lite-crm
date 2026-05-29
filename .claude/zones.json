@@ -1,9 +1,11 @@
 {
   "codex": [
     "lib/server/**",
-    "lib/db/**",
+    "lib/services/**",
+    "lib/business/**",
     "lib/routing/**",
-    "lib/forecast/**",
+    "lib/ai/**",
+    "lib/prisma.ts",
     "prisma/seed.ts"
   ],
   "claude": ["app/**"],

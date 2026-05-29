@@ -1,7 +1,7 @@
 # 007 — Reconcile phantom ownership zones (docs ↔ reality)
 
 - **Wave:** Phase 0 — Quick Wins & Safety
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 2/5 · Feasibility 5/5 · Risk Low · Codebase Fit 5/5
 - **Depends on:** none
 - **Scope gate:** In-scope; **`.claude/zones.json` edits require a `[CONFIG CHANGE]` tag** (CLAUDE.md §10)
@@ -13,11 +13,11 @@
 Impact: removes a correctness trap in the agent coordination layer. Small but it protects every future autonomous iteration.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] `AGENTS.md` Ownership Zones list only paths that exist; the Codex zone reads (e.g.) `lib/server/`, `lib/services/`, `lib/business/`, `lib/routing/`, `lib/ai/`, `prisma/seed.ts` — matching the real tree.
-- [ ] `.claude/zones.json` is consistent with `AGENTS.md` (committed with a `[CONFIG CHANGE]` tag).
-- [ ] `PLAN.md` §5 (if it lists the same zones) is reconciled.
-- [ ] `grep -rn "lib/types\|lib/db\|lib/forecast" --include=*.md` returns no stale references (except this spec / historical archives).
-- [ ] Gate green.
+- [x] `AGENTS.md` Ownership Zones list only paths that exist; the Codex zone reads `lib/server/`, `lib/services/`, `lib/business/`, `lib/routing/`, `lib/ai/`, `lib/prisma.ts`, `prisma/seed.ts` — matching the real tree (`git ls-files lib`). Removed the phantom `lib/types/` shared-zone bullet (types are inline/co-located).
+- [x] `.claude/zones.json` is consistent with `AGENTS.md` (committed with a `[CONFIG CHANGE]` tag).
+- [x] `PLAN.md` §5 reconciled (byte-precise edit — PLAN.md is mixed CRLF/LF, so the Edit tool was avoided): removed the `lib/types/` shared-zone bullet and updated the Codex agent-zone table row.
+- [x] `grep -rn "lib/types\|lib/db\|lib/forecast" --include=*.md` returns only allowed matches: this spec (007), the PLAN.md §"Rejected:" ADR note (historical decision record), and the sprint-4 `prompts/shared/**` task prompts (historical archives). No live ownership-zone definition still names a phantom path.
+- [x] Gate green: `npm run test` (566), `npm run build` (exit 0).
 
 ## Implementation Approach
 **Files to touch:** `AGENTS.md`, `.claude/zones.json` (CONFIG CHANGE), `PLAN.md` §5 if applicable.
