@@ -1,7 +1,14 @@
 # TICKET002 — Reduce PLAN.md context noise (archive completed-sprint detail)
 
-- **Status:** Open
+- **Status:** Done (2026-05-28)
 - **Priority:** Medium
+- **Result:** `PLAN.md` trimmed 3382 → 1465 lines. §4 now states the permanent
+  non-goals once, indexes Sprints 4–55 in a compact table, and keeps the active
+  sprint (56) inline. Completed-sprint detail (feature tables + per-sprint
+  non-goals) moved verbatim to `docs/PLAN-ARCHIVE.md` (2006 lines). All live
+  rules (§1–3, §5–17) preserved byte-for-byte. No code/contract/schema change;
+  no broken cross-references (refs point to the still-present §4 section, not to
+  removed anchors).
 
 ## Goal
 
@@ -39,10 +46,10 @@ truth, topology, current sprint) are a small fraction of the file.
 
 ## Acceptance criteria
 
-- [ ] `PLAN.md` live rules (§1–4 + source-of-truth + topology) unchanged in meaning.
-- [ ] Completed-sprint detail preserved in an archive doc, not deleted.
-- [ ] No broken doc cross-references.
-- [ ] No code/contract/schema change.
+- [x] `PLAN.md` live rules (§1–4 + source-of-truth + topology) unchanged in meaning.
+- [x] Completed-sprint detail preserved in an archive doc, not deleted.
+- [x] No broken doc cross-references.
+- [x] No code/contract/schema change.
 
 ## Commands
 
