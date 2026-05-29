@@ -6,7 +6,7 @@ Feature: S56-F3 - Pacing snapshot review packets
 
 Branch: codex/sprint-56-pacing-snapshot-review-packets
 
-Timestamp: 2026-05-29T10:57:07-07:00
+Timestamp: 2026-05-29T11:11:15-07:00
 
 Escalation required: NO
 
@@ -17,4 +17,4 @@ Escalation required: NO
 
 ### Resolved this prompt
 
-- None.
+- Initial PR `gate` failure resolved: `node scripts/check-reachability.mjs` reported `lib/server/pacingSnapshotReviewPackets.ts` as a new test-only orphan; fixed by wiring the packet into `app/reports/actions.ts` and lowering the ratchet baseline to 18.
