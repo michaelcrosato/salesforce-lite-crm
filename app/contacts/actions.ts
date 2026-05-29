@@ -5,6 +5,8 @@ import { deterministicActivitySummarizer } from "@/lib/ai/activitySummarizer";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { contactFormSchema, noteFormSchema } from "@/lib/validation";
+import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import type { Contact } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -15,6 +17,22 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
+}
+
+function contactAuditMetadata(contact: Contact): Record<string, AuditMetadataValue> {
+  return {
+    accountId: contact.accountId,
+    firstName: contact.firstName,
+    lastName: contact.lastName,
+    email: contact.email,
+    phone: contact.phone,
+    title: contact.title,
+    status: contact.status
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }
 
 export async function createContactAction(
@@ -39,16 +57,29 @@ export async function createContactAction(
   }
 
   try {
-    await prisma.contact.create({
-      data: {
-        accountId: parsed.data.accountId ?? null,
-        firstName: parsed.data.firstName,
-        lastName: parsed.data.lastName,
-        email: parsed.data.email ?? null,
-        phone: parsed.data.phone ?? null,
-        title: parsed.data.title ?? null,
-        status: parsed.data.status
-      }
+    await prisma.$transaction(async (tx) => {
+      const contact = await tx.contact.create({
+        data: {
+          accountId: parsed.data.accountId ?? null,
+          firstName: parsed.data.firstName,
+          lastName: parsed.data.lastName,
+          email: parsed.data.email ?? null,
+          phone: parsed.data.phone ?? null,
+          title: parsed.data.title ?? null,
+          status: parsed.data.status
+        }
+      });
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: "created",
+          entityType: "contact",
+          entityId: contact.id,
+          summary: `Contact created: ${contact.firstName} ${contact.lastName}.`,
+          metadata: contactAuditMetadata(contact)
+        })
+      });
     });
     updateTag("contacts");
     revalidatePath("/contacts");
@@ -90,19 +121,44 @@ export async function updateContactAction(
   }
 
   try {
-    await prisma.contact.update({
-      where: {
-        id: contactId
-      },
-      data: {
-        accountId: parsed.data.accountId ?? null,
-        firstName: parsed.data.firstName,
-        lastName: parsed.data.lastName,
-        email: parsed.data.email ?? null,
-        phone: parsed.data.phone ?? null,
-        title: parsed.data.title ?? null,
-        status: parsed.data.status
-      }
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.contact.findUniqueOrThrow({
+        where: { id: contactId }
+      });
+
+      const contact = await tx.contact.update({
+        where: {
+          id: contactId
+        },
+        data: {
+          accountId: parsed.data.accountId ?? null,
+          firstName: parsed.data.firstName,
+          lastName: parsed.data.lastName,
+          email: parsed.data.email ?? null,
+          phone: parsed.data.phone ?? null,
+          title: parsed.data.title ?? null,
+          status: parsed.data.status
+        }
+      });
+
+      const statusChanged = existing.status !== contact.status;
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: statusChanged ? "status_changed" : "updated",
+          entityType: "contact",
+          entityId: contact.id,
+          summary: statusChanged
+            ? `Contact status changed from ${existing.status} to ${contact.status}.`
+            : `Contact updated: ${contact.firstName} ${contact.lastName}.`,
+          metadata: {
+            ...contactAuditMetadata(contact),
+            changedFields: auditChangedFields(parsed.data),
+            previousStatus: statusChanged ? existing.status : null
+          }
+        })
+      });
     });
     updateTag("contacts");
     revalidatePath("/contacts");

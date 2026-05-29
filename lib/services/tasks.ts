@@ -247,7 +247,26 @@ export async function completeTask(id: string): Promise<Task> {
 }
 
 export async function deleteTask(id: string): Promise<Task> {
-  return prisma.task.delete({ where: { id: idSchema.parse(id) } });
+  const taskId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const task = await tx.task.delete({
+      where: { id: taskId }
+    });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "deleted",
+        entityType: "task",
+        entityId: task.id,
+        summary: `Task deleted: ${task.title}.`,
+        metadata: taskAuditMetadata(task)
+      })
+    });
+
+    return task;
+  });
 }
 
 function taskAuditMetadata(task: Task): Record<string, AuditMetadataValue> {

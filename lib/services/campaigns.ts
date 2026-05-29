@@ -272,7 +272,26 @@ export async function completeCampaign(id: string): Promise<Campaign> {
 }
 
 export async function deleteCampaign(id: string): Promise<Campaign> {
-  return prisma.campaign.delete({ where: { id: idSchema.parse(id) } });
+  const campaignId = idSchema.parse(id);
+
+  return prisma.$transaction(async (tx) => {
+    const campaign = await tx.campaign.delete({
+      where: { id: campaignId }
+    });
+
+    await tx.auditEvent.create({
+      data: buildAuditEventCreateData({
+        category: "record",
+        action: "deleted",
+        entityType: "campaign",
+        entityId: campaign.id,
+        summary: `Campaign deleted: ${campaign.name}.`,
+        metadata: campaignAuditMetadata(campaign)
+      })
+    });
+
+    return campaign;
+  });
 }
 
 function campaignAuditMetadata(

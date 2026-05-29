@@ -4,6 +4,8 @@ import { revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { accountFormSchema } from "@/lib/validation";
+import { recordAuditEvent, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import type { Account } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -14,6 +16,23 @@ function fieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
   return error.flatten().fieldErrors;
+}
+
+function accountAuditMetadata(account: Account): Record<string, AuditMetadataValue> {
+  return {
+    name: account.name,
+    domain: account.domain,
+    industry: account.industry,
+    city: account.city,
+    region: account.region,
+    status: account.status,
+    ownerId: account.ownerId,
+    healthScore: account.healthScore
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }
 
 export async function createAccountAction(formData: FormData): Promise<ActionResult> {
@@ -37,7 +56,7 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
   }
 
   try {
-    await prisma.account.create({
+    const account = await prisma.account.create({
       data: {
         name: parsed.data.name,
         domain: parsed.data.domain ?? null,
@@ -48,6 +67,15 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
         ownerId: parsed.data.ownerId ?? null,
         healthScore: parsed.data.healthScore
       }
+    });
+
+    await recordAuditEvent({
+      category: "record",
+      action: "created",
+      entityType: "account",
+      entityId: account.id,
+      summary: `Account created: ${account.name}.`,
+      metadata: accountAuditMetadata(account)
     });
   } catch (error) {
     return actionErrorResult(error, {
@@ -91,7 +119,11 @@ export async function updateAccountAction(
   }
 
   try {
-    await prisma.account.update({
+    const existing = await prisma.account.findUniqueOrThrow({
+      where: { id: accountId }
+    });
+
+    const account = await prisma.account.update({
       where: {
         id: accountId
       },
@@ -104,6 +136,23 @@ export async function updateAccountAction(
         status: parsed.data.status,
         ownerId: parsed.data.ownerId ?? null,
         healthScore: parsed.data.healthScore
+      }
+    });
+
+    const statusChanged = existing.status !== account.status;
+
+    await recordAuditEvent({
+      category: "record",
+      action: statusChanged ? "status_changed" : "updated",
+      entityType: "account",
+      entityId: account.id,
+      summary: statusChanged
+        ? `Account status changed from ${existing.status} to ${account.status}.`
+        : `Account updated: ${account.name}.`,
+      metadata: {
+        ...accountAuditMetadata(account),
+        changedFields: auditChangedFields(parsed.data),
+        previousStatus: statusChanged ? existing.status : null
       }
     });
   } catch (error) {

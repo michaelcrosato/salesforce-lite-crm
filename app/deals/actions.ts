@@ -5,8 +5,9 @@ import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
-import { recordOpportunityStageChangeOperation } from "@/lib/services/opportunityStageHistory";
 import { dealFormSchema, dealMoveSchema } from "@/lib/validation";
+import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import type { Deal } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -21,6 +22,23 @@ function fieldErrors(error: {
 
 function closeDateFromForm(value: string | undefined) {
   return value ? new Date(`${value}T12:00:00`) : null;
+}
+
+function dealAuditMetadata(deal: Deal): Record<string, AuditMetadataValue> {
+  return {
+    accountId: deal.accountId,
+    contactId: deal.contactId,
+    ownerId: deal.ownerId,
+    name: deal.name,
+    stage: deal.stage,
+    value: deal.value,
+    probability: deal.probability,
+    expectedCloseDate: deal.expectedCloseDate ? deal.expectedCloseDate.toISOString() : null
+  };
+}
+
+function auditChangedFields(input: object): string[] {
+  return Object.keys(input).sort();
 }
 
 export async function createDealAction(formData: FormData): Promise<ActionResult> {
@@ -45,33 +63,46 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
 
   const now = new Date();
   try {
-    await prisma.deal.create({
-      data: {
-        accountId: parsed.data.accountId ?? null,
-        contactId: parsed.data.contactId ?? null,
-        ownerId: parsed.data.ownerId ?? null,
-        name: parsed.data.name,
-        stage: parsed.data.stage,
-        value: parsed.data.value,
-        probability: parsed.data.probability,
-        expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
-        lastActivityAt: now,
-        activities: {
-          create: {
-            accountId: parsed.data.accountId ?? null,
-            contactId: parsed.data.contactId ?? null,
-            userId: parsed.data.ownerId ?? null,
-            type: "status_change",
-            title: `${parsed.data.name} created in ${STAGE_LABELS[parsed.data.stage]}`,
-            summary: `Deal created in ${parsed.data.stage}.`,
-            nextStep:
-              parsed.data.stage === "won" || parsed.data.stage === "lost"
-                ? "Review closed deal outcome."
-                : "Confirm next action for the new stage.",
-            createdAt: now
+    await prisma.$transaction(async (tx) => {
+      const deal = await tx.deal.create({
+        data: {
+          accountId: parsed.data.accountId ?? null,
+          contactId: parsed.data.contactId ?? null,
+          ownerId: parsed.data.ownerId ?? null,
+          name: parsed.data.name,
+          stage: parsed.data.stage,
+          value: parsed.data.value,
+          probability: parsed.data.probability,
+          expectedCloseDate: closeDateFromForm(parsed.data.expectedCloseDate),
+          lastActivityAt: now,
+          activities: {
+            create: {
+              accountId: parsed.data.accountId ?? null,
+              contactId: parsed.data.contactId ?? null,
+              userId: parsed.data.ownerId ?? null,
+              type: "status_change",
+              title: `${parsed.data.name} created in ${STAGE_LABELS[parsed.data.stage]}`,
+              summary: `Deal created in ${parsed.data.stage}.`,
+              nextStep:
+                parsed.data.stage === "won" || parsed.data.stage === "lost"
+                  ? "Review closed deal outcome."
+                  : "Confirm next action for the new stage.",
+              createdAt: now
+            }
           }
         }
-      },
+      });
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: "created",
+          entityType: "opportunity",
+          entityId: deal.id,
+          summary: `Opportunity created: ${deal.name}.`,
+          metadata: dealAuditMetadata(deal)
+        })
+      });
     });
   } catch (error) {
     return actionErrorResult(error, {
@@ -131,7 +162,7 @@ export async function updateDealAction(
   const now = new Date();
   try {
     await prisma.$transaction(async (tx) => {
-      await tx.deal.update({
+      const deal = await tx.deal.update({
         where: {
           id: dealId
         },
@@ -148,7 +179,9 @@ export async function updateDealAction(
         }
       });
 
-      if (existing.stage !== parsed.data.stage) {
+      const stageChanged = existing.stage !== parsed.data.stage;
+
+      if (stageChanged) {
         await tx.activity.create({
           data: {
             accountId: parsed.data.accountId ?? null,
@@ -176,6 +209,23 @@ export async function updateDealAction(
           }
         });
       }
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: stageChanged ? "stage_changed" : "updated",
+          entityType: "opportunity",
+          entityId: deal.id,
+          summary: stageChanged
+            ? `Opportunity stage changed from ${existing.stage} to ${deal.stage}.`
+            : `Opportunity updated: ${deal.name}.`,
+          metadata: {
+            ...dealAuditMetadata(deal),
+            changedFields: auditChangedFields(parsed.data),
+            previousStatus: stageChanged ? existing.stage : null
+          }
+        })
+      });
     });
   } catch (error) {
     return actionErrorResult(error, {
@@ -233,8 +283,8 @@ export async function moveDealAction(input: {
   const probability = probabilityForStage(parsed.data.stage);
 
   try {
-    await prisma.$transaction([
-      prisma.deal.update({
+    await prisma.$transaction(async (tx) => {
+      const updatedDeal = await tx.deal.update({
         where: {
           id: deal.id
         },
@@ -243,8 +293,9 @@ export async function moveDealAction(input: {
           probability,
           lastActivityAt: now
         }
-      }),
-      prisma.activity.create({
+      });
+
+      await tx.activity.create({
         data: {
           accountId: deal.accountId,
           contactId: deal.contactId,
@@ -259,15 +310,33 @@ export async function moveDealAction(input: {
               : "Confirm next action for the new stage.",
           createdAt: now
         }
-      }),
-      recordOpportunityStageChangeOperation({
-        dealId: deal.id,
-        fromStage: deal.stage,
-        toStage: parsed.data.stage,
-        changedAt: now,
-        changedByUserId: deal.ownerId ?? undefined
-      })
-    ]);
+      });
+
+      await tx.opportunityStageHistory.create({
+        data: {
+          dealId: deal.id,
+          fromStage: deal.stage,
+          toStage: parsed.data.stage,
+          changedAt: now,
+          changedByUserId: deal.ownerId ?? null
+        }
+      });
+
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: "stage_changed",
+          entityType: "opportunity",
+          entityId: updatedDeal.id,
+          summary: `Opportunity stage changed from ${deal.stage} to ${updatedDeal.stage}.`,
+          metadata: {
+            ...dealAuditMetadata(updatedDeal),
+            changedFields: ["stage", "probability"],
+            previousStatus: deal.stage
+          }
+        })
+      });
+    });
   } catch (error) {
     return actionErrorResult(error, {
       action: "moveDeal",
