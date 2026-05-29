@@ -19,3 +19,4 @@ Backfilled current baseline:
 - `2026-05-24 | codex | [S33-F1] | add KnowledgeArticle schema, service workflow metadata, and seeded article examples`
 - `2026-05-27 | codex | [REPO HEALTH] | add Activity composite index for lead routing-event lookup by lead, type, and createdAt`
 - `2026-05-27 | codex | [S50-F1] | add SavedReportDefinition schema for persisted saved report definition contracts`
+- `2026-05-29 | claude | [SEED CHANGE] | add type-only non-null assertions to modulo-indexed reads for noUncheckedIndexedAccess (spec 005); no data, ordering, or routing change (TS strips !, compiled JS identical)`

@@ -315,8 +315,9 @@ function buildLead(
     postalCode?: string;
   }
 ): DealerLeadSeed {
-  const firstName = leadFirstNames[index % leadFirstNames.length];
-  const lastName = leadLastNames[index % leadLastNames.length];
+  // `index % length` is always a valid index into these non-empty seed arrays.
+  const firstName = leadFirstNames[index % leadFirstNames.length]!;
+  const lastName = leadLastNames[index % leadLastNames.length]!;
   const leadNumber = index + 1;
 
   return {
@@ -327,7 +328,7 @@ function buildLead(
     email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${leadNumber}@dealerlead.example`,
     postalCode: input.postalCode ?? postalSamples[input.areaId ?? ""] ?? "Z9Z 9Z9",
     province: provinceForArea(input.areaId),
-    source: leadSources[index % leadSources.length],
+    source: leadSources[index % leadSources.length]!,
     status: input.status,
     areaId: input.areaId,
     assignedOrderId: input.assignedOrderId,
@@ -637,13 +638,14 @@ async function main() {
   });
 
   const activityData = Array.from({ length: 45 }).map((_, index) => {
-    const deal = deals[index % deals.length];
+    // `index % length` is always a valid index into these non-empty seed arrays.
+    const deal = deals[index % deals.length]!;
     const contact = contacts.find((candidate) => candidate[0] === deal[2]);
     const accountId = deal[1];
-    const rawText = noteTemplates[index % noteTemplates.length];
+    const rawText = noteTemplates[index % noteTemplates.length]!;
     const summary = deterministicActivitySummarizer.summarize({ rawText });
     const typeCycle = ["note", "call", "email", "meeting", "status_change"] as const;
-    const type = typeCycle[index % typeCycle.length];
+    const type = typeCycle[index % typeCycle.length]!;
 
     return {
       id: `activity-${index + 1}`,
@@ -863,7 +865,8 @@ async function main() {
       accountId,
       contactId
     });
-    const slaProfile = caseSlaProfiles[i % caseSlaProfiles.length];
+    // `i % length` is always a valid index into this non-empty seed array.
+    const slaProfile = caseSlaProfiles[i % caseSlaProfiles.length]!;
     const createdAt = new Date(
       caseSlaSeedNow.getTime() - slaProfile.createdHoursAgo * caseSlaHour
     );
@@ -1014,16 +1017,17 @@ async function main() {
   const campaignContactIds = contacts.slice(0, 6).map((c) => c[0]);
 
   const campaignData = Array.from({ length: 8 }, (_, i) => {
-    const ownerId = campaignOwners[i % campaignOwners.length];
+    // `i % length` is always a valid index into these non-empty seed arrays.
+    const ownerId = campaignOwners[i % campaignOwners.length]!;
     const mod = i % 5;
-    const status = campaignStatuses[mod % campaignStatuses.length];
+    const status = campaignStatuses[mod % campaignStatuses.length]!;
     const start = new Date(Date.now() - (30 + i * 5) * 86400000);
     const end = new Date(start.getTime() + (mod + 10) * 86400000);
     const budget = 5000 + (i % 4) * 2500;
 
     return {
       id: `campaign-${String(i + 1).padStart(3, "0")}`,
-      name: campaignTemplates[i % campaignTemplates.length],
+      name: campaignTemplates[i % campaignTemplates.length]!,
       description: "Seeded marketing campaign for campaign list and lead association demo.",
       status,
       startDate: start,
