@@ -1,6 +1,12 @@
 "use client";
 
-import { type FormEvent, useMemo, useState, useTransition } from "react";
+import {
+  type FormEvent,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  useTransition
+} from "react";
 import {
   AlertTriangle,
   ClipboardCheck,
@@ -70,6 +76,11 @@ export function RoutingSimulatorOperator({
   const [result, setResult] =
     useState<RoutingSimulatorReviewActionResult | null>(null);
   const [isPending, startTransition] = useTransition();
+  const isHydrated = useSyncExternalStore(
+    subscribeHydration,
+    getHydrationSnapshot,
+    getServerHydrationSnapshot
+  );
   const fixtureInput = useMemo(
     () =>
       JSON.stringify(
@@ -125,7 +136,11 @@ export function RoutingSimulatorOperator({
   }
 
   return (
-    <section className="space-y-4" data-testid="routing-simulator-operator">
+    <section
+      className="space-y-4"
+      data-hydrated={isHydrated ? "true" : "false"}
+      data-testid="routing-simulator-operator"
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-normal">
@@ -660,4 +675,18 @@ function formatToken(value: string): string {
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+function subscribeHydration(onStoreChange: () => void): () => void {
+  queueMicrotask(onStoreChange);
+
+  return () => {};
+}
+
+function getHydrationSnapshot(): boolean {
+  return true;
+}
+
+function getServerHydrationSnapshot(): boolean {
+  return false;
 }

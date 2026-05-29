@@ -106,7 +106,7 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   ).toContainText("10");
   await expect(
     page.getByTestId("list-filter-support-summary-filters")
-  ).toContainText("37");
+  ).toContainText("38");
   await expect(
     page.getByTestId("list-filter-support-summary-sorts")
   ).toContainText("42");
@@ -139,6 +139,10 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   ).toContainText("Routes off");
 
   await expect(page.getByTestId("saved-report-operator")).toBeVisible();
+  await expect(page.getByTestId("saved-report-operator")).toHaveAttribute(
+    "data-hydrated",
+    "true"
+  );
   await expect(page.getByTestId("saved-report-summary-entities")).toContainText(
     "10"
   );
