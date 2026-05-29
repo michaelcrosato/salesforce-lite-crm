@@ -2,11 +2,11 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 5 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 008): `tsc --noEmit` ✅ · test **568 passed** ✅ · build ✅.
+**Overall: 6 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 005): `tsc --noEmit` ✅ (now with `noUncheckedIndexedAccess`) · test **568 passed** ✅ · build ✅.
 
 ---
 
-## Wave 0 — Quick Wins & Safety (5 / 8)
+## Wave 0 — Quick Wins & Safety (6 / 8)
 
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
@@ -14,7 +14,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 002 | Zod v4 imports (`zod/v4`) | — | |
 | [x] Done | 003 | Portable case-insensitive search | — | |
 | [ ] Todo | 004 | Surface server-action errors | 009 | |
-| [ ] Todo | 005 | `noUncheckedIndexedAccess` | — | |
+| [x] Done | 005 | `noUncheckedIndexedAccess` | — | |
 | [ ] Todo | 006 | Vitest coverage reporting | — | ⚠️ |
 | [x] Done | 007 | Reconcile ownership zones | — | |
 | [x] Done | 008 | Security headers baseline | — | |
@@ -65,3 +65,4 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-28 — **003 Done** (branch `phase-0-quick-wins`, `[CROSS-ZONE OK]` — touches `lib/prisma.ts`, `lib/services/search.ts`, `tests/api/search.test.ts` [gemini zone]). Added `databaseProvider()` to `lib/prisma.ts` (reused by `createPrismaClient`); `globalSearch`'s `contains` helper now returns `{ contains, mode: "insensitive" }` on Postgres and `{ contains }` on SQLite. New unit test pins case-folding (`ACME`/`acme`/`AcMe` → "Acme Insulation Co"). SQLite client lacks `mode` in `StringFilter`, so a dedicated filter type avoids `any`. Validated: `npm run typecheck` exit 0 · `npm run test` **566 passed** · `npm run build` exit 0.
 - 2026-05-29 — **008 Done** (branch `phase-0-quick-wins`). Files: `next.config.mjs` (+`async headers()` → baseline `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Content-Security-Policy-Report-Only` on `source: "/:path*"`), `tests/security-headers.test.ts` (new, 2 cases). **Two deliberate deviations** (see spec 008 Implementation Note): (a) automated check landed as **vitest**, not the spec's Playwright `request` — vitest is the authoritative inline gate (CLAUDE.md §6) while e2e is advisory; the test imports the `.mjs` config via a runtime `new URL(..., import.meta.url)` specifier to dodge `tsc`'s `allowJs:false` (no `any`/`@ts-ignore`), and `npm run build` independently validates the `headers()` shape. (b) `next.config.mjs` kept (not renamed `.ts`) — filename is referenced in AGENTS.md/PLAN.md/REPO_MAP/run-autonomous-loop.ps1/specs 014,017. **CSP is report-only only** (enforcing + manual browser dry-run deferred to a follow-up spec); HSTS omitted (HTTP/local-first). Validated: `npx tsc --noEmit` exit 0 · `npm run test` **568 passed** · `npm run build` exit 0.
 - 2026-05-29 — **007 Done** (branch `phase-0-quick-wins`, `[CONFIG CHANGE]` for `.claude/zones.json`; also touches shared-zone `AGENTS.md` + `PLAN.md`). Removed phantom `lib/types/`/`lib/db/`/`lib/forecast/` paths; Codex zone now reads the real tree (`lib/server`, `lib/services`, `lib/business`, `lib/routing`, `lib/ai`, `lib/prisma.ts`, `prisma/seed.ts`) consistently across `AGENTS.md`, `.claude/zones.json`, and `PLAN.md` §5. PLAN.md is mixed CRLF/LF → edited byte-precisely via a one-shot Node script (verified 1 row + 1 bullet matched), not the Edit tool. Remaining `--include=*.md` phantom matches are only spec 007, the PLAN.md "Rejected:" ADR note, and sprint-4 `prompts/shared/**` (all historical). Validated: `npm run test` **566 passed** · `npm run build` exit 0.
+- 2026-05-29 — **005 Done** (branch `phase-0-quick-wins`). Enabled `noUncheckedIndexedAccess` and fixed all **132** fallout errors (lib 43, tests 66, prisma/seed 16, components 7). Production code fixed with behavior-preserving narrowing (guards, `?.`, `?? null/0`); the one `lib/routing/leadRouter.ts` `!` is guarded by an unreachable-throw. `prisma/seed.ts` ([SEED CHANGE] + changelog) uses `!` on modulo-indexed reads into non-empty constant arrays — TS strips `!`, so seeded rows + V5K 0A1 routing are byte-identical. Tests use `!` on setup-guaranteed reads (spec-sanctioned). Landed in 5 area commits (lib → components → seed → tests → tsconfig flag flip **last**) so every committed snapshot typechecks. **Environmental note:** the date-sensitive `seeded cases cover case SLA states` test (`tests/seed-integrity.test.ts`) fails on a *stale* shared SQLite baseline (case ages drift past the `due_soon` window) — reproduced on clean HEAD, so unrelated to this spec; fixed by re-seeding (`npm run seed`). Logged as a hardening candidate in `plan/BACKLOG.md`. Validated: `npx tsc --noEmit` exit 0 · `npm run test` **568 passed** · `npm run build` exit 0.
