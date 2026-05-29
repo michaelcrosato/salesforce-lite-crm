@@ -34,16 +34,16 @@ describe("crmClient list functions", () => {
       filters: { search: "ListMatch", status: "active" }
     });
     expect(results).toHaveLength(1);
-    expect(results[0].name).toBe("ListMatch Account");
+    expect(results[0]!.name).toBe("ListMatch Account");
   });
 
   it("lists contacts with search and account filter", async () => {
     const accounts = await listAccounts({ filters: { search: "ListMatch" } });
     const results = await listContacts({
-      filters: { search: "ListMatch", accountId: accounts[0].id }
+      filters: { search: "ListMatch", accountId: accounts[0]!.id }
     });
     expect(results).toHaveLength(1);
-    expect(results[0].firstName).toBe("ListMatch");
+    expect(results[0]!.firstName).toBe("ListMatch");
   });
 
   it("lists opportunities with stage filter", async () => {

@@ -89,8 +89,8 @@ describe("leads service - getRoutingDecisionForLead", () => {
     expect(decision?.matchedAreaName).toBe("Test Routing Area");
     expect(decision?.selectedOrderId).toBe(testOrderId);
     expect(decision?.candidateOrders).toHaveLength(1);
-    expect(decision?.candidateOrders[0].paceGap).toBe(2.5);
-    expect(decision?.candidateOrders[0].dealerName).toBe("Test Dealer Order");
+    expect(decision?.candidateOrders[0]!.paceGap).toBe(2.5);
+    expect(decision?.candidateOrders[0]!.dealerName).toBe("Test Dealer Order");
   });
 
   it("parses valid JSON routing payload steps", async () => {
@@ -134,8 +134,8 @@ describe("leads service - getRoutingDecisionForLead", () => {
     expect(decision?.normalizedPostal).toBe("90210");
     expect(decision?.prefix).toBe("90210");
     expect(decision?.candidateOrders).toHaveLength(1);
-    expect(decision?.candidateOrders[0].dealerName).toBe("Test JSON Order");
-    expect(decision?.candidateOrders[0].paceGap).toBe(5);
+    expect(decision?.candidateOrders[0]!.dealerName).toBe("Test JSON Order");
+    expect(decision?.candidateOrders[0]!.paceGap).toBe(5);
   });
 
   it("resolves US zip codes correctly", async () => {
@@ -206,7 +206,7 @@ describe("leads service - getRoutingDecisionForLead", () => {
 
     expect(decisions.size).toBe(3);
     expect(decisions.get(testLeadId)?.summary).toBe("Latest route (pace gap 3)");
-    expect(decisions.get(testLeadId)?.candidateOrders[0].paceGap).toBe(3);
+    expect(decisions.get(testLeadId)?.candidateOrders[0]!.paceGap).toBe(3);
     expect(decisions.get(testLeadIdTwo)?.leadId).toBe(testLeadIdTwo);
     expect(decisions.get("missing-lead-routing")).toBeNull();
   });

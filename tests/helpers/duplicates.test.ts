@@ -60,7 +60,7 @@ describe("duplicate detector", () => {
   });
 
   it("returns empty for no duplicates", () => {
-    const unique = [baseContacts[0], baseContacts[2], baseContacts[4]];
+    const unique = [baseContacts[0]!, baseContacts[2]!, baseContacts[4]!];
     expect(findDuplicateContacts(unique)).toHaveLength(0);
   });
 
@@ -77,6 +77,6 @@ describe("duplicate detector", () => {
     }));
     const groups = findDuplicateLeads(leads);
     expect(groups.length).toBeGreaterThan(0);
-    expect(groups[0].records[0].id.startsWith("l")).toBe(true);
+    expect(groups[0]!.records[0]!.id.startsWith("l")).toBe(true);
   });
 });

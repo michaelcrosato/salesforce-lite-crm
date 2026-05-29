@@ -53,25 +53,25 @@ describe("server CSV import preview validation", () => {
         status: "active"
       }
     });
-    expect(preview.rows[0].data).toMatchObject({
+    expect(preview.rows[0]!.data).toMatchObject({
       firstName: "Alice",
       lastName: "Ng",
       email: "alice.ng@example.test",
       status: "active"
     });
-    expect(preview.rows[1].status).toBe("invalid");
-    expect(preview.rows[1].errors.join(" ")).toContain("First Name");
-    expect(preview.rows[1].errors.join(" ")).toContain("Email");
-    expect(preview.rows[1].errors.join(" ")).toContain("Status");
+    expect(preview.rows[1]!.status).toBe("invalid");
+    expect(preview.rows[1]!.errors.join(" ")).toContain("First Name");
+    expect(preview.rows[1]!.errors.join(" ")).toContain("Email");
+    expect(preview.rows[1]!.errors.join(" ")).toContain("Status");
     expect(preview.issueSummary).toMatchObject({
-      errorCount: preview.rows[1].errors.length,
+      errorCount: preview.rows[1]!.errors.length,
       warningCount: 0,
       affectedRows: 1
     });
     expect(preview.issueSummary.categories).toContainEqual({
       category: "row_validation",
       severity: "error",
-      issueCount: preview.rows[1].errors.length,
+      issueCount: preview.rows[1]!.errors.length,
       affectedRows: 1
     });
     expect(preview.issueSummary.categories).toContainEqual({
@@ -93,14 +93,14 @@ describe("server CSV import preview validation", () => {
 
     expect(preview.validRows).toBe(1);
     expect(preview.invalidRows).toBe(1);
-    expect(preview.rows[0].data).toMatchObject({
+    expect(preview.rows[0]!.data).toMatchObject({
       firstName: "Maya",
       lastName: "Singh",
       postalCode: "V5K 0A1",
       source: "Website",
       status: "new"
     });
-    expect(preview.rows[1].errors.join(" ")).toContain(
+    expect(preview.rows[1]!.errors.join(" ")).toContain(
       "Postal code must be in the format A1A 1A1"
     );
   });
@@ -122,8 +122,8 @@ describe("server CSV import preview validation", () => {
       fieldKey: null,
       status: "ignored"
     });
-    expect(preview.rows[0].values.firstName).toBe("Alice");
-    expect(preview.rows[0].status).toBe("valid");
+    expect(preview.rows[0]!.values.firstName).toBe("Alice");
+    expect(preview.rows[0]!.status).toBe("valid");
     expect(preview.issueSummary.categories).toContainEqual({
       category: "header",
       severity: "error",
@@ -139,9 +139,9 @@ describe("server CSV import preview validation", () => {
     );
 
     expect(preview.parseErrors.length).toBeGreaterThan(0);
-    expect(preview.rows[0].errors).toContain("Expected 3 columns but found 2.");
+    expect(preview.rows[0]!.errors).toContain("Expected 3 columns but found 2.");
     expect(preview.issueSummary.errorCount).toBe(
-      preview.parseErrors.length + preview.rows[0].errors.length
+      preview.parseErrors.length + preview.rows[0]!.errors.length
     );
     expect(preview.issueSummary.categories).toContainEqual({
       category: "parse",
@@ -152,7 +152,7 @@ describe("server CSV import preview validation", () => {
     expect(preview.issueSummary.categories).toContainEqual({
       category: "row_validation",
       severity: "error",
-      issueCount: preview.rows[0].errors.length,
+      issueCount: preview.rows[0]!.errors.length,
       affectedRows: 1
     });
   });
@@ -220,7 +220,7 @@ describe("server CSV import preflight diagnostics", () => {
       "contact_account_not_found",
       "contact_missing_contact_method"
     ]);
-    expect(preview.rows[0].diagnostics).toMatchObject([
+    expect(preview.rows[0]!.diagnostics).toMatchObject([
       {
         category: "duplicate",
         fieldKey: "email",
@@ -235,7 +235,7 @@ describe("server CSV import preflight diagnostics", () => {
         relatedRecord: null
       }
     ]);
-    expect(preview.rows[1].diagnostics).toMatchObject([
+    expect(preview.rows[1]!.diagnostics).toMatchObject([
       {
         category: "contactability",
         fieldKey: null,
@@ -309,37 +309,37 @@ describe("server CSV import preflight diagnostics", () => {
       "blocked",
       "review_candidate"
     ]);
-    expect(preview.rows[0].readiness).toMatchObject({
+    expect(preview.rows[0]!.readiness).toMatchObject({
       canImport: true,
       reasonCount: 0
     });
-    expect(preview.rows[0].action).toMatchObject({
+    expect(preview.rows[0]!.action).toMatchObject({
       canProceed: true,
       requiresReview: false,
       reasonCodes: []
     });
-    expect(preview.rows[1].action).toMatchObject({
+    expect(preview.rows[1]!.action).toMatchObject({
       canProceed: true,
       requiresReview: true,
       reasonCodes: ["contact_duplicate_email"]
     });
-    expect(preview.rows[1].readiness.reasons).toContainEqual({
+    expect(preview.rows[1]!.readiness.reasons).toContainEqual({
       source: "diagnostic_warning",
       severity: "warning",
       code: "contact_duplicate_email",
       fieldKey: "email",
       message: "Existing contact has this email: Alice Ng."
     });
-    expect(preview.rows[2].readiness).toMatchObject({
+    expect(preview.rows[2]!.readiness).toMatchObject({
       canImport: false,
       reasonCount: 1
     });
-    expect(preview.rows[2].action).toMatchObject({
+    expect(preview.rows[2]!.action).toMatchObject({
       canProceed: false,
       requiresReview: true,
       reasonCodes: ["row_validation_error"]
     });
-    expect(preview.rows[3].readiness).toMatchObject({
+    expect(preview.rows[3]!.readiness).toMatchObject({
       status: "needs_review",
       canImport: true
     });
@@ -362,12 +362,12 @@ describe("server CSV import preflight diagnostics", () => {
       importableRows: 0,
       globalErrorCount: 1
     });
-    expect(preview.rows[0].readiness).toMatchObject({
+    expect(preview.rows[0]!.readiness).toMatchObject({
       status: "blocked",
       canImport: false,
       reasonCount: 1
     });
-    expect(preview.rows[0].readiness.reasons[0]).toMatchObject({
+    expect(preview.rows[0]!.readiness.reasons[0]).toMatchObject({
       source: "header",
       severity: "error",
       code: "header_error"
@@ -410,11 +410,11 @@ describe("server CSV import preflight diagnostics", () => {
       globalErrorCount: 0
     });
     expect(preview.rows.every((row) => row.readiness.canImport)).toBe(true);
-    expect(preview.rows[0].diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+    expect(preview.rows[0]!.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
       "lead_duplicate_email",
       "lead_area_not_found"
     ]);
-    expect(preview.rows[1].diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+    expect(preview.rows[1]!.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
       "lead_missing_contact_method",
       "lead_postal_missing"
     ]);

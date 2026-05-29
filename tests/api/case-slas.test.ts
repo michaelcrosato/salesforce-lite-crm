@@ -88,10 +88,10 @@ describe("case SLA contracts", () => {
       "stopped_overdue"
     ]);
     expect(snapshots.every((snapshot) => snapshot.isStopped)).toBe(true);
-    expect(snapshots[0].stoppedAt?.toISOString()).toBe(
+    expect(snapshots[0]!.stoppedAt?.toISOString()).toBe(
       "2026-05-24T10:00:00.000Z"
     );
-    expect(snapshots[1].overdueMinutes).toBe(240);
+    expect(snapshots[1]!.overdueMinutes).toBe(240);
   });
 
   it("exposes read-only case service SLA snapshots", async () => {

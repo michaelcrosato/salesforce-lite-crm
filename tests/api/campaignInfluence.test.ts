@@ -289,9 +289,9 @@ describe("campaign influence summaries", () => {
     });
 
     expect(summaries).toHaveLength(1);
-    expect(summaries[0].campaignId).toBe(selected.id);
-    expect(summaries[0].topOpportunities).toHaveLength(1);
-    expect(summaries[0].opportunityMetrics.totalCount).toBe(2);
+    expect(summaries[0]!.campaignId).toBe(selected.id);
+    expect(summaries[0]!.topOpportunities).toHaveLength(1);
+    expect(summaries[0]!.opportunityMetrics.totalCount).toBe(2);
   });
 
   it("rejects invalid campaign identifiers", async () => {

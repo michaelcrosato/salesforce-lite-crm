@@ -129,10 +129,10 @@ describe("server bulk action selected export packets", () => {
       "Contact ID,First Name,Last Name,Email,Phone,Title,Status,Account ID,Account Name,Created At,Updated At"
     );
     expect(lines).toHaveLength(3);
-    expect(lines[1].startsWith(
+    expect(lines[1]!.startsWith(
       `${contactBId},Beta,Selected,beta.selected@example.test,,,inactive,${accountId},Selected Export Account,`
     )).toBe(true);
-    expect(lines[2].startsWith(
+    expect(lines[2]!.startsWith(
       `${contactAId},Alpha,Selected,alpha.selected@example.test,,,active,${accountId},Selected Export Account,`
     )).toBe(true);
     expect(packet.auditPlan).toMatchObject({

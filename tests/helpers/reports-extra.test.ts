@@ -43,8 +43,8 @@ describe("reports-extra pure helpers", () => {
       }
     ];
     const b = bucketByDateRange(records, "createdAt", buckets);
-    expect(b.apr.map((r) => r.id)).toEqual(["r3", "r4"]);
-    expect(b.may.map((r) => r.id)).toEqual(["r1", "r2", "r5"]);
+    expect(b.apr!.map((r) => r.id)).toEqual(["r3", "r4"]);
+    expect(b.may!.map((r) => r.id)).toEqual(["r1", "r2", "r5"]);
   });
 
   it("handles empty and missing dates gracefully", () => {

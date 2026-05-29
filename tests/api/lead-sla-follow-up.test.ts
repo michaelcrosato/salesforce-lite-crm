@@ -112,13 +112,13 @@ describe("lead SLA follow-up packets", () => {
       ["dead", "dead_terminal", "none", "no_follow_up_dead"]
     ]);
 
-    expect(packets[0].stale).toMatchObject({
+    expect(packets[0]!.stale).toMatchObject({
       isStale: true,
       staleAfterDays: 7,
       urgentStaleAfterDays: 14,
       staleAgeDays: 3
     });
-    expect(packets[2].age.routingEventAgeDays).toBe(1);
+    expect(packets[2]!.age.routingEventAgeDays).toBe(1);
     expect(packets.every((packet) => packet.write.readOnly)).toBe(true);
   });
 

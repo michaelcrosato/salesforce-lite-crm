@@ -200,7 +200,7 @@ describe("server CSV release exception registers", () => {
       "entity"
     ]);
 
-    const contactExport = contacts.entries[0];
+    const contactExport = contacts.entries[0]!;
 
     expect(contactExport).toMatchObject({
       id: "contacts:export",

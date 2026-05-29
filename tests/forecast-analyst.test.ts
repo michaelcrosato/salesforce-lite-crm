@@ -118,7 +118,7 @@ describe("forecast simulator math", () => {
 
   it("falls back to safe defaults for non-finite scenario inputs", () => {
     const forecast = buildForecast({
-      orders: [forecastOrders[0]],
+      orders: [forecastOrders[0]!],
       leadVolumeMultiplier: Number.NaN,
       assignmentRate: Number.POSITIVE_INFINITY,
       now
@@ -138,7 +138,7 @@ describe("forecast simulator math", () => {
     const forecast = buildForecast({
       orders: [
         {
-          ...forecastOrders[0],
+          ...forecastOrders[0]!,
           deliveredThisMonth: Number.NaN,
           monthlyQuota: Number.POSITIVE_INFINITY
         }

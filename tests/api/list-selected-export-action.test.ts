@@ -59,9 +59,9 @@ describe("list selected export action", () => {
         message: "Selected record was not found."
       }
     ]);
-    expect(result.csv.split("\n")[1].startsWith(`${contactBId},Beta,Action`))
+    expect(result.csv.split("\n")[1]!.startsWith(`${contactBId},Beta,Action`))
       .toBe(true);
-    expect(result.csv.split("\n")[2].startsWith(`${contactAId},Alpha,Action`))
+    expect(result.csv.split("\n")[2]!.startsWith(`${contactAId},Alpha,Action`))
       .toBe(true);
     expect(await prisma.auditEvent.count()).toBe(auditCountBefore);
     expect(await listContacts()).toEqual(contactsBefore);

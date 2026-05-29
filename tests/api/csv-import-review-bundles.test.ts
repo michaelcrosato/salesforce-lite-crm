@@ -88,7 +88,7 @@ describe("server CSV import review bundles", () => {
       "create_candidate",
       "review_candidate"
     ]);
-    expect(bundle.rowSample.rows[1].diagnostics[0]).toMatchObject({
+    expect(bundle.rowSample.rows[1]!.diagnostics[0]).toMatchObject({
       code: "contact_duplicate_email",
       fieldKey: "email",
       relatedRecord: {
@@ -142,7 +142,7 @@ describe("server CSV import review bundles", () => {
     expect(after).toBe(before);
     expect(bundle.rowSample.sampleLimit).toBe(CSV_IMPORT_REVIEW_BUNDLE_DEFAULT_SAMPLE_LIMIT);
     expect(bundle.rowSample.rows).toHaveLength(1);
-    expect(bundle.rowSample.rows[0].data).toMatchObject({
+    expect(bundle.rowSample.rows[0]!.data).toMatchObject({
       firstName: "Csv",
       lastName: "Review",
       postalCode: "V5K 0A1",

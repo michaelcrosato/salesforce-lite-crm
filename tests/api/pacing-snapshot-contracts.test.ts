@@ -290,7 +290,7 @@ describe("pacing snapshot contracts", () => {
       1,
       7
     ]);
-    expect(fixture.requests[0].dealerOrderIds).toEqual([
+    expect(fixture.requests[0]!.dealerOrderIds).toEqual([
       "dealer-order-vancouver-northstar"
     ]);
     expect(fixture.write).toEqual(noWriteFlags);

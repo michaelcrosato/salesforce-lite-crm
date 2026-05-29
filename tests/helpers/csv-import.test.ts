@@ -8,8 +8,8 @@ describe("csv import preview helper (RFC 4180 tolerant)", () => {
     const res = parseCsv(input);
     expect(res.headers).toEqual(["Name", "Email", "Notes"]);
     expect(res.rows).toHaveLength(2);
-    expect(res.rows[0][1]).toBe("a,b@example.com");
-    expect(res.rows[0][2]).toBe('Said "hi"');
+    expect(res.rows[0]![1]).toBe("a,b@example.com");
+    expect(res.rows[0]![2]).toBe('Said "hi"');
     expect(res.errors).toHaveLength(0);
   });
 

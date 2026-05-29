@@ -158,7 +158,7 @@ describe("server CSV import dry-run receipts", () => {
       createCandidateRows: 1,
       importableRows: 1
     });
-    expect(receipt.rowSample.rows[0].data).toMatchObject({
+    expect(receipt.rowSample.rows[0]!.data).toMatchObject({
       firstName: "Csv",
       lastName: "Dryrun",
       email,

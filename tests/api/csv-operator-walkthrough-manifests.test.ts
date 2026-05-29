@@ -160,10 +160,10 @@ describe("server CSV operator walkthrough manifests", () => {
           item.fixture.kind === "export-delivery-packet"
       )
     ).toBe(true);
-    expect(exportManifest.items[0].steps.map((step) => step.order)).toEqual([
+    expect(exportManifest.items[0]!.steps.map((step) => step.order)).toEqual([
       1, 2, 3, 4, 5, 6
     ]);
-    expect(exportManifest.items[0].steps.map((step) => step.sourceKind)).toEqual(
+    expect(exportManifest.items[0]!.steps.map((step) => step.sourceKind)).toEqual(
       [
         "csv-capability",
         "export-contract",

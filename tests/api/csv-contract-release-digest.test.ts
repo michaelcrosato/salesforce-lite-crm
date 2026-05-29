@@ -195,7 +195,7 @@ describe("server CSV contract release digest", () => {
       safeForCurrentSprintCount: 0,
       requiresContractChangeCount: 24
     });
-    expect(digest.warningCodeRollup.entries[0].examples[0]).toEqual({
+    expect(digest.warningCodeRollup.entries[0]!.examples[0]).toEqual({
       entity: "accounts",
       operation: "export",
       status: "watch"
