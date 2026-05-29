@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   BULK_ACTION_EXECUTION_ACTIONS,
@@ -50,7 +50,8 @@ describe("server bulk action execution", () => {
       "status_update",
       "stage_update",
       "owner_assignment",
-      "task_creation"
+      "task_creation",
+      "delete"
     ]);
     expect(definitions.map((definition) => definition.entity)).toEqual([
       "accounts",
@@ -78,7 +79,8 @@ describe("server bulk action execution", () => {
     expect(opportunityDefinition.supportedActions).toEqual([
       "stage_update",
       "owner_assignment",
-      "task_creation"
+      "task_creation",
+      "delete"
     ]);
     expect(dealerOrderDefinition.supportedActions).toEqual([]);
   });
@@ -358,6 +360,59 @@ describe("server bulk action execution", () => {
 
     expect(account.status).toBe("active");
     expect(auditCount).toBe(0);
+  });
+
+  it("executes eligible deletes and writes deleted audit events", async () => {
+    const extraLeadId = "test-bulk-exec-delete-lead-extra";
+    await prisma.lead.create({
+      data: {
+        id: extraLeadId,
+        firstName: "Extra",
+        lastName: "Delete",
+        status: "new"
+      }
+    });
+
+    const result = await executeBulkAction({
+      entity: "leads",
+      action: "delete",
+      recordIds: [leadId, extraLeadId],
+      generatedAt: new Date("2026-05-24T14:00:00Z")
+    });
+
+    const leads = await prisma.lead.findMany({
+      where: { id: { in: [leadId, extraLeadId] } }
+    });
+    const auditCount = await prisma.auditEvent.count({
+      where: {
+        entityId: { in: [leadId, extraLeadId] },
+        action: "deleted",
+        metadata: { contains: "bulk_action_execution" }
+      }
+    });
+
+    expect(result.rollup.executedCount).toBe(2);
+    expect(leads.length).toBe(0);
+    expect(auditCount).toBe(2);
+  });
+
+  it("handles transactional all-or-nothing rollback when a delete fails", async () => {
+    const spy = vi.spyOn(prisma, "$transaction").mockRejectedValueOnce(new Error("Simulated transaction failure"));
+
+    const result = await executeBulkAction({
+      entity: "leads",
+      action: "delete",
+      recordIds: [leadId],
+      generatedAt: new Date("2026-05-24T14:00:00Z")
+    });
+
+
+    expect(result.records[0]!.executionStatus).toBe("failed");
+    expect(result.records[0]!.error).toBe("Simulated transaction failure");
+    expect(result.rollup.status).toBe("failed");
+    expect(result.rollup.executedCount).toBe(0);
+
+    spy.mockRestore();
   });
 });
 

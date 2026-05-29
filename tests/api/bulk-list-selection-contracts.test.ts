@@ -102,7 +102,8 @@ describe("server bulk list selection contracts", () => {
         "stage_update",
         "owner_assignment",
         "task_creation",
-        "selected_export"
+        "selected_export",
+        "delete"
       ],
       maxSelectedRecords: 200,
       wouldMutate: false,
@@ -161,7 +162,8 @@ describe("server bulk list selection contracts", () => {
     expect(opportunityContract.downstream.execution.supportedActions).toEqual([
       "stage_update",
       "owner_assignment",
-      "task_creation"
+      "task_creation",
+      "delete"
     ]);
     expect(dealerOrderContract.downstream.execution.supportedActions).toEqual(
       []

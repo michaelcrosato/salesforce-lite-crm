@@ -1,7 +1,7 @@
 # 020 — Bulk actions for Leads & Deals lists
 
 - **Wave:** Phase 2 — Major Features
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 4/5 · Feasibility 3/5 · Risk Med · Codebase Fit 4/5
 - **Depends on:** 019 (selection/filter UI), 018 (audit each bulk mutation)
 - **Scope gate:** In-scope (UI + server actions over existing entities; no schema change). Confirm bulk-delete semantics against product guardrails.
@@ -13,11 +13,11 @@ Every benchmark CRM supports multi-select + bulk operations (reassign, change st
 Impact: real operational efficiency for the most common list workflows (mass status/stage changes, bulk reassignment).
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Multi-select on Leads and Deals lists with a bulk-action bar: change status/stage, reassign owner, and delete (with confirmation).
-- [ ] Each bulk mutation is transactional, Zod-validated (array of ids + the operation), and writes an `AuditEvent` per affected row (spec 018).
-- [ ] Optimistic or post-action revalidation refreshes the list (ties into spec 014 tags).
-- [ ] Bulk operations are bounded (cap N per call) to avoid pathological transactions.
-- [ ] Gate + e2e green.
+- [x] Multi-select on Leads and Deals lists with a bulk-action bar: change status/stage, reassign owner, and delete (with confirmation).
+- [x] Each bulk mutation is transactional, Zod-validated (array of ids + the operation), and writes an `AuditEvent` per affected row (spec 018).
+- [x] Optimistic or post-action revalidation refreshes the list (ties into spec 014 tags).
+- [x] Bulk operations are bounded (cap N per call) to avoid pathological transactions.
+- [x] Gate + e2e green.
 
 ## Implementation Approach
 **Files to touch:** Leads/Deals list `components/**` (selection + action bar), `app/leads/actions.ts` + `app/deals/actions.ts` (new bulk action functions), `app/list-selected-export-actions.ts` (reuse selection), `lib/validation.ts`.

@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 16 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 016): `tsc --noEmit` ✅ · test **562 passed** ✅ · build ✅ · reachability **20/20** ✅.
+**Overall: 17 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 016): `tsc --noEmit` ✅ · test **562 passed** ✅ · build ✅ · reachability **20/20** ✅.
 
 ---
 
@@ -39,7 +39,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 019 | Saved views + persisted filters | 014 | |
-| [ ] Todo | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
+| [x] Done | 020 | Bulk actions (Leads & Deals) | 019, 018 | |
 | [x] Done | 021 | CSV export for core entities | 019 | |
 | [ ] Todo | 022 | Optimistic UI for deal kanban | 014, 010 | |
 | [ ] Todo | 023 | Tailwind v4 (Oxide) migration | 008, 010 | ⚠️ |

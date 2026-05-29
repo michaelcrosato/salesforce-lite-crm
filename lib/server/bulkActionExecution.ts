@@ -1,14 +1,7 @@
 import { z } from "zod/v4";
-import {
-  createTask,
-  updateAccount,
-  updateCampaign,
-  updateCase,
-  updateContact,
-  updateLead,
-  updateOpportunity,
-  updateTask
-} from "@/lib/crm/crmClient";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import {
   BULK_ACTION_DRY_RUN_ENTITIES,
   BULK_ACTION_DRY_RUN_MAX_RECORDS,
@@ -17,7 +10,7 @@ import {
   type BulkActionDryRunResult
 } from "@/lib/server/bulkActionDryRun";
 import {
-  recordAuditEvent,
+  buildAuditEventCreateData,
   type AuditEntityType,
   type AuditMetadataValue
 } from "@/lib/services/auditEvents";
@@ -38,7 +31,8 @@ export const BULK_ACTION_EXECUTION_ACTIONS = [
   "status_update",
   "stage_update",
   "owner_assignment",
-  "task_creation"
+  "task_creation",
+  "delete"
 ] as const;
 
 export type BulkActionExecutionEntity =
@@ -231,6 +225,8 @@ function isExecutionSupported(
       return OWNER_ASSIGNMENT_ENTITIES.has(entity);
     case "task_creation":
       return TASK_CREATION_ENTITIES.has(entity);
+    case "delete":
+      return entity === "leads" || entity === "opportunities";
   }
 }
 
@@ -274,6 +270,7 @@ function updateSummary(
 }
 
 async function executeStatusUpdate(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   record: BulkActionDryRunRecord
 ): Promise<MutationResult> {
@@ -281,27 +278,39 @@ async function executeStatusUpdate(
 
   switch (input.entity) {
     case "accounts":
-      await updateAccount(record.id, {
-        status: accountStatusSchema.parse(status)
+      await tx.account.update({
+        where: { id: record.id },
+        data: { status: accountStatusSchema.parse(status) }
       });
       break;
     case "contacts":
-      await updateContact(record.id, {
-        status: contactStatusSchema.parse(status)
+      await tx.contact.update({
+        where: { id: record.id },
+        data: { status: contactStatusSchema.parse(status) }
       });
       break;
     case "leads":
-      await updateLead(record.id, { status: leadStatusSchema.parse(status) });
+      await tx.lead.update({
+        where: { id: record.id },
+        data: { status: leadStatusSchema.parse(status) }
+      });
       break;
     case "tasks":
-      await updateTask(record.id, { status: taskStatusSchema.parse(status) });
+      await tx.task.update({
+        where: { id: record.id },
+        data: { status: taskStatusSchema.parse(status) }
+      });
       break;
     case "cases":
-      await updateCase(record.id, { status: caseStatusSchema.parse(status) });
+      await tx.case.update({
+        where: { id: record.id },
+        data: { status: caseStatusSchema.parse(status) }
+      });
       break;
     case "campaigns":
-      await updateCampaign(record.id, {
-        status: campaignStatusSchema.parse(status)
+      await tx.campaign.update({
+        where: { id: record.id },
+        data: { status: campaignStatusSchema.parse(status) }
       });
       break;
     case "opportunities":
@@ -325,6 +334,7 @@ async function executeStatusUpdate(
 }
 
 async function executeStageUpdate(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   record: BulkActionDryRunRecord
 ): Promise<MutationResult> {
@@ -336,7 +346,26 @@ async function executeStageUpdate(
     throw new Error(executionUnsupportedMessage(input.entity, input.action));
   }
 
-  await updateOpportunity(record.id, { stage });
+  const existing = await tx.deal.findUnique({
+    where: { id: record.id },
+    select: { stage: true, ownerId: true }
+  });
+
+  await tx.deal.update({
+    where: { id: record.id },
+    data: { stage }
+  });
+
+  if (existing && existing.stage !== stage) {
+    await tx.opportunityStageHistory.create({
+      data: {
+        dealId: record.id,
+        fromStage: existing.stage,
+        toStage: stage,
+        changedByUserId: existing.ownerId ?? "system"
+      }
+    });
+  }
 
   return {
     affectedEntityType: "opportunity",
@@ -350,6 +379,7 @@ async function executeStageUpdate(
 }
 
 async function executeOwnerAssignment(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   record: BulkActionDryRunRecord
 ): Promise<MutationResult> {
@@ -357,19 +387,19 @@ async function executeOwnerAssignment(
 
   switch (input.entity) {
     case "accounts":
-      await updateAccount(record.id, { ownerId });
+      await tx.account.update({ where: { id: record.id }, data: { ownerId } });
       break;
     case "opportunities":
-      await updateOpportunity(record.id, { ownerId });
+      await tx.deal.update({ where: { id: record.id }, data: { ownerId } });
       break;
     case "tasks":
-      await updateTask(record.id, { ownerId });
+      await tx.task.update({ where: { id: record.id }, data: { ownerId } });
       break;
     case "cases":
-      await updateCase(record.id, { ownerId });
+      await tx.case.update({ where: { id: record.id }, data: { ownerId } });
       break;
     case "campaigns":
-      await updateCampaign(record.id, { ownerId });
+      await tx.campaign.update({ where: { id: record.id }, data: { ownerId } });
       break;
     case "contacts":
     case "leads":
@@ -393,6 +423,7 @@ async function executeOwnerAssignment(
 }
 
 async function executeTaskCreation(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   record: BulkActionDryRunRecord
 ): Promise<MutationResult> {
@@ -402,19 +433,42 @@ async function executeTaskCreation(
     title,
     ...taskRelation(input.entity, record.id)
   };
-  const task = await createTask(taskInput);
+  const createdTask = await tx.task.create({
+    data: taskInput
+  });
+
+  await tx.auditEvent.create({
+    data: buildAuditEventCreateData({
+      category: "record",
+      action: "created",
+      entityType: "task",
+      entityId: createdTask.id,
+      summary: `Task created: ${createdTask.title}.`,
+      metadata: {
+        accountId: createdTask.accountId,
+        contactId: createdTask.contactId,
+        dealId: createdTask.dealId,
+        dueDate: createdTask.dueDate ? createdTask.dueDate.toISOString() : null,
+        leadId: createdTask.leadId,
+        ownerId: createdTask.ownerId,
+        priority: createdTask.priority,
+        status: createdTask.status,
+        title: createdTask.title
+      }
+    })
+  });
 
   return {
     affectedEntityType: "task",
-    affectedRecordId: task.id,
-    summary: `Bulk task_creation created task ${task.title} for ${
+    affectedRecordId: createdTask.id,
+    summary: `Bulk task_creation created task ${createdTask.title} for ${
       record.label ?? record.id
     }.`,
     metadata: {
       linkedEntity: input.entity,
       linkedRecordId: record.id,
-      createdTaskId: task.id,
-      taskTitle: task.title
+      createdTaskId: createdTask.id,
+      taskTitle: createdTask.title
     }
   };
 }
@@ -439,19 +493,49 @@ function taskRelation(entity: BulkActionExecutionEntity, recordId: string) {
   }
 }
 
+async function executeDelete(
+  tx: Prisma.TransactionClient,
+  input: ParsedBulkActionExecutionInput,
+  record: BulkActionDryRunRecord
+): Promise<MutationResult> {
+  if (input.entity !== "leads" && input.entity !== "opportunities") {
+    throw new Error(executionUnsupportedMessage(input.entity, input.action));
+  }
+
+  if (input.entity === "leads") {
+    await tx.lead.delete({ where: { id: record.id } });
+  } else {
+    await tx.deal.delete({ where: { id: record.id } });
+  }
+
+  const affectedType = ENTITY_AUDIT_TYPES[input.entity];
+
+  return {
+    affectedEntityType: affectedType,
+    affectedRecordId: record.id,
+    summary: `Bulk delete executed for ${affectedType} ${record.label ?? record.id}.`,
+    metadata: {
+      deleted: true
+    }
+  };
+}
+
 async function executeRecordMutation(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   record: BulkActionDryRunRecord
 ): Promise<MutationResult> {
   switch (input.action) {
     case "status_update":
-      return executeStatusUpdate(input, record);
+      return executeStatusUpdate(tx, input, record);
     case "stage_update":
-      return executeStageUpdate(input, record);
+      return executeStageUpdate(tx, input, record);
     case "owner_assignment":
-      return executeOwnerAssignment(input, record);
+      return executeOwnerAssignment(tx, input, record);
     case "task_creation":
-      return executeTaskCreation(input, record);
+      return executeTaskCreation(tx, input, record);
+    case "delete":
+      return executeDelete(tx, input, record);
   }
 }
 
@@ -465,6 +549,8 @@ function auditActionFor(action: BulkActionExecutionAction) {
       return "updated";
     case "task_creation":
       return "created";
+    case "delete":
+      return "deleted";
   }
 }
 
@@ -482,30 +568,33 @@ function dryRunAuditMetadata(
 }
 
 async function recordExecutionAuditEvent(
+  tx: Prisma.TransactionClient,
   input: ParsedBulkActionExecutionInput,
   dryRun: BulkActionDryRunResult,
   record: BulkActionDryRunRecord,
   mutation: MutationResult
 ): Promise<string> {
-  const auditEvent = await recordAuditEvent({
-    category: "record",
-    action: auditActionFor(input.action),
-    entityType: mutation.affectedEntityType,
-    entityId: mutation.affectedRecordId,
-    summary: mutation.summary,
-    metadata: {
-      source: "bulk_action_execution",
-      entity: input.entity,
-      action: input.action,
-      selectedRecordId: record.id,
-      selectedRecordLabel: record.label,
-      currentValue: record.currentValue,
-      targetValue: record.targetValue,
-      generatedAt: input.generatedAt?.toISOString() ?? null,
-      dryRun: dryRunAuditMetadata(dryRun),
-      ...mutation.metadata
-    },
-    occurredAt: input.generatedAt
+  const auditEvent = await tx.auditEvent.create({
+    data: buildAuditEventCreateData({
+      category: "record",
+      action: auditActionFor(input.action),
+      entityType: mutation.affectedEntityType,
+      entityId: mutation.affectedRecordId,
+      summary: mutation.summary,
+      metadata: {
+        source: "bulk_action_execution",
+        entity: input.entity,
+        action: input.action,
+        selectedRecordId: record.id,
+        selectedRecordLabel: record.label,
+        currentValue: record.currentValue,
+        targetValue: record.targetValue,
+        generatedAt: input.generatedAt?.toISOString() ?? null,
+        dryRun: dryRunAuditMetadata(dryRun),
+        ...mutation.metadata
+      },
+      occurredAt: input.generatedAt
+    })
   });
 
   return auditEvent.id;
@@ -691,46 +780,65 @@ export async function executeBulkAction(
   );
   const records: BulkActionExecutionRecord[] = [];
 
-  for (const record of dryRun.records) {
-    if (!record.eligible) {
-      records.push(skippedRecord(record));
-      continue;
-    }
+  try {
+    return await prisma.$transaction(async (tx) => {
+      for (const record of dryRun.records) {
+        if (!record.eligible) {
+          records.push(skippedRecord(record));
+          continue;
+        }
 
-    if (!supported) {
-      records.push(blockedRecord(record, unsupportedMessage));
-      continue;
-    }
+        if (!supported) {
+          records.push(blockedRecord(record, unsupportedMessage));
+          continue;
+        }
 
-    try {
-      const mutation = await executeRecordMutation(parsed, record);
-      const auditEventId = await recordExecutionAuditEvent(
-        parsed,
-        dryRun,
-        record,
-        mutation
-      );
-      records.push(
-        executedRecord(
+        const mutation = await executeRecordMutation(tx, parsed, record);
+        const auditEventId = await recordExecutionAuditEvent(
+          tx,
+          parsed,
+          dryRun,
           record,
-          mutation,
-          auditEventId,
-          parsed.action === "task_creation" ? "created" : "executed"
-        )
-      );
-    } catch (error) {
-      records.push(failedRecord(record, error));
-    }
-  }
+          mutation
+        );
+        records.push(
+          executedRecord(
+            record,
+            mutation,
+            auditEventId,
+            parsed.action === "task_creation" ? "created" : "executed"
+          )
+        );
+      }
 
-  return {
-    mode: "bulk_action_execution",
-    entity: parsed.entity,
-    action: parsed.action,
-    supported,
-    dryRun,
-    records,
-    rollup: buildRollup(dryRun, records),
-    write: writeFlags()
-  };
+      return {
+        mode: "bulk_action_execution",
+        entity: parsed.entity,
+        action: parsed.action,
+        supported,
+        dryRun,
+        records,
+        rollup: buildRollup(dryRun, records),
+        write: writeFlags()
+      };
+    });
+  } catch (error) {
+    const failedRecords = dryRun.records.map((record) => {
+      if (record.eligible) {
+        return failedRecord(record, error);
+      }
+      return skippedRecord(record);
+    });
+
+    return {
+      mode: "bulk_action_execution",
+      entity: parsed.entity,
+      action: parsed.action,
+      supported,
+      dryRun,
+      records: failedRecords,
+      rollup: buildRollup(dryRun, failedRecords),
+      write: writeFlags()
+    };
+  }
 }
