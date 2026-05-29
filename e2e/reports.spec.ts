@@ -106,7 +106,7 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   ).toContainText("10");
   await expect(
     page.getByTestId("list-filter-support-summary-filters")
-  ).toContainText("37");
+  ).toContainText("38");
   await expect(
     page.getByTestId("list-filter-support-summary-sorts")
   ).toContainText("42");
@@ -193,7 +193,7 @@ test("reports index lists reports and a report renders", async ({ page }) => {
     page.getByTestId("bulk-dry-run-summary-entities")
   ).toContainText("10");
   await expect(page.getByTestId("bulk-dry-run-summary-actions")).toContainText(
-    "5"
+    "6"
   );
   await expect(
     page.getByTestId("bulk-dry-run-summary-max-records")

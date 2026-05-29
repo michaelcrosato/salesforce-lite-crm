@@ -1,12 +1,21 @@
 "use server";
 
-import { revalidatePath, updateTag, cacheTag } from "next/cache";
+import { cacheTag, revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
-import { dealFormSchema, dealMoveSchema, auditHistoryQuerySchema } from "@/lib/validation";
-import { buildAuditEventCreateData, listAuditEventsForEntity, type AuditMetadataValue, type AuditEntityType } from "@/lib/services/auditEvents";
+import {
+  auditHistoryQuerySchema,
+  dealFormSchema,
+  dealMoveSchema
+} from "@/lib/validation";
+import {
+  buildAuditEventCreateData,
+  listAuditEventsForEntity,
+  type AuditEntityType,
+  type AuditMetadataValue
+} from "@/lib/services/auditEvents";
 import type { Deal } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -356,20 +365,23 @@ export async function moveDealAction(input: {
   };
 }
 
-async function getCachedAuditHistoryInternal(entity: string, entityId: string) {
+async function getCachedAuditHistoryInternal(
+  entity: AuditEntityType,
+  entityId: string
+) {
   "use cache";
   const tag = entity === "opportunity" ? "deals" : `${entity}s`;
   cacheTag(tag);
   cacheTag(`audit-events-${entity}-${entityId}`);
-  
-  return await listAuditEventsForEntity(entity as AuditEntityType, entityId);
+
+  return listAuditEventsForEntity(entity, entityId);
 }
 
-async function getCachedAuditHistory(entity: string, entityId: string) {
+async function getCachedAuditHistory(entity: AuditEntityType, entityId: string) {
   if (process.env.NODE_ENV === "test") {
-    return await listAuditEventsForEntity(entity as AuditEntityType, entityId);
+    return listAuditEventsForEntity(entity, entityId);
   }
-  return await getCachedAuditHistoryInternal(entity, entityId);
+  return getCachedAuditHistoryInternal(entity, entityId);
 }
 
 export async function getAuditHistoryAction(rawQuery: unknown) {
@@ -377,7 +389,7 @@ export async function getAuditHistoryAction(rawQuery: unknown) {
   if (!parsed.success) {
     return { ok: false, message: "Invalid query parameters.", events: [] };
   }
-  
+
   try {
     const events = await getCachedAuditHistory(
       parsed.data.entity,
@@ -388,4 +400,3 @@ export async function getAuditHistoryAction(rawQuery: unknown) {
     return { ok: false, message: "Could not retrieve audit history.", events: [] };
   }
 }
-

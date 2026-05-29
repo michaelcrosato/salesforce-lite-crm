@@ -4,13 +4,11 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { moveDealAction, getAuditHistoryAction } from "@/app/deals/actions";
-import {
-  ActivityTimeline,
-  type TimelineActivity
-} from "@/components/activity-timeline";
-import { AuditHistoryPanel, type HistoryEvent } from "@/components/audit-history-panel";
+import { getAuditHistoryAction, moveDealAction } from "@/app/deals/actions";
+import { type TimelineActivity } from "@/components/activity-timeline";
+import { type HistoryEvent } from "@/components/audit-history-panel";
 import { AddNoteForm } from "@/components/add-note-form";
+import { DetailTimelineTabs } from "@/components/detail-timeline-tabs";
 import {
   DealForm,
   type DealAccountOption,
@@ -81,14 +79,14 @@ export function DealDetailDrawer({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const focusedDealId = deal?.id;
 
-  const [activeTab, setActiveTab] = useState<"activities" | "history">("activities");
-  const [auditEvents, setAuditEvents] = useState<HistoryEvent[]>([]);
-  const [prevDealId, setPrevDealId] = useState<string | undefined>(undefined);
-
-  if (focusedDealId !== prevDealId) {
-    setPrevDealId(focusedDealId);
-    setAuditEvents([]);
-  }
+  const [auditHistory, setAuditHistory] = useState<{
+    dealId: string;
+    events: HistoryEvent[];
+  } | null>(null);
+  const auditEvents =
+    auditHistory && auditHistory.dealId === focusedDealId
+      ? auditHistory.events
+      : [];
 
   useEffect(() => {
     if (focusedDealId) {
@@ -107,7 +105,10 @@ export function DealDetailDrawer({
         entityId: focusedDealId
       });
       if (active && result.ok && result.events) {
-        setAuditEvents(result.events as HistoryEvent[]);
+        setAuditHistory({
+          dealId: focusedDealId,
+          events: result.events as HistoryEvent[]
+        });
       }
     })();
     return () => {
@@ -330,43 +331,11 @@ export function DealDetailDrawer({
             </Card>
           )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("activities")}
-                  className={`text-sm font-semibold pb-2 border-b-2 transition-all ${
-                    activeTab === "activities"
-                      ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                  data-testid="deal-activities-tab"
-                >
-                  Activity Timeline
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("history")}
-                  className={`text-sm font-semibold pb-2 border-b-2 transition-all ${
-                    activeTab === "history"
-                      ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                  data-testid="deal-history-tab"
-                >
-                  System Change History
-                </button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {activeTab === "activities" ? (
-                <ActivityTimeline activities={activeDeal.activities} />
-              ) : (
-                <AuditHistoryPanel events={auditEvents} data-testid="deal-history-panel" />
-              )}
-            </CardContent>
-          </Card>
+          <DetailTimelineTabs
+            activities={activeDeal.activities}
+            auditEvents={auditEvents}
+            entityType="deal"
+          />
         </div>
       </aside>
     </div>

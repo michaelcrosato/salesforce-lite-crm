@@ -63,7 +63,11 @@ export function AuditHistoryPanel({ events, "data-testid": testId }: AuditHistor
                     {event.action.replace("_", " ")}
                   </Badge>
                   <span className="text-xs text-muted-foreground font-medium">
-                    by <span className="text-foreground" data-testid="audit-history-actor">{actorName}{actorEmail}</span>
+                    by{" "}
+                    <span className="text-foreground" data-testid="audit-history-actor">
+                      {actorName}
+                      {actorEmail}
+                    </span>
                   </span>
                 </div>
                 <span className="text-xs text-muted-foreground font-medium" data-testid="audit-history-timestamp">
@@ -75,7 +79,10 @@ export function AuditHistoryPanel({ events, "data-testid": testId }: AuditHistor
                   {event.summary}
                 </p>
                 {beforeAfter && (
-                  <div className="mt-2 rounded-md bg-muted/30 p-2 border border-muted/50" data-testid="audit-history-diff">
+                  <div
+                    className="mt-2 rounded-md bg-muted/30 p-2 border border-muted/50"
+                    data-testid="audit-history-diff"
+                  >
                     {beforeAfter}
                   </div>
                 )}
@@ -122,32 +129,38 @@ function formatMetadataSummary(event: HistoryEvent) {
     const meta = JSON.parse(event.metadata);
     if (!meta || typeof meta !== "object") return null;
 
-    // 1. Check for stage_changed or status_changed previous properties
-    if (meta.previousStage) {
+    const previousStage =
+      typeof meta.previousStage === "string"
+        ? meta.previousStage
+        : event.action === "stage_changed" &&
+            typeof meta.previousStatus === "string"
+          ? meta.previousStatus
+          : null;
+    if (previousStage) {
       return (
         <div className="text-xs font-normal">
-          Stage changed from <span className="font-semibold text-destructive">{String(meta.previousStage)}</span> to{" "}
+          Stage changed from <span className="font-semibold text-destructive">{previousStage}</span> to{" "}
           <span className="font-semibold text-success">{String(meta.stage || "")}</span>
         </div>
       );
     }
-    if (meta.previousStatus) {
+
+    if (typeof meta.previousStatus === "string") {
       return (
         <div className="text-xs font-normal">
-          Status changed from <span className="font-semibold text-destructive">{String(meta.previousStatus)}</span> to{" "}
+          Status changed from <span className="font-semibold text-destructive">{meta.previousStatus}</span> to{" "}
           <span className="font-semibold text-success">{String(meta.status || "")}</span>
         </div>
       );
     }
 
-    // 2. Check for changedFields array
     if (Array.isArray(meta.changedFields) && meta.changedFields.length > 0) {
       const changes = meta.changedFields.map((field: string) => {
         const val = meta[field];
         const valStr = val !== undefined && val !== null ? String(val) : "null";
         return (
           <div key={field} className="text-xs font-normal text-muted-foreground">
-            • <span className="font-medium text-foreground">{field}</span> updated to{" "}
+            - <span className="font-medium text-foreground">{field}</span> updated to{" "}
             <span className="font-semibold text-success">&quot;{valStr}&quot;</span>
           </div>
         );
@@ -155,16 +168,19 @@ function formatMetadataSummary(event: HistoryEvent) {
       return <div className="space-y-1">{changes}</div>;
     }
 
-    // 3. Fallback: render fields that were set (excluding changedFields/previous...)
     const keys = Object.keys(meta).filter(
-      (k) => k !== "changedFields" && !k.startsWith("previous") && k !== "stage" && k !== "status"
+      (key) =>
+        key !== "changedFields" &&
+        !key.startsWith("previous") &&
+        key !== "stage" &&
+        key !== "status"
     );
     if (keys.length > 0) {
       const items = keys.map((key) => {
         const valStr = meta[key] !== null && meta[key] !== undefined ? String(meta[key]) : "empty";
         return (
           <div key={key} className="text-xs text-muted-foreground">
-            • <span className="font-medium">{key}</span>: &quot;{valStr}&quot;
+            - <span className="font-medium">{key}</span>: &quot;{valStr}&quot;
           </div>
         );
       });
