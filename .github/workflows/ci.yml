@@ -32,6 +32,12 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=high
 
+      # Reachability ratchet (spec 011): fails if a NEW lib/server module is
+      # reachable only from tests/ (a dead read-only "packet tower" layer).
+      # Static, no DB/build needed — runs early for fast feedback.
+      - name: Reachability gate
+        run: node scripts/check-reachability.mjs
+
       - name: Prepare .env
         run: cp .env.example .env
 

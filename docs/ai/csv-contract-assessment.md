@@ -150,3 +150,63 @@ one layer at a time. Order from lowest to highest risk:
 - Recommended next ticket: **Phase 1** above (decide + execute the apex), then
   **Phase 2** (shared envelope helper). Nothing should be deleted without
   removing its test in the same atomic commit and re-running the full gate.
+
+---
+
+## Reachability gate + retirement plan (spec 011, 2026-05-29)
+
+Spec 011 lands a **mechanical** reachability gate so this analysis no longer has
+to be re-derived by hand, and so the dead tower cannot regrow.
+
+- **Checker:** `scripts/check-reachability.mjs` — static import-graph analysis
+  (no runtime, no deps). It builds the transitive closure from the live product
+  roots (`app/**` + `components/**`), following every `from "…"` /
+  `import("…")` / side-effect specifier (resolving `@/…` and relative paths),
+  then flags any `lib/server/*.ts` not in that closure as a **test-only orphan**.
+- **Ratchet:** `scripts/reachability-baseline.json` pins the allowed-orphan set.
+  A module that becomes a **new** orphan fails the gate (CI `gate` job, fast
+  static step). As orphans are wired or deleted, lower `maxOrphans` and prune
+  `allowedOrphans` in the **same commit**.
+- **Validation:** the checker independently reproduced this document's manual
+  CSV analysis exactly — all **21** test-only CSV tower modules above — which
+  corroborates both the tool and the original graph.
+
+### Newly surfaced (non-CSV) test-only orphans — 4
+
+Beyond the 21 CSV modules, the checker found **4** test-only `lib/server`
+orphans this CSV-scoped assessment never covered (25 orphans total at baseline):
+
+- `bulkListSelectionContracts.ts`
+- `pacingSnapshotContracts.ts`
+- `pacingSnapshotBuilder.ts` (imports `pacingSnapshotContracts`)
+- `workflowRuleExecutionReceipts.ts`
+
+`pacingSnapshot*` were added in **Sprint 56** (this week) with no UI consumer —
+a live example of the loop re-accreting read-only packet layers faster than the
+UI that would read them. The ratchet exists to stop exactly this.
+
+### Retirement order (bottom-up from the apex; one atomic commit per cut)
+
+Each cut deletes the module **and** its `tests/api/*.test.ts` together, lowers
+the ratchet, and must keep `npm run test` + `npm run build` green:
+
+1. `csvReleaseReadinessPackets` — release apex, terminal + test-only (assessment
+   Phase 1). Safest first cut: nothing imports it.
+2. The release-tower layer it aggregated, once (1) is gone and they fall to
+   terminal: `csvReleaseClosureScorecards`, `csvReleaseDispositionManifests`,
+   `csvReleaseExceptionRegisters`, `csvReleaseVerificationManifests`,
+   `csvContractReleaseDigest`, `csvReleaseHandoffCatalog`,
+   `csvHandoffReleaseNotesPackets`.
+3. The operator tower: `csvOperator*` (scorecards → checklists → walkthroughs →
+   remediation runbooks → fixture bundles → handoff packets).
+4. Remaining contract/QA/coverage scaffolding: `csvContractQaChecks`,
+   `csvContractDriftSnapshots`, `csvCompatibilityReports`,
+   `csvFieldCoverageSummaries`, `csvHandoffIndex`, `csvTransferManifests`.
+5. `csvInFlightCache` **last** — shared infra for the tower, only safe once its
+   consumers are gone.
+6. Non-CSV orphans, each verified terminal first: `pacingSnapshotBuilder` then
+   `pacingSnapshotContracts`; `bulkListSelectionContracts`;
+   `workflowRuleExecutionReceipts`.
+
+After each cut, re-run `node scripts/check-reachability.mjs` — a freed inner
+layer drops to terminal and becomes the next safe deletion.
