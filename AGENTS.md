@@ -15,6 +15,61 @@ file is the short handoff.
 - Do not paste raw chat history into repo docs.
 - Do not create product features during readiness or cleanup passes.
 
+## Agent Loop
+
+Repeat this unprompted each session:
+
+1. **Status** — `npm run agent:status` (or `bash scripts/agent/status.sh`).
+2. **Read** — `GOAL.md` → `docs/ai/REPO_MAP.md` → `PLAN.md` §1–4 →
+   `CRM-CONTRACT.md` → top open ticket in `tickets/`.
+3. **Pick** one unblocked, session-sized ticket; mark it in progress.
+4. **Change** — smallest edit that satisfies the ticket; stay in scope.
+5. **Check** — targeted test first, then `npm run agent:check` (lint +
+   typecheck + test + build). E2E (`npm run test:e2e`) when UI/flows change.
+6. **Update** docs + the ticket's acceptance checkboxes.
+7. **File follow-ups** for anything out of scope (new ticket, not a half-fix).
+8. **Summarize** — what changed, commands+results, next ticket.
+
+## Command Reference
+
+| Purpose | Command (cross-platform npm) | POSIX wrapper |
+|---|---|---|
+| Bootstrap (install/generate/push/seed) | `npm run agent:bootstrap` | `scripts/agent/bootstrap.sh` |
+| Env diagnostics | — | `scripts/agent/doctor.sh` |
+| Full non-e2e gate | `npm run agent:check` | `scripts/agent/check.sh` |
+| Lint | `npm run lint` | `scripts/agent/lint.sh` |
+| Typecheck | `npm run typecheck` | `scripts/agent/typecheck.sh` |
+| Test | `npm run test` | `scripts/agent/test.sh` |
+| Build | `npm run build` | (covered by `check.sh`) |
+| Format | `npm run agent:format` (no formatter; lint enforces style) | `scripts/agent/format.sh` |
+| Status | `npm run agent:status` | `scripts/agent/status.sh` |
+| Full gate incl. e2e | `scripts/local-gate.ps1` / `scripts/local-gate.sh` | — |
+
+`agent:*` scripts are thin wrappers over the existing scripts; they add a stable
+interface, not new behavior. There is no `format` step — lint is the style gate.
+
+## Autonomous vs Ask
+
+Proceed without asking. **Stop and ask** only for: missing credentials/paid
+services, destructive/production or data-loss operations, dependency removal or
+forced git, schema/seed changes (CLAUDE.md §7–8), `.claude/**` hook config
+(§10), or real legal/security ambiguity. Otherwise take the safest assumption,
+document it in the ticket/summary, and continue.
+
+## Token Efficiency
+
+Read `PLAN.md` §1–4 and the current sprint, not all 3.4k lines. Use
+`docs/ai/REPO_MAP.md` to jump to the right module. Honour `.aiignore` (skip
+`node_modules/`, `.next/`, `agent-runs/`, `failure-archives/`, `test-results/`,
+`traces/`, `*.log`, `prisma/dev.db*`, `package-lock.json`). Skip per-agent
+`SUMMARY.*`/`BLOCKERS.*`/`*-NOTES.md` unless coordinating a parallel run.
+
+## Completion Criteria
+
+`lint`/`typecheck`/`test`/`build` attempted with real results recorded; docs and
+the worked ticket updated; out-of-scope findings filed as tickets; no
+unexplained failures. Never claim a check passed unless it ran and passed.
+
 ## Execution Topology
 
 The worktree path decides whether ownership zones are mandatory.
