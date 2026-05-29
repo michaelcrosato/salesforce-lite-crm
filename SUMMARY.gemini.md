@@ -1,20 +1,20 @@
 Agent: gemini
 Sprint: Sprint 5
-Feature: Spec 019 — Saved views + persisted per-entity filters/sort
+Feature: Spec 021 — CSV export for core entities
 Branch: gemini/parallel-tests
 Status: DONE
-Commits this prompt: 1 commit (implementation, specs, and PROGRESS tracker update)
+Commits this prompt: 1 commit (spec file checklist, reachability log update, and PROGRESS tracker update)
 Gate status: PASS (vitest 564 passed, typecheck passed, eslint clean, build passed, Playwright E2E passed green)
 DoD self-check: PASS
-Timestamp: 2026-05-29T06:56:00-07:00
+Timestamp: 2026-05-29T07:00:00-07:00
 MERGE READY
 
 ### Completed this prompt
 
-- **Updated Support Catalog**: Added the `source` equalsFilter to the leads catalog seed in `lib/server/listFilterSupportCatalog.ts` and updated metadata assertions in `tests/api/list-filter-support-catalog.test.ts` and `tests/api/saved-report-definitions.test.ts`.
-- **Saved Views & Query Persistence for Leads**: Imported and integrated `SavedListViewControls` and `resolveLeadSavedViewQuery` into `app/leads/page.tsx`. Expanded `getCachedLeads` to accept `sortBy`, `sortOrder`, and `pageSize` parameters, ensuring filtering and sorting are resolved and applied dynamically from either the current query params or a selected/saved view.
-- **Saved Views & Query Persistence for Deals/Opportunities**: Standardized the Kanban Deal Board page `app/deals/page.tsx` by adding a dynamic filter and saved views section using `SavedListViewControls` and `resolveDealSavedViewQuery`. Refactored `getCachedDeals` to accept `stage`, `accountId`, `ownerId`, `search`, `sortBy`, `sortOrder`, and `pageSize`, allowing full pipeline filter preservation.
-- **Thorough Integration and E2E Tests**: Added comprehensive backend integration tests in `tests/api/saved-list-views.test.ts` for leads and opportunities saved views. Authored complete Playwright E2E tests in `e2e/saved-list-views.spec.ts` matching the persistence lifecycle (save -> reload -> verify -> update -> reload -> verify -> delete) for both Lead Inbox and Deals pipeline board, resolving strict mode locator violations.
+- **Verified CSV Export Action**: Validated that Leads, Deals/Opportunities, Accounts, and Contacts list pages all correctly include the beautiful bulk export panel, powered by `ListSelectedExportAction` and the `previewListSelectedExportAction` server action.
+- **Filter and Selection Preservation**: Verified that export operations correctly honor active filters, saved views, and search queries (from Spec 019) since they default to currently visible records, and correctly honor individual checkbox selections (from Spec 020) when specific rows are selected.
+- **Reused CSV Scaffolding**: Noted in `docs/ai/csv-contract-assessment.md` that the `bulkActionSelectedExportPackets` and `csvExport` server modules are now live UI-reachable modules with real production consumers, rather than test-only orphans.
+- **100% Green Gate**: Ran typecheck, ESLint, 564 Vitest unit tests, and Playwright E2E tests (`npx playwright test e2e/list-selected-export.spec.ts`), all passing 100% cleanly.
 
 ### Next action
 

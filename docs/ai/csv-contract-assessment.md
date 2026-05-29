@@ -27,9 +27,10 @@ Only four modules are imported by the app at all — both in the Reports surface
 | `csvImportTemplates` | `app/reports/page.tsx` |
 | `csvDedupeReviewBundles` | `app/reports/actions.ts` |
 | `csvImportApplyExecutor` | `app/reports/actions.ts` |
+| `bulkActionSelectedExportPackets` | `app/list-selected-export-actions.ts` (Spec 021) |
+| `csvExport` | `app/list-selected-export-actions.ts` (Spec 021) |
 
-No `components/**` or other route imports any `csv*` module. There is no
-dedicated CSV route; the Reports page is the only product surface.
+No `components/**` or other route imports any `csv*` module except the `components/list-selected-export-action.tsx` which imports the actions. The Reports page and list selected export actions are the product surfaces.
 
 ## UI-reachable transitive closure (13 modules)
 
