@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod/v4";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import {
@@ -49,6 +49,7 @@ function failureFrom(error: unknown, action: string): ActionResult {
 }
 
 function revalidateAll(): void {
+  updateTag("reports");
   revalidatePath("/tasks");
   revalidatePath("/dashboard");
   revalidatePath("/reports/overdue-tasks");

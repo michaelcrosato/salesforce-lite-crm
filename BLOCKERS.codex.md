@@ -1,21 +1,23 @@
-Agent: codex
+Agent: Codex
 
-Sprint: cleanup
+Sprint: Spec 024 repair
 
-Feature: dirty worktree cleanup / commit handoff
+Feature: Audit history local-gate repair
 
-Branch: main
+Branch: gemini/spec-024-audit-history
 
-Timestamp: 2026-05-29T10:00:39.1559186-07:00
+Timestamp: 2026-05-29T10:24:27.3263489-07:00
 
-Escalation required: YES
+Escalation required: NO
 
 ### Active blockers
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|--------------|------|-------------|----------|---------|-----------------|
-| 1 | `C:\dev\salesforce-lite-crm` worktree / port 3004 | dependency | Concurrent automation is using the single-agent root while this cleanup is running, invalidating final gate validation. | Reflog shows checkouts from `main` to `gemini/spec-020-bulk-actions` during cleanup; `scripts/local-gate.ps1` failed when Playwright could not bind `http://127.0.0.1:3004/dashboard`; `Get-CimInstance Win32_Process` showed active `scripts\autonomy-loop.ps1 -RunRoot C:\dev\salesforce-lite-crm` and `npx playwright test` / `next dev --port 3004` processes. | Exclusive root worktree or isolated agent worktrees. | Stop or move the concurrent run, switch to `main`, rerun `scripts/local-gate.ps1`, then update reports and continue through PR-based integration. |
 
 ### Resolved this prompt
 
-- Removed stale overnight-startup blocker state from the Codex report and replaced it with the current root-worktree concurrency blocker.
+- Resolved `npm run test:e2e` failure in `e2e/reports.spec.ts`: `/reports` served a stale cached audit explorer snapshot after task creation because task mutations did not invalidate the `reports` cache tag.
+- Resolved stale reports e2e assertions for contract counts: server/unit contracts report 38 list-filter fields and 6 bulk dry-run actions.
+- Final `scripts/local-gate.ps1` passed with `npm run test` 116 files / 575 tests and Playwright 52 / 52 tests.
+- No blocker filed for untracked `pnpm-lock.yaml`; it is out-of-scope package-manager output and was left unstaged.

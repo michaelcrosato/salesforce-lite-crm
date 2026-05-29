@@ -43,7 +43,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 021 | CSV export for core entities | 019 | |
 | [ ] Todo | 022 | Optimistic UI for deal kanban | 014, 010 | |
 | [ ] Todo | 023 | Tailwind v4 (Oxide) migration | 008, 010 | ⚠️ |
-| [ ] Todo | 024 | Audit-trail change-history UI | 018 | |
+| [x] Done | 024 | Audit-trail change-history UI | 018 | |
 
 ---
 

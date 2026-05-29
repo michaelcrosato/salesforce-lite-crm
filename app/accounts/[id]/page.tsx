@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AccountForm } from "@/components/account-form";
-import { ActivityTimeline } from "@/components/activity-timeline";
+import { DetailTimelineTabs } from "@/components/detail-timeline-tabs";
+import { type HistoryEvent } from "@/components/audit-history-panel";
+import { listAuditEventsForEntity } from "@/lib/services/auditEvents";
 import { PageHeader } from "@/components/page-header";
 import { AccountStatusBadge, HealthBadge } from "@/components/account-badges";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +143,8 @@ export default async function AccountDetailPage({
   if (!account) {
     notFound();
   }
+
+  const auditEvents = await listAuditEventsForEntity("account", resolvedParams.id);
 
   return (
     <div className="crm-page">
@@ -298,14 +302,11 @@ export default async function AccountDetailPage({
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activities</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ActivityTimeline activities={account.activities} />
-        </CardContent>
-      </Card>
+      <DetailTimelineTabs
+        activities={account.activities}
+        auditEvents={auditEvents as HistoryEvent[]}
+        entityType="account"
+      />
     </div>
   );
 }

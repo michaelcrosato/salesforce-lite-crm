@@ -4,12 +4,11 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { moveDealAction } from "@/app/deals/actions";
-import {
-  ActivityTimeline,
-  type TimelineActivity
-} from "@/components/activity-timeline";
+import { getAuditHistoryAction, moveDealAction } from "@/app/deals/actions";
+import { type TimelineActivity } from "@/components/activity-timeline";
+import { type HistoryEvent } from "@/components/audit-history-panel";
 import { AddNoteForm } from "@/components/add-note-form";
+import { DetailTimelineTabs } from "@/components/detail-timeline-tabs";
 import {
   DealForm,
   type DealAccountOption,
@@ -80,11 +79,42 @@ export function DealDetailDrawer({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const focusedDealId = deal?.id;
 
+  const [auditHistory, setAuditHistory] = useState<{
+    dealId: string;
+    events: HistoryEvent[];
+  } | null>(null);
+  const auditEvents =
+    auditHistory && auditHistory.dealId === focusedDealId
+      ? auditHistory.events
+      : [];
+
   useEffect(() => {
     if (focusedDealId) {
       closeButtonRef.current?.focus();
     }
   }, [focusedDealId]);
+
+  useEffect(() => {
+    if (!focusedDealId) {
+      return;
+    }
+    let active = true;
+    void (async () => {
+      const result = await getAuditHistoryAction({
+        entity: "opportunity",
+        entityId: focusedDealId
+      });
+      if (active && result.ok && result.events) {
+        setAuditHistory({
+          dealId: focusedDealId,
+          events: result.events as HistoryEvent[]
+        });
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [focusedDealId, deal]);
 
   if (!deal) {
     return null;
@@ -301,14 +331,11 @@ export function DealDetailDrawer({
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Activities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ActivityTimeline activities={activeDeal.activities} />
-            </CardContent>
-          </Card>
+          <DetailTimelineTabs
+            activities={activeDeal.activities}
+            auditEvents={auditEvents}
+            entityType="deal"
+          />
         </div>
       </aside>
     </div>

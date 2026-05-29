@@ -9,6 +9,7 @@ import {
   recordAuditEvent,
   serializeAuditMetadata
 } from "@/lib/services/auditEvents";
+import { getAuditHistoryAction } from "@/app/deals/actions";
 
 const actorUserId = "test-audit-user";
 const accountEntityId = "test-audit-account";
@@ -223,6 +224,46 @@ describe("audit event service", () => {
 
   it("serializes absent metadata as null", () => {
     expect(serializeAuditMetadata(undefined)).toBeNull();
+  });
+
+  it("listAuditEventsForEntity returns events in deterministic order", async () => {
+    // Empty history case
+    const emptyEvents = await listAuditEventsForEntity("account", "non-existent-id");
+    expect(emptyEvents).toEqual([]);
+
+    // Insert events with specific timestamps
+    await recordAuditEvent({
+      category: "record",
+      action: "created",
+      entityType: "account",
+      entityId: accountEntityId,
+      summary: "First account event",
+      occurredAt: new Date("2026-05-10T12:00:00Z")
+    });
+
+    await recordAuditEvent({
+      category: "record",
+      action: "updated",
+      entityType: "account",
+      entityId: accountEntityId,
+      summary: "Second account event",
+      occurredAt: new Date("2026-05-12T12:00:00Z")
+    });
+
+    const events = await listAuditEventsForEntity("account", accountEntityId);
+    expect(events.length).toBe(2);
+    // Deterministic order check: occurredAt desc, so second event (newest) first!
+    expect(events[0]!.summary).toBe("Second account event");
+    expect(events[1]!.summary).toBe("First account event");
+  });
+
+  it("getAuditHistoryAction server action works correctly", async () => {
+    const invalidQuery = await getAuditHistoryAction({ entity: "invalid-entity", entityId: "" });
+    expect(invalidQuery.ok).toBe(false);
+    expect(invalidQuery.events).toEqual([]);
+
+    const validQuery = await getAuditHistoryAction({ entity: "account", entityId: accountEntityId });
+    expect(validQuery.ok).toBe(true);
   });
 });
 

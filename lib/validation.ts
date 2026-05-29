@@ -367,3 +367,23 @@ export function isLeadStatus(
 ): value is z.infer<typeof leadStatusSchema> {
   return leadStatusSchema.safeParse(value).success;
 }
+
+export const auditHistoryQuerySchema = z.object({
+  entity: z.enum([
+    "account",
+    "contact",
+    "opportunity",
+    "lead",
+    "activity",
+    "dealer_order",
+    "area",
+    "task",
+    "case",
+    "campaign",
+    "knowledge_article",
+    "report",
+    "csv",
+    "system"
+  ]),
+  entityId: idSchema
+});
