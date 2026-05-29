@@ -13,11 +13,11 @@
 Impact: makes test-quality work data-driven and prevents silent coverage erosion.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Dependency `@vitest/coverage-v8` added at an exact pin matching `vitest@4.1.7` (approval recorded).
-- [ ] `vitest.config.ts` defines `coverage: { provider: "v8", reporter: ["text", "html", "lcov"], include: ["lib/**", "app/**", "components/**"], exclude: [tests, generated, scripts] }`.
-- [ ] `npx vitest run --coverage` produces a report; the **measured baseline** is recorded in the PR description (don't invent thresholds — set them at/just below the measured floor to ratchet upward).
-- [ ] CI optionally runs coverage in the `gate` job or a separate non-blocking step (decide based on runtime cost; 565 tests already take ~46s serially).
-- [ ] Gate green.
+- [x] Dependency `@vitest/coverage-v8` added at an exact pin matching `vitest@4.1.7` (approval recorded).
+- [x] `vitest.config.ts` defines `coverage: { provider: "v8", reporter: ["text", "html", "lcov"], include: ["lib/**", "app/**", "components/**"], exclude: [tests, generated, scripts] }`.
+- [x] `npx vitest run --coverage` produces a report; the **measured baseline** is recorded in the PR description (don't invent thresholds — set them at/just below the measured floor to ratchet upward).
+- [x] CI optionally runs coverage in the `gate` job or a separate non-blocking step (decide based on runtime cost; 565 tests already take ~46s serially).
+- [x] Gate green.
 
 ## Implementation Approach
 **Files to touch:** `package.json` (devDep — gated), `vitest.config.ts`, optionally `.github/workflows/ci.yml`, `.gitignore` (ignore `coverage/`).
