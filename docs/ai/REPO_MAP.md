@@ -51,13 +51,18 @@ handoff records — skip unless coordinating a multi-agent run.
 
 ## Notes / caveats
 
-- `PLAN.md` is ~3.4k lines documenting 56 sprints; most of the bulk is
-  near-duplicate read-only CSV "handoff contract" prose. Read §1–4 and the
-  current sprint, not the whole file. Consolidation is tracked in `tickets/`.
-- `lib/server/csv*` (34 files) is a deep read-only contract stack built over
-  Sprints 5–23. It is no-write by design. Mapped in
+- `PLAN.md` (~1.5k lines after the TICKET002 trim) documents the live sprint
+  inline; completed-sprint detail (Sprints 4–55) is archived in
+  `docs/PLAN-ARCHIVE.md`. Read §1–4 and the current sprint, not the whole file.
+- `lib/server/csv*` (34 of 63 server modules) is a deep read-only contract stack
+  built over Sprints 5–23. It is no-write by design. Mapped in
   `docs/ai/csv-contract-assessment.md`: 13 modules are UI-reachable (behind
   `/reports`), 21 are a test-only operator/release tower. Consolidation is
   tracked (TICKET003 assessment done; TICKET004 = Phase-1 execution).
+- `docs/ai/NEXT-LEVEL.md` is the meta-level scaling assessment for the
+  autonomous-coding system itself (loop cost, anti-gold-plating guardrail,
+  refactor sequencing). Distinct from `docs/ROADMAP.md` (product features).
+  Actionable as TICKET005 (prompt dedup), TICKET006 (reachability gate),
+  TICKET007 (parallel-safe tests).
 - Full local gate (incl. Playwright e2e, 50 tests) was confirmed green on
   2026-05-28. E2E is heavy (needs `npx playwright install chromium`).
