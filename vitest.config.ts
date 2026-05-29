@@ -5,7 +5,10 @@ export default defineConfig({
   test: {
     globals: false,
     environment: "node",
-    include: ["tests/**/*.test.ts"]
+    include: ["tests/**/*.test.ts"],
+    globalSetup: ["tests/setup/global.ts"],
+    setupFiles: ["tests/setup/db.ts"],
+    testTimeout: 30000
   },
   resolve: {
     alias: {

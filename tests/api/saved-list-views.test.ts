@@ -194,6 +194,75 @@ describe("saved list view service", () => {
 
     await expect(prisma.savedListView.count()).resolves.toBe(countBefore);
   });
+
+  it("creates and resolves saved views for leads, including the source filter", async () => {
+    const leadView = await createSavedListView({
+      entity: "leads",
+      name: `${testNamePrefix} incoming web leads`,
+      filters: {
+        status: "assigned",
+        source: "Website"
+      },
+      sortBy: "lastName",
+      sortOrder: "asc",
+      pageSize: 15
+    });
+
+    const resolved = await buildSavedListViewQuery({
+      entity: "leads",
+      savedViewId: leadView.id,
+      query: {
+        page: 1,
+        pageSize: 10
+      }
+    });
+
+    expect(resolved.source).toBe("saved-view");
+    expect(resolved.selectedView?.id).toBe(leadView.id);
+    expect(resolved.query).toEqual({
+      page: 1,
+      pageSize: 15,
+      sortBy: "lastName",
+      sortOrder: "asc",
+      filters: {
+        status: "assigned",
+        source: "Website"
+      }
+    });
+  });
+
+  it("creates and resolves saved views for opportunities (deals) with custom sorting", async () => {
+    const dealView = await createSavedListView({
+      entity: "opportunities",
+      name: `${testNamePrefix} high value pipeline`,
+      filters: {
+        stage: "qualified"
+      },
+      sortBy: "value",
+      sortOrder: "desc",
+      pageSize: 30
+    });
+
+    const resolved = await buildSavedListViewQuery({
+      entity: "opportunities",
+      savedViewId: dealView.id,
+      query: {
+        page: 2
+      }
+    });
+
+    expect(resolved.source).toBe("saved-view");
+    expect(resolved.selectedView?.id).toBe(dealView.id);
+    expect(resolved.query).toEqual({
+      page: 2,
+      pageSize: 30,
+      sortBy: "value",
+      sortOrder: "desc",
+      filters: {
+        stage: "qualified"
+      }
+    });
+  });
 });
 
 async function cleanupSavedListViews() {
