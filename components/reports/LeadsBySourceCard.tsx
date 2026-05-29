@@ -53,7 +53,7 @@ export function LeadsBySourceCard({ data, isLoading }: LeadsBySourceCardProps) {
       </CardHeader>
       <CardContent className="space-y-2">
         {chart.labels.map((label, i) => {
-          const count = chart.data[i];
+          const count = chart.data[i] ?? 0;
           const rate = chart.rates[i];
           const width = max > 0 ? Math.round((count / max) * 100) : 0;
 

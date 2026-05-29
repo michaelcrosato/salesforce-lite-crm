@@ -51,12 +51,13 @@ const REGISTRY_ICONS: Record<string, LucideIcon> = {
 const registryNavItems: readonly NavItem[] = ENTITY_REGISTRY.filter(
   (entity) => !baseNavItems.some((item) => item.href === entity.route)
 )
-  .filter((entity) => entity.iconName in REGISTRY_ICONS)
-  .map((entity) => ({
-    href: entity.route,
-    label: entity.listLabel,
-    icon: REGISTRY_ICONS[entity.iconName]
-  }));
+  .map((entity) => {
+    const icon = REGISTRY_ICONS[entity.iconName];
+    return icon
+      ? { href: entity.route, label: entity.listLabel, icon }
+      : null;
+  })
+  .filter((item): item is NavItem => item !== null);
 
 const reportsItem: NavItem = {
   href: "/reports",

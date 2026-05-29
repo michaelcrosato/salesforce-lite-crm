@@ -161,6 +161,9 @@ export function DashboardCardOperator({
       const next = [...current];
       const sourceIndex = activeIndexes[activeIndex];
       const targetIndex = activeIndexes[targetActiveIndex];
+      if (sourceIndex === undefined || targetIndex === undefined) {
+        return current;
+      }
       const sourceCard = next[sourceIndex];
 
       if (!sourceCard || !next[targetIndex]) {
