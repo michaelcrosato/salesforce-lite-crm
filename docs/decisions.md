@@ -92,3 +92,10 @@
 - Enabled `reactCompiler: true` in `next.config.mjs` and observed Next.js attempting to resolve `babel-plugin-react-compiler` under the hood.
 - Build failed with a hard resolution error because the dependency `babel-plugin-react-compiler` is not present in `node_modules` and is a gated dependency change requiring human/operator promotion approval per CLAUDE.md §14.
 - Decided to **DEFER** the adoption of the React Compiler to a future sprint. Reverted all config modifications to keep the `main` branch completely clean and avoid introducing unapproved dependencies or breaking compilation pipelines.
+
+## Tailwind v4 Oxide Migration (Spec 023)
+
+- Inspected the next pending task (`023` Tailwind v4 migration) in `plan/PROGRESS.md` and read its specification file (`plan/specs/023_tailwind_v4_migration.md`).
+- Observed that the spec's Scope-gate has a strict warning (⚠️) requiring dependency approval for upgrading `tailwindcss` to `4.x` and adding `@tailwindcss/postcss` under `CLAUDE.md` §14 / `AGENTS.md` guidelines.
+- Decided to **STOP** and file a formal promotion request (`docs/PROMOTION_REQUEST_023.md`) instead of executing the migration unattended. This preserves the stability of the `main` branch and guarantees that no unapproved dependency upgrades or PostCSS pipeline alterations bypass operator verification.
+
