@@ -1089,6 +1089,100 @@ function Push-GreenBranchIfRequested {
   return $true
 }
 
+function Write-Blocker {
+  param(
+    [string] $Description,
+    [string] $Evidence
+  )
+  $blockerPath = Join-Path $script:RunRoot ("BLOCKERS.{0}.md" -f $script:Agent)
+  $timestamp = Get-Date -Format o
+  $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD")
+  $escapedEvidence = $Evidence -replace "\r?\n", " " -replace "\|", "\|"
+  if ($escapedEvidence.Length -gt 200) { $escapedEvidence = $escapedEvidence.Substring(0, 200) + "..." }
+
+  $content = @"
+Agent: $script:Agent
+Sprint: Sprint 5
+Branch: $branch
+Timestamp: $timestamp
+Escalation required: YES
+
+### Active blockers
+
+| #    | File / module | Type | Description | Evidence | Awaiting | Safe next action |
+| ---- | ------------- | ---- | ----------- | -------- | -------- | ---------------- |
+| 1    | PR Gate       | RED  | $Description | $escapedEvidence | Operator review | Investigate CI failure |
+
+"@
+
+  [System.IO.File]::WriteAllText($blockerPath, $content, (Get-Utf8NoBomEncoding))
+  Write-Host "Wrote blocker file: $blockerPath"
+  Write-MasterLog "Active blocker recorded: $Description"
+}
+
+function Merge-GreenBranchIfRequested {
+  param([string]$SummaryText)
+  
+  if (-not (Test-SummarySaysMergeReady -Text $SummaryText)) {
+    return $true
+  }
+
+  $branch = Get-GitText @("rev-parse", "--abbrev-ref", "HEAD")
+  if ($branch -eq "main") {
+    Write-Host "On main branch. No PR merge needed."
+    return $true
+  }
+
+  if (-not $Push) {
+    Write-Host "Push is disabled. Skipping PR creation and merge."
+    return $true
+  }
+
+  Write-Host "Agent reported MERGE READY. Starting automated PR-open, watch-gate, and squash-merge process..."
+
+  Push-Location $script:RunRoot
+  try {
+    # 1. Open the PR
+    Write-Host "Opening PR for '$branch' using gh cli..."
+    $prCreateResult = Invoke-NativeCapture { & gh pr create --base main --fill 2>&1 }
+    $prOutput = $prCreateResult.Output | Out-String
+    if ($prCreateResult.ExitCode -ne 0 -and $prOutput -notmatch "already exists") {
+      Write-Host "Failed to create PR: $prOutput"
+      Write-Blocker -Description "Failed to create PR for $branch" -Evidence $prOutput
+      return $false
+    }
+
+    # 2. Watch the checks / gate
+    Write-Host "Watching PR checks/gate for '$branch'..."
+    $checksResult = Invoke-NativeCapture { & gh pr checks $branch --watch 2>&1 }
+    $checksOutput = $checksResult.Output | Out-String
+    if ($checksResult.ExitCode -ne 0) {
+      Write-Host "PR checks failed (gate is red) for $branch. Leaving PR open."
+      Write-Host $checksOutput
+      Write-Blocker -Description "PR checks failed (gate is red) for $branch" -Evidence $checksOutput
+      return $false
+    }
+
+    # 3. Squash-merge the PR (never --admin)
+    Write-Host "Squash-merging pull request for '$branch'..."
+    $mergeResult = Invoke-NativeCapture { & gh pr merge $branch --squash --delete-branch 2>&1 }
+    $mergeOutput = $mergeResult.Output | Out-String
+    if ($mergeResult.ExitCode -ne 0) {
+      Write-Host "PR squash-merge failed for $branch: $mergeOutput"
+      Write-Blocker -Description "PR squash-merge failed for $branch" -Evidence $mergeOutput
+      return $false
+    }
+
+    Write-Host "PR squash-merged successfully. Switching to main and pulling updates..."
+    Invoke-Git @("checkout", "main")
+    Invoke-Git @("pull", "origin", "main")
+    return $true
+  }
+  finally {
+    Pop-Location
+  }
+}
+
 function Read-SummaryText {
   param([string] $SummaryPath)
   if (Test-Path -LiteralPath $SummaryPath) {
@@ -1364,8 +1458,14 @@ try {
     $headAfter = Get-HeadFull
     $summaryText = Read-SummaryText -SummaryPath $summaryPath
 
+    $mergeOk = Merge-GreenBranchIfRequested -SummaryText $summaryText
+    if (-not $mergeOk) {
+      Set-LoopFailureExit -Reason "PR/merge failed."
+      break
+    }
+
     if (Test-SummarySaysMergeReady -Text $summaryText) {
-      Write-Host "Agent reported MERGE READY. Stopping feature loop."
+      Write-Host "Agent reported MERGE READY and merged successfully. Stopping feature loop."
       break
     }
 

@@ -37,7 +37,7 @@ param(
   [switch] $NoStartDockerServices,
   [switch] $NoAutoRevertBroken,
   [switch] $NoAllowSprintRollover,
-  [switch] $NoAllowMain,
+  [switch] $AllowMain,
   [switch] $NoPush,
   [switch] $PollOriginStop
 )
@@ -403,7 +403,7 @@ function Get-LoopArguments {
   if (-not $NoStartDockerServices) { $args += "-StartDockerServices" }
   if (-not $NoAutoRevertBroken) { $args += "-AutoRevertBroken" }
   if (-not $NoAllowSprintRollover) { $args += "-AllowSprintRollover" }
-  if (-not $NoAllowMain) { $args += "-AllowMain" }
+  if ($AllowMain) { $args += "-AllowMain" }
   if (-not $NoPush) { $args += "-Push" }
   if ($PollOriginStop) { $args += "-PollOriginStop" }
   if ($CodexInvocationSmokeOnly) { $args += "-CodexInvocationSmokeOnly" }
