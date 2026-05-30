@@ -35,3 +35,11 @@ Extended `plan/ROADMAP.md` and `plan/PROGRESS.md` to reflect Wave 3.
 - **Verification**: Verified via `npx vitest run tests/seed-integrity.test.ts` (all 7 tests passed cleanly) and verified full local gate `npm run agent:check` successfully.
 - **Status**: Done [x]
 
+### Spec 027 Execution & Verification — 2026-05-30T17:50:00Z
+- **Goal**: Dedup Calendar-Date split/UTC helpers across `lib/server`.
+- **Branch**: `gemini/spec-027-dedup-date-helpers`
+- **Work**: Created `lib/datetime.ts` containing centralized, highly robust `isCalendarDate`, `calendarDateStart`, and `calendarDateKey` helpers. Cleaned up naming collisions in `dealerCapacityWindowContracts.ts` by aliasing `isCalendarDate` import, and completely deleted duplicate helper declarations/stubs in `pacingSnapshotBuilder.ts` and `routingSimulatorEvaluator.ts` to use direct imports. Added comprehensive unit tests in `tests/datetime.test.ts`.
+- **Verification**: Verified via `npx vitest run tests/datetime.test.ts` (all 7 tests passed cleanly), specific contract tests, and verified full local gate `npm run agent:check` successfully (all 604 tests green, ESLint clean, Next build successful).
+- **Status**: Done [x]
+
+
