@@ -21,6 +21,10 @@ if [ ! -f .env ]; then
 fi
 
 echo ""
+echo "==> node scripts/check-reachability.mjs"
+node scripts/check-reachability.mjs
+
+echo ""
 echo "==> npx prisma generate"
 npx prisma generate
 
