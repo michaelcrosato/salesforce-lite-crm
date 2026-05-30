@@ -1,7 +1,7 @@
 # 026 — Extend logActionError into app/reports/actions.ts
 
 - **Wave:** Wave 3 — Autonomous Quality & Robustness
-- **Status:** [ ] Todo
+- **Status:** [x] Done
 - **Scores:** Impact 4/5 · Feasibility 4/5 · Risk Low · Codebase Fit 5/5
 - **Depends on:** 009 (structured logging), 004 (surface action errors)
 - **Scope gate:** Add error logging to `catch` blocks in `app/reports/actions.ts` only. No changes to the return schema or user-facing masked messages.
@@ -13,11 +13,11 @@ Spec 004 successfully centralized error logging across standard CRM server actio
 Impact: Eliminates an oversight in reporting mutations and preview executions, ensuring all server throws are correctly captured in structured JSON logs.
 
 ## Definition of Done & Acceptance Criteria
-- [ ] Import `logActionError` from `@/lib/action-result` into `app/reports/actions.ts`.
-- [ ] Bind the exception object inside `catch` blocks of mutating or preview builder server actions in `app/reports/actions.ts` (e.g. `catch (error)`).
-- [ ] Invoke `logActionError(error, { action, entity })` in each catch block, specifying descriptive action and entity fields.
-- [ ] Confirm no change to the user-facing return structure or payload signatures.
-- [ ] Write integration/unit tests validating that structured error logging is triggered when these actions fail.
+- [x] Import `logActionError` from `@/lib/action-result` into `app/reports/actions.ts`.
+- [x] Bind the exception object inside `catch` blocks of mutating or preview builder server actions in `app/reports/actions.ts` (e.g. `catch (error)`).
+- [x] Invoke `logActionError(error, { action, entity })` in each catch block, specifying descriptive action and entity fields.
+- [x] Confirm no change to the user-facing return structure or payload signatures.
+- [x] Write integration/unit tests validating that structured error logging is triggered when these actions fail.
 
 ## Implementation Approach
 **Files to touch:** `app/reports/actions.ts`, `tests/api/reportsErrorLogging.test.ts` (new)

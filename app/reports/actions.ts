@@ -2,6 +2,7 @@
 
 import { ZodError } from "zod/v4";
 import { updateTag } from "next/cache";
+import { logActionError } from "@/lib/action-result";
 import {
   getCsvDedupeReviewBundle,
   isCsvDedupeReviewBundleEntity,
@@ -406,7 +407,8 @@ export async function previewBulkActionDryRunReviewAction(
       message: `${packet.entityMetadata.label} ${packet.actionMetadata.label}: ${packet.rollup.eligibleCount} eligible, ${packet.rollup.blockedCount} blocked.`,
       packet
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "getBulkActionDryRunReviewPacket", entity: "bulkAction" });
     return {
       ok: false,
       message: "The bulk dry-run review packet could not be built.",
@@ -483,7 +485,8 @@ export async function executeBulkActionOperatorAction(
       message: `${execution.action} execution for ${execution.entity}: ${execution.rollup.executedCount} executed, ${execution.rollup.skippedCount} skipped, ${execution.rollup.blockedCount} blocked.`,
       execution
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "executeBulkAction", entity: "bulkAction" });
     return {
       ok: false,
       message: "The bulk action could not be executed.",
@@ -531,7 +534,8 @@ export async function previewCsvImportReviewAction(
       message: `${bundle.label} preview: ${safeRows} safe, ${watchRows} watch, ${blockRows} block.`,
       bundle
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewCsvImportAction", entity: "csvImport" });
     return {
       ok: false,
       message: "The CSV preview could not be built."
@@ -580,7 +584,8 @@ export async function previewSavedReportDefinitionAction(
       message: `${preview.definition?.label ?? "Saved report"} preview: ${preview.rowCount} rows, ${preview.aggregates.length} aggregates.`,
       preview
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewSavedReportDefinitionAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report preview could not be built.",
@@ -644,7 +649,8 @@ export async function createSavedReportDefinitionAction(
       definition: toSavedReportDefinitionSnapshot(definition),
       definitions: await activeSavedReportSnapshots()
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "createSavedReportDefinitionAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report could not be created.",
@@ -709,7 +715,8 @@ export async function updateSavedReportDefinitionAction(
       definition: toSavedReportDefinitionSnapshot(definition),
       definitions: await activeSavedReportSnapshots()
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "updateSavedReportDefinitionAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report could not be updated.",
@@ -776,7 +783,8 @@ export async function previewPersistedSavedReportDefinitionAction(
       definitions: await activeSavedReportSnapshots(),
       preview
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewSavedReportAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report preview could not be built.",
@@ -813,7 +821,8 @@ export async function archiveSavedReportDefinitionAction(
       definition: toSavedReportDefinitionSnapshot(definition),
       definitions: await activeSavedReportSnapshots()
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "archiveSavedReportDefinitionAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report could not be archived.",
@@ -850,7 +859,8 @@ export async function deleteSavedReportDefinitionAction(
       definition: toSavedReportDefinitionSnapshot(definition),
       definitions: await activeSavedReportSnapshots()
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "deleteSavedReportDefinitionAction", entity: "savedReport" });
     return {
       ok: false,
       message: "The saved report could not be deleted.",
@@ -920,7 +930,8 @@ export async function previewDashboardCardAction(
       message: `${preview.card?.title ?? definition.name} card preview: ${preview.rowCount} rows.`,
       preview
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewDashboardCardAction", entity: "dashboardCard" });
     return {
       ok: false,
       message: "The dashboard card preview could not be built.",
@@ -954,7 +965,8 @@ export async function previewRoutingSimulatorReviewAction(
 
   try {
     parsedInput = JSON.parse(rawInput);
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewRoutingSimulatorAction_parseInput", entity: "routingSimulator" });
     return {
       ok: false,
       message: "Routing simulator input must be valid JSON.",
@@ -969,7 +981,8 @@ export async function previewRoutingSimulatorReviewAction(
   if (rawCapacityInput.trim().length > 0) {
     try {
       parsedCapacityInput = JSON.parse(rawCapacityInput);
-    } catch {
+    } catch (error) {
+      logActionError(error, { action: "previewRoutingSimulatorAction_parseCapacity", entity: "routingSimulator" });
       return {
         ok: false,
         message: "Capacity window input must be valid JSON.",
@@ -1038,7 +1051,8 @@ export async function previewRoutingFairnessReviewAction(
 
   try {
     parsedInput = JSON.parse(rawInput);
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewRoutingFairnessReviewAction_parseInput", entity: "routingFairness" });
     return {
       ok: false,
       message: "Routing fairness input must be valid JSON.",
@@ -1093,7 +1107,8 @@ export async function previewPacingSnapshotReviewAction(
 
   try {
     parsedInput = JSON.parse(rawInput);
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewPacingSnapshotReviewAction_parseInput", entity: "pacingSnapshot" });
     return {
       ok: false,
       message: "Pacing snapshot input must be valid JSON.",
@@ -1287,7 +1302,8 @@ export async function executeCsvImportApplyOperatorAction(
       message: `Contact CSV apply: ${execution.summary.createdRows} created, ${execution.summary.skippedRows} skipped, ${execution.summary.blockedRows} blocked.`,
       execution
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "applyCsvContactImportOperatorAction", entity: "csvImport" });
     return {
       ok: false,
       message: "The contact CSV apply could not be completed.",
@@ -1334,7 +1350,8 @@ export async function previewWorkflowRuleDryRunAction(
       example,
       packet
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "previewWorkflowRuleDryRunAction", entity: "workflowRule" });
     return {
       ok: false,
       message: "The workflow dry-run review packet could not be built.",
@@ -1399,7 +1416,8 @@ export async function executeWorkflowRuleOperatorAction(
       message: `${example.entityLabel} workflow execution: ${execution.summary.executedRecordActionCount} executed, ${execution.summary.blockedActionCount} blocked actions, ${execution.summary.auditEventCount} audit events.`,
       execution
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, { action: "executeWorkflowRuleOperatorAction", entity: "workflowRule" });
     return {
       ok: false,
       message: "The workflow execution could not be completed.",
