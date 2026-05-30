@@ -61,4 +61,16 @@ Extended `plan/ROADMAP.md` and `plan/PROGRESS.md` to reflect Wave 3.
 - **Verification**: Verified via `npm run agent:check` locally (all 605 tests green, lint clean, typecheck passed, build completed).
 - **Status**: Done [x]
 
+## Cycle 3 — 2026-05-30T18:19:00Z
+- **Role**: Autonomous Principal Engineer
+- **Status**: REPLENISH Wave 5
+- **Objective**: Target legacy unreferenced CSV "operator/release" tower files, define Wave 5 Spec 029 to retire 16 dead files and tests, and lower baseline allowed orphans from 18 to 2.
+
+### Spec 029 Execution & Verification — 2026-05-30T18:20:00Z
+- **Goal**: Retire Dead CSV Tower (TICKET004 assessment Phase 2+3+4).
+- **Branch**: `gemini/spec-029-retire-dead-csv-tower`
+- **Work**: Atomically deleted 16 orphaned source modules in `lib/server/` and their corresponding 15 unit/integration test files in `tests/api/`. Updated `scripts/reachability-baseline.json` to reflect the retired files and racheted `maxOrphans` from 18 to 2. Verified reachability check passes cleanly.
+- **Verification**: Verified via `npm run agent:check` locally (all 534 tests green, lint clean, typecheck passed, build completed).
+- **Status**: Done [x]
+
 
