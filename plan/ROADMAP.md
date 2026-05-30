@@ -56,6 +56,7 @@ Ranked by Priority Score (desc). `Dep` = upstream specs that must land first. �
 | 27 | 026 | Extend logActionError in Reports | P3 | 4 | 4 | Low | 5 | 15 | 009, 004 | |
 | 28 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
 | 29 | 028 | Local Gate Reachability Parity | P4 | 3 | 5 | Low | 5 | 15 | — | |
+| 30 | 030 | Retire Remaining Non-CSV Orphans | P6 | 3 | 5 | Low | 5 | 15 | 029 | |
 
 **⚠️ Dependency/scope-gated (do not execute without explicit approval):** 006 (`@vitest/coverage-v8`), 010 (DOM test env), 017 (`babel-plugin-react-compiler`), 023 (Tailwind 4 + `@tailwindcss/postcss`). These are blueprinted but **blocked** under CLAUDE.md §14 / LOOP §11 until a human/promotion request clears the new dependency.
 
@@ -129,6 +130,13 @@ Tuning, optimization, and dead code retirement to prune legacy unused packet tow
 **Execution order (dependency-respecting):**
 1. **029** — Retire Dead CSV Tower (low risk, high leverage; needs 011 and 028).
 
+## Wave 6 — Complete Reachability Zero-Orphans Ratchet
+
+Continuous safety wave to completely prune any remaining dead modules and enforce a strict zero allowed orphans reachability baseline.
+
+**Execution order (dependency-respecting):**
+1. **030** — Retire Remaining Non-CSV Orphans (low risk, high leverage; needs 029).
+
 ---
 
 ## Dependency graph
@@ -176,6 +184,9 @@ graph LR
   subgraph P5["Wave 5 — Dead Code Retirement"]
     S029["029 retire dead CSV tower"]
   end
+  subgraph P6["Wave 6 — Complete Reachability Ratchet"]
+    S030["030 retire remaining non-CSV orphans"]
+  end
 
   S009 --> S004
   S009 --> S018
@@ -196,6 +207,7 @@ graph LR
   S004 --> S026
   S011 --> S029
   S028 --> S029
+  S029 --> S030
 ```
 
 

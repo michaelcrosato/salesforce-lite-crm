@@ -1,23 +1,23 @@
 Agent: gemini
 Sprint: Sprint 5
-Feature: Wave 5 Dead Code Retirement & Reachability Ratchet (Spec 029)
-Branch: gemini/spec-029-retire-dead-csv-tower
+Feature: Wave 6 Complete Zero-Orphans Reachability Ratchet (Spec 030)
+Branch: gemini/spec-030-retire-remaining-non-csv-orphans
 Status: DONE
-Commits this prompt: 1 commit (feat(spec-029): retire dead CSV tower and ratchet reachability)
-Gate status: PASS (vitest 534 passed, lint clean, typecheck passed, build passed)
+Commits this prompt: 1 commit (feat(spec-030): retire final non-CSV orphans and ratchet allowed orphans to zero)
+Gate status: PASS (vitest 527 passed, lint clean, typecheck passed, build passed)
 DoD self-check: PASS
-Timestamp: 2026-05-30T18:21:00-07:00
+Timestamp: 2026-05-30T18:26:00-07:00
 MERGE READY
 
 ### Completed this prompt
 
-- **Retire Dead CSV Tower (Spec 029)**: Safely deleted 16 unreferenced, test-only CSV contract modules in `lib/server/` and their corresponding 15 unit/integration test files in `tests/api/`, removing over 6,000 lines of dead code.
-- **Ratcheted Reachability Baseline**: Updated `scripts/reachability-baseline.json` to prune the deleted files and tightened the allowed orphan ratchet `maxOrphans` down to exactly **2** allowed orphans.
-- **100% Green Local Gates**: Verified all gate requirements pass cleanly; static checks (`check-reachability.mjs`), ESLint, TypeScript typecheck, 109 remaining test files (534 tests) pass green, and Next.js Turbopack compiler production build successful.
+- **Retire Final Non-CSV Orphans (Spec 030)**: Safely deleted the final 2 unreferenced, test-only server contract files `lib/server/bulkListSelectionContracts.ts` and `lib/server/workflowRuleExecutionReceipts.ts` and their corresponding 2 test files in `tests/api/`.
+- **Zero Allowed Orphans Reachability Baseline**: Configured `scripts/reachability-baseline.json` to reduce `maxOrphans` to exactly **0** and cleared the allowed orphans list. This guarantees any newly created unreferenced server code added in the future will fail the static check locally and on CI.
+- **100% Green Local Gates**: Verified all gate requirements pass cleanly; static checks (`check-reachability.mjs`), ESLint, TypeScript typecheck, 107 remaining test files (527 tests) pass green, and Next.js Turbopack compiler production build successful.
 
 ### Next action
 
-Squash-merge the branch `gemini/spec-029-retire-dead-csv-tower` to main.
+Squash-merge the branch `gemini/spec-030-retire-remaining-non-csv-orphans` to main.
 
 ### Scope confirmation
 
