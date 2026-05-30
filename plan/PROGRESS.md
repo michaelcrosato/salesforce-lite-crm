@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 30 / 30 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 030): lint ✅ · `tsc --noEmit` ✅ · test **527 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 31 / 31 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 030): lint ✅ · `tsc --noEmit` ✅ · test **527 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -70,6 +70,12 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 030 | Retire Remaining Non-CSV Orphans | 029 | |
+
+## Wave 7 — Identity & Authorization Foundations (1 / 1)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 031 | Developer Identity Session Switcher | — | |
 
 
 ---

@@ -3,6 +3,7 @@
 import { ZodError } from "zod/v4";
 import { updateTag } from "next/cache";
 import { logActionError } from "@/lib/action-result";
+import { getCurrentUserId } from "@/lib/session";
 import {
   getCsvDedupeReviewBundle,
   isCsvDedupeReviewBundleEntity,
@@ -279,10 +280,8 @@ export type PacingSnapshotReviewActionResult =
 
 const CSV_IMPORT_PREVIEW_SAMPLE_LIMIT = 10;
 const CSV_IMPORT_APPLY_CONFIRMATION_VALUE = "confirmed";
-const CSV_IMPORT_APPLY_ACTOR_USER_ID = "user-ava";
 const BULK_EXECUTION_CONFIRMATION_VALUE = "confirmed";
 const WORKFLOW_EXECUTION_CONFIRMATION_VALUE = "confirmed";
-const WORKFLOW_EXECUTION_ACTOR_USER_ID = "user-ava";
 const ROUTING_SIMULATOR_REVIEW_SAMPLE_LIMIT = 5;
 const ROUTING_FAIRNESS_REVIEW_SAMPLE_LIMIT = 5;
 const PACING_SNAPSHOT_REVIEW_BUCKET_SAMPLE_LIMIT = 5;
@@ -1291,7 +1290,7 @@ export async function executeCsvImportApplyOperatorAction(
       generatedAt: approvedAt,
       approval: {
         approved: true,
-        actorUserId: CSV_IMPORT_APPLY_ACTOR_USER_ID,
+        actorUserId: await getCurrentUserId(),
         approvedAt,
         note: "Operator confirmed contact CSV import apply from reports."
       }
@@ -1405,7 +1404,7 @@ export async function executeWorkflowRuleOperatorAction(
       ...example.rule,
       approval: {
         approved: true,
-        actorUserId: WORKFLOW_EXECUTION_ACTOR_USER_ID,
+        actorUserId: await getCurrentUserId(),
         approvedAt: new Date(),
         note: `Operator confirmed ${example.label} from the reports workflow panel.`
       }

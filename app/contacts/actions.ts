@@ -6,6 +6,7 @@ import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { contactFormSchema, noteFormSchema } from "@/lib/validation";
 import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import { getCurrentUserId } from "@/lib/session";
 import type { Contact } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -74,6 +75,7 @@ export async function createContactAction(
         data: buildAuditEventCreateData({
           category: "record",
           action: "created",
+          actorUserId: await getCurrentUserId(),
           entityType: "contact",
           entityId: contact.id,
           summary: `Contact created: ${contact.firstName} ${contact.lastName}.`,
@@ -147,6 +149,7 @@ export async function updateContactAction(
         data: buildAuditEventCreateData({
           category: "record",
           action: statusChanged ? "status_changed" : "updated",
+          actorUserId: await getCurrentUserId(),
           entityType: "contact",
           entityId: contact.id,
           summary: statusChanged

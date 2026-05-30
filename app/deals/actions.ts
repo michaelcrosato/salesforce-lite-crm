@@ -16,6 +16,7 @@ import {
   type AuditEntityType,
   type AuditMetadataValue
 } from "@/lib/services/auditEvents";
+import { getCurrentUserId } from "@/lib/session";
 import type { Deal } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -106,6 +107,7 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
         data: buildAuditEventCreateData({
           category: "record",
           action: "created",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: deal.id,
           summary: `Opportunity created: ${deal.name}.`,
@@ -223,6 +225,7 @@ export async function updateDealAction(
         data: buildAuditEventCreateData({
           category: "record",
           action: stageChanged ? "stage_changed" : "updated",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: deal.id,
           summary: stageChanged
@@ -335,6 +338,7 @@ export async function moveDealAction(input: {
         data: buildAuditEventCreateData({
           category: "record",
           action: "stage_changed",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: updatedDeal.id,
           summary: `Opportunity stage changed from ${deal.stage} to ${updatedDeal.stage}.`,
