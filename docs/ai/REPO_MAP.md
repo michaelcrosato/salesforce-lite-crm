@@ -7,8 +7,11 @@ Fast orientation for where things live. Authority for product behavior is
 ## Stack
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript 5.9 · Prisma 7 +
-`@prisma/adapter-better-sqlite3` (SQLite default) · Tailwind 3 · Zod · Vitest ·
+`@prisma/adapter-better-sqlite3` (SQLite default) · Tailwind 4 · Zod · Vitest ·
 Playwright. Package manager: npm.
+ 
+Recent status (2026-05-29): local tests run as 562 cases through
+`npm run test`; lint/typecheck/build are green in this branch.
 
 ## Where core logic lives
 
@@ -23,7 +26,7 @@ Playwright. Package manager: npm.
 | Deterministic "AI" | `lib/ai/**` | Local summarizer, action intent registry, governance/eval fixtures. No external AI provider. |
 | CRM registry/adapter | `lib/crm/**`, `lib/crm-constants.ts` | Entity registry and shared constants. |
 | Validation | `lib/validation.ts`, `lib/services/*` | Zod schemas for form actions. |
-| Prisma | `prisma/schema.prisma`, `prisma/seed.ts` | SQLite default; `schema.postgres.prisma` for the helper switch. **Sacred** — see CLAUDE.md §7–8. |
+| Prisma | `prisma/schema.prisma`, `prisma/seed.ts` | SQLite default; `schema.postgres.prisma` for the helper switch. **Sacred** — see `PLAN.md` and `CRM-CONTRACT.md`. |
 
 ## Entry points
 
@@ -35,6 +38,23 @@ Playwright. Package manager: npm.
 
 - Unit: `tests/**/*.test.ts` (115 files, 562 tests) — `npm run test`.
 - E2E: `e2e/**/*.spec.ts` — `npm run test:e2e` (seeds first, needs Chromium).
+
+## Core dependencies
+
+- Runtime: `next`, `react`, `react-dom`, `@prisma/client`, `@prisma/adapter-better-sqlite3`,
+  `better-sqlite3`, `zod`.
+- Build/lint/typecheck: `eslint`, `typescript`, `tailwindcss`, `tailwind-merge`.
+- Testing: `vitest`, `@testing-library/*`, `@playwright/test`.
+
+## Debugging workflow
+
+- `npm run agent:status` → branch and ticket baseline.
+- `npm run lint` → fast structural issues.
+- `npm run typecheck` → compile issues.
+- `npm run test` → behavior contracts.
+- `npm run build` → bundling/type surface in app.
+- `npm run agent:format` → formatting/no-formatter check.
+- `npm run test:e2e` and `npx playwright install chromium` for full UI verification.
 
 ## Config
 
@@ -48,6 +68,8 @@ See `.aiignore`. In short: `node_modules/`, `.next/`, `agent-runs/`,
 `failure-archives/`, `test-results/`, `traces/`, `*.log`, `prisma/dev.db*`,
 `package-lock.json`. Per-agent `SUMMARY.*`, `BLOCKERS.*`, and `*-NOTES.md` are
 handoff records — skip unless coordinating a multi-agent run.
+
+Use `scripts/agent/check.sh` and `npm run agent:check` for the non-e2e AFK gate.
 
 ## Notes / caveats
 

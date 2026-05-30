@@ -1,9 +1,9 @@
 # AGENTS.md
 
 This repo is prepared for autonomous CLI-agent work. `PLAN.md` and
-`CRM-CONTRACT.md` are the primary coordination files. `docs/PROJECT-CONTROL.md`
-and `docs/LOCAL-GATE.md` are the current state and validation references. This
-file is the short handoff.
+`CRM-CONTRACT.md` are the primary coordination files. `docs/PROJECT-CONTROL.md`,
+`docs/LOCAL-GATE.md`, and `ROADMAP.md` are the current state and execution
+references. This file is the short handoff.
 
 ## Operating Policy
 
@@ -14,6 +14,9 @@ file is the short handoff.
   prompt-authorized exceptions.
 - Do not paste raw chat history into repo docs.
 - Do not create product features during readiness or cleanup passes.
+- Tool policy files (`CLAUDE.md`, `.cursor/rules`, `*.mdc`) are thin
+  instructions pointers; the AFK control plane remains `AGENTS.md`, `PLAN.md`,
+  and `CRM-CONTRACT.md`.
 
 ## Agent Loop
 
@@ -21,7 +24,7 @@ Repeat this unprompted each session:
 
 1. **Status** — `npm run agent:status` (or `bash scripts/agent/status.sh`).
 2. **Read** — `GOAL.md` → `docs/ai/REPO_MAP.md` → `PLAN.md` §1–4 →
-   `CRM-CONTRACT.md` → top open ticket in `tickets/`.
+   `CRM-CONTRACT.md` → `ROADMAP.md` → top open ticket in `tickets/`.
 3. **Pick** one unblocked, session-sized ticket; mark it in progress.
 4. **Change** — smallest edit that satisfies the ticket; stay in scope.
 5. **Check** — targeted test first, then `npm run agent:check` (lint +
@@ -46,7 +49,8 @@ Repeat this unprompted each session:
 | Full gate incl. e2e | `scripts/local-gate.ps1` / `scripts/local-gate.sh` | — |
 
 `agent:*` scripts are thin wrappers over the existing scripts; they add a stable
-interface, not new behavior. There is no `format` step — lint is the style gate.
+interface, not new behavior. There is no standalone `format` package script;
+`agent:format` is the no-op marker and lint is the style gate.
 
 ## Autonomous vs Ask
 

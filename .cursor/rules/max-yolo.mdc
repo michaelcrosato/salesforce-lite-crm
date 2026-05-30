@@ -5,6 +5,8 @@ alwaysApply: true
 ---
 
 Follow `AGENTS.md`, `PLAN.md`, and `CRM-CONTRACT.md` as the active repo instructions.
+Use `ROADMAP.md` for AFK session sequencing and `docs/ai/REPO_MAP.md` for
+context loading.
 
 This repo authorizes autonomous repo-local execution for the standard gate and git workflow. Do not stop for manual approval before running ordinary local commands such as `npm install`, `npm run *`, `npx prisma *`, `npx playwright *`, `git status`, `git log`, `git diff`, `git fetch`, `git pull`, `git checkout`, `git merge`, `git add`, `git commit`, or `git push`.
 

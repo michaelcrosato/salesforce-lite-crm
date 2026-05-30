@@ -1,21 +1,21 @@
-Agent: Codex
+Agent: codex
 
-Sprint: Sprint 56
+Sprint: automation
 
-Feature: S56-F3 - Pacing snapshot review packets
+Feature: overnight autonomy startup
 
-Branch: codex/sprint-56-pacing-snapshot-review-packets
+Branch: codex/autonomy-20260529-182923
 
-Timestamp: 2026-05-29T11:24:30-07:00
+Timestamp: 2026-05-29T20:30:32-07:00
 
-Escalation required: NO
+Escalation required: YES
 
 ### Active blockers
 
 | # | File / module | Type | Description | Evidence | Awaiting | Safe next action |
 |---|--------------|------|-------------|----------|---------|-----------------|
+| 1 | scripts/autonomy-loop.ps1 / scripts/start-codex-overnight.ps1 | gate | Codex overnight launcher failed before starting the watchdog loop. | Codex invocation smoke failed with exit code 1. See C:\dev\salesforce-lite-crm\agent-runs\codex-watchdog-safe-before-yolo-20260529-090411.log. | Fix the Codex invocation path or local Codex CLI startup behavior. | Do not restart the overnight loop until the Codex invocation smoke passes. |
 
 ### Resolved this prompt
 
-- Initial PR `gate` failure resolved: `node scripts/check-reachability.mjs` reported `lib/server/pacingSnapshotReviewPackets.ts` as a new test-only orphan; fixed by wiring the packet into `app/reports/actions.ts` and lowering the ratchet baseline to 18.
-- Duplicate PR `gate` failure resolved: `tests/api/auditEvents.test.ts` expected one global `routing/lead_routed` event, while CI observed an additional matching event; fixed by asserting against the test-created `leadEntityId` event only.
+- None.

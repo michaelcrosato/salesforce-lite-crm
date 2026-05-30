@@ -2,11 +2,11 @@
 
 ## Current Status
 
-- Branch observed this pass: `main`
+- Branch observed this pass: `codex/autonomy-20260529-182923`
 - Commit observed this pass: use `git rev-parse HEAD` for the current local
   commit; this file intentionally avoids freezing a SHA that stales after
   documentation-only commits.
-- Current pass: doc alignment + AFK-readiness maintenance (2026-05-28).
+- Current pass: AFK readiness maintenance and agent script hardening (2026-05-29).
 - Product feature work: through Sprint 55 is present in `main`; Sprint 56
   (Pacing Snapshot Readiness) is the active track. `PLAN.md` §1/§4 is
   authoritative for the live sprint and its per-feature status.

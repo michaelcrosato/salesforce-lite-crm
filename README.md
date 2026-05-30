@@ -37,6 +37,8 @@ Start with these files before changing code or documentation:
   exports, and server-side adapter signatures.
 - `AGENTS.md` - short handoff for CLI agents, worktree paths, branch
   conventions, and max-YOLO operating policy.
+- `ROADMAP.md` - AFK execution roadmap and task order.
+- `.aiignore` - repo paths to skip during AFK context loading.
 - `docs/PROJECT-CONTROL.md` - current readiness status and coordination notes.
 - `docs/MERGE-PLAYBOOK.md` - merge checks, rollback/archive procedure, and
   final-gate expectations.
@@ -222,12 +224,16 @@ build            next build
 lint             eslint . --max-warnings=0
 typecheck        tsc --noEmit --pretty false
 seed             tsx prisma/seed.ts
-test             vitest run --maxWorkers=1
+test             vitest run
 test:e2e         npm run seed && playwright test
 prisma:postgres  node scripts/prisma-postgres.mjs
 autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
 autonomy:watchdog  powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
-```
+agent:bootstrap     npm install + prisma + seed
+agent:check         npm run lint + npm run typecheck + npm run test + npm run build
+agent:status        git status + ticket summary
+agent:format        formatter marker (lint is authoritative)
+``` 
 
 There is no `format` script unless `package.json` later adds one.
 
