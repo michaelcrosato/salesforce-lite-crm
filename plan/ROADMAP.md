@@ -54,6 +54,7 @@ Ranked by Priority Score (desc). `Dep` = upstream specs that must land first. �
 | 25 | 025 | Deterministic Case SLA Seed Test | P3 | 4 | 5 | Low | 5 | 16 | — | |
 | 26 | 026 | Extend logActionError in Reports | P3 | 4 | 4 | Low | 5 | 15 | 009, 004 | |
 | 27 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
+| 28 | 028 | Local Gate Reachability Parity | P4 | 3 | 5 | Low | 5 | 15 | — | |
 
 **⚠️ Dependency/scope-gated (do not execute without explicit approval):** 006 (`@vitest/coverage-v8`), 010 (DOM test env), 017 (`babel-plugin-react-compiler`), 023 (Tailwind 4 + `@tailwindcss/postcss`). These are blueprinted but **blocked** under CLAUDE.md §14 / LOOP §11 until a human/promotion request clears the new dependency.
 
@@ -113,6 +114,13 @@ Hardening, test determinism, and observability upgrades promoted from the backlo
 2. **027** — Dedup Date UTC Helpers (pure refactoring).
 3. **026** — Extend logActionError in Reports (needs 009 and 004).
 
+## Wave 4 — Continuous Safety & Parity
+
+Continuous improvement wave to enforce toolchain parity, environment safety, and developer workflow consistency.
+
+**Execution order (dependency-respecting):**
+1. **028** — Local Gate Reachability Parity (low risk, high leverage, independent).
+
 ---
 
 ## Dependency graph
@@ -153,6 +161,9 @@ graph LR
     S025["025 deterministic SLA test"]
     S026["026 logActionError in Reports"]
     S027["027 dedup date helpers"]
+  end
+  subgraph P4["Wave 4 — Continuous Safety & Parity"]
+    S028["028 local gate reachability parity"]
   end
 
   S009 --> S004

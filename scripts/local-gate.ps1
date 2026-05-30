@@ -34,6 +34,8 @@ try {
         Copy-Item -LiteralPath ".env.example" -Destination ".env"
     }
 
+    Invoke-GateStep "node scripts/check-reachability.mjs" { & node scripts/check-reachability.mjs }
+
     Invoke-GateStep "npx prisma generate" { & npx prisma generate }
     Invoke-GateStep "npx prisma db push" { & npx prisma db push }
     Invoke-GateStep "npm run seed" { & npm run seed }

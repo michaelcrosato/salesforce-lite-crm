@@ -42,4 +42,23 @@ Extended `plan/ROADMAP.md` and `plan/PROGRESS.md` to reflect Wave 3.
 - **Verification**: Verified via `npx vitest run tests/datetime.test.ts` (all 7 tests passed cleanly), specific contract tests, and verified full local gate `npm run agent:check` successfully (all 604 tests green, ESLint clean, Next build successful).
 - **Status**: Done [x]
 
+### Spec 026 Execution & Verification — 2026-05-30T18:00:00Z
+- **Goal**: Extend `logActionError` into `app/reports/actions.ts`.
+- **Branch**: `gemini/spec-026-log-action-error-reports`
+- **Work**: Centralized structured action error logging across all 15 catch blocks in `app/reports/actions.ts`. Added a unit test `tests/api/reportsErrorLogging.test.ts` mocking a preview/execution action throw and verifying logger error output.
+- **Verification**: Verified via `npm run agent:check` locally (all 605 tests green, lint clean, typecheck passed, build completed). Squash-merged to `main` via PR #25.
+- **Status**: Done [x]
+
+## Cycle 2 — 2026-05-30T18:06:00Z
+- **Role**: Autonomous Principal Engineer
+- **Status**: REPLENISH Wave 4
+- **Objective**: Identify next frontier, define safety and environment parity improvements, construct Wave 4 Spec 028, and execute it.
+
+### Spec 028 Execution & Verification — 2026-05-30T18:07:00Z
+- **Goal**: Implement Local Gate Reachability Parity (B-11).
+- **Branch**: `gemini/spec-028-local-gate-reachability-parity`
+- **Work**: Audited local gates against CI workflow and identified a gap where `check-reachability` check was missing locally. Added `node scripts/check-reachability.mjs` as an early blocking step in both `scripts/local-gate.ps1` and `scripts/local-gate.sh`. Verified drift detection fails with exit code 1, and clean conditions pass.
+- **Verification**: Verified via `npm run agent:check` locally (all 605 tests green, lint clean, typecheck passed, build completed).
+- **Status**: Done [x]
+
 
