@@ -1,23 +1,24 @@
 Agent: gemini
 Sprint: Sprint 5
-Feature: Wave 6 Complete Zero-Orphans Reachability Ratchet (Spec 030)
-Branch: gemini/spec-030-retire-remaining-non-csv-orphans
+Feature: Wave 9 Advanced Enterprise Modernization & Reliability Hardening (Spec 037)
+Branch: gemini/spec-037-transactional-accounts
 Status: DONE
-Commits this prompt: 1 commit (feat(spec-030): retire final non-CSV orphans and ratchet allowed orphans to zero)
-Gate status: PASS (vitest 527 passed, lint clean, typecheck passed, build passed)
+Commits this prompt: 2 commits (feat(spec-037): wrap account mutations and audit events in a single transaction; test(spec-037): add accounts transaction safety and rollback integration tests)
+Gate status: PASS (vitest 537 passed, lint clean, typecheck passed, build passed, Playwright E2E 52 passed)
 DoD self-check: PASS
-Timestamp: 2026-05-30T18:26:00-07:00
+Timestamp: 2026-05-30T15:02:00-07:00
 MERGE READY
 
 ### Completed this prompt
 
-- **Retire Final Non-CSV Orphans (Spec 030)**: Safely deleted the final 2 unreferenced, test-only server contract files `lib/server/bulkListSelectionContracts.ts` and `lib/server/workflowRuleExecutionReceipts.ts` and their corresponding 2 test files in `tests/api/`.
-- **Zero Allowed Orphans Reachability Baseline**: Configured `scripts/reachability-baseline.json` to reduce `maxOrphans` to exactly **0** and cleared the allowed orphans list. This guarantees any newly created unreferenced server code added in the future will fail the static check locally and on CI.
-- **100% Green Local Gates**: Verified all gate requirements pass cleanly; static checks (`check-reachability.mjs`), ESLint, TypeScript typecheck, 107 remaining test files (527 tests) pass green, and Next.js Turbopack compiler production build successful.
+- **Transactional Audit Logging for Accounts (Spec 037)**: Wrapped both the Account creation and update mutations alongside their corresponding `recordAuditEvent` writes inside a single atomic `prisma.$transaction` block. This prevents orphaned Account rows and audit trails in the event of an audit log write failure.
+- **Accounts Transaction Rollback & Safety Tests**: Created `tests/api/accountsTransactionSafety.test.ts` to fully pin down and assert normal transaction success pathways as well as transaction rollback behavior when an audit event write fails (proving data-drift prevention).
+- **Mock Transaction Test Harness Support**: Added full support for `$transaction` and transaction client calls inside `tests/api/actionErrorMasking.test.ts` to align existing test coverage with transactional boundaries.
+- **100% Green Local Verification Gate**: Verified that all static checks, ESLint, TypeScript typechecking, and all 537 vitest tests in 109 test files pass green. Playwright E2E test suite successfully executed with 52/52 browser tests passing cleanly.
 
 ### Next action
 
-Squash-merge the branch `gemini/spec-030-retire-remaining-non-csv-orphans` to main.
+Squash-merge the branch `gemini/spec-037-transactional-accounts` to main.
 
 ### Scope confirmation
 
