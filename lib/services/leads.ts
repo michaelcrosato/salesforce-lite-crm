@@ -1,3 +1,4 @@
+import { logger } from "@/lib/observability/logger";
 import { prisma } from "@/lib/prisma";
 import {
   normalizePostalCode,
@@ -290,7 +291,10 @@ function parseRoutingPayload(summary: string | null) {
         typeof summaryValue === "string" ? summaryValue : fallbackSummary,
       steps
     };
-  } catch {
+  } catch (error) {
+    logger.warn("routing_payload_parse_failed", {
+      error: error instanceof Error ? error.message : String(error)
+    });
     return legacyPayload(fallbackSummary);
   }
 }

@@ -44,7 +44,14 @@ export function PacingBar({
         </Badge>
         <span className="text-xs text-muted-foreground">{percent}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-muted">
+      <div
+        className="h-2 overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Pacing progress: ${percent}% (${pacingLabels[status]})`}
+      >
         <div
           className={cn(
             "h-full rounded-full",

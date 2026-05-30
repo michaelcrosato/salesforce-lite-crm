@@ -1,5 +1,6 @@
 import type { Prisma, SavedReportDefinition } from "@prisma/client";
 import { z } from "zod/v4";
+import { logger } from "@/lib/observability/logger";
 import { prisma } from "@/lib/prisma";
 import {
   buildAuditEventCreateData,
@@ -526,7 +527,11 @@ function savedReportAuditComparableValue(
 function parseJson(serialized: string, label: string): unknown {
   try {
     return JSON.parse(serialized);
-  } catch {
+  } catch (error) {
+    logger.warn("saved_report_json_parse_failed", {
+      label,
+      error: error instanceof Error ? error.message : String(error)
+    });
     throw new Error(`Saved report definition ${label} must be valid JSON.`);
   }
 }

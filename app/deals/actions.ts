@@ -1,7 +1,7 @@
 "use server";
 
 import { cacheTag, revalidatePath, updateTag } from "next/cache";
-import { actionErrorResult, type ActionResult } from "@/lib/action-result";
+import { actionErrorResult, logActionError, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
@@ -400,7 +400,11 @@ export async function getAuditHistoryAction(rawQuery: unknown) {
       parsed.data.entityId
     );
     return { ok: true, events };
-  } catch {
+  } catch (error) {
+    logActionError(error, {
+      action: "getAuditHistoryAction",
+      entity: "audit_events"
+    });
     return { ok: false, message: "Could not retrieve audit history.", events: [] };
   }
 }

@@ -29,6 +29,7 @@ import {
   type TaskStatus
 } from "@/lib/crm/registry";
 import type { TaskListOptions } from "@/lib/crm/crmClient";
+import { logger } from "@/lib/observability/logger";
 import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
 import {
   buildSavedListViewQuery,
@@ -142,7 +143,12 @@ async function resolveTaskSavedViewQuery(
         query
       })
     };
-  } catch {
+  } catch (error) {
+    logger.warn("saved_view_query_failed", {
+      entity: "tasks",
+      savedViewId,
+      error: error instanceof Error ? error.message : String(error)
+    });
     return {
       invalidView: true,
       resolved: {
