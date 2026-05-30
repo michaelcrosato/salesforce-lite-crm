@@ -51,8 +51,12 @@ Ranked by Priority Score (desc). `Dep` = upstream specs that must land first. �
 | 22 | 022 | Optimistic UI for deal kanban | P2 | 3 | 3 | Med | 4 | 11 | 014, 010 | |
 | 23 | 012 | Parallel-safe tests | P1 | 3 | 2 | Med | 4 | 10 | — | |
 | 24 | 023 | Tailwind v4 (Oxide) migration | P2 | 2 | 3 | Med | 3 | 9 | 008, 010 | ⚠️ |
+| 25 | 025 | Deterministic Case SLA Seed Test | P3 | 4 | 5 | Low | 5 | 16 | — | |
+| 26 | 026 | Extend logActionError in Reports | P3 | 4 | 4 | Low | 5 | 15 | 009, 004 | |
+| 27 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
 
 **⚠️ Dependency/scope-gated (do not execute without explicit approval):** 006 (`@vitest/coverage-v8`), 010 (DOM test env), 017 (`babel-plugin-react-compiler`), 023 (Tailwind 4 + `@tailwindcss/postcss`). These are blueprinted but **blocked** under CLAUDE.md §14 / LOOP §11 until a human/promotion request clears the new dependency.
+
 
 ---
 
@@ -100,6 +104,15 @@ User-facing CRM parity features. Each sits on Wave 1 plumbing (caching, audit, c
 5. **022** — Optimistic UI for the deal kanban (needs 014 read-your-writes + 010 component tests).
 6. **023** ⚠️ — Tailwind v4 migration (gated dep; standalone PR; needs 008 + 010 as a regression net).
 
+## Wave 3 — Autonomous Quality & Robustness
+
+Hardening, test determinism, and observability upgrades promoted from the backlog to lock in frontier quality.
+
+**Execution order (dependency-respecting):**
+1. **025** — Deterministic Case SLA Seed Test (low risk, high leverage).
+2. **027** — Dedup Date UTC Helpers (pure refactoring).
+3. **026** — Extend logActionError in Reports (needs 009 and 004).
+
 ---
 
 ## Dependency graph
@@ -136,6 +149,11 @@ graph LR
     S023["023 Tailwind v4 ⚠️"]
     S024["024 change-history UI"]
   end
+  subgraph P3["Wave 3 — Autonomous Quality"]
+    S025["025 deterministic SLA test"]
+    S026["026 logActionError in Reports"]
+    S027["027 dedup date helpers"]
+  end
 
   S009 --> S004
   S009 --> S018
@@ -152,7 +170,10 @@ graph LR
   S019 --> S021
   S018 --> S020
   S018 --> S024
+  S009 --> S026
+  S004 --> S026
 ```
+
 
 ---
 
