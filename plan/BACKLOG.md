@@ -22,3 +22,10 @@ Out-of-scope-but-worth-doing items found while implementing specs. Each entry: w
   - *Why it matters:* four copies of the same parsing invariant drift independently.
   - *Caveat:* a shared helper crosses several `lib/server` packet modules — scope as its own refactor spec, with the existing contract tests pinning behavior first.
   - *Source:* spec 005 fallout triage, 2026-05-29.
+
+## Transaction Safety
+
+- **Transactional Audit Logging for Accounts Actions.** In `app/accounts/actions.ts`, lines 73-81 (`createAccountAction`) and 146-160 (`updateAccountAction`) call `recordAuditEvent` *outside* of the Prisma `$transaction` block, whereas `contacts`, `deals`, and `leads` actions correctly wrap both database mutations and audit logging in a single `$transaction`. If the audit write fails or if the mutation fails, the database state drifts (i.e. an account could be modified without a corresponding audit trail, or vice versa).
+  - *Why it matters:* Audit logging must be reliable and atomic. Unwrapped writes violate this integrity guarantee.
+  - *How:* Wrap the database mutation and `recordAuditEvent` in a `prisma.$transaction` in both the create and update actions.
+  - *Source:* Codebase audit, 2026-05-30.

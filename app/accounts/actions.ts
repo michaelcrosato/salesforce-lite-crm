@@ -5,6 +5,7 @@ import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { accountFormSchema } from "@/lib/validation";
 import { recordAuditEvent, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import { getCurrentUserId } from "@/lib/session";
 import type { Account } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -72,6 +73,7 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
     await recordAuditEvent({
       category: "record",
       action: "created",
+      actorUserId: await getCurrentUserId(),
       entityType: "account",
       entityId: account.id,
       summary: `Account created: ${account.name}.`,
@@ -144,6 +146,7 @@ export async function updateAccountAction(
     await recordAuditEvent({
       category: "record",
       action: statusChanged ? "status_changed" : "updated",
+      actorUserId: await getCurrentUserId(),
       entityType: "account",
       entityId: account.id,
       summary: statusChanged

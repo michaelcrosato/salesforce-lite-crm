@@ -57,6 +57,13 @@ Ranked by Priority Score (desc). `Dep` = upstream specs that must land first. �
 | 28 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
 | 29 | 028 | Local Gate Reachability Parity | P4 | 3 | 5 | Low | 5 | 15 | — | |
 | 30 | 030 | Retire Remaining Non-CSV Orphans | P6 | 3 | 5 | Low | 5 | 15 | 029 | |
+| 31 | 031 | Developer Identity Session Switcher | P7 | 5 | 5 | Low | 5 | 17 | — | |
+| 32 | 032 | Route Error Boundaries | P8 | 4 | 5 | Low | 5 | 16 | — | |
+| 33 | 033 | Page Metadata for List & Form Routes | P8 | 3 | 5 | Low | 5 | 15 | — | |
+| 34 | 034 | Loading Skeletons for Missing Routes | P8 | 3 | 5 | Low | 5 | 15 | — | |
+| 35 | 035 | Instrument Silent Catch Blocks with Logger | P8 | 4 | 5 | Low | 5 | 16 | — | |
+| 36 | 036 | Accessibility: ARIA Roles for Tabs and Progress Bars | P8 | 3 | 5 | Low | 5 | 15 | — | |
+
 
 **⚠️ Dependency/scope-gated (do not execute without explicit approval):** 006 (`@vitest/coverage-v8`), 010 (DOM test env), 017 (`babel-plugin-react-compiler`), 023 (Tailwind 4 + `@tailwindcss/postcss`). These are blueprinted but **blocked** under CLAUDE.md §14 / LOOP §11 until a human/promotion request clears the new dependency.
 
@@ -137,6 +144,24 @@ Continuous safety wave to completely prune any remaining dead modules and enforc
 **Execution order (dependency-respecting):**
 1. **030** — Retire Remaining Non-CSV Orphans (low risk, high leverage; needs 029).
 
+## Wave 7 — Identity & Authorization Foundations
+
+Lightweight developer identity session switcher and multi-user mock harness to support RBAC and record ownership.
+
+**Execution order (dependency-respecting):**
+1. **031** — Developer Identity Session Switcher & Multi-user Mock Harness (low risk, high leverage).
+
+## Wave 8 — Quality & Observability Extensions
+
+Resilience, SEO/accessibility standardization, and observability upgrades to polish the codebase for next-frontier robustness.
+
+**Execution order (dependency-respecting):**
+1. **032** — Route Error Boundaries (low risk, independent).
+2. **033** — Page Metadata for List & Form Routes (low risk, independent).
+3. **034** — Loading Skeletons for Missing Routes (low risk, independent).
+4. **035** — Instrument Silent Catch Blocks with Logger (low risk, independent).
+5. **036** — Accessibility: ARIA Roles for Tabs and Progress Bars (low risk, independent).
+
 ---
 
 ## Dependency graph
@@ -186,6 +211,16 @@ graph LR
   end
   subgraph P6["Wave 6 — Complete Reachability Ratchet"]
     S030["030 retire remaining non-CSV orphans"]
+  end
+  subgraph P7["Wave 7 — Identity & Authorization Foundations"]
+    S031["031 developer identity session"]
+  end
+  subgraph P8["Wave 8 — Quality & Observability Extensions"]
+    S032["032 route error boundaries"]
+    S033["033 page metadata"]
+    S034["034 loading skeletons"]
+    S035["035 instrument catches"]
+    S036["036 aria roles"]
   end
 
   S009 --> S004

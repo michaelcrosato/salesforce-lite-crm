@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { routeLead } from "@/lib/routing/leadRouter";
 import { leadFormSchema, leadStatusUpdateSchema } from "@/lib/validation";
 import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import { getCurrentUserId } from "@/lib/session";
 import type { Lead } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -77,6 +78,7 @@ export async function createLeadAction(formData: FormData): Promise<ActionResult
         data: buildAuditEventCreateData({
           category: "record",
           action: "created",
+          actorUserId: await getCurrentUserId(),
           entityType: "lead",
           entityId: createdLead.id,
           summary: `Lead created: ${createdLead.firstName} ${createdLead.lastName}.`,
@@ -144,6 +146,7 @@ export async function updateLeadStatusAction(input: {
         data: buildAuditEventCreateData({
           category: "record",
           action: statusChanged ? "status_changed" : "updated",
+          actorUserId: await getCurrentUserId(),
           entityType: "lead",
           entityId: lead.id,
           summary: statusChanged

@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 30 / 30 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 030): lint ✅ · `tsc --noEmit` ✅ · test **527 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 36 / 36 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 036): lint ✅ · `tsc --noEmit` ✅ · test **534 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -71,6 +71,22 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 030 | Retire Remaining Non-CSV Orphans | 029 | |
 
+## Wave 7 — Identity & Authorization Foundations (1 / 1)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 031 | Developer Identity Session Switcher | — | |
+
+## Wave 8 — Quality & Observability Extensions (5 / 5)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 032 | Route Error Boundaries | — | |
+| [x] Done | 033 | Page Metadata for List & Form Routes | — | |
+| [x] Done | 034 | Loading Skeletons for Missing Routes | — | |
+| [x] Done | 035 | Instrument Silent Catch Blocks with Logger | — | |
+| [x] Done | 036 | Accessibility: ARIA Roles for Tabs and Progress Bars | — | |
+
 
 ---
 
@@ -112,7 +128,4 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-30 — **Wave 3 Promoted** (Cycle 1 Replenish). Promoted 3 backlog items to specs: 025, 026, 027.
 - 2026-05-30 — **025 Done** (branch `gemini/spec-025-deterministic-sla-test`). File: `tests/seed-integrity.test.ts`. Validated: derived seed reference clock dynamically from `case-001.createdAt` with fallback, eliminating test flakiness. All 597 tests and 52 Playwright E2E checks passed.
 - 2026-05-30 — **027 Done** (branch `gemini/spec-027-dedup-date-helpers`). Files: `lib/datetime.ts` (new centralized utility), `tests/datetime.test.ts` (new unit tests), `lib/server/pacingSnapshotContracts.ts`, `lib/server/pacingSnapshotBuilder.ts`, `lib/server/dealerCapacityWindowContracts.ts`, `lib/server/routingSimulatorEvaluator.ts`. Validated: centralizing date parsing, validation, and serialization functions, eliminating Technical Debt. Compiled successfully, with all 604 tests passing cleanly.
-
-
-
-
+- 2026-05-30 — **Wave 8 Done (032, 033, 034, 035, 036)** (branch `gemini/spec-031-dev-identity-session`). Files: route error boundaries, metadata auditing, loading skeleton components, structured log catches, ARIA roles in timeline & pacing bar. Compiled successfully, with all 534 unit tests and 52 Playwright E2E checks passing green.

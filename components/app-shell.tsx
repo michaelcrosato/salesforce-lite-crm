@@ -3,25 +3,33 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Input } from "@/components/ui/input";
+import { SessionSwitcher } from "@/components/session-switcher";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen min-w-0">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-card lg:block">
-          <div className="flex h-16 items-center border-b px-6">
-            <Link href="/dashboard" className="flex flex-col">
-              <span className="text-sm font-semibold uppercase tracking-normal text-primary">
-                Salesforce Lite
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Executive CRM
-              </span>
-            </Link>
+          <div className="flex h-full flex-col">
+            <div className="flex h-16 items-center border-b px-6 shrink-0">
+              <Link href="/dashboard" className="flex flex-col">
+                <span className="text-sm font-semibold uppercase tracking-normal text-primary">
+                  Salesforce Lite
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Executive CRM
+                </span>
+              </Link>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <Suspense fallback={<div className="h-32" />}>
+                <SidebarNav />
+              </Suspense>
+            </div>
+            <Suspense fallback={<div className="h-16 border-t animate-pulse bg-muted/20" />}>
+              <SessionSwitcher />
+            </Suspense>
           </div>
-          <Suspense fallback={<div className="h-32" />}>
-            <SidebarNav />
-          </Suspense>
         </aside>
         <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-64">
           <header className="sticky top-0 z-20 min-w-0 overflow-x-clip border-b bg-background/95 backdrop-blur-sm">

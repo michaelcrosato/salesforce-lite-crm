@@ -1,7 +1,7 @@
 "use server";
 
 import { cacheTag, revalidatePath, updateTag } from "next/cache";
-import { actionErrorResult, type ActionResult } from "@/lib/action-result";
+import { actionErrorResult, logActionError, type ActionResult } from "@/lib/action-result";
 import { probabilityForStage } from "@/lib/business/deals";
 import { STAGE_LABELS } from "@/lib/crm-constants";
 import { prisma } from "@/lib/prisma";
@@ -16,6 +16,7 @@ import {
   type AuditEntityType,
   type AuditMetadataValue
 } from "@/lib/services/auditEvents";
+import { getCurrentUserId } from "@/lib/session";
 import type { Deal } from "@prisma/client";
 
 function formValue(formData: FormData, key: string) {
@@ -106,6 +107,7 @@ export async function createDealAction(formData: FormData): Promise<ActionResult
         data: buildAuditEventCreateData({
           category: "record",
           action: "created",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: deal.id,
           summary: `Opportunity created: ${deal.name}.`,
@@ -223,6 +225,7 @@ export async function updateDealAction(
         data: buildAuditEventCreateData({
           category: "record",
           action: stageChanged ? "stage_changed" : "updated",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: deal.id,
           summary: stageChanged
@@ -335,6 +338,7 @@ export async function moveDealAction(input: {
         data: buildAuditEventCreateData({
           category: "record",
           action: "stage_changed",
+          actorUserId: await getCurrentUserId(),
           entityType: "opportunity",
           entityId: updatedDeal.id,
           summary: `Opportunity stage changed from ${deal.stage} to ${updatedDeal.stage}.`,
@@ -396,7 +400,11 @@ export async function getAuditHistoryAction(rawQuery: unknown) {
       parsed.data.entityId
     );
     return { ok: true, events };
-  } catch {
+  } catch (error) {
+    logActionError(error, {
+      action: "getAuditHistoryAction",
+      entity: "audit_events"
+    });
     return { ok: false, message: "Could not retrieve audit history.", events: [] };
   }
 }

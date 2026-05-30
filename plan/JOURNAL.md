@@ -85,4 +85,41 @@ Extended `plan/ROADMAP.md` and `plan/PROGRESS.md` to reflect Wave 3.
 - **Verification**: Verified via `npm run agent:check` locally (all 527 tests green, lint clean, typecheck passed, build completed).
 - **Status**: Done [x]
 
+## Cycle 5 — 2026-05-30T18:35:00Z
+- **Role**: Autonomous Principal Engineer
+- **Status**: REPLENISH Wave 7
+- **Objective**: Design a lightweight developer identity switcher and session harness to mock multi-user roles/permissions safely in local SQLite DB without external OAuth deps (Spec 031), then execute and verify.
+
+### Spec 031 Execution & Verification — 2026-05-30T18:40:00Z
+- **Goal**: Implement Developer Identity Session Switcher & Multi-user Mock Harness.
+- **Branch**: `gemini/spec-031-dev-identity-session`
+- **Work**: 
+  1. Created `lib/session.ts` providing `getCurrentUserId()`, `getCurrentUser()`, `getCurrentSession()`, and a unit-test-friendly mock override structure. Defaults to `user-ava` when no session is present.
+  2. Created `lib/session-actions.ts` containing Server Actions `setCurrentUserAction` and `clearCurrentUserAction` which set/delete the `dev_user_id` cookie and revalidate the path.
+  3. Created an interactive UI `components/session-switcher-client.tsx` and Server Component wrapper `components/session-switcher.tsx` rendering active session details and role badges (sales/manager) with rich hover animations and instant transition feedback.
+  4. Integrated the `SessionSwitcher` component pinned at the bottom of the desktop sidebar inside `components/app-shell.tsx`.
+  5. Refactored hardcoded `"user-ava"` constants in `app/reports/actions.ts` and campaign member operations to use dynamic session user ID resolutions.
+  6. Added comprehensive unit tests in `tests/session.test.ts`.
+- **Verification**: Verified via `npx vitest run tests/session.test.ts` (all 7 tests passed) and full local gate `npm run agent:check` successfully (all 534 tests green, ESLint clean, Next build successful). Verified `node scripts/check-reachability.mjs` remains green at 0 allowed orphans. 52/52 Playwright E2E browser checks passed cleanly.
+- **Status**: Done [x]
+
+## Cycle 6 — 2026-05-30T21:35:00Z
+- **Role**: Autonomous Principal Engineer
+- **Status**: REPLENISH Wave 8
+- **Objective**: Execute and verify route error boundaries (032), loading skeletons (034), metadata titles (033), silent catch block log instrumentation (035), and accessibility ARIA roles (036), then verify full gate.
+
+### Specs 032-036 Execution & Verification — 2026-05-30T21:36:00Z
+- **Goal**: Implement Wave 8 Quality & Observability Extensions.
+- **Branch**: `gemini/spec-031-dev-identity-session`
+- **Work**:
+  1. Verified Spec 032 (Route Error Boundaries) by ensuring all 14 routes have robust route-level error boundary rendering via `components/route-error-boundary.tsx`.
+  2. Verified Spec 033 (Page Metadata) where every page now correctly registers static `metadata` title exports.
+  3. Verified Spec 034 (Loading Skeletons) by ensuring 12 newly added loading skeletons are fully functional.
+  4. Executed Spec 035 (Instrument Silent Catch Blocks with Logger) by replacing silent `catch {}` blocks in `app/list-selected-export-actions.ts`, `app/campaigns/page.tsx`, `app/cases/page.tsx`, `app/deals/page.tsx`, `app/leads/page.tsx`, `app/tasks/page.tsx`, `app/deals/actions.ts`, `lib/server/savedReportPersistence.ts`, and `lib/services/leads.ts` with structured error logging via `logActionError` or `logger.warn`.
+  5. Executed Spec 036 (ARIA Roles for Tabs and Progress Bars) by adding `role="tablist"` + `role="tab"` + `aria-selected` to `components/detail-timeline-tabs.tsx` and `role="progressbar"` + `aria-valuenow`/`valuemin`/`valuemax`/`label` to `components/pacing-bar.tsx`.
+  6. Documented a critical Accounts transactional audit logging bug in the backlog.
+- **Verification**: Verified via full local gate `npm run agent:check` successfully (all 534 tests green, ESLint clean, Next build successful, reachability checked at 0 allowed orphans).
+- **Status**: Done [x]
+
+
 

@@ -21,9 +21,11 @@ export function DetailTimelineTabs({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
-        <div className="flex gap-4">
+        <div className="flex gap-4" role="tablist" aria-label="Entity detail navigation">
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "activities"}
             onClick={() => setActiveTab("activities")}
             className={`text-sm font-semibold pb-2 border-b-2 transition-all ${
               activeTab === "activities"
@@ -36,6 +38,8 @@ export function DetailTimelineTabs({
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "history"}
             onClick={() => setActiveTab("history")}
             className={`text-sm font-semibold pb-2 border-b-2 transition-all ${
               activeTab === "history"

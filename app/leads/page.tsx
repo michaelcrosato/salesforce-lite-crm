@@ -31,6 +31,7 @@ import {
   SavedListViewControls,
   savedListViewStatus
 } from "@/components/saved-list-view-controls";
+import { logger } from "@/lib/observability/logger";
 import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
 import {
   buildSavedListViewQuery,
@@ -198,7 +199,12 @@ async function resolveLeadSavedViewQuery(
         query
       })
     };
-  } catch {
+  } catch (error) {
+    logger.warn("saved_view_query_failed", {
+      entity: "leads",
+      savedViewId,
+      error: error instanceof Error ? error.message : String(error)
+    });
     return {
       invalidView: true,
       resolved: {

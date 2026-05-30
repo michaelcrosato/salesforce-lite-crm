@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
+import { getCurrentUserId } from "@/lib/session";
 import {
   completeCampaign,
   createCampaign,
@@ -212,7 +213,8 @@ export async function addCampaignMemberAction(
           ? [memberReference.memberId]
           : [],
       leadIds:
-        memberReference.memberType === "lead" ? [memberReference.memberId] : []
+        memberReference.memberType === "lead" ? [memberReference.memberId] : [],
+      actorUserId: await getCurrentUserId()
     });
     revalidateAll();
     return { ok: true, message: "Campaign member added." };
@@ -241,7 +243,8 @@ export async function removeCampaignMemberAction(
     await removeCampaignMembers({
       campaignId: parsedCampaignId.data,
       contactIds: memberType === "contact" ? [parsedMemberId.data] : [],
-      leadIds: memberType === "lead" ? [parsedMemberId.data] : []
+      leadIds: memberType === "lead" ? [parsedMemberId.data] : [],
+      actorUserId: await getCurrentUserId()
     });
     revalidateAll();
     return { ok: true, message: "Campaign member removed." };

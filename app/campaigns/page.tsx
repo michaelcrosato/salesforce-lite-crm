@@ -36,6 +36,7 @@ import {
   CAMPAIGN_STATUSES,
   type CampaignStatus
 } from "@/lib/crm/registry";
+import { logger } from "@/lib/observability/logger";
 import { getListFilterSupportEntityCatalog } from "@/lib/server/listFilterSupportCatalog";
 import {
   buildSavedListViewQuery,
@@ -145,7 +146,12 @@ async function resolveCampaignSavedViewQuery(
         query
       })
     };
-  } catch {
+  } catch (error) {
+    logger.warn("saved_view_query_failed", {
+      entity: "campaigns",
+      savedViewId,
+      error: error instanceof Error ? error.message : String(error)
+    });
     return {
       invalidView: true,
       resolved: {

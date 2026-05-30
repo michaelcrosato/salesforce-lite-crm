@@ -19,6 +19,7 @@ import {
   type BulkActionExecutionEntity,
   type BulkActionExecutionResult
 } from "@/lib/server/bulkActionExecution";
+import { logActionError } from "@/lib/action-result";
 
 export type ListSelectedExportActionResult =
   | {
@@ -292,7 +293,11 @@ export async function previewListSelectedExportAction(
         requiresApproval: packet.rollup.requiresApproval
       }
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, {
+      action: "previewListSelectedExportAction",
+      entity
+    });
     return {
       ok: false,
       message: "The selected export packet could not be built.",
@@ -320,7 +325,11 @@ export async function previewListBulkExecutionAction(
       message: `${packet.entityMetadata.label} ${packet.actionMetadata.label}: ${packet.rollup.eligibleCount} eligible, ${packet.rollup.blockedCount} blocked.`,
       packet
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, {
+      action: "previewListBulkExecutionAction",
+      entity: parsed.input.entity
+    });
     return {
       ok: false,
       message: "The list bulk dry run could not be built.",
@@ -360,7 +369,11 @@ export async function executeListBulkExecutionAction(
       message: `${execution.action} execution for ${execution.entity}: ${execution.rollup.executedCount} executed, ${execution.rollup.skippedCount} skipped, ${execution.rollup.blockedCount} blocked.`,
       execution
     };
-  } catch {
+  } catch (error) {
+    logActionError(error, {
+      action: "executeListBulkExecutionAction",
+      entity: parsed.input.entity
+    });
     return {
       ok: false,
       message: "The list bulk action could not be executed.",
