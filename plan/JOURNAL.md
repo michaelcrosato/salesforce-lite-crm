@@ -73,4 +73,16 @@ Extended `plan/ROADMAP.md` and `plan/PROGRESS.md` to reflect Wave 3.
 - **Verification**: Verified via `npm run agent:check` locally (all 534 tests green, lint clean, typecheck passed, build completed).
 - **Status**: Done [x]
 
+## Cycle 4 — 2026-05-30T18:25:00Z
+- **Role**: Autonomous Principal Engineer
+- **Status**: REPLENISH Wave 6
+- **Objective**: Target the final 2 unreferenced non-CSV server contract files, define Wave 6 Spec 030 to retire these files and tests, and lower baseline allowed orphans from 2 to 0.
+
+### Spec 030 Execution & Verification — 2026-05-30T18:25:30Z
+- **Goal**: Retire Remaining Non-CSV Orphans.
+- **Branch**: `gemini/spec-030-retire-remaining-non-csv-orphans`
+- **Work**: Atomically deleted the remaining 2 orphaned source modules `lib/server/bulkListSelectionContracts.ts` and `lib/server/workflowRuleExecutionReceipts.ts` and their corresponding 2 test files in `tests/api/`. Updated `scripts/reachability-baseline.json` to ratchet `maxOrphans` all the way down to 0 with an empty `allowedOrphans` list. Verified reachability check passes cleanly at zero.
+- **Verification**: Verified via `npm run agent:check` locally (all 527 tests green, lint clean, typecheck passed, build completed).
+- **Status**: Done [x]
+
 

@@ -1,8 +1,5 @@
 {
   "note": "Spec 011 reachability ratchet. allowedOrphans may only shrink; a NEW test-only lib/server orphan fails the gate. Lower maxOrphans + prune allowedOrphans in the same commit that wires or deletes a module.",
-  "maxOrphans": 2,
-  "allowedOrphans": [
-    "lib/server/bulkListSelectionContracts.ts",
-    "lib/server/workflowRuleExecutionReceipts.ts"
-  ]
+  "maxOrphans": 0,
+  "allowedOrphans": []
 }
