@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 36 / 36 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 036): lint ✅ · `tsc --noEmit` ✅ · test **534 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 37 / 37 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 037): lint ✅ · `tsc --noEmit` ✅ · test **537 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -87,6 +87,12 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 035 | Instrument Silent Catch Blocks with Logger | — | |
 | [x] Done | 036 | Accessibility: ARIA Roles for Tabs and Progress Bars | — | |
 
+## Wave 9 — Advanced Enterprise Modernization & Reliability Hardening (0 / 1)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 037 | Transactional Audit Logging for Accounts Actions | — | |
+
 
 ---
 
@@ -129,3 +135,6 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-30 — **025 Done** (branch `gemini/spec-025-deterministic-sla-test`). File: `tests/seed-integrity.test.ts`. Validated: derived seed reference clock dynamically from `case-001.createdAt` with fallback, eliminating test flakiness. All 597 tests and 52 Playwright E2E checks passed.
 - 2026-05-30 — **027 Done** (branch `gemini/spec-027-dedup-date-helpers`). Files: `lib/datetime.ts` (new centralized utility), `tests/datetime.test.ts` (new unit tests), `lib/server/pacingSnapshotContracts.ts`, `lib/server/pacingSnapshotBuilder.ts`, `lib/server/dealerCapacityWindowContracts.ts`, `lib/server/routingSimulatorEvaluator.ts`. Validated: centralizing date parsing, validation, and serialization functions, eliminating Technical Debt. Compiled successfully, with all 604 tests passing cleanly.
 - 2026-05-30 — **Wave 8 Done (032, 033, 034, 035, 036)** (branch `gemini/spec-031-dev-identity-session`). Files: route error boundaries, metadata auditing, loading skeleton components, structured log catches, ARIA roles in timeline & pacing bar. Compiled successfully, with all 534 unit tests and 52 Playwright E2E checks passing green.
+- 2026-05-30 — **Wave 9 Promoted** (Cycle 7 Replenish). Promoted the Accounts transaction safety backlog item to Spec 037.
+- 2026-05-30 — **037 Done** (branch `gemini/spec-037-transactional-accounts`). Files: `app/accounts/actions.ts` (wrapped creation/updates in `prisma.$transaction`), `tests/api/accountsTransactionSafety.test.ts` (new integration/rollback tests), `tests/api/actionErrorMasking.test.ts` (added mock transaction environment). Validated: complete transactional safety for Accounts, preventing orphaned records and audit drift. Compiled successfully with all 537 vitest tests and 52 Playwright E2E browser checks passing 100% green.
+
