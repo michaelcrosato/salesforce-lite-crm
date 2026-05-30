@@ -12,6 +12,7 @@ playwright-report/
 test-results/
 traces/
 e2e/**/*-snapshots/
+playwright/.cache/
 
 # Agent run logs and archives (large, regenerated each run)
 agent-runs/
@@ -32,7 +33,6 @@ prisma/dev.db-shm
 *.tsbuildinfo
 tsconfig.tsbuildinfo
 next-env.d.ts
-
 # Large lockfile (read package.json instead for dependency intent)
 package-lock.json
 
