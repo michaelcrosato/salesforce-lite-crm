@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { z } from "zod/v4";
+import { calendarDateStart, calendarDateKey } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 import {
   PACING_SNAPSHOT_CONTENT_TYPE,
@@ -771,18 +772,7 @@ function inWindow(value: Date, start: Date, endExclusive: Date): boolean {
   return value >= start && value < endExclusive;
 }
 
-function calendarDateStart(value: string): Date {
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    throw new Error(`Invalid calendar date: ${value}`);
-  }
 
-  return new Date(Date.UTC(year, month - 1, day));
-}
-
-function calendarDateKey(value: Date): string {
-  return value.toISOString().slice(0, 10);
-}
 
 function startOfUtcDay(value: Date): Date {
   return calendarDateStart(calendarDateKey(value));

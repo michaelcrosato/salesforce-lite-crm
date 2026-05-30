@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { isCalendarDate, calendarDateStart } from "@/lib/datetime";
 
 export const PACING_SNAPSHOT_CONTENT_TYPE =
   "application/json; charset=utf-8" as const;
@@ -619,21 +620,7 @@ export function validatePacingSnapshotDraft(
 }
 
 export function isPacingSnapshotCalendarDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    return false;
-  }
-  const utc = new Date(Date.UTC(year, month - 1, day));
-
-  return (
-    utc.getUTCFullYear() === year &&
-    utc.getUTCMonth() === month - 1 &&
-    utc.getUTCDate() === day
-  );
+  return isCalendarDate(value);
 }
 
 function requiredTrimmedText(maxLength: number, label: string) {
@@ -921,10 +908,5 @@ function countMonthBuckets(startsOn: string, endsOn: string): number {
 }
 
 function calendarDateUtcMs(value: string): number {
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    throw new Error(`Invalid calendar date: ${value}`);
-  }
-
-  return Date.UTC(year, month - 1, day);
+  return calendarDateStart(value).getTime();
 }

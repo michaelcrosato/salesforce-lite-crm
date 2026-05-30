@@ -1,5 +1,6 @@
 import type { Area, Prisma } from "@prisma/client";
 import { ASSIGNMENT_REASONS, type AssignmentReason } from "@/lib/crm-constants";
+import { calendarDateStart, calendarDateKey } from "@/lib/datetime";
 import { prisma } from "@/lib/prisma";
 import {
   calculatePaceGap,
@@ -982,18 +983,7 @@ function evaluationSafetyFlags(
   };
 }
 
-function calendarDateKey(value: Date): string {
-  return value.toISOString().slice(0, 10);
-}
 
-function calendarDateStart(value: string): Date {
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    throw new Error(`Invalid calendar date: ${value}`);
-  }
-
-  return new Date(Date.UTC(year, month - 1, day));
-}
 
 function slotNoun(count: number): string {
   return count === 1 ? "slot" : "slots";

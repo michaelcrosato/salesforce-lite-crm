@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 25 / 27 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 26 / 27 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -51,7 +51,7 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 025 | Deterministic Case SLA Seed Test | — | |
 | [ ] Todo | 026 | Extend `logActionError` into `app/reports/actions.ts` | 009, 004 | |
-| [ ] Todo | 027 | Dedup Calendar-Date split/UTC helpers across `lib/server` | — | |
+| [x] Done | 027 | Dedup Calendar-Date split/UTC helpers across `lib/server` | — | |
 
 ---
 
@@ -92,6 +92,7 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-29 — **017 Done** (branch `gemini/spec-017-react-compiler`). Conducted a controlled, timed evaluation of the React Compiler (React 19.2 stable auto-memoization engine). Swift SWC compilation under the native flag required resolving the gated `babel-plugin-react-compiler` package per CLAUDE.md §14. Recorded the detailed decision to DEFER the adoption to a future sprint in `docs/decisions.md` and reverted all configuration edits to keep the main branch stable and completely clean.
 - 2026-05-30 — **Wave 3 Promoted** (Cycle 1 Replenish). Promoted 3 backlog items to specs: 025, 026, 027.
 - 2026-05-30 — **025 Done** (branch `gemini/spec-025-deterministic-sla-test`). File: `tests/seed-integrity.test.ts`. Validated: derived seed reference clock dynamically from `case-001.createdAt` with fallback, eliminating test flakiness. All 597 tests and 52 Playwright E2E checks passed.
+- 2026-05-30 — **027 Done** (branch `gemini/spec-027-dedup-date-helpers`). Files: `lib/datetime.ts` (new centralized utility), `tests/datetime.test.ts` (new unit tests), `lib/server/pacingSnapshotContracts.ts`, `lib/server/pacingSnapshotBuilder.ts`, `lib/server/dealerCapacityWindowContracts.ts`, `lib/server/routingSimulatorEvaluator.ts`. Validated: centralizing date parsing, validation, and serialization functions, eliminating Technical Debt. Compiled successfully, with all 604 tests passing cleanly.
 
 
 

@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { isCalendarDate as centralIsCalendarDate, calendarDateStart } from "@/lib/datetime";
 import {
   ROUTING_SIMULATOR_INPUT_CONTENT_TYPE,
   ROUTING_SIMULATOR_INPUT_VERSION,
@@ -496,21 +497,7 @@ export function validateDealerCapacityWindowDraft(
 }
 
 export function isCalendarDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    return false;
-  }
-  const utc = new Date(Date.UTC(year, month - 1, day));
-
-  return (
-    utc.getUTCFullYear() === year &&
-    utc.getUTCMonth() === month - 1 &&
-    utc.getUTCDate() === day
-  );
+  return centralIsCalendarDate(value);
 }
 
 function requiredTrimmedText(maxLength: number, label: string) {
@@ -724,10 +711,5 @@ function countInclusiveCalendarDays(startsOn: string, endsOn: string): number {
 }
 
 function calendarDateUtcMs(value: string): number {
-  const [year, month, day] = value.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    throw new Error(`Invalid calendar date: ${value}`);
-  }
-
-  return Date.UTC(year, month - 1, day);
+  return calendarDateStart(value).getTime();
 }
