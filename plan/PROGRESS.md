@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 24 / 24 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 25 / 27 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-29, spec 023): lint ✅ · `tsc --noEmit` ✅ · test **597 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -45,6 +45,14 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | [x] Done | 023 | Tailwind v4 (Oxide) migration | 008, 010 | |
 | [x] Done | 024 | Audit-trail change-history UI | 018 | |
 
+## Wave 3 — Autonomous Quality & Robustness (0 / 3)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 025 | Deterministic Case SLA Seed Test | — | |
+| [ ] Todo | 026 | Extend `logActionError` into `app/reports/actions.ts` | 009, 004 | |
+| [ ] Todo | 027 | Dedup Calendar-Date split/UTC helpers across `lib/server` | — | |
+
 ---
 
 ## Suggested first-five (unblocked, no approval needed)
@@ -82,6 +90,9 @@ In order: **001** → **002** → **003** → **007** → **009**. All are depen
 - 2026-05-29 — **006 Done** (branch `gemini/spec-006-coverage`). Added `@vitest/coverage-v8` devDependency. Configured Vitest to generate coverage reports for lib, app, and components. Verified all 577 tests pass cleanly and coverage baseline is recorded: Statements 64.35%, Branches 49.33%, Functions 67.27%, Lines 64.26%.
 - 2026-05-29 — **022 Done** (branch `gemini/spec-022-optimistic-kanban`). Implemented high-performance React 19 `useOptimistic` transitions in the Deals Kanban pipeline (`components/deal-board.tsx`), ensuring a snappy drag-and-drop/dropdown pipeline UX. Enabled seamless rollback and precise toast error delivery on server mutation failure by converting the stage select dropdown into a fully controlled component. Added robust component test coverage (`tests/components/deal-board.test.tsx`) validating initial layout, instant optimistic transitions, server action success, and rollback/error path. Verified all gates pass cleanly: typechecking, ESLint linting, Vitest (591/591 tests passing), and Playwright E2E smoke tests (52/52 tests passing).
 - 2026-05-29 — **017 Done** (branch `gemini/spec-017-react-compiler`). Conducted a controlled, timed evaluation of the React Compiler (React 19.2 stable auto-memoization engine). Swift SWC compilation under the native flag required resolving the gated `babel-plugin-react-compiler` package per CLAUDE.md §14. Recorded the detailed decision to DEFER the adoption to a future sprint in `docs/decisions.md` and reverted all configuration edits to keep the main branch stable and completely clean.
+- 2026-05-30 — **Wave 3 Promoted** (Cycle 1 Replenish). Promoted 3 backlog items to specs: 025, 026, 027.
+- 2026-05-30 — **025 Done** (branch `gemini/spec-025-deterministic-sla-test`). File: `tests/seed-integrity.test.ts`. Validated: derived seed reference clock dynamically from `case-001.createdAt` with fallback, eliminating test flakiness. All 597 tests and 52 Playwright E2E checks passed.
+
 
 
 

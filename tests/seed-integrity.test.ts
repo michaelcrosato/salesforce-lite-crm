@@ -143,8 +143,15 @@ describe("seed integrity (post-seed invariants)", () => {
         id: "asc"
       }
     });
+
+    const case1 = cases.find((c) => c.id === "case-001");
+    // case-001 was seeded with `caseSlaSeedNow - 12 hours`
+    const seedNow = case1
+      ? new Date(case1.createdAt.getTime() + 12 * 60 * 60 * 1000)
+      : new Date();
+
     const snapshots = buildCaseSlaSnapshots(cases, {
-      now: () => new Date()
+      now: () => seedNow
     });
     const states = snapshots.map((snapshot) => snapshot.state);
 
