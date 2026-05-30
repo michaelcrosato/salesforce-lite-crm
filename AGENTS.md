@@ -194,3 +194,38 @@ action, and scope confirmation.
 The sibling `alpha-scale-engine4` provides v0.1+ hybrid dispatch (`orchestrate.ps1` + `spawn-agent.ps1`) for safe, principle-governed scale-out. It can spawn specialized agents (Grok 4.3, Claude, Gemini...) into isolated `.agent-worktrees/` (ephemeral, A#3 hygiene) with engine overlay (AXIOMS/AGENT-LOOP/GOAL + 5 rich personas) while *strictly* honoring this `AGENTS.md`, `CRM-CONTRACT.md`, ownership zones, and the full target local-gate + CONTRACT. 
 
 See engine `docs/GOAL.md` (ACTIVE_SPEC, Phase-3 hybrid priority, TARGET Multi-Agent Scale-Out) and CRM `GROK-NOTES.md` / dedicated grok worktree patterns. All engine-driven changes are doc-scoped or contract-respecting, gate-enforced before integrate, and produce full traces/LOG provenance. Doc-only notes (like this) are zero-risk and encouraged for discoverability.
+
+## Cursor Cloud specific instructions
+
+Single-process **Next.js 16 + SQLite** (no Docker Compose, no separate API or database daemon). Standard commands live in `README.md` and the Command Reference above.
+
+### Services
+
+| Service | Port | Notes |
+|---|---|---|
+| Next.js dev (`npm run dev`) | **3000** (default) | Manual browsing and local UI work |
+| Playwright `webServer` | **3004** (`PLAYWRIGHT_PORT`) | Started automatically by `npm run test:e2e` |
+
+Only one `next dev` instance may run per repo checkout (Next.js lock). Stop an existing dev server before Playwright E2E, or let Playwright own the server on 3004.
+
+### First-time / full bootstrap
+
+`npm run agent:bootstrap` (or `bash scripts/agent/bootstrap.sh`) — install, `.env` from `.env.example` if missing, `prisma generate`, `db push`, **seed**.
+
+Run `npm run seed` again after schema or seed changes, then **restart** `npm run dev` so the app does not serve stale Prisma data.
+
+### Quality gates (manual)
+
+| Check | Command |
+|---|---|
+| Non-E2E gate | `npm run agent:check` |
+| E2E (starts dev on 3004) | `npx playwright install chromium` once, then `npm run test:e2e` |
+| Fast smoke | `npx playwright test e2e/smoke.spec.ts` |
+
+Vitest (`npm run test`) uses isolated DB files under `prisma/.test-dbs/` and does **not** need the dev server.
+
+### Gotchas
+
+- **Package manager:** npm only (`package-lock.json`). Node 20+ (CI uses 20; Cloud VM may ship 22).
+- **Playwright browsers** install to `node_modules` via `config.playwright_browsers_path` in `package.json`; run `npx playwright install chromium` after a clean `npm install` before E2E.
+- **Hello-world flow:** `/dashboard` → `/leads` create lead with postal **V5K 0A1** (expect **Routed**) → `/deals` board. See `DEMO.md` and `e2e/smoke.spec.ts`.
