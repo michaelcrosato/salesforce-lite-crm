@@ -52,9 +52,10 @@ Ranked by Priority Score (desc). `Dep` = upstream specs that must land first. �
 | 23 | 012 | Parallel-safe tests | P1 | 3 | 2 | Med | 4 | 10 | — | |
 | 24 | 023 | Tailwind v4 (Oxide) migration | P2 | 2 | 3 | Med | 3 | 9 | 008, 010 | ⚠️ |
 | 25 | 025 | Deterministic Case SLA Seed Test | P3 | 4 | 5 | Low | 5 | 16 | — | |
-| 26 | 026 | Extend logActionError in Reports | P3 | 4 | 4 | Low | 5 | 15 | 009, 004 | |
-| 27 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
-| 28 | 028 | Local Gate Reachability Parity | P4 | 3 | 5 | Low | 5 | 15 | — | |
+| 26 | 029 | Retire Dead CSV Tower | P5 | 4 | 5 | Low | 5 | 16 | 011, 028 | |
+| 27 | 026 | Extend logActionError in Reports | P3 | 4 | 4 | Low | 5 | 15 | 009, 004 | |
+| 28 | 027 | Dedup Date UTC Helpers | P3 | 3 | 5 | Low | 5 | 15 | — | |
+| 29 | 028 | Local Gate Reachability Parity | P4 | 3 | 5 | Low | 5 | 15 | — | |
 
 **⚠️ Dependency/scope-gated (do not execute without explicit approval):** 006 (`@vitest/coverage-v8`), 010 (DOM test env), 017 (`babel-plugin-react-compiler`), 023 (Tailwind 4 + `@tailwindcss/postcss`). These are blueprinted but **blocked** under CLAUDE.md §14 / LOOP §11 until a human/promotion request clears the new dependency.
 
@@ -121,6 +122,13 @@ Continuous improvement wave to enforce toolchain parity, environment safety, and
 **Execution order (dependency-respecting):**
 1. **028** — Local Gate Reachability Parity (low risk, high leverage, independent).
 
+## Wave 5 — Dead Code Retirement & Reachability Ratchet
+
+Tuning, optimization, and dead code retirement to prune legacy unused packet towers and lower baseline constraints.
+
+**Execution order (dependency-respecting):**
+1. **029** — Retire Dead CSV Tower (low risk, high leverage; needs 011 and 028).
+
 ---
 
 ## Dependency graph
@@ -165,6 +173,9 @@ graph LR
   subgraph P4["Wave 4 — Continuous Safety & Parity"]
     S028["028 local gate reachability parity"]
   end
+  subgraph P5["Wave 5 — Dead Code Retirement"]
+    S029["029 retire dead CSV tower"]
+  end
 
   S009 --> S004
   S009 --> S018
@@ -183,6 +194,8 @@ graph LR
   S018 --> S024
   S009 --> S026
   S004 --> S026
+  S011 --> S029
+  S028 --> S029
 ```
 
 

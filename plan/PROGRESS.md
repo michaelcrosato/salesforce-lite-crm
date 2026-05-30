@@ -2,7 +2,7 @@
 
 Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time per agent. Tick the spec's own Definition-of-Done checkboxes as you go; flip the line here only when the gate is green and the change is merged. Dependencies (`Dep`) must be `[x] Done` before a spec starts. ⚠️ = blocked pending dependency/scope approval (see `plan/AGENTS.md`).
 
-**Overall: 28 / 28 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 028): lint ✅ · `tsc --noEmit` ✅ · test **605 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
+**Overall: 29 / 29 done.** Baseline (2026-05-28): `npm install` 0 vulns · lint ✅ · `tsc --noEmit` ✅ · test **565 passed** ✅ · build ✅. Latest gate (2026-05-30, spec 029): lint ✅ · `tsc --noEmit` ✅ · test **534 passed** ✅ · build ✅ · test:e2e **52 passed** ✅.
 
 ---
 
@@ -58,6 +58,13 @@ Status legend: `[ ] Todo` · `[~] In Progress` · `[x] Done`. One spec at a time
 | Status | Spec | Title | Dep | Gate |
 |:------:|:----|:------|:----|:----:|
 | [x] Done | 028 | Local Gate Reachability Parity | — | |
+
+## Wave 5 — Dead Code Retirement & Reachability Ratchet (1 / 1)
+
+| Status | Spec | Title | Dep | Gate |
+|:------:|:----|:------|:----|:----:|
+| [x] Done | 029 | Retire Dead CSV Tower | 011, 028 | |
+
 
 ---
 

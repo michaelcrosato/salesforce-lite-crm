@@ -1,24 +1,8 @@
 {
   "note": "Spec 011 reachability ratchet. allowedOrphans may only shrink; a NEW test-only lib/server orphan fails the gate. Lower maxOrphans + prune allowedOrphans in the same commit that wires or deletes a module.",
-  "maxOrphans": 18,
+  "maxOrphans": 2,
   "allowedOrphans": [
     "lib/server/bulkListSelectionContracts.ts",
-    "lib/server/csvCompatibilityReports.ts",
-    "lib/server/csvContractDriftSnapshots.ts",
-    "lib/server/csvContractQaChecks.ts",
-    "lib/server/csvContractReleaseDigest.ts",
-    "lib/server/csvFieldCoverageSummaries.ts",
-    "lib/server/csvHandoffIndex.ts",
-    "lib/server/csvHandoffReleaseNotesPackets.ts",
-    "lib/server/csvInFlightCache.ts",
-    "lib/server/csvOperatorAcceptanceChecklists.ts",
-    "lib/server/csvOperatorFixtureBundles.ts",
-    "lib/server/csvOperatorHandoffPackets.ts",
-    "lib/server/csvOperatorReadinessScorecards.ts",
-    "lib/server/csvOperatorRemediationRunbooks.ts",
-    "lib/server/csvOperatorWalkthroughManifests.ts",
-    "lib/server/csvReleaseVerificationManifests.ts",
-    "lib/server/csvTransferManifests.ts",
     "lib/server/workflowRuleExecutionReceipts.ts"
   ]
 }
