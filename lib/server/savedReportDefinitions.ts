@@ -200,7 +200,7 @@ const savedReportDefinitionDraftSchema = z
       .array(z.string().trim().min(1))
       .min(1, "At least one report field is required.")
       .max(12, "Saved report definitions can select at most 12 fields."),
-    filters: z.record(z.string(), z.unknown()).optional(),
+    filters: z.record(z.string(), z.string()).optional(),
     groupBy: z
       .array(z.string().trim().min(1))
       .max(2, "Saved report definitions can group by at most 2 fields.")

@@ -1,7 +1,6 @@
 import { DEAL_STAGES } from "@/lib/crm-constants";
 import { ROUTE_REGISTRY } from "@/lib/crm/registry";
 import {
-  isOpenDealStage,
   isStaleDeal,
   stageSortIndex
 } from "@/lib/business/deals";
@@ -185,67 +184,59 @@ export async function activityVolumeByDay(
 export async function topAccountsByOpportunityValue(
   limit = 5
 ): Promise<TopAccountByOpportunityValueRow[]> {
-  const accounts = await prisma.account.findMany({
-    include: {
-      deals: {
-        select: {
-          value: true
-        }
-      }
-    }
+  const dealGroups = await prisma.deal.groupBy({
+    by: ["accountId"],
+    _count: { _all: true },
+    _sum: { value: true },
+    orderBy: { _sum: { value: "desc" } },
+    take: limit
   });
 
-  return accounts
-    .map((account) => ({
-      accountId: account.id,
-      accountName: account.name,
-      opportunityCount: account.deals.length,
-      totalValue: account.deals.reduce((total, deal) => total + deal.value, 0),
-      route: ROUTE_REGISTRY.accountDetail(account.id)
-    }))
-    .filter((account) => account.opportunityCount > 0)
-    .sort(
-      (left, right) =>
-        right.totalValue - left.totalValue ||
-        left.accountName.localeCompare(right.accountName)
-    )
-    .slice(0, limit);
+  const accountIds = dealGroups.map((g) => g.accountId).filter((id): id is string => id !== null);
+  const accounts = await prisma.account.findMany({
+    where: { id: { in: accountIds } },
+    select: { id: true, name: true }
+  });
+  const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
+
+  return dealGroups.filter(g => g.accountId !== null).map((group) => ({
+    accountId: group.accountId as string,
+    accountName: accountMap.get(group.accountId as string) ?? "Unknown",
+    opportunityCount: group._count._all,
+    totalValue: group._sum.value ?? 0,
+    route: ROUTE_REGISTRY.accountDetail(group.accountId as string)
+  })).sort((a, b) => b.totalValue - a.totalValue || a.accountName.localeCompare(b.accountName));
 }
 
 export async function topAccountsByDealValue(
   limit = 10
 ): Promise<TopAccountByDealValueRow[]> {
-  const accounts = await prisma.account.findMany({
-    include: {
-      deals: {
-        select: {
-          stage: true,
-          value: true
-        }
+  const dealGroups = await prisma.deal.groupBy({
+    by: ["accountId"],
+    where: {
+      NOT: {
+        stage: { in: ["closed_won", "closed_lost"] }
       }
-    }
+    },
+    _count: { _all: true },
+    _sum: { value: true },
+    orderBy: { _sum: { value: "desc" } },
+    take: limit
   });
 
-  return accounts
-    .map((account) => {
-      const openDeals = account.deals.filter((deal) =>
-        isOpenDealStage(deal.stage)
-      );
+  const accountIds = dealGroups.map((g) => g.accountId).filter((id): id is string => id !== null);
+  const accounts = await prisma.account.findMany({
+    where: { id: { in: accountIds } },
+    select: { id: true, name: true }
+  });
+  const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
 
-      return {
-        accountId: account.id,
-        accountName: account.name,
-        totalValue: openDeals.reduce((total, deal) => total + deal.value, 0),
-        openDealCount: openDeals.length
-      };
-    })
-    .filter((account) => account.openDealCount > 0)
-    .sort(
-      (left, right) =>
-        right.totalValue - left.totalValue ||
-        left.accountName.localeCompare(right.accountName)
-    )
-    .slice(0, limit);
+  return dealGroups.filter(g => g.accountId !== null).map((group) => ({
+    accountId: group.accountId as string,
+    accountName: accountMap.get(group.accountId as string) ?? "Unknown",
+    totalValue: group._sum.value ?? 0,
+    openDealCount: group._count._all
+  })).sort((a, b) => b.totalValue - a.totalValue || a.accountName.localeCompare(b.accountName));
 }
 
 export async function staleOpportunities(

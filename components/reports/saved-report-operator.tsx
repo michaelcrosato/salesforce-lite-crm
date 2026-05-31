@@ -135,8 +135,8 @@ export function SavedReportOperator({
   const selectedDefinition = useMemo(
     () =>
       catalog.entities.find((entity) => entity.entity === selectedEntity) ??
-      initialDefinition,
-    [catalog.entities, initialDefinition, selectedEntity]
+      catalog.entities[0] ?? null,
+    [catalog.entities, selectedEntity]
   );
   const selectedChart = useMemo(
     () => findChart(selectedDefinition, chartType),

@@ -151,9 +151,10 @@ test("reports index lists reports and a report renders", async ({ page }) => {
   await expect(page.getByTestId("saved-report-definition-table")).toContainText(
     "Opportunities"
   );
-  await page.getByTestId("saved-report-entity-select").selectOption(
-    "opportunities"
-  );
+  await page.getByTestId("saved-report-entity-select").click();
+  await page.getByTestId("saved-report-entity-select").selectOption({ label: "Opportunities" });
+  await expect(page.getByTestId("saved-report-field-stage")).toBeVisible();
+
   await expect(page.getByTestId("saved-report-field-name")).toBeChecked();
   await expect(page.getByTestId("saved-report-field-stage")).toBeChecked();
   await expect(page.getByTestId("saved-report-field-value")).toBeChecked();
