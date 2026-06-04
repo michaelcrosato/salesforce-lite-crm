@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { actionErrorResult, type ActionResult } from "@/lib/action-result";
 import { prisma } from "@/lib/prisma";
 import { accountFormSchema } from "@/lib/validation";
-import { recordAuditEvent, type AuditMetadataValue } from "@/lib/services/auditEvents";
+import { buildAuditEventCreateData, type AuditMetadataValue } from "@/lib/services/auditEvents";
 import { getCurrentUserId } from "@/lib/session";
 import type { Account } from "@prisma/client";
 
@@ -57,27 +57,31 @@ export async function createAccountAction(formData: FormData): Promise<ActionRes
   }
 
   try {
-    const account = await prisma.account.create({
-      data: {
-        name: parsed.data.name,
-        domain: parsed.data.domain ?? null,
-        industry: parsed.data.industry ?? null,
-        city: parsed.data.city ?? null,
-        region: parsed.data.region ?? null,
-        status: parsed.data.status,
-        ownerId: parsed.data.ownerId ?? null,
-        healthScore: parsed.data.healthScore
-      }
-    });
+    await prisma.$transaction(async (tx) => {
+      const account = await tx.account.create({
+        data: {
+          name: parsed.data.name,
+          domain: parsed.data.domain ?? null,
+          industry: parsed.data.industry ?? null,
+          city: parsed.data.city ?? null,
+          region: parsed.data.region ?? null,
+          status: parsed.data.status,
+          ownerId: parsed.data.ownerId ?? null,
+          healthScore: parsed.data.healthScore
+        }
+      });
 
-    await recordAuditEvent({
-      category: "record",
-      action: "created",
-      actorUserId: await getCurrentUserId(),
-      entityType: "account",
-      entityId: account.id,
-      summary: `Account created: ${account.name}.`,
-      metadata: accountAuditMetadata(account)
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: "created",
+          actorUserId: await getCurrentUserId(),
+          entityType: "account",
+          entityId: account.id,
+          summary: `Account created: ${account.name}.`,
+          metadata: accountAuditMetadata(account)
+        })
+      });
     });
   } catch (error) {
     return actionErrorResult(error, {
@@ -121,42 +125,46 @@ export async function updateAccountAction(
   }
 
   try {
-    const existing = await prisma.account.findUniqueOrThrow({
-      where: { id: accountId }
-    });
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.account.findUniqueOrThrow({
+        where: { id: accountId }
+      });
 
-    const account = await prisma.account.update({
-      where: {
-        id: accountId
-      },
-      data: {
-        name: parsed.data.name,
-        domain: parsed.data.domain ?? null,
-        industry: parsed.data.industry ?? null,
-        city: parsed.data.city ?? null,
-        region: parsed.data.region ?? null,
-        status: parsed.data.status,
-        ownerId: parsed.data.ownerId ?? null,
-        healthScore: parsed.data.healthScore
-      }
-    });
+      const account = await tx.account.update({
+        where: {
+          id: accountId
+        },
+        data: {
+          name: parsed.data.name,
+          domain: parsed.data.domain ?? null,
+          industry: parsed.data.industry ?? null,
+          city: parsed.data.city ?? null,
+          region: parsed.data.region ?? null,
+          status: parsed.data.status,
+          ownerId: parsed.data.ownerId ?? null,
+          healthScore: parsed.data.healthScore
+        }
+      });
 
-    const statusChanged = existing.status !== account.status;
+      const statusChanged = existing.status !== account.status;
 
-    await recordAuditEvent({
-      category: "record",
-      action: statusChanged ? "status_changed" : "updated",
-      actorUserId: await getCurrentUserId(),
-      entityType: "account",
-      entityId: account.id,
-      summary: statusChanged
-        ? `Account status changed from ${existing.status} to ${account.status}.`
-        : `Account updated: ${account.name}.`,
-      metadata: {
-        ...accountAuditMetadata(account),
-        changedFields: auditChangedFields(parsed.data),
-        previousStatus: statusChanged ? existing.status : null
-      }
+      await tx.auditEvent.create({
+        data: buildAuditEventCreateData({
+          category: "record",
+          action: statusChanged ? "status_changed" : "updated",
+          actorUserId: await getCurrentUserId(),
+          entityType: "account",
+          entityId: account.id,
+          summary: statusChanged
+            ? `Account status changed from ${existing.status} to ${account.status}.`
+            : `Account updated: ${account.name}.`,
+          metadata: {
+            ...accountAuditMetadata(account),
+            changedFields: auditChangedFields(parsed.data),
+            previousStatus: statusChanged ? existing.status : null
+          }
+        })
+      });
     });
   } catch (error) {
     return actionErrorResult(error, {

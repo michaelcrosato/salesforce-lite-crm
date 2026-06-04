@@ -10,11 +10,23 @@ vi.mock("next/cache", () => ({
 
 // Isolated to this file: a minimal account delegate so the server action can
 // reach its catch without touching the shared SQLite database.
+const mockTx = {
+  account: {
+    create: vi.fn()
+  },
+  auditEvent: {
+    create: vi.fn()
+  }
+};
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     account: {
-      create: vi.fn()
-    }
+      create: mockTx.account.create
+    },
+    $transaction: vi.fn(async (fn) => {
+      return fn(mockTx);
+    })
   }
 }));
 

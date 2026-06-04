@@ -231,7 +231,7 @@ autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-lo
 autonomy:watchdog  powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
 agent:bootstrap     npm install + prisma + seed
 agent:check         npm run lint + npm run typecheck + npm run test + npm run build
-agent:status        git status + ticket summary
+agent:status        git status --short --branch
 agent:format        formatter marker (lint is authoritative)
 ``` 
 
@@ -243,7 +243,9 @@ Run from the repo root in PowerShell:
 
 ```powershell
 npm install
+npm audit --audit-level=high
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+node scripts/check-reachability.mjs
 npx prisma generate
 npx prisma db push
 npm run seed

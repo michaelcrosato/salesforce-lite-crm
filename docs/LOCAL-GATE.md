@@ -6,6 +6,7 @@ Run from the repo root in PowerShell:
 npm install
 npm audit --audit-level=high   # security gate: blocks High/Critical (matches CI)
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+node scripts/check-reachability.mjs
 npx prisma generate
 npx prisma db push
 npm run seed
@@ -44,7 +45,7 @@ autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-lo
 autonomy:watchdog  powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
 agent:bootstrap      npm install + prisma generate/push + seed
 agent:check          lint + typecheck + test + build
-agent:status         status + open ticket list
+agent:status         git status --short --branch
 agent:format         no formatter configured (lint is style gate)
 ```
 

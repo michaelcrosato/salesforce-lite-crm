@@ -24,6 +24,7 @@ function Invoke-GateStep {
 Push-Location $RepoRoot
 try {
     Invoke-GateStep "npm install" { & npm install }
+    Invoke-GateStep "npm audit --audit-level=high" { & npm audit --audit-level=high }
 
     if (-not (Test-Path -LiteralPath ".env")) {
         if (-not (Test-Path -LiteralPath ".env.example")) {

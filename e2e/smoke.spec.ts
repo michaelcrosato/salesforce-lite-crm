@@ -56,6 +56,8 @@ test("daily CRM loop smoke test", async ({ page }, testInfo) => {
   await page.getByLabel("Province").fill("BC");
   await page.getByLabel("Source").fill("e2e");
   await page.getByRole("button", { name: "Create lead" }).click();
+  await expect(page.getByText("Lead saved").first()).toBeVisible();
+  await page.goto("/leads?source=e2e&sortBy=createdAt&sortOrder=desc&pageSize=100");
 
   const leadRow = page.getByRole("row").filter({ hasText: leadName }).first();
   await expect(leadRow).toContainText("Routed");

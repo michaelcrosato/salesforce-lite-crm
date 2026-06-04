@@ -448,7 +448,7 @@ describe("dealer lead routing transactions", () => {
   });
 
   it("writes all_orders_at_quota when every matching active order is full", async () => {
-    await createRouteArea("test-route-area-full", "Full Test", "V8");
+    await createRouteArea("test-route-area-full", "Full Test", "Q9");
     await createActiveRouteOrder(
       "test-route-order-full",
       "test-route-area-full",
@@ -460,7 +460,7 @@ describe("dealer lead routing transactions", () => {
           id: "test-route-lead-existing",
           firstName: "Existing",
           lastName: "Delivered",
-          postalCode: "V8W 1A1",
+          postalCode: "Q9W 1A1",
           status: "assigned",
           areaId: "test-route-area-full",
           assignedOrderId: "test-route-order-full",
@@ -471,7 +471,7 @@ describe("dealer lead routing transactions", () => {
           id: "test-route-lead-at-quota",
           firstName: "At",
           lastName: "Quota",
-          postalCode: "V8W 1A1",
+          postalCode: "Q9W 1A1",
           status: "new"
         }
       ]
@@ -488,6 +488,7 @@ describe("dealer lead routing transactions", () => {
     });
 
     expect(result.reason).toBe("all_orders_at_quota");
+    expect(lead.areaId).toBe("test-route-area-full");
     expect(lead.assignedOrderId).toBeNull();
     await expectRoutingEvent("test-route-lead-at-quota");
   });
