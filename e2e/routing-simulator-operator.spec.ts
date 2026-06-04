@@ -155,6 +155,11 @@ test("routing simulator preview applies hypothetical capacity windows", async ({
 }) => {
   const before = await liveRoutingState();
   const capacityDate = todayCalendarDate();
+  const cascadeDailyCap =
+    (await leadCountForOrderOnDate(
+      "dealer-order-vancouver-cascade",
+      capacityDate
+    )) + 1;
 
   await page.goto("/reports");
 
@@ -202,7 +207,7 @@ test("routing simulator preview applies hypothetical capacity windows", async ({
             label: "Cascade one lead today",
             startsOn: capacityDate,
             endsOn: capacityDate,
-            dailyCap: 1
+            dailyCap: cascadeDailyCap
           }
         ]
       },
@@ -306,6 +311,22 @@ async function liveRoutingState() {
 
 function todayCalendarDate() {
   return new Date().toISOString().slice(0, 10);
+}
+
+async function leadCountForOrderOnDate(orderId: string, calendarDate: string) {
+  const start = new Date(`${calendarDate}T00:00:00.000Z`);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 1);
+
+  return await prisma.lead.count({
+    where: {
+      assignedOrderId: orderId,
+      createdAt: {
+        gte: start,
+        lt: end
+      }
+    }
+  });
 }
 
 function currentMonthWhere() {

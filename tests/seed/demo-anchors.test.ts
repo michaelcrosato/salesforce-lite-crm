@@ -12,7 +12,7 @@ describe("Demo Anchor Seed Integrity", () => {
   });
 
   it("b) At least one behind-pace DealerOrder exists", async () => {
-    const now = new Date();
+    const now = pacingAnchorDate();
     const dealerOrders = await prisma.dealerOrder.findMany({
       where: { status: "active" },
       include: {
@@ -108,3 +108,10 @@ describe("Demo Anchor Seed Integrity", () => {
     expect(kpis.weightedForecastValue).toBeLessThan(expectedForecast + margin);
   });
 });
+
+function pacingAnchorDate() {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+  return new Date(now.getFullYear(), now.getMonth(), Math.min(28, lastDay));
+}
