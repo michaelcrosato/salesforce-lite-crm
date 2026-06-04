@@ -9,6 +9,10 @@ echo ""
 echo "==> npm install"
 npm install
 
+echo ""
+echo "==> npm audit --audit-level=high"
+npm audit --audit-level=high
+
 if [ ! -f .env ]; then
     if [ -f .env.example ]; then
         echo ""
