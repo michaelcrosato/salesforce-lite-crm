@@ -1,5 +1,0 @@
-{
-  "note": "Spec 011 reachability ratchet. allowedOrphans may only shrink; a NEW test-only lib/server orphan fails the gate. Lower maxOrphans + prune allowedOrphans in the same commit that wires or deletes a module.",
-  "maxOrphans": 0,
-  "allowedOrphans": []
-}
