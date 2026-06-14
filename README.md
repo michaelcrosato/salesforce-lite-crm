@@ -1,353 +1,106 @@
 # Salesforce Lite CRM
 
-[![CI Gate](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/michaelcrosato/salesforce-lite-crm/actions/workflows/ci.yml)
+> **Honest status (2026-06-14): research + spec only. There is no implementation yet.**
+> No `src/`, no `prisma/`, no app, no tests. This repo is a clean slate with a
+> strong research foundation and an AI operations engine ready to build on. The
+> previous implementation was intentionally purged on 2026-06-09 and is
+> recoverable from git history at tag `pre-purge-20260609` — but rebuilding
+> deliberately from the research, not resurrecting the old code, is the plan.
 
-Salesforce Lite CRM is a full-fledged, AI-adaptive Salesforce-style CRM for
-small business revenue operations. It combines account, contact, opportunity,
-activity, task, case, campaign, lead-routing, dealer-order, forecasting,
-reporting, command-palette search, and analyst workflows in a local-first
-Next.js and Prisma application.
+A local-first, lightweight CRM for small-business revenue operations — accounts,
+contacts, opportunities, activities, and tasks — designed to be built and
+extended by autonomous AI coding agents under a deterministic quality gate.
 
-This repository is no longer framed as a demo or proof-of-concept. It is a CRM
-application foundation designed for autonomous AI coding agents to customize for
-small business requirements while preserving a shared product contract,
-repeatable local gate, and clear ownership boundaries.
+## What this is meant to be
 
-## Demo
+A small, honest, **single-tenant local-first CRM**. The intended product is
+deliberately narrow: the core operating loop for one small team — manage
+accounts and contacts, track opportunities through pipeline stages, log
+activities and tasks, and run a handful of built-in reports. It is explicitly
+**not** a Salesforce clone and not (under the current contract) a multi-tenant
+SaaS.
 
-A five-minute reviewer walkthrough lives in [DEMO.md](DEMO.md). It assumes a
-freshly seeded local database and a running dev server. One-click reset:
+The product contract lives in [`GOAL.md`](GOAL.md). Where this README and
+`GOAL.md` disagree, `GOAL.md` is the spec — but note that `GOAL.md` itself is
+mid-cleanup and still references files from the purged codebase; treat it as the
+*intended direction*, not a description of current contents.
 
-```powershell
-npm run seed
-```
+## Local-first architecture (intended)
 
-## Read First For AI Agents
+- **Single tenant, local-first.** Runs against a local **SQLite** database by
+  default. No login, no multi-tenant separation, no cloud dependency to use it.
+- **Synthetic data only.** Seeded local data for development; never live customer
+  data.
+- **Boring, visible stack.** Schemas, migrations, routes, and tests on disk so
+  an AI agent (or a human) can orient quickly and work in vertical slices
+  (schema → persistence → UI → tests).
 
-Start with these files before changing code or documentation:
+**Open architectural decision (must be made before schema work):** the salvaged
+research (below) describes a *multi-tenant Postgres row-level-security* design,
+which directly contradicts the local-first single-tenant SQLite contract in
+`GOAL.md`. The engineering review recommends honoring `GOAL.md` (build
+single-tenant SQLite; shelve the RLS material). This is recorded as the
+first thing to resolve — see the review and `roadmap/DECISIONS.md`.
 
-- `GOAL.md` - single-page orientation: purpose, current state, non-goals,
-  key commands, and definition of done (defers to `PLAN.md`/`CRM-CONTRACT.md`).
-- `docs/ai/REPO_MAP.md` - where core logic, tests, entry points, and config
-  live, and what to skip.
-- `tickets/` - atomic, session-sized maintenance tickets.
-- `PLAN.md` - execution rules, source-of-truth hierarchy, ownership zones,
-  current prompt/sprint scope, local gate, report schema, and anti-drift rules.
-- `CRM-CONTRACT.md` - entity names, route contract, status values, registry
-  exports, and server-side adapter signatures.
-- `AGENTS.md` - short handoff for CLI agents, worktree paths, branch
-  conventions, and max-YOLO operating policy.
-- `ROADMAP.md` - AFK execution roadmap and task order.
-- `.aiignore` - repo paths to skip during AFK context loading.
-- `docs/PROJECT-CONTROL.md` - current readiness status and coordination notes.
-- `docs/MERGE-PLAYBOOK.md` - merge checks, rollback/archive procedure, and
-  final-gate expectations.
-- `docs/LOCAL-GATE.md` - authoritative local setup and validation commands.
-- `prompts/README.md` - policy for versioned prompt artifacts.
+## Intended stack
 
-Agents should work from repo-local evidence and treat the PowerShell local gate
-as the pass/fail authority. Worktree path decides collaboration mode:
-`C:\dev\salesforce-lite-crm` is single-agent full-repo mode, while
-agent-specific worktrees such as `C:\dev\salesforce-lite-crm-codex`,
-`C:\dev\salesforce-lite-crm-claude`, `C:\dev\salesforce-lite-crm-grok`, and
-`C:\dev\salesforce-lite-crm-gemini` are parallel mode and enforce ownership
-zones. Parallel-mode cross-zone exceptions are recorded in that agent's
-`SUMMARY.<agent>.md` and `BLOCKERS.<agent>.md`.
+Nothing is installed yet (`package.json` carries only the operations-engine
+toolchain). The intended product stack, **to be version-verified live before
+adoption** (per the freshness rule in `CLAUDE.md`):
 
-## What The CRM Does
+- Next.js + React (app + UI)
+- Prisma ORM over **SQLite** (`@prisma/adapter-better-sqlite3`) for the local
+  runtime
+- Vitest (unit/service/contract tests) + Playwright (user-visible flows)
+- Biome + TypeScript (lint + typecheck), wired into the deterministic gate
 
-The application supports the core operating loop for a small business revenue
-team:
+## The research foundation (the real asset today)
 
-- Manage accounts, contacts, opportunities, and activity history.
-- Plan tasks, track cases, and coordinate campaigns tied to CRM records.
-- Create opportunities, move stages, and preserve stage-change history.
-- Capture notes and generate deterministic AI-style summaries and next steps.
-- Search across primary CRM objects from the global Ctrl/Cmd+K command palette.
-- Route consumer leads to dealer orders using postal-prefix coverage and quota
-  pacing.
-- Monitor dealer order delivery, behind-pace accounts, and operational focus
-  items.
-- Simulate forecast outcomes from pipeline value and lead-delivery assumptions.
-- Review built-in reports for pipeline, leads, activity volume, top accounts,
-  stale opportunities, and overdue tasks.
-- Review and download bounded CSV exports from deterministic server-side
-  delivery packets.
-- Preview CSV imports with deterministic validation, preflight, readiness,
-  action, and dedupe review output, then run the bounded contact-create apply
-  path only after explicit operator confirmation.
-- Expose deterministic analyst recommendations without relying on an external
-  AI provider.
+The most valuable content in this repo is in
+[`docs/research/ralph-crm-reviews/`](docs/research/ralph-crm-reviews/): three
+independent, evidence-cited deep reviews of three prior CRM build attempts, plus
+a synthesis. This is decision-ready material, not filler.
 
-The codebase is intentionally structured so AI coding agents can adapt the CRM
-to vertical-specific workflows, reports, copy, seeded data, and UI polish while
-respecting `CRM-CONTRACT.md` and the current sprint boundaries.
+- [`README.md`](docs/research/ralph-crm-reviews/README.md) — synthesis: the
+  eight design decisions all three attempts independently converged on, the
+  shared failure mode (loops degenerating into honest busywork once the backlog
+  drains), and the open SQLite-vs-Postgres product decision.
+- [`codex-ralph-crm.md`](docs/research/ralph-crm-reviews/codex-ralph-crm.md) —
+  the most implemented variant; a fully-specified entity schema, lead-conversion
+  flow, audit pattern, and test strategy. **Start a rebuild here.**
+- [`claude-ralph-crm.md`](docs/research/ralph-crm-reviews/claude-ralph-crm.md) —
+  the strongest harness/process methodology (and a cautionary tale: zero product
+  features in 72 cycles).
+- [`agy-ralph-crm.md`](docs/research/ralph-crm-reviews/agy-ralph-crm.md) — the
+  broadest feature catalog and AFK-loop skeleton; use as a reference, not a
+  backlog.
 
-## Setup
+## How it gets built
 
-Run from the repository root in PowerShell:
+This is a 100% AI-coded project run by an AI operations engine. Humans plan (in
+[`roadmap/ROADMAP.md`](roadmap/ROADMAP.md)) and do final QA; agents write every
+line under a deterministic gate. See [`CLAUDE.md`](CLAUDE.md) for the agent
+constitution and [`AI_OPERATIONS_PLAN.md`](AI_OPERATIONS_PLAN.md) for how the
+factory works.
 
-```powershell
-npm install
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-npx prisma generate
-npx prisma db push
-npm run seed
-npm run dev
-```
+## Pointers
 
-Open:
+- **Read the honest assessment first:**
+  [`docs/ENGINEERING_REVIEW.md`](docs/ENGINEERING_REVIEW.md) — full audit:
+  verdict, what exists vs what's claimed, research quality, risks, and the top
+  five things to do first.
+- **Roadmap:** [`roadmap/ROADMAP.md`](roadmap/ROADMAP.md) — Now / Next / Later /
+  Ideas, starting with the first buildable CRM slice.
+- **Product contract:** [`GOAL.md`](GOAL.md) (mid-cleanup; intended direction).
+- **Agent constitution:** [`CLAUDE.md`](CLAUDE.md).
 
-```text
-http://localhost:3000/dashboard
-```
+## Status at a glance
 
-## Database Notes
-
-- SQLite is the default local database.
-- `.env.example` sets `DATABASE_URL="file:./prisma/dev.db"`.
-- `lib/prisma.ts` uses `@prisma/adapter-better-sqlite3` for the local runtime.
-- `prisma/seed.ts` creates users, accounts, contacts, opportunities, areas,
-  dealer orders, leads, and CRM/routing activities for local development.
-- Local SQLite files under `prisma/dev.db*` are generated artifacts and should
-  not be committed.
-
-Useful database commands:
-
-```powershell
-npx prisma generate
-npx prisma db push
-npm run seed
-```
-
-### Postgres Switching Notes
-
-The repo includes `prisma/schema.postgres.prisma` and a helper script:
-
-```powershell
-npm run prisma:postgres
-```
-
-That script temporarily copies the Postgres schema over `prisma/schema.prisma`,
-runs `prisma generate` and `prisma db push`, then restores the SQLite schema.
-For an actual production Postgres cutover, `DATABASE_URL` must point at
-Postgres and the generated Prisma Client must be produced from the Postgres
-schema. SQLite remains the default local workflow until that cutover is
-explicitly promoted.
-
-## Core Routes And Workflows
-
-| Route | Workflow |
+| | |
 |---|---|
-| `/` | Redirects to `/dashboard`. |
-| `/dashboard` | CRM KPIs, pipeline charts, focus lists, Dealer Ops cards, and deterministic analyst actions. |
-| `/accounts` | Account list and account health overview. |
-| `/accounts/new` | Account creation. |
-| `/accounts/<id>` | Account detail with contacts, opportunities, dealer orders, and activity context. |
-| `/contacts` | Contact list and CRM relationship context. |
-| `/contacts/<id>` | Contact detail, activity history, note capture, and deterministic summary/next-step output. |
-| `/deals` | Opportunity board and list using the existing `Deal` model. |
-| `/deals/new` | Opportunity creation. |
-| `/deals?deal=<id>` | Opportunity detail drawer. There is no live `/deals/[id]` detail route in the current contract. |
-| `/activities` | Activity timeline for notes, calls, emails, meetings, status changes, and routing events. |
-| `/leads` | Consumer lead creation and dealer-order routing. |
-| `/leads/<id>` | Lead detail and status updates. |
-| `/orders` | Dealer order pacing and quota overview. |
-| `/orders/<id>` | Dealer order detail with delivered leads and routing events. |
-| `/areas` | Postal-prefix routing coverage. |
-| `/forecast` | Pipeline and dealer delivery forecast simulator. |
-| `/tasks` | Task list with filters; detail via `/tasks?task=<id>` drawer. |
-| `/tasks/new` | Task creation. |
-| `/cases` | Case list with filters; detail via `/cases?case=<id>` drawer. |
-| `/cases/new` | Case creation. |
-| `/campaigns` | Campaign list with filters; detail via `/campaigns?campaign=<id>` drawer. |
-| `/campaigns/new` | Campaign creation. |
-| `/knowledge` | Read-oriented local knowledge article workspace for service-workflow case assist context. |
-| `/knowledge?article=<id>` | Knowledge article detail drawer. There is no live `/knowledge/[id]` detail route in the current contract. |
-| `/reports` | Report index with KPI cards, CSV export review/download, CSV import preview, and operator-confirmed contact import apply. |
-| `/reports/<slug>` | Report detail for `pipeline-by-stage`, `leads-by-source`, `activity-volume`, `top-accounts`, `stale-opportunities`, and `overdue-tasks`. |
-
-Primary workflows:
-
-- Create a lead with a postal code and inspect the deterministic routing result.
-- Review dealer order pacing and lead delivery against monthly quota.
-- Open an account to inspect contacts, opportunities, dealer orders, and recent
-  activity.
-- Add a contact note and review the generated summary and next step.
-- Move an opportunity through the board/drawer flow and update forecast values.
-- Adjust forecast assumptions to see month-end delivery and pipeline outcomes.
-- Use Ctrl/Cmd+K to search accounts, contacts, deals, leads, tasks, cases, and
-  campaigns.
-- Create or update tasks, cases, and campaigns through their list, new-page,
-  and drawer flows.
-- Review local service-workflow knowledge articles and deterministic
-  case-to-article suggestion context for case assist surfaces.
-- Open reports from `/reports`, drill into the supported report slugs, review
-  CSV export packets, preview contact or lead CSV imports, and apply
-  create-safe contact rows only after explicit confirmation.
-
-Task, Case, and Campaign entities are now wired into the app-router pages
-listed above. Detail flows for those entities use the drawer pattern
-(`/<entity>?<entity>=<id>`) to stay consistent with the existing `/deals`
-drawer flow.
-
-## Dealer Revenue Command Center
-
-Dealer Revenue Command Center capabilities are implemented without external
-services:
-
-- Lead creation with postal-code normalization.
-- Area resolution from `Area.postalPrefixes`.
-- Active dealer-order filtering by linked area, lifecycle status, and monthly
-  quota availability.
-- Deterministic assignment to the active dealer order that is most behind
-  expected monthly pace.
-- `routing_event` activity records for successful assignments and failure
-  reasons.
-- Order pacing labels for behind, on pace, ahead, and over-quota states.
-- Dashboard Dealer Ops KPI cards and focus lists.
-- Dealer order detail pages with current-month delivered leads and routing
-  history.
-- Forecast simulation for lead volume, assignment rate, and month-end order
-  delivery.
-- Deterministic analyst ranking for behind-pace orders, unrouted leads, stale
-  high-value opportunities, and low-health dealer accounts.
-
-## Scripts
-
-Current `package.json` scripts:
-
-```text
-postinstall      node scripts/ensure-sqlite-db.mjs
-dev              next dev
-build            next build
-lint             eslint . --max-warnings=0
-typecheck        tsc --noEmit --pretty false
-seed             tsx prisma/seed.ts
-test             vitest run
-test:e2e         npm run seed && playwright test
-prisma:postgres  node scripts/prisma-postgres.mjs
-autonomy:overnight  powershell -ExecutionPolicy Bypass -File scripts/autonomy-loop.ps1
-autonomy:watchdog  powershell -ExecutionPolicy Bypass -File scripts/start-codex-overnight.ps1
-agent:bootstrap     npm install + prisma + seed
-agent:check         npm run lint + npm run typecheck + npm run test + npm run build
-agent:status        git status --short --branch
-agent:format        formatter marker (lint is authoritative)
-``` 
-
-There is no `format` script unless `package.json` later adds one.
-
-## Full Local Gate
-
-Run from the repo root in PowerShell:
-
-```powershell
-npm install
-npm audit --audit-level=high
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-node scripts/check-reachability.mjs
-npx prisma generate
-npx prisma db push
-npm run seed
-npm run lint
-npm run typecheck
-npm run test
-npm run build
-npx playwright install chromium
-npm run test:e2e
-```
-
-The helper script mirrors this sequence:
-
-```powershell
-scripts/local-gate.ps1
-```
-
-## Test Coverage
-
-Vitest (`npm run test`) covers deterministic server-side and contract logic,
-including:
-
-- forecast math and weighted pipeline calculations
-- stale-opportunity and focus ranking logic
-- activity summarization and next-step generation
-- stage-to-probability behavior
-- validation schemas and form-action behavior
-- list query filtering, sorting, and pagination helpers
-- account, contact, opportunity, lead, activity, task, case, campaign, and
-  report service behavior
-- postal-code normalization, area resolution, pace-gap ranking, and lead routing
-- deterministic analyst and forecast simulator outputs
-
-Playwright (`npm run test:e2e`) covers user-visible CRM flows, including:
-
-- dashboard load and primary navigation
-- contact detail navigation
-- note creation and deterministic summary rendering
-- opportunity drawer/query behavior and drag-and-drop stage movement
-- lead creation, lead detail, status updates, and routing feedback
-- Dealer Ops dashboard cards
-- dealer order pacing/detail verification
-- forecast simulator input changes
-- toast/result feedback
-- excluded-route placeholders and command-palette shortcut search
-- task, case, and campaign creation and status updates via drawer flow
-- report index and detail rendering
-- screenshot smoke coverage for stable dashboard and area views
-
-## Known Limitations
-
-- No authentication, permissions, or multi-tenant separation.
-- No deployment configuration is included.
-- No Salesforce integration is included.
-- Deterministic AI-style summarization and analyst output remain local defaults;
-  there is no external AI provider integration.
-- `Lead` means a consumer lead routed to a dealer order, not a generic B2B
-  lead-conversion object.
-- Deal detail stays in the `/deals?deal=<id>` drawer flow; `/deals/[id]` is not
-  implemented as a live detail route.
-- Dealer orders and areas are seeded and browsable, but create/edit flows for
-  them are deferred.
-- The header search form routes to contacts only. Cross-entity search is
-  available through the global Ctrl/Cmd+K command palette; there is no dedicated
-  `/search` page.
-- SQLite is the local default; Postgres is available only through the helper
-  path described above and is not the runtime default.
-- Postal-prefix matching is intentionally simple and does not use geocoding or
-  territory polygons.
-- Forecast scenarios are transparent and deterministic, but they do not persist.
-- CSV export review/download and CSV import preview are surfaced on `/reports`.
-  Contact CSV import has a bounded operator-confirmed create path for
-  create-safe rows only. Lead import apply, routing execution, bulk
-  update/upsert, duplicate merge, file storage, background jobs, and external
-  services remain out of scope.
-- Knowledge articles are local service-workflow records surfaced in a
-  read-oriented operator workspace; there is no live `/knowledge/[id]` detail
-  route, customer knowledge portal, external knowledge provider integration,
-  RAG/vector search, or article sync.
-- No `Lead` to `Account + Contact + Opportunity` conversion flow — consumer
-  leads route to dealer orders instead.
-
-## Roadmap
-
-The canonical roadmap lives in [docs/ROADMAP.md](docs/ROADMAP.md). It records
-the latest completed feature track, deferred promotion candidates, and
-guardrails for future scope. Companion docs cover [AI sequencing](docs/AI-ROADMAP.md),
-[architecture](docs/ARCHITECTURE.md), [evals](docs/EVALS.md), and
-[security/privacy](docs/SECURITY-PRIVACY.md). Current product truth still comes
-from `CRM-CONTRACT.md`, `PLAN.md`, and repo-local evidence.
-
-The current tree includes the Sprint 4B demo-hardening surface, the CSV
-handoff/operator tracks, audit/list/bulk action foundations, service knowledge
-and AI governance tracks, approval and lead follow-up readiness work, saved
-report and dashboard-card foundations, and the routing simulation / fairness /
-dealer-capacity / pacing-snapshot tracks (Sprints 52–56, executing roadmap
-Phase 3 items B-53 through B-57). The active sprint and its per-feature status
-live in `PLAN.md` §1/§4 — that is the authority, not this paragraph. Completed
-sprint detail is archived in `docs/PLAN-ARCHIVE.md`.
-
-Deferred items such as auth, deployment, external AI, global search expansion,
-Postgres runtime cutover, dealer or area CRUD, persistent forecast scenarios,
-CSV import apply workflows beyond the bounded contact-create path, and any
-future live `/deals/[id]` detail behavior require explicit promotion before
-implementation.
+| Product code | None yet (`src/`, `prisma/`, app all absent) |
+| Tests | None yet |
+| Backlog (`roadmap/features.json`) | Empty — needs grooming |
+| Research/spec | Substantive — `docs/research/ralph-crm-reviews/` |
+| Prior implementation | Purged 2026-06-09; recoverable at tag `pre-purge-20260609` |
+| Next decision | SQLite single-tenant vs Postgres multi-tenant (recommend: SQLite) |
